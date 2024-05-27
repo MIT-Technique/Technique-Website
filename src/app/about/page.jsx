@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 
 function page() {
   return (
-    <div className="h-[100vh] w-[100vw] bg-white pt-[15vh] font-light text-gray-700 overflow-y-auto flex-col">
+    <div className="min-h-screen h-fit w-screen bg-white pt-[15vh] font-light text-gray-700 flex-col">
       <main className="w-full px-60 pb-6">
         <div className="flex-col justify-center w-full items-center space-y-3 ">
           <p className="text-5xl font-extralight w-full text-center text-black">

@@ -18,7 +18,7 @@ const raleway = Raleway({
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} ${raleway.variable} `}>
+      <body className={`${inter.className} ${raleway.variable} overflow-y-auto scroll-smooth overflow-x-hidden`}>
         <Navbar></Navbar>
         {children}
       </body>

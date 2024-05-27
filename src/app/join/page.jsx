@@ -1,9 +1,10 @@
+"use client";
 import React from "react";
 import Footer from "@/components/Footer";
 
 function page() {
   return (
-    <div className="w-[100vw] h-screen overflow-y-auto bg-white">
+    <div className="w-screen min-h-screen h-fit bg-white">
       <main className="w-full h-full pt-[15vh] px-60 font-light text-gray-700  ">
         <div className="mt-4 space-y-3 w-fit">
           <p className="text-3xl font-extralight text-black">WEEKLY</p>
