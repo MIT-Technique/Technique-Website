@@ -4,8 +4,8 @@ import Footer from "@/components/Footer";
 
 function page() {
   return (
-    <div className="min-h-screen h-fit w-screen flex-col">
-      <main className="h-full w-full bg-white pt-[15vh] px-60 font-light text-gray-700 ">
+    <div className="min-h-screen h-screen w-screen flex flex-col pt-[15vh] bg-white ">
+      <main className="h-full w-full px-12 md:px-60 font-light text-gray-700 ">
         page
       </main>
       <Footer></Footer>

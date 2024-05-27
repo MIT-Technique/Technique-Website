@@ -4,9 +4,9 @@ import Footer from "@/components/Footer";
 
 function page() {
   return (
-    <div className="w-screen min-h-screen h-fit bg-white">
-      <main className="w-full h-full pt-[15vh] px-60 font-light text-gray-700  ">
-        <div className="mt-4 space-y-3 w-fit">
+    <div className="w-screen min-h-screen h-screen bg-white pt-[15vh]">
+      <main className="w-full h-full px-12 md:px-60 font-light text-gray-700  ">
+        <div className="space-y-3 w-fit">
           <p className="text-3xl font-extralight text-black">WEEKLY</p>
           <div className="space-y-2">
             <p>

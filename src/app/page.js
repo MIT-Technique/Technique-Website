@@ -3,16 +3,17 @@ import Image from "next/image";
 import Footer from "@/components/Footer";
 import React, { useState, useEffect } from "react";
 import { ReactTyped } from "react-typed";
+import { FaCircleArrowDown } from "react-icons/fa6";
 
 export default function Home() {
   const [tnq, setTnq] = useState("");
   const options = {
     strings: [
-      "photographers.",
-      "photojournalists.",
-      "designers.",
-      "editors.",
-      "yearbook.",
+      "Photographers.",
+      "Photojournalists.",
+      "Designers.",
+      "Editors.",
+      "Yearbook.",
     ],
     loop: true,
     typeSpeed: 100,
@@ -22,26 +23,56 @@ export default function Home() {
     smartBackspace: false,
   };
 
+  function handleScroll() {
+    const target = document.getElementById("section2");
+
+    target?.scrollIntoView({ behavior: "smooth" });
+  }
 
   return (
-    <div className="w-screem h-[200vh] flex-col">
-      <section className="h-screen w-screen bg-white flex items-center justify-center flex-col">
-        <p>
-          We are MIT's
-        </p>
-        <ReactTyped
-          strings={options.strings}
-          loop={options.loop}
-          typeSpeed={options.typeSpeed}
-          backDelay={options.backDelay}
-          backSpeed={options.backspeed}
-          showCursor={options.showCursor}
-          smartBackspace={options.smartBackspace}
-
-        ></ReactTyped>
+    <div className="w-screen h-screen flex flex-col ">
+      <section
+        className="min-h-screen h-screen w-screen bg-white flex flex-col justify-center items-center pt-[15vh]"
+        id="section1"
+      >
+        <div className=" w-screen space-y-3">
+          <div className="w-full flex flex-col items-center justify-center">
+            <p className=" text-center">We are MIT's</p>
+            <div className="w-full flex justify-center h-[2.5rem]">
+              <ReactTyped
+                strings={options.strings}
+                loop={options.loop}
+                typeSpeed={options.typeSpeed}
+                backDelay={options.backDelay}
+                backSpeed={options.backspeed}
+                showCursor={options.showCursor}
+                smartBackspace={options.smartBackspace}
+                style={{
+                  fontSize: "2.25rem",
+                  lineHeight: "2.5rem",
+                  fontWeight: "300",
+                  background: "white",
+                }}
+              ></ReactTyped>
+            </div>
+          </div>
+          <div className="w-full flex justify-center">
+            <FaCircleArrowDown
+              style={{ width: "auto", height: "3.5rem",}}
+              to="section2"
+              onClick={handleScroll}
+            />
+          </div>
+        </div>
       </section>
 
-      <section className="flex w-full flex-col items-center justify-between p-24 h-full">
+      {/* Everything below here except <Footer/> is stuff that was already here when i ran 
+      npx create next app. I just kept it here so I could have some content
+      to see the functionality and overall look of some stuff */}
+      <section
+        className="flex w-full flex-col items-center justify-between p-24 min-h-screen h-screen w-screen"
+        id="section2"
+      >
         <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
           <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
             Get started by editing&nbsp;

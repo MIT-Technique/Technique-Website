@@ -5,9 +5,9 @@ import Footer from "@/components/Footer";
 
 function page() {
   return (
-    <div className="min-h-screen h-fit w-screen bg-white pt-[15vh] font-light text-gray-700 flex-col">
-      <main className="w-full px-60 pb-6">
-        <div className="flex-col justify-center w-full items-center space-y-3 ">
+    <div className="min-h-screen w-screen bg-white pt-[15vh] font-light text-gray-700 flex flex-col">
+      <main className="w-full px-12 md:px-60 pb-6">
+        <div className="flex flex-col justify-center w-full items-center space-y-3 ">
           <p className="text-5xl font-extralight w-full text-center text-black">
             ABOUT US
           </p>
@@ -19,7 +19,7 @@ function page() {
             <div className=" text-center ">each year at MIT.</div>
           </div>
         </div>
-        <div className="flex-col mt-8 space-y-5">
+        <div className="flex flex-col mt-8 space-y-5">
           <p className="text-center">
             We are MIT's photography, yearbook, and design student organization.
             Every year, our staph send off our 400 page annual to the publisher

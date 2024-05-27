@@ -25,8 +25,8 @@ function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className=" flex-col">
-      <span className="hidden md:flex rounded-b-xl bg-black font-sans h-[10vh] items-center px-24 lg:px-36 justify-between text-gray-200 fixed top-0 w-full z-50 bg-opacity-85">
+    <div className="flex flex-col">
+      <span className="hidden md:flex rounded-b-xl bg-black font-sans h-[10vh] items-center px-16 lg:px-36 justify-between text-gray-200 fixed top-0 w-full z-50 bg-opacity-85">
         <Link className="text-2xl font-bold text-white" href="/">
           TECHNIQUE
         </Link>
@@ -52,7 +52,13 @@ function Navbar() {
         </div>
       </span>
       <div className="bg-black  h-[10vh] rounded-b-xl md:hidden flex fixed top-0 z-30 w-full items-center font-sans justify-between px-4 bg-opacity-85">
-        <Link className="text-xl font-bold text-white" href="/">
+        <Link
+          className="text-xl font-bold text-white"
+          href="/"
+          onClick={() => {
+            setIsOpen(false);
+          }}
+        >
           TECHNIQUE
         </Link>
         <VscThreeBars
