@@ -53,6 +53,9 @@ function Sidebar(props) {
           <Link className="w-full pl-6 h-[7vh] text-white flex items-center hover:bg-red-900 active:bg-red-700" href="/join">
             JOIN US
           </Link>
+          <Link className="w-full pl-6 h-[7vh] text-white flex items-center hover:bg-red-900 active:bg-red-700" href="/archives">
+            ARCHIVES
+          </Link>
         </ul>
       </div>
       

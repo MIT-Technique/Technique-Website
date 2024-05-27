@@ -18,6 +18,7 @@ function Navbar() {
           <Link className="hover:text-white" href="/seniors">SENIORS</Link>
           <Link className="hover:text-white" href="/hire">HIRE US</Link>
           <Link className="hover:text-white" href="/join">JOIN US</Link>
+          <Link className="hover:text-white" href="/archives">ARCHIVES</Link>
         </div>
       </span>
       <div className="bg-black  h-[10vh] rounded-b-xl md:hidden flex fixed top-0 z-30 w-full items-center font-sans justify-between px-4 bg-opacity-85">
