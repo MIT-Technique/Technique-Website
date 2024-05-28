@@ -14,10 +14,6 @@ function Sidebar(props) {
       setClose(false);
     }, 400);
   }
-  //   targetElement.focus()
-  // console.log(targetElement)
-  // targetElement?.focus()
-  // console.log(targetElement)
 
   return (
     <div
