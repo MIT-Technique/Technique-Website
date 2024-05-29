@@ -33,48 +33,62 @@ function Sidebar(props) {
             onClick={handleClose}
           />
         </span>
-        <ul className="space-y-4 ">
+        <ul className=" text-sm">
           <Link
-            className="pl-6 w-full  h-[7vh] text-white flex items-center hover:bg-red-900 active:bg-red-700"
+            className="pl-6 w-full  h-[5vh] text-white flex items-center hover:bg-red-900 active:bg-red-700"
             href="/"
             onClick={handleClose}
           >
             HOME
           </Link>
           <Link
-            className="w-full pl-6 h-[7vh] text-white flex items-center hover:bg-red-900 active:bg-red-700"
+            className="w-full pl-6 h-[5vh] text-white flex items-center hover:bg-red-900 active:bg-red-700"
             href="/about"
             onClick={handleClose}
           >
             ABOUT
           </Link>
           <Link
-            className="w-full pl-6 h-[7vh] text-white flex items-center hover:bg-red-900 active:bg-red-700"
+            className="w-full pl-6 h-[5vh] text-white flex items-center hover:bg-red-900 active:bg-red-700"
             href="/seniors"
             onClick={handleClose}
           >
             SENIORS
           </Link>
           <Link
-            className="w-full pl-6 h-[7vh] text-white flex items-center hover:bg-red-900 active:bg-red-700"
+            className="w-full pl-6 h-[5vh] text-white flex items-center hover:bg-red-900 active:bg-red-700"
             href="/hire"
             onClick={handleClose}
           >
             HIRE US
           </Link>
           <Link
-            className="w-full pl-6 h-[7vh] text-white flex items-center hover:bg-red-900 active:bg-red-700"
+            className="w-full pl-6 h-[5vh] text-white flex items-center hover:bg-red-900 active:bg-red-700"
             href="/join"
             onClick={handleClose}
           >
             JOIN US
           </Link>
           <Link
-            className="w-full pl-6 h-[7vh] text-white flex items-center hover:bg-red-900 active:bg-red-700"
+            className="w-full pl-6 h-[5vh] text-white flex items-center hover:bg-red-900 active:bg-red-700"
             href="/archives"
             onClick={handleClose}
           >
             ARCHIVES
+          </Link>
+          <Link
+            className="w-full pl-6 h-[5vh] text-white flex items-center hover:bg-red-900 active:bg-red-700"
+            href="/portfolio"
+            onClick={handleClose}
+          >
+            PORTFOLIO
+          </Link>
+          <Link
+            className="w-full pl-6 h-[5vh] text-white flex items-center hover:bg-red-900 active:bg-red-700"
+            href="/contact"
+            onClick={handleClose}
+          >
+            CONTACT
           </Link>
         </ul>
       </div>
