@@ -1,8 +1,9 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/Navbar_and_Sidebar/Navbar";
 import { Raleway } from "next/font/google";
-
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -12,13 +13,15 @@ export const metadata = {
 };
 const raleway = Raleway({
   subsets: ["latin"],
-  variable: "--font-raleway"
-})
+  variable: "--font-raleway",
+});
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} ${raleway.variable} overflow-y-auto scroll-smooth overflow-x-hidden`}>
+      <body
+        className={`${inter.className} ${raleway.variable} overflow-y-auto scroll-smooth overflow-x-hidden`}
+      >
         <Navbar></Navbar>
         {children}
       </body>

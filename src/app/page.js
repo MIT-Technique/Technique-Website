@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import Footer from "@/components/Footer";
+import Footer from "@/components/Footer/Footer";
 import React, { useState, useEffect } from "react";
 import { ReactTyped } from "react-typed";
 import { FaCircleArrowDown } from "react-icons/fa6";
@@ -58,7 +58,7 @@ export default function Home() {
           </div>
           <div className="w-full flex justify-center">
             <FaCircleArrowDown
-              style={{ width: "auto", height: "3.5rem",}}
+              style={{ width: "auto", height: "3.5rem" }}
               to="section2"
               onClick={handleScroll}
             />
