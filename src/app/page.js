@@ -62,6 +62,7 @@ export default function Home() {
               to="section2"
               onClick={handleScroll}
             />
+            
           </div>
         </div>
       </section>

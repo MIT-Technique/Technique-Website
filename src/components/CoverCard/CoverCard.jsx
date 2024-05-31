@@ -1,5 +1,4 @@
 import React from "react";
-import eight from "../../public/images/covers/1885_Technique@2x.jpg";
 import Image from "next/image";
 import Link from "next/link";
 import Card from "./CoverCard.css"

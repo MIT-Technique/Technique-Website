@@ -25,7 +25,7 @@ function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-colrelative z-50">
       <span className="hidden lg:flex rounded-b-xl bg-black font-sans h-[10vh] items-center px-12 lg:px-30 justify-between text-gray-200 fixed top-0 w-full z-50 bg-opacity-85">
         <Link className="text-xl lg:text-2xl font-bold text-white" href="/">
           TECHNIQUE

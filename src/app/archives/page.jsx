@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import Footer from "@/components/Footer/Footer";
-import CoverCard from "@/components/CoverCard";
+import CoverCard from "@/components/CoverCard/CoverCard";
 import Image from "next/image";
 import oneEightEightFive from "../../../public/images/covers/1885_Technique@2x.jpg";
 const options = [
@@ -313,7 +313,6 @@ function page() {
           })}
         </div>
       </main>
-      <Footer></Footer>
     </div>
   );
 }

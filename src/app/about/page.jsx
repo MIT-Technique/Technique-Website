@@ -75,7 +75,6 @@ function page() {
           </div>
         </div>
       </main>
-      <Footer></Footer>
     </div>
   );
 }
