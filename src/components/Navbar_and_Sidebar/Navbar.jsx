@@ -4,17 +4,28 @@ import { VscThreeBars } from "react-icons/vsc";
 import Sidebar from "./Sidebar";
 import SidebarCSS from "./Sidebar.css";
 import Link from "next/link";
+import { useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation'
 
 function Navbar() {
+  const pathname = usePathname()
+
   useEffect(() => {
+    console.log("In useEffect!!!")
     function handleScroll() {
-      if (window.scrollY > 0) {
+      
+      console.log(window.location.pathname)
+      // console.log(window)
+      if (window.scrollY > 0 || window.location.pathname !== "/") {
         setIsScrolled(true);
       } else {
         setIsScrolled(false);
       }
     }
-
+    if (window.location.pathname !== "/"){
+      setIsScrolled(true)
+      console.log("HEERREEE")
+    }
     window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
@@ -26,7 +37,7 @@ function Navbar() {
 
   return (
     <div className="flex flex-colrelative z-50">
-      <span className="hidden lg:flex rounded-b-xl bg-black font-sans h-[10vh] items-center px-12 lg:px-30 justify-between text-gray-200 fixed top-0 w-full z-50 bg-opacity-85">
+      <span className={`hidden lg:flex rounded-b-xl bg-black font-sans h-[10vh] items-center px-12 lg:px-30 justify-between text-gray-200 fixed top-0 w-full z-50 transition-all ${isScrolled ? "bg-opacity-85" : "bg-opacity-0"}`}>
         <Link className="text-xl lg:text-2xl font-bold text-white" href="/">
           TECHNIQUE
         </Link>
