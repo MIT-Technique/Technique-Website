@@ -45,7 +45,7 @@ export default function Home() {
           ></Image>
           <div className="flex flex-col justify-center h-full w-full absolute z-20 space-y-3">
             <div className="w-full flex flex-col items-center justify-center">
-              <p className=" text-center  text-white">We are MIT's</p>
+              <p className=" text-center  text-white">We are MIT&apos;s</p>
               <div className="w-full flex justify-center">
                 <ReactTyped
                   strings={options.strings}
