@@ -21,13 +21,13 @@ function page() {
         </div>
         <div className="flex flex-col mt-8 space-y-5">
           <p className="text-center">
-            We are MIT's photography, yearbook, and design student organization.
-            Every year, our staph send off our 400 page annual to the publisher
-            in February and release the book in May every year. As students and
-            alumni of MIT, we take great care to showcase MIT in its truest
-            form, candidly, at its best and at its worst. We know how tough the
-            Institute can be, and we know how rewarding it is to get to the
-            other side.
+            We are MIT&apos;s photography, yearbook, and design student
+            organization. Every year, our staph send off our 400 page annual to
+            the publisher in February and release the book in May every year. As
+            students and alumni of MIT, we take great care to showcase MIT in
+            its truest form, candidly, at its best and at its worst. We know how
+            tough the Institute can be, and we know how rewarding it is to get
+            to the other side.
           </p>
           <p className="text-center">
             In addition to designing the MIT yearbook, Technique supports the
@@ -42,16 +42,16 @@ function page() {
           <p className="text-3xl font-extralight text-black">H.R.H. Grogo</p>
           <div className="space-y-2">
             <p>
-              If you hang around Technique often, you'll hear this name being
-              tossed around. You'll also see his beautiful face on all our
-              merch. THis is because our mascot is a gorilla and his name is
-              H.R.H. Grogo
+              If you hang around Technique often, you&apos;ll hear this name
+              being tossed around. You&apos;ll also see his beautiful face on
+              all our merch. THis is because our mascot is a gorilla and his
+              name is H.R.H. Grogo
             </p>
             <p>
-              "But why?" you asl. We don't know either, but H.R.H. Grogo has
-              been there since the beginning, inscribed in the back of the very
-              first <i>Technique </i>, and has been there ever since. We're not
-              quite sure how or when he became a gorilla.
+              &quot;But why?&quot; you asl. We don&apos;t know either, but
+              H.R.H. Grogo has been there since the beginning, inscribed in the
+              back of the very first <i>Technique </i>, and has been there ever
+              since. We&apos;re not quite sure how or when he became a gorilla.
             </p>
           </div>
         </div>
@@ -68,9 +68,9 @@ function page() {
               <Link href="/join" className=" text-[#156fff]">
                 join Technique
               </Link>
-              . Our dedicated staph are committed to helping everyone who's
-              willing to learn, especially if when it's about photography or
-              design.
+              . Our dedicated staph are committed to helping everyone who&apos;s
+              willing to learn, especially if when it&apos;s about photography
+              or design.
             </p>
           </div>
         </div>
