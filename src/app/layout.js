@@ -23,7 +23,7 @@ export default function RootLayout({ children }) {
       <body
         className={`${inter.className} ${raleway.variable} overflow-y-auto scroll-smooth overflow-x-hidden`}
       >
-        <Navbar></Navbar>
+        <Navbar />
         {children}
         <Footer />
       </body>

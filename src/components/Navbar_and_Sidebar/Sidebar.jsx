@@ -23,7 +23,7 @@ function Sidebar(props) {
       id="element100"
     >
       <div
-        className={`bg-red-800 w-[70vw] h-[100vh] absolute right-0 top-0 rounded-l-3xl flex flex-col pullLeft ${
+        className={`bg-red-800 w-[70vw] h-[100vh] absolute right-0 top-0 flex flex-col pullLeft ${
           close ? "pullRight" : ""
         }`}
       >
