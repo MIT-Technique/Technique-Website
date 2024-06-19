@@ -1,11 +1,11 @@
-import React from 'react'
+import React from "react";
 
 function Footer() {
   return (
-    <div className='bg-black h-[15vh] w-full z-50 relative'>
-
+    <div className="bg-black h-[15vh] w-full text-white flex items-center justify-center">
+      FOOTER
     </div>
-  )
+  );
 }
 
-export default Footer
+export default Footer;

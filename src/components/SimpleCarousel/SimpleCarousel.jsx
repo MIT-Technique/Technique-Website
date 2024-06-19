@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import Slider from "react-slick";
 import SimpleCarouselCSS from "./SimpleCarousel.css";
 import "slick-carousel/slick/slick.css";
@@ -15,7 +15,7 @@ import "swiper/css/navigation";
 // import required modules
 import { Autoplay, Pagination, Navigation } from "swiper/modules";
 
-function SimpleCarousel({ images }) {
+function SimpleCarousel({ images, reverseDirection }) {
   var settings = {
     dots: true,
     infinite: true,
@@ -28,10 +28,14 @@ function SimpleCarousel({ images }) {
     // lazyLoad: true,
     centerMode: true,
     // centerPadding: "70px",
-    autoplay: true,
+    autoplay: { reverseDirection: false, pauseOnMouseEnter: true },
     speed: 2000,
     autoplaySpeed: 2000,
+    // reverseDirection: true,
   };
+  useEffect(()=>{
+
+  },[])
   return (
     // <div className="w-[95vw]">
     //   <Slider {...settings}>
@@ -55,7 +59,7 @@ function SimpleCarousel({ images }) {
     //     })}
     //   </Slider>
     // </div>
-    <div className="w-[95vw] h-[50vh] flex justify-center ">
+    <div className="w-[95vw] h-[50vh] flex justify-center items-center overflow-x-hidden">
       <Swiper
         slidesPerView={1}
         loop={true}
@@ -65,6 +69,7 @@ function SimpleCarousel({ images }) {
         autoplay={{
           delay: 2000,
           disableOnInteraction: false,
+          reverseDirection: reverseDirection,
         }}
         pagination={{
           clickable: true,

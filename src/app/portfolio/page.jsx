@@ -3,6 +3,7 @@ import React, { useRef, useState } from "react";
 import Footer from "@/components/Footer/Footer";
 import SimpleCarousel from "@/components/SimpleCarousel/SimpleCarousel";
 import Image from "next/image";
+import Navbar from "@/components/Navbar_and_Sidebar/Navbar";
 
 // Import Swiper React components
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -46,7 +47,7 @@ function page() {
       src: "/images/other_images/Jade_Chongsathapornpong/_TNA4087.jpg",
       photographer: "Jade Chongsathapornpong",
     },
-    
+
     {
       src: "/images/other_images/Ruhundaka_Ejilemele/DSC_4286.jpg",
       photographer: "Ruhundaka Ejilemele",
@@ -145,8 +146,6 @@ function page() {
       src: "/images/other_images/Ruhundaka_Ejilemele/DSC_7784.jpg",
       photographer: "Ruhundaka Ejilemele",
     },
-
-    
   ];
 
   function handleScroll() {
@@ -156,44 +155,62 @@ function page() {
   }
 
   return (
-    <div className="min-h-screen h-fit w-screen bg-white  pt-[15vh]">
-      <main className="w-full h-full flex flex-col justify-center items-center">
-        <section
-          className="h-[100vh] w-full flex flex-col justify-center items-center  pb-[1%]"
-          id="section1"
-        >
-          <label
-            htmlFor="carousel1"
-            className="w-[95vw] text-left pl-[0.5%] font-semibold text-2xl mb-[1%]"
+    <>
+      <Navbar />
+      <div className="min-h-screen h-fit  pt-[12vh] relative bg-white">
+        <main className="w-full h-full flex flex-col justify-center items-center h-fit">
+          <div className="bg-black w-full absolute top-0 h-[20vh]"></div>
+          <section
+            className="h-[100vh] w-full flex flex-col justify-center items-center  pb-[1%]"
+            id="section1"
           >
-            {" "}
-            EVENTS
-          </label>
-          <SimpleCarousel images={events} id="carousel1" />
-          <div className="w-full flex  flex-col justify-center items-center">
-            <FaCircleArrowDown
-              style={{ width: "auto", height: "3.5rem" , cursor: "pointer"}}
-              to="section2"
-              onClick={handleScroll}
-            />
-            <p className="font-semibold">Go to Pretty</p>
-          </div>
-        </section>
-        <section
-          className="h-[100vh] w-full flex flex-col justify-center items-center "
-          id="section2"
-        >
-          <label
-            htmlFor="carousel2"
-            className="w-[95vw] text-left pl-[0.5%] font-semibold text-2xl mb-[1%]"
+            <div className="w-full bg-white py-[2%] flex flex-col items-center justify-center">
+              <label
+                htmlFor="carousel1"
+                className="w-[95vw] text-left pl-[0.5%] font-semibold text-2xl "
+              >
+                {" "}
+                EVENTS
+              </label>
+              <SimpleCarousel
+                images={events}
+                id="carousel1"
+                reverseDirection={false}
+              />
+              <div className="w-full flex  flex-col justify-center items-center">
+                <FaCircleArrowDown
+                  style={{ width: "auto", height: "3.5rem", cursor: "pointer" }}
+                  to="section2"
+                  onClick={handleScroll}
+                />
+                <p className="font-semibold">Go to Pretty</p>
+              </div>
+            </div>
+          </section>
+          <section
+            className="h-[100vh] w-full flex flex-col justify-center items-center relative"
+            id="section2"
           >
-            {" "}
-            PRETTY PICTURES!
-          </label>
-          <SimpleCarousel images={niceThings} id="carousel2"/>
-        </section>
-      </main>
-    </div>
+            <div className="w-full bg-white py-[2%] flex flex-col items-center justify-center">
+              <label
+                htmlFor="carousel2"
+                className="w-[95vw] text-left pl-[0.5%] font-semibold text-2xl "
+              >
+                {" "}
+                PRETTY PICTURES!
+              </label>
+              <SimpleCarousel
+                images={niceThings}
+                id="carousel2"
+                reverseDirection={true}
+              />
+            </div>
+          <div className="bg-black w-full  h-[20vh] text-white absolute bottom-0"></div>
+          </section>
+          <Footer />
+        </main>
+      </div>
+    </>
   );
 }
 

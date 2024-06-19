@@ -4,6 +4,7 @@ import Footer from "@/components/Footer/Footer";
 import CoverCard from "@/components/CoverCard/CoverCard";
 import Image from "next/image";
 import oneEightEightFive from "../../../public/images/covers/1885_Technique@2x.jpg";
+import Navbar from "@/components/Navbar_and_Sidebar/Navbar";
 const options = [
   {
     src: "/images/covers/1885_Technique@2x.jpg",
@@ -286,34 +287,38 @@ const options = [
 
 function page() {
   return (
-    <div className="min-h-screen w-screen flex flex-col pt-[15vh] bg-white ">
-      <main className="h-full w-full px-12 md:px-60 font-light text-gray-700 flex flex-col justify-center items-center">
-        <div className="flex flex-col justify-center w-full items-center space-y-3 ">
-          <p className="text-5xl font-extralight w-full text-center text-black">
-            Archive
-          </p>
-          <p className=" text-center ">
-            Take a look at some past editions of Technique.
-          </p>
-        </div>
-        <div
-          className=" w-[65vw] h-full rounded-2xl pt-5 flex flex-wrap items-center justify-center pb-5"
-          id="section1"
-        >
-          {options.map(({ src, alt, href, title }, i) => {
-            return (
-              <CoverCard
-                src={src}
-                alt={alt}
-                href={href}
-                title={title}
-                key={i}
-              ></CoverCard>
-            );
-          })}
-        </div>
-      </main>
-    </div>
+    <>
+    <Navbar/>
+      <div className="min-h-screen  flex flex-col pt-[15vh] bg-white ">
+        <main className="h-full w-full px-12 md:px-60 font-light text-gray-700 flex flex-col justify-center items-center">
+          <div className="flex flex-col justify-center w-full items-center space-y-3 ">
+            <p className="text-5xl font-extralight w-full text-center text-black">
+              Archive
+            </p>
+            <p className=" text-center ">
+              Take a look at some past editions of Technique.
+            </p>
+          </div>
+          <div
+            className=" w-[65vw] h-full rounded-2xl pt-5 flex flex-wrap items-center justify-center pb-5"
+            id="section1"
+          >
+            {options.map(({ src, alt, href, title }, i) => {
+              return (
+                <CoverCard
+                  src={src}
+                  alt={alt}
+                  href={href}
+                  title={title}
+                  key={i}
+                ></CoverCard>
+              );
+            })}
+          </div>
+        </main>
+      </div>
+      <Footer/>
+    </>
   );
 }
 

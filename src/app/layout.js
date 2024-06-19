@@ -5,6 +5,7 @@ import { Raleway } from "next/font/google";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Footer from "@/components/Footer/Footer";
+import { ChakraProvider } from "@chakra-ui/react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,11 +22,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${inter.className} ${raleway.variable} overflow-y-auto scroll-smooth overflow-x-hidden`}
+        className={`${inter.className} ${raleway.variable} overflow-y-auto scroll-smooth  relative`}
       >
-        <Navbar></Navbar>
-        {children}
-        <Footer />
+        {/* <ChakraProvider> */}
+          {children}
+          {/* </ChakraProvider> */}
       </body>
     </html>
   );
