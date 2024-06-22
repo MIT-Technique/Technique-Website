@@ -35,7 +35,7 @@ export default function Home() {
 
   return (
     <div className="relative h-fit">
-      <Navbar></Navbar>
+      <Navbar/>
 
       <div className=" h-[100vh] flex flex-col">
         <section
@@ -142,7 +142,7 @@ export default function Home() {
           {/* <div className="bg-black w-full h-[20vh] text-white relative z-50">
             asdf
           </div> */}
-          <Footer></Footer>
+          <Footer/>
         </section>
         {/* <section className="flex flex-col items-center justify-center min-h-screen h-screen w-screen bg-blue-400">
           <div className="text-white">

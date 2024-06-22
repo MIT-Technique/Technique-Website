@@ -21,12 +21,8 @@ const raleway = Raleway({
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body
-        className={`${inter.className} ${raleway.variable} overflow-y-auto scroll-smooth  relative`}
-      >
-        {/* <ChakraProvider> */}
-          {children}
-          {/* </ChakraProvider> */}
+      <body className={`${inter.className} ${raleway.variable} overflow-y-auto scroll-smooth  relative`} >
+        {children}
       </body>
     </html>
   );

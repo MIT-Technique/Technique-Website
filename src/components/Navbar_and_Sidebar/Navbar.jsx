@@ -59,7 +59,7 @@ function Navbar() {
   return (
     <div className="flex flex-colrelative z-50">
       <span
-        className={`hidden lg:flex rounded-b-xl bg-black font-sans h-[10vh] items-center px-12 lg:px-30 justify-between text-gray-200 fixed top-0 w-full z-50 transition-all ${
+        className={`hidden lg:flex bg-black font-sans h-[10vh] items-center px-12 lg:px-30 justify-between text-gray-200 fixed top-0 w-full z-50 transition-all ${
           isScrolled ? "bg-opacity-85" : "bg-opacity-0"
         }`}
       >
@@ -94,7 +94,7 @@ function Navbar() {
         </div>
       </span>
       <div
-        className={`bg-black  h-[10vh] rounded-b-xl lg:hidden flex fixed top-0 z-30 w-full items-center font-sans justify-between px-4 ${
+        className={`bg-black  h-[10vh]  lg:hidden flex fixed top-0 z-30 w-full items-center font-sans justify-between px-4 ${
           isScrolled ? "bg-opacity-85" : "bg-opacity-0"
         }`}
       >
@@ -117,7 +117,7 @@ function Navbar() {
             setIsOpen(false);
           }}
           anchor="right"
-          className="bg-transparent rounded-l-xl"
+          className="bg-transparent"
           sx={{
             "& .MuiDrawer-paper": {
               background: "transparent",
@@ -137,7 +137,6 @@ function Navbar() {
             role="presentation"
             onClick={() => setIsOpen(false)}
             onKeyDown={() => setIsOpen(false)}
-            className="rounded-l-xl"
           >
             <List>
               <ListItem>
