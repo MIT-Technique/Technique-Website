@@ -33,10 +33,7 @@ function Navbar() {
   const pathname = usePathname();
 
   useEffect(() => {
-    console.log("In useEffect!!!");
     function handleScroll() {
-      console.log(pathname);
-      // console.log(window)
       if (window.scrollY > 0 || pathname !== "/") {
         setIsScrolled(true);
       } else {
@@ -45,13 +42,12 @@ function Navbar() {
     }
     if (pathname !== "/") {
       setIsScrolled(true);
-      console.log("HEERREEE");
     }
     window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [pathname]);
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);

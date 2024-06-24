@@ -100,7 +100,7 @@ export default function Home() {
             </div> */}
             <div className="relative rounded-[0.3rem] h-[57.6%] w-[86.4%] md:h-[69.12%] md:w-[75%] overflow-hidden">
               <Image
-                src="/images/Senior_Pictures/232198679.jpg"
+                src="/images/Senior_Pictures/232198679.JPG"
                 alt="senior picture"
                 layout="fill"
                 style={{
