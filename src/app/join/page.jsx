@@ -2,15 +2,27 @@
 import React from "react";
 import Footer from "@/components/Footer/Footer";
 import Navbar from "@/components/Navbar_and_Sidebar/Navbar";
+import Image from "next/image";
 
 function page() {
   return (
     <>
       <Navbar/>
-      <div className=" min-h-screen h-screen bg-white pt-[15vh]">
-        <main className="w-full h-full px-12 md:px-60 font-light text-gray-700  ">
+      <div className="min-h-screen h-screen bg-white">
+        <main className="flex flex-col md:flex-row relative items-center w-full h-full px-10 py-24 md:py-12 md:px-40 font-light text-gray-700">
+          <div className="relative aspect-square w-auto h-full mx-8">
+            <Image
+              src="/images/other_images/Jade_Chongsathapornpong/20240421_152409.jpg"
+              alt="senior picture"
+              fill={true}
+              style={{
+                borderRadius: "0.3rem",
+                objectFit: "contain",
+              }}
+            />
+          </div>
           <div className="space-y-3 w-fit">
-            <p className="text-3xl font-extralight text-black">WEEKLY</p>
+            <h1 className="text-3xl font-extralight text-black">WEEKLY</h1>
             <div className="space-y-2">
               <p>
                 We hold regular meetings at 3pm on Saturday in the riverside
@@ -32,6 +44,7 @@ function page() {
           </div>
         </main>
       </div>
+      <Footer/>
     </>
   );
 }
