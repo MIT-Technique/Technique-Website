@@ -22,7 +22,7 @@ function page() {
                 During book season, fall term through early spring term, we hold
                 regular meetings during the week where the various editors of
                 each <i>Technique</i> section come in and do work. This is the
-                best time to get involved with the processof crafting a yearbook
+                best time to get involved with the process of crafting a yearbook
               </p>
               <p>
                 We also Enjoy going on photwalks and different photographic
