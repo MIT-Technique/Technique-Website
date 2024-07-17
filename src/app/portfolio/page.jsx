@@ -158,20 +158,14 @@ function page() {
     <>
       <Navbar />
       <div className="min-h-screen h-fit  pt-[12vh] relative bg-white">
-        <main className="w-full h-full flex flex-col justify-center items-center h-fit">
+        <main className="w-full flex flex-col justify-center items-center h-fit">
           <div className="bg-black w-full absolute top-0 h-[20vh]"></div>
           <section
             className="h-[100vh] w-full flex flex-col justify-center items-center  pb-[1%]"
             id="section1"
           >
             <div className="w-full bg-white py-[2%] flex flex-col items-center justify-center">
-              <label
-                htmlFor="carousel1"
-                className="w-[95vw] text-left pl-[0.5%] font-semibold text-2xl "
-              >
-                {" "}
-                EVENTS
-              </label>
+              
               <SimpleCarousel
                 images={events}
                 id="carousel1"
@@ -179,7 +173,12 @@ function page() {
               />
               <div className="w-full flex  flex-col justify-center items-center">
                 <FaCircleArrowDown
-                  style={{ width: "auto", height: "3.5rem", cursor: "pointer" }}
+                  style={{
+                    width: "auto",
+                    height: "3.5rem",
+                    cursor: "pointer",
+                    color: "black",
+                  }}
                   to="section2"
                   onClick={handleScroll}
                 />
@@ -192,20 +191,14 @@ function page() {
             id="section2"
           >
             <div className="w-full bg-white py-[2%] flex flex-col items-center justify-center">
-              <label
-                htmlFor="carousel2"
-                className="w-[95vw] text-left pl-[0.5%] font-semibold text-2xl "
-              >
-                {" "}
-                PRETTY PICTURES!
-              </label>
+              
               <SimpleCarousel
                 images={niceThings}
                 id="carousel2"
                 reverseDirection={true}
               />
             </div>
-          <div className="bg-black w-full  h-[20vh] text-white absolute bottom-0"></div>
+            <div className="bg-black w-full  h-[20vh] text-white absolute bottom-0"></div>
           </section>
           <Footer />
         </main>

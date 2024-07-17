@@ -39,7 +39,7 @@ function page() {
                   <Button
                     variant="outlined"
                     // comment out in order to enable
-                    disabled
+                    // disabled
                     sx={{
                       width: "auto",
                       borderColor: "black",
