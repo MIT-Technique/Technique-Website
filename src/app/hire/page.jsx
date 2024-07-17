@@ -39,7 +39,7 @@ function page() {
     return () => {
       resizeObserver.unobserve(container.current);
       resizeObserver.disconnect();
-      resizeObserver2.unobserve(container.current);
+      resizeObserver2.unobserve(screen.current);
       resizeObserver2.disconnect();
     };
   }, []);
