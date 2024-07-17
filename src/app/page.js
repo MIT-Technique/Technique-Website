@@ -35,7 +35,7 @@ export default function Home() {
 
   return (
     <div className="relative h-fit">
-      <Navbar/>
+      <Navbar />
 
       <div className=" h-[100vh] flex flex-col">
         <section
@@ -98,6 +98,10 @@ export default function Home() {
             {/* <div className="h-full w-[15%] absolute left-0 bg-black top-0 hidden lg:block">
 
             </div> */}
+            <div className="text-black text-3xl">
+              MIT&apos;s fourth-year students are the star of the show.
+            </div>
+
             <div className="relative rounded-[0.3rem] h-[57.6%] w-[86.4%] md:h-[69.12%] md:w-[75%] overflow-hidden">
               <Image
                 src="/images/Senior_Pictures/232198679.JPG"
@@ -110,13 +114,6 @@ export default function Home() {
               />
             </div>
             <div className="flex flex-col space-y-[1%] items-center text-center">
-              <div className="text-black text-3xl">
-                MIT&apos;s fourth-year students are the star of the show.
-              </div>
-              <p className="text-black text-semibold text-xs">
-                Portrait sessions are for seniors only and occur in the fall of
-                your fourth-year.
-              </p>
               <Button
                 variant="outlined"
                 sx={{
@@ -133,16 +130,14 @@ export default function Home() {
                 {" "}
                 Click Me
               </Button>
-             
             </div>
-          {/* <div className="h-[100%]] w-[15%] absolute right-0 bg-black top-[-5%] hidden lg:block">
+            {/* <div className="h-[100%]] w-[15%] absolute right-0 bg-black top-[-5%] hidden lg:block">
           </div> */}
-  
           </div>
           {/* <div className="bg-black w-full h-[20vh] text-white relative z-50">
             asdf
           </div> */}
-          <Footer/>
+          <Footer />
         </section>
         {/* <section className="flex flex-col items-center justify-center min-h-screen h-screen w-screen bg-blue-400">
           <div className="text-white">
