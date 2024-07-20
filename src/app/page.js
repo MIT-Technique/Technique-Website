@@ -36,7 +36,6 @@ export default function Home() {
   return (
     <div className="relative h-fit">
       <Navbar />
-
       <div className=" h-[100vh] flex flex-col">
         <section
           className="h-fit  bg-white flex flex-col justify-center items-center"
@@ -91,59 +90,8 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <div
-            className="flex flex-col items-center justify-center min-h-screen h-screen w-full bg-white relative space-y-[2%] pt-[15vh]"
-            id="section2"
-          >
-            {/* <div className="h-full w-[15%] absolute left-0 bg-black top-0 hidden lg:block">
-
-            </div> */}
-            <div className="text-black text-3xl">
-              MIT&apos;s fourth-year students are the star of the show.
-            </div>
-
-            <div className="relative rounded-[0.3rem] h-[57.6%] w-[86.4%] md:h-[69.12%] md:w-[75%] overflow-hidden">
-              <Image
-                src="/images/Senior_Pictures/232198679.JPG"
-                alt="senior picture"
-                layout="fill"
-                style={{
-                  borderRadius: "0.3rem",
-                  objectFit: "contain",
-                }}
-              />
-            </div>
-            <div className="flex flex-col space-y-[1%] items-center text-center">
-              <Button
-                variant="outlined"
-                sx={{
-                  width: "15vw",
-                  borderColor: "black",
-                  color: "black",
-                  "&:hover": {
-                    borderColor: "black",
-                    backgroundColor: "rgba(0, 0, 0, 0.04)",
-                  },
-                }}
-                color="primary"
-              >
-                {" "}
-                Click Me
-              </Button>
-            </div>
-            {/* <div className="h-[100%]] w-[15%] absolute right-0 bg-black top-[-5%] hidden lg:block">
-          </div> */}
-          </div>
-          {/* <div className="bg-black w-full h-[20vh] text-white relative z-50">
-            asdf
-          </div> */}
           <Footer />
         </section>
-        {/* <section className="flex flex-col items-center justify-center min-h-screen h-screen w-screen bg-blue-400">
-          <div className="text-white">
-            MIT&apos;s fourth-year students are the star of the show.
-          </div>
-        </section> */}
       </div>
     </div>
   );

@@ -19,7 +19,7 @@ import CallIcon from "@mui/icons-material/Call";
 import PersonIcon from "@mui/icons-material/Person";
 import { VscThreeBars } from "react-icons/vsc";
 
-function Sidebar({ isScrolled}) {
+function Sidebar({ isScrolled }) {
   const [close, setClose] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -155,24 +155,7 @@ function Sidebar({ isScrolled}) {
                 </ListItemButton>
               </Link>
             </ListItem>
-            <ListItem>
-              <Link href="/join" onClick={() => setIsOpen(false)}>
-                <ListItemButton>
-                  <ListItemIcon color="white">
-                    <PersonIcon
-                      color="white"
-                      sx={{ color: "white", fontSize: "1.3rem" }}
-                    />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={"JOIN US"}
-                    primaryTypographyProps={{
-                      style: { fontSize: "0.8rem" },
-                    }}
-                  />
-                </ListItemButton>
-              </Link>
-            </ListItem>
+
             <ListItem>
               <Link href="/archives" onClick={() => setIsOpen(false)}>
                 <ListItemButton>

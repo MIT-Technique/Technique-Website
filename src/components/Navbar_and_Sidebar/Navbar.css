@@ -1,0 +1,25 @@
+@keyframes fadeOut {
+  from {
+    background-color: rgba(0, 0, 0, 0.85);
+  }
+  to {
+    background-color: rgba(0, 0, 0, 0);
+  }
+}
+
+.fade-out {
+  animation: fadeOut 0.3s forwards ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    background-color: rgba(0, 0, 0, 0);
+  }
+  to {
+    background-color: rgba(0, 0, 0, 0.85);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s forwards ease-in;
+}

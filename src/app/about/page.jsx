@@ -7,12 +7,12 @@ import Navbar from "@/components/Navbar_and_Sidebar/Navbar";
 function page() {
   return (
     <>
-    <Navbar/>
+      <Navbar />
       <div className="min-h-screen  bg-white pt-[15vh] font-light text-gray-700 flex flex-col">
         <main className="w-full px-12 md:px-60 pb-6">
           <div className="flex flex-col justify-center w-full items-center space-y-3 ">
             <p className="text-5xl font-extralight w-full text-center text-black">
-              ABOUT US
+              About Us
             </p>
             <div>
               <div className=" text-center ">
@@ -68,19 +68,36 @@ function page() {
                 our staph are free of infection.
               </p>
               <p>
-                It takes no experience to{" "}
-                <Link href="/join" className=" text-[#156fff]">
-                  join Technique
-                </Link>
-                . Our dedicated staph are committed to helping everyone
-                who&apos;s willing to learn, especially if when it&apos;s about
-                photography or design.
+                It takes no experience to join Technique . Our dedicated staph
+                are committed to helping everyone who&apos;s willing to learn,
+                especially if when it&apos;s about photography or design.
+              </p>
+            </div>
+          </div>
+          <div className="mt-4 space-y-3">
+            <p className="text-3xl font-extralight text-black">Weekly</p>
+            <div className="space-y-2">
+              <p>
+                We hold regular meetings at 3pm on Saturday in the riverside
+                lounge of Walker Memorial. Anyone is welcome to attend. We have
+                photographic equipment for borrowing and often teach various
+                photography and design related seminars at this time.
+              </p>
+              <p>
+                During book season, fall term through early spring term, we hold
+                regular meetings during the week where the various editors of
+                each <i>Technique</i> section come in and do work. This is the
+                best time to get involved with the processof crafting a yearbook
+              </p>
+              <p>
+                We also Enjoy going on photwalks and different photographic
+                excursions from time to time!
               </p>
             </div>
           </div>
         </main>
       </div>
-      <Footer/>
+      <Footer />
     </>
   );
 }

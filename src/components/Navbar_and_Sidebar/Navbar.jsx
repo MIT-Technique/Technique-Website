@@ -3,14 +3,16 @@ import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar.jsx";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
+import Navbarcss from "./Navbar.css";
 
 function Navbar() {
   const pathname = usePathname();
+  const [firstLoad, setFirstLoad] = useState(true);
 
   useEffect(() => {
     function handleScroll() {
       if (window.scrollY > 0 || pathname !== "/") {
+        setFirstLoad(false);
         setIsScrolled(true);
       } else {
         setIsScrolled(false);
@@ -30,9 +32,15 @@ function Navbar() {
 
   return (
     <div className="flex flex-colrelative z-50">
-      <span
-        className={`hidden lg:flex bg-black font-sans h-[10vh] items-center px-12 lg:px-30 justify-between text-gray-200 fixed top-0 w-full z-50 transition-all ${
-          isScrolled ? "bg-opacity-85" : "bg-opacity-0"
+      <nav
+        className={`hidden lg:flex bg-black font-sans h-[10vh] items-center px-12 lg:px-30 justify-between text-gray-200 fixed top-0 w-full z-50  ${
+          pathname == "/"
+            ? `${
+                isScrolled
+                  ? `${firstLoad ? "bg-opacity-85" : "fade-in"} `
+                  : `${firstLoad ? "bg-opacity-0" : "fade-out"}`
+              }`
+            : ""
         }`}
       >
         <Link className="text-xl lg:text-2xl font-bold text-white" href="/">
@@ -51,9 +59,7 @@ function Navbar() {
           <Link className="hover:text-white" href="/hire">
             HIRE US
           </Link>
-          <Link className="hover:text-white" href="/join">
-            JOIN US
-          </Link>
+
           <Link className="hover:text-white" href="/archives">
             ARCHIVES
           </Link>
@@ -64,7 +70,7 @@ function Navbar() {
             CONTACT
           </Link>
         </div>
-      </span>
+      </nav>
       <Sidebar isScrolled={isScrolled} />
     </div>
   );
