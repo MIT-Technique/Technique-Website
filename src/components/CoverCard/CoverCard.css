@@ -14,7 +14,7 @@
 }
 .colorChange::after {
     content: "";
-    background-color: #FF581c;
+    background-color: #d6d6d6;
     border-radius: 0.75rem; /* 12px */
     position: absolute;
     left: 0;

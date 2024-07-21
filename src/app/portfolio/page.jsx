@@ -156,20 +156,24 @@ function page() {
 
   return (
     <>
-      <Navbar />
-      <div className="min-h-screen h-fit   relative bg-white lg:pt-[5vh] pt-[10vh]">
-        <main className="w-full flex flex-col justify-end items-center h-[205vh] bg-white ">
-          <div className="h-full lg:h-[200vh] w-full  bg-[#265147]  lg:rounded-t-xl">
-            <section
+      <div className="min-h-[90vh]    relative bg-white lg:pt-[5vh] pt-[10vh]">
+        {/* <main className="w-full flex flex-col justify-start items-center h-[100vh] bg-white "> */}
+          <div className="h-full  w-full  bg-white  lg:rounded-t-xl flex flex-col items-center">
+            <SimpleCarousel
+              images={events}
+              id="carousel1"
+              reverseDirection={false}
+            />
+            <SimpleCarousel
+              images={niceThings}
+              id="carousel2"
+              reverseDirection={true}
+            />
+            {/* <section
               className="h-[100vh] w-full flex flex-col justify-center items-center  pb-[1%]"
               id="section1"
             >
               <div className="w-full  py-[2%] flex flex-col items-center justify-center">
-                <SimpleCarousel
-                  images={events}
-                  id="carousel1"
-                  reverseDirection={false}
-                />
                 <div className="w-full flex  flex-col justify-center items-center ">
                   <FaCircleArrowDown
                     style={{
@@ -188,18 +192,12 @@ function page() {
               className="h-[100vh] w-full flex flex-col justify-center items-center relative"
               id="section2"
             >
-              <div className="w-full  py-[2%] flex flex-col items-center justify-center">
-                <SimpleCarousel
-                  images={niceThings}
-                  id="carousel2"
-                  reverseDirection={true}
-                />
-              </div>
-            </section>
+              <div className="w-full  py-[2%] flex flex-col items-center justify-center"></div>
+            </section> */}
           </div>
-        </main>
-        <Footer />
+        {/* </main> */}
       </div>
+      <Footer />
     </>
   );
 }

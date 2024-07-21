@@ -288,7 +288,6 @@ const options = [
 function page() {
   return (
     <>
-      <Navbar />
       <div className="min-h-screen  flex flex-col lg:pt-[5vh] pt-[10vh] bg-white ">
         <main className="h-full w-full px-12 md:px-52 font-light  flex flex-col justify-center items-center ">
           <div className="flex flex-col justify-center items-center bg-[#265147] rounded-t-lg text-white pt-4">

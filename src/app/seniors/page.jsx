@@ -11,7 +11,6 @@ const preorder_discounted_price = 90;
 function page() {
   return (
     <>
-      <Navbar />
       <div className="min-h-screen bg-white flex flex-col lg:pt-[5vh] pt-[10vh]">
         <main className="h-full w-full px-12 pb-4 md:px-60 md:pb-20">
           <div className="flex flex-col justify-center w-full items-center space-y-3 text-gray-700">

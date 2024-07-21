@@ -35,7 +35,7 @@ function Navbar() {
       <nav
         className={`hidden lg:flex bg-black font-sans h-[10vh] items-center px-12 lg:px-30 justify-between text-gray-200 fixed top-0 w-full z-50 realtive ${
           pathname == "/"
-            ? `${
+            ? ` ${
                 isScrolled
                   ? `${firstLoad ? "bg-opacity-85" : "fade-in"} `
                   : `${firstLoad ? "bg-opacity-0" : "fade-out"}`
@@ -51,7 +51,7 @@ function Navbar() {
         </Link>
         <div className="flex space-x-9 text-xs w-full justify-center font-semibold">
           <Link
-            className={` ${
+            className={`px-5 py-2 relative z-10 cursor-pointer ${
               pathname == "/"
                 ? "text-[#FF581c] underline underline-offset-3 decoration-2 hover:text-[#c4481b]"
                 : "hover:text-white"
@@ -61,7 +61,7 @@ function Navbar() {
             HOME
           </Link>
           <Link
-            className={` ${
+            className={`px-5 py-2 relative z-10 cursor-pointer ${
               pathname == "/about"
                 ? "text-[#FF581c] underline underline-offset-3 decoration-2 hover:text-[#c4481b]"
                 : "hover:text-white"
@@ -71,7 +71,7 @@ function Navbar() {
             ABOUT
           </Link>
           <Link
-            className={` ${
+            className={`px-5 py-2 relative z-10 cursor-pointer ${
               pathname == "/seniors"
                 ? "text-[#FF581c] underline underline-offset-3 decoration-2 hover:text-[#c4481b]"
                 : "hover:text-white"
@@ -81,7 +81,7 @@ function Navbar() {
             SENIORS
           </Link>
           <Link
-            className={` ${
+            className={`px-5 py-2 relative z-10 cursor-pointer ${
               pathname == "/hire"
                 ? "text-[#FF581c] underline underline-offset-3 decoration-2 hover:text-[#c4481b]"
                 : "hover:text-white"
@@ -92,7 +92,7 @@ function Navbar() {
           </Link>
 
           <Link
-            className={` ${
+            className={`px-5 py-2 relative z-10 cursor-pointer ${
               pathname == "/archives"
                 ? "text-[#FF581c] underline underline-offset-3 decoration-2 hover:text-[#c4481b]"
                 : "hover:text-white"
@@ -102,7 +102,7 @@ function Navbar() {
             ARCHIVES
           </Link>
           <Link
-            className={` ${
+            className={`px-5 py-2 relative z-10 cursor-pointer ${
               pathname == "/portfolio"
                 ? "text-[#FF581c] underline underline-offset-3 decoration-2 hover:text-[#c4481b]"
                 : "hover:text-white"
@@ -112,7 +112,7 @@ function Navbar() {
             PORTFOLIO
           </Link>
           <Link
-            className={` ${
+            className={`px-5 py-2 relative z-10 cursor-pointer ${
               pathname == "/contact"
                 ? "text-[#FF581c] underline underline-offset-3 decoration-2 hover:text-[#c4481b]"
                 : "hover:text-white"

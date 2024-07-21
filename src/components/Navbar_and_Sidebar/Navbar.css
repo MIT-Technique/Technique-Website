@@ -23,3 +23,35 @@
 .fade-in {
   animation: fadeIn 0.3s forwards ease-in;
 }
+nav {
+  position: relative;
+  display: flex;
+}
+
+.nav-item {
+  padding: 10px 20px;
+  cursor: pointer;
+  position: relative;
+  z-index: 10; /* Ensure the nav items are above the indicator */
+  transition: color 0.3s;
+}
+
+.nav-item:hover {
+  color: #FF581c;
+}
+
+.nav-item.active {
+  color: white;
+}
+.nav-item.active:hover {
+  color: #265147;
+}
+
+.indicator {
+  position: absolute;
+  height: 100%;
+  background-color: #FF581c;
+  /* transition: all 0.3s ease; */
+  border-radius: 4px; /* Adjust the border-radius if needed */
+  z-index: 5; /* Ensure the indicator is behind the nav items */
+}

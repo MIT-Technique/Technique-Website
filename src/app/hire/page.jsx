@@ -46,9 +46,8 @@ function page() {
 
   return (
     <>
-      <Navbar />
       <div
-        className="min-h-screen  bg-white pt-[15vh] font-light text-[#265147] flex flex-col"
+        className="min-h-[90vh]  bg-white lg:pt-[5vh] pt-[10vh] font-light text-[#265147] flex flex-col"
         ref={screen}
       >
         <main className="w-full  pb-6">
@@ -128,7 +127,10 @@ function page() {
                 groups affiliated with MIT. Technique matches you with one of
                 our trained staff photographers to capture every moment during
                 your event. To get a quote, please{" "}
-                <Link href="mailto:technique@mit.edu?subject=Event%20Photography%20Quote" className="text-blue-400">
+                <Link
+                  href="mailto:technique@mit.edu?subject=Event%20Photography%20Quote"
+                  className="text-blue-400"
+                >
                   email us
                 </Link>{" "}
                 with the subject line &quot;Event Photography Quote&quot; and

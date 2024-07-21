@@ -34,12 +34,10 @@ function Sidebar({ isScrolled }) {
 
   return (
     <div
-      className={`absolute bg-black  h-[10vh]  lg:hidden flex top-0 z-30 w-full items-center font-sans justify-between px-4 ${
-        isScrolled ? "bg-opacity-85" : "bg-opacity-0"
-      }`}
+      className={` bg-white  h-[10vh]  lg:hidden flex top-0 z-30 w-full items-center font-sans justify-between px-4  text-[#265147]`}
     >
       <Link
-        className="text-xl font-bold text-white"
+        className="text-xl font-bold "
         href="/"
         onClick={() => {
           setIsOpen(false);
@@ -48,7 +46,7 @@ function Sidebar({ isScrolled }) {
         TECHNIQUE
       </Link>
       <VscThreeBars
-        style={{ color: "white" }}
+        style={{ color: "#265147" }}
         onClick={() => setIsOpen(true)}
       />
       <Drawer
@@ -67,7 +65,7 @@ function Sidebar({ isScrolled }) {
         <Box
           sx={{
             width: 250,
-            backgroundColor: "black",
+            backgroundColor: "white",
             height: "100%",
             color: "white",
             overflowY: "auto",
@@ -85,10 +83,10 @@ function Sidebar({ isScrolled }) {
                 // className="flex"
               >
                 <ListItemButton>
-                  <ListItemIcon color="white">
+                  <ListItemIcon color="#265147">
                     <HomeIcon
                       color="white"
-                      sx={{ color: "white", fontSize: "1.3rem" }}
+                      sx={{ color: "#265147", fontSize: "1.3rem" }}
                     />
                   </ListItemIcon>
 
@@ -97,6 +95,7 @@ function Sidebar({ isScrolled }) {
                     primaryTypographyProps={{
                       style: { fontSize: "0.8rem" },
                     }}
+                    sx={{color: "#265147"}}
                   />
                 </ListItemButton>
               </Link>
@@ -107,7 +106,7 @@ function Sidebar({ isScrolled }) {
                   <ListItemIcon color="white">
                     <InfoIcon
                       color="white"
-                      sx={{ color: "white", fontSize: "1.3rem" }}
+                      sx={{ color: "#265147", fontSize: "1.3rem" }}
                     />
                   </ListItemIcon>
                   <ListItemText
@@ -115,6 +114,7 @@ function Sidebar({ isScrolled }) {
                     primaryTypographyProps={{
                       style: { fontSize: "0.8rem" },
                     }}
+                    sx={{color: "#265147"}}
                   />
                 </ListItemButton>
               </Link>
@@ -125,7 +125,7 @@ function Sidebar({ isScrolled }) {
                   <ListItemIcon color="white">
                     <SchoolIcon
                       color="white"
-                      sx={{ color: "white", fontSize: "1.3rem" }}
+                      sx={{ color: "#265147", fontSize: "1.3rem" }}
                     />
                   </ListItemIcon>
                   <ListItemText
@@ -133,6 +133,8 @@ function Sidebar({ isScrolled }) {
                     primaryTypographyProps={{
                       style: { fontSize: "0.8rem" },
                     }}
+                    sx={{color: "#265147"}}
+
                   />
                 </ListItemButton>
               </Link>
@@ -143,7 +145,7 @@ function Sidebar({ isScrolled }) {
                   <ListItemIcon color="white">
                     <SearchIcon
                       color="white"
-                      sx={{ color: "white", fontSize: "1.3rem" }}
+                      sx={{ color: "#265147", fontSize: "1.3rem" }}
                     />
                   </ListItemIcon>
                   <ListItemText
@@ -151,6 +153,8 @@ function Sidebar({ isScrolled }) {
                     primaryTypographyProps={{
                       style: { fontSize: "0.8rem" },
                     }}
+                    sx={{color: "#265147"}}
+
                   />
                 </ListItemButton>
               </Link>
@@ -162,7 +166,7 @@ function Sidebar({ isScrolled }) {
                   <ListItemIcon color="white">
                     <InventoryIcon
                       color="white"
-                      sx={{ color: "white", fontSize: "1.3rem" }}
+                      sx={{ color: "#265147", fontSize: "1.3rem" }}
                     />
                   </ListItemIcon>
                   <ListItemText
@@ -170,6 +174,8 @@ function Sidebar({ isScrolled }) {
                     primaryTypographyProps={{
                       style: { fontSize: "0.8rem" },
                     }}
+                    sx={{color: "#265147"}}
+
                   />
                 </ListItemButton>
               </Link>
@@ -179,8 +185,8 @@ function Sidebar({ isScrolled }) {
                 <ListItemButton>
                   <ListItemIcon color="white">
                     <FolderIcon
-                      color="white"
-                      sx={{ color: "white", fontSize: "1.3rem" }}
+                      color="#265147"
+                      sx={{ color: "#265147", fontSize: "1.3rem" }}
                     />
                   </ListItemIcon>
                   <ListItemText
@@ -188,6 +194,8 @@ function Sidebar({ isScrolled }) {
                     primaryTypographyProps={{
                       style: { fontSize: "0.8rem" },
                     }}
+                    sx={{color: "#265147"}}
+
                   />
                 </ListItemButton>
               </Link>
@@ -195,16 +203,16 @@ function Sidebar({ isScrolled }) {
             <ListItem>
               <Link href="/contact" onClick={() => setIsOpen(false)}>
                 <ListItemButton>
-                  <ListItemIcon color="white">
+                  <ListItemIcon color="#265147">
                     <CallIcon
-                      color="white"
-                      sx={{ color: "white", fontSize: "1.3rem" }}
+                      color="#265147"
+                      sx={{ color: "#265147", fontSize: "1.3rem" }}
                     />
                   </ListItemIcon>
                   <ListItemText
                     primary={"CONTACT"}
                     primaryTypographyProps={{
-                      style: { fontSize: "0.8rem" },
+                      style: { fontSize: "0.8rem", color: "#265147" },
                     }}
                   />
                 </ListItemButton>

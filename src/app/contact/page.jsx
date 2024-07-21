@@ -7,8 +7,7 @@ import Link from "next/link";
 function page() {
   return (
     <>
-      <Navbar />
-      <div className="min-h-screen bg-white flex flex-col lg:pt-[5vh] pt-[10vh] text-black">
+      <div className="min-h-[90vh] bg-white flex flex-col lg:pt-[5vh] pt-[10vh] text-black">
         <main className="w-full h-full px-4 flex flex-col space-y-20">
           {/* <div className="flex flex-col justify-center w-full items-center space-y-3 px-12 md:px-60">
             <p className=" text-center ">HEY THERE</p>

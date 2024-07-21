@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import Sidebar from "./Sidebar.jsx";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -8,22 +8,50 @@ import Navbarcss from "./Navbar.css";
 function Navbar() {
   const pathname = usePathname();
   const [firstLoad, setFirstLoad] = useState(true);
+  const indicatorRef = useRef(null);
+  const width1 = useRef(null);
+  const navRef = useRef();
+  const techniqueLabel = useRef()
 
-  useEffect(() => {
-    function handleScroll() {
-      if (window.scrollY > 0 || pathname !== "/") {
-        setFirstLoad(false);
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
+
+  useLayoutEffect(() => {
+    const activeNavItem = document.querySelector(".nav-item.active");
+    let rect;
+    let height1;
+    const navElement = navRef.current
+    console.log(activeNavItem);
+    let resizeObserver;
+
+    if (activeNavItem && indicatorRef.current) {
+      const rect = activeNavItem.getBoundingClientRect();
+      const parentRect = activeNavItem.parentElement.getBoundingClientRect();
+      const offsetLeft = activeNavItem.offsetLeft - parentRect.left;
+      const offsetTop = activeNavItem.offsetTop - parentRect.top;
+
+      indicatorRef.current.style.width = `${rect.width}px`;
+      indicatorRef.current.style.height = `${rect.height}px`;
+      indicatorRef.current.style.transform = `translateX(${offsetLeft}px) `;
+      if(!firstLoad){
+        indicatorRef.current.style.transition = 'all 0.3s ease';
       }
+      resizeObserver = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          const rect = activeNavItem.getBoundingClientRect();
+          const parentRect =
+            activeNavItem.parentElement.getBoundingClientRect();
+          const offsetLeft = activeNavItem.offsetLeft - parentRect.left;
+          const offsetTop = activeNavItem.offsetTop - parentRect.top;
+
+          indicatorRef.current.style.width = `${rect.width}px`;
+          indicatorRef.current.style.height = `${rect.height}px`;
+          indicatorRef.current.style.transform = `translateX(${offsetLeft}px) `;
+        }
+      });
+      resizeObserver.observe(navRef.current);
     }
-    if (pathname !== "/") {
-      setIsScrolled(true);
-    }
-    window.addEventListener("scroll", handleScroll);
+    setFirstLoad(false)
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      resizeObserver?.unobserve(navElement);
     };
   }, [pathname]);
 
@@ -32,89 +60,63 @@ function Navbar() {
 
   return (
     <>
-      <div className="flex flex-col relative z-50 bg-transparent bg-white">
+      <div className={`hidden  flex-col relative z-50 bg-transparent bg-white ${pathname == "/" ? "hidden" : " lg:flex"}`}>
         <nav
-          className={`hidden lg:flex  font-sans h-[10vh] items-center px-12 lg:px-30 justify-between text-[#265147]  top-0 w-full z-50  `}
+          className={`h-[10vh]  text-[#265147]  top-0 w-full flex items-center`}
+          ref={navRef}
         >
           <Link
-            className="text-xl lg:text-2xl font-bold  absolute left-4"
+            className="text-xl lg:text-2xl font-bold  absolute left-4 w-"
             href="/"
           >
             TECHNIQUE
           </Link>
           <div className="flex space-x-9 text-xs w-full justify-center font-semibold">
             <Link
-              className={` ${
-                pathname == "/"
-                  ? "text-white  hover:bg-[#265147] p-2 rounded-md bg-[#FF581c]"
-                  : "hover:text-[#FF581c] p-2"
-              }`}
+              className={`nav-item ${pathname == "/" ? "active" : ""} ${(firstLoad && pathname == "/") ? "bg-[#FF581c] rounded-[4px]" : ""}`}
               href="/"
             >
               HOME
             </Link>
             <Link
-              className={` ${
-                pathname == "/about"
-                  ? "text-white  hover:bg-[#265147] p-2 rounded-md bg-[#FF581c]"
-                  : "hover:text-[#FF581c] p-2"
-              }`}
+              className={`nav-item ${pathname == "/about" ? "active" : ""} ${(firstLoad && pathname == "/about") ? "bg-[#FF581c] rounded-[4px]" : ""}`}
               href="/about"
             >
               ABOUT
             </Link>
             <Link
-              className={` ${
-                pathname == "/seniors"
-                  ? "text-white  hover:bg-[#265147] p-2 rounded-md bg-[#FF581c]"
-                  : "hover:text-[#FF581c] p-2"
-              }`}
+              className={`nav-item ${pathname == "/seniors" ? "active" : ""} ${(firstLoad && pathname == "/seniors") ? "bg-[#FF581c] rounded-[4px]" : ""}`}
               href="/seniors"
             >
               SENIORS
             </Link>
             <Link
-              className={` ${
-                pathname == "/hire"
-                  ? "text-white  hover:bg-[#265147] p-2 rounded-md bg-[#FF581c]"
-                  : "hover:text-[#FF581c] p-2"
-              }`}
+              className={`nav-item ${pathname == "/hire" ? "active" : ""} ${(firstLoad && pathname == "/hire") ? "bg-[#FF581c] rounded-[4px]" : ""}`}
               href="/hire"
             >
               HIRE US
             </Link>
 
             <Link
-              className={` ${
-                pathname == "/archives"
-                  ? "text-white  hover:bg-[#265147] p-2 rounded-md bg-[#FF581c]"
-                  : "hover:text-[#FF581c] p-2"
-              }`}
+              className={`nav-item ${pathname == "/archives" ? "active" : ""} ${(firstLoad && pathname == "/archives") ? "bg-[#FF581c] rounded-[4px]" : ""}`}
               href="/archives"
             >
               ARCHIVES
             </Link>
             <Link
-              className={` ${
-                pathname == "/portfolio"
-                  ? "text-white  hover:bg-[#265147] p-2 rounded-md bg-[#FF581c]"
-                  : "hover:text-[#FF581c] p-2"
-              }`}
+              className={`nav-item ${pathname == "/portfolio" ? "active" : ""} ${(firstLoad && pathname == "/portfolio") ? "bg-[#FF581c] rounded-[4px]" : ""}`}
               href="/portfolio"
             >
               PORTFOLIO
             </Link>
             <Link
-              className={` ${
-                pathname == "/contact"
-                  ? "text-white  hover:bg-[#265147] p-2 rounded-md bg-[#FF581c]"
-                  : "hover:text-[#FF581c] p-2"
-              }`}
+              className={`nav-item ${pathname == "/contact" ? "active" : ""} ${(firstLoad && pathname == "/contact") ? "bg-[#FF581c] rounded-[4px]" : ""}`}
               href="/contact"
             >
               CONTACT
             </Link>
           </div>
+          <div ref={indicatorRef} className="indicator"></div>
         </nav>
       </div>
       <Sidebar isScrolled={isScrolled} />

@@ -59,7 +59,7 @@ function SimpleCarousel({ images, reverseDirection }) {
     //     })}
     //   </Slider>
     // </div>
-    <div className="w-[95vw] h-[50vh] flex justify-center items-center overflow-x-hidden bg-transparent">
+    <div className="w-[98vw] h-[40vh] flex justify-center items-center overflow-x-hidden bg-transparent">
       <Swiper
         slidesPerView={1}
         loop={true}

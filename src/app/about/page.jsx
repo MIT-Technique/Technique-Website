@@ -7,7 +7,6 @@ import Navbar from "@/components/Navbar_and_Sidebar/Navbar_new";
 function page() {
   return (
     <>
-      <Navbar />
       <div className="min-h-screen  bg-white lg:pt-[5vh] pt-[10vh] font-light text-gray-700 flex flex-col ">
         <main className="w-full px-12 md:px-48 pb-6 flex flex-col">
           <div>
@@ -44,7 +43,7 @@ function page() {
           </div>
           <div className="flex flex-col lg:flex-row lg:space-x-2">
             <div className="mt-4 space-y-3 bg-[#265147] rounded-lg text-white p-3 px-5 w-full lg:w-1/3">
-              <p className="text-3xl font-extralight text-black w-full text-center">
+              <p className="text-3xl font-extralight  w-full text-center">
                 H.R.H. Grogo
               </p>
               <div className="space-y-2">
@@ -64,7 +63,7 @@ function page() {
               </div>
             </div>
             <div className="mt-4 space-y-3 bg-[#FF581c]  rounded-lg text-[#265147] p-3 px-5 w-full lg:w-1/3">
-              <p className="text-3xl font-extralight text-black w-full text-center">Weekly</p>
+              <p className="text-3xl font-extralight  w-full text-center">Weekly</p>
               <div className="space-y-2 text-white">
                 <p>
                   We hold regular meetings at 3pm on Saturday in the riverside
@@ -86,7 +85,7 @@ function page() {
               </div>
             </div>
             <div className="mt-4 space-y-3 bg-[#265147] rounded-lg text-white p-3 px-5 w-full lg:w-1/3">
-              <p className="text-3xl font-extralight text-black w-full text-center">Staph</p>
+              <p className="text-3xl font-extralight  w-full text-center">Staph</p>
               <div className="space-y-2">
                 <p>
                   Many of our staph are part time (or full time) photographers

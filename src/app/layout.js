@@ -1,6 +1,6 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar_and_Sidebar/Navbar";
+import Navbar from "@/components/Navbar_and_Sidebar/Navbar_new";
 import { Raleway } from "next/font/google";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -22,6 +22,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${inter.className} ${raleway.variable} overflow-y-auto scroll-smooth  relative`} >
+        <Navbar/>
         {children}
       </body>
     </html>
