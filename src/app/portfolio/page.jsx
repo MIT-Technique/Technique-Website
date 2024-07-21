@@ -164,7 +164,7 @@ function page() {
             className="h-[100vh] w-full flex flex-col justify-center items-center  pb-[1%]"
             id="section1"
           >
-            <div className="w-full bg-white py-[2%] flex flex-col items-center justify-center">
+            <div className="w-full  py-[2%] flex flex-col items-center justify-center">
               
               <SimpleCarousel
                 images={events}
@@ -190,7 +190,7 @@ function page() {
             className="h-[100vh] w-full flex flex-col justify-center items-center relative"
             id="section2"
           >
-            <div className="w-full bg-white py-[2%] flex flex-col items-center justify-center">
+            <div className="w-full  py-[2%] flex flex-col items-center justify-center">
               
               <SimpleCarousel
                 images={niceThings}

@@ -77,7 +77,7 @@ export default function Home() {
                   ></ReactTyped>
                 </div>
               </div>
-              <div className="w-full flex justify-center cursor-pointer">
+              {/* <div className="w-full flex justify-center cursor-pointer">
                 <FaCircleArrowDown
                   style={{
                     width: "auto",
@@ -87,7 +87,7 @@ export default function Home() {
                   to="section2"
                   onClick={handleScroll}
                 />
-              </div>
+              </div> */}
             </div>
           </div>
           <Footer />

@@ -292,7 +292,7 @@ function page() {
       <div className="min-h-screen  flex flex-col pt-[15vh] bg-white ">
         <main className="h-full w-full px-12 md:px-60 font-light text-gray-700 flex flex-col justify-center items-center">
           <div className="flex flex-col justify-center w-full items-center space-y-3 ">
-            <p className="text-5xl font-extralight w-full text-center text-black">
+            <p className="text-5xl font-extralight w-full text-center ">
               Archive
             </p>
             <p className=" text-center ">
