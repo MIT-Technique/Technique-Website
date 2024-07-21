@@ -91,7 +91,7 @@ function page() {
                         }}
                       />
                     </div>
-                    <p>Valid attire for photo</p>
+                    <p>Valid attire for photo </p>
                   </div>
                   <div className="flex flex-col relative rounded-[0.3rem] h-[57.6%] w-[86.4%] md:h-[100%] md:w-[100%] overflow-hidden">
                     <div className="relative aspect-square w-full h-auto">
