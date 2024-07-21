@@ -5,7 +5,7 @@ import Card from "./CoverCard.css"
 
 function CoverCard(props) {
   return (
-    <div className="bg-gray-50 rounded-lg flex  flex-col w-fit p-5 items-center m-3 card  text-black colorChange shadow-md shadow-[#a6a8ab]">
+    <div className="bg-gray-50 rounded-lg flex  flex-col w-fit p-5 items-center m-3 card  text-black colorChange shadow-md shadow-[#243e38]">
       <a
         href={props.href}
         target="_blank"

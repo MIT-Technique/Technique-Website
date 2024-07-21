@@ -34,7 +34,7 @@ function Sidebar({ isScrolled }) {
 
   return (
     <div
-      className={`bg-black  h-[10vh]  lg:hidden flex fixed top-0 z-30 w-full items-center font-sans justify-between px-4 ${
+      className={`absolute bg-black  h-[10vh]  lg:hidden flex top-0 z-30 w-full items-center font-sans justify-between px-4 ${
         isScrolled ? "bg-opacity-85" : "bg-opacity-0"
       }`}
     >

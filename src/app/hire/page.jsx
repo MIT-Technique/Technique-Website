@@ -2,7 +2,7 @@
 import React, { useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Footer from "@/components/Footer/Footer";
-import Navbar from "@/components/Navbar_and_Sidebar/Navbar";
+import Navbar from "@/components/Navbar_and_Sidebar/Navbar_new";
 import Image from "next/image";
 
 function page() {
@@ -48,12 +48,12 @@ function page() {
     <>
       <Navbar />
       <div
-        className="min-h-screen  bg-white pt-[15vh] font-light text-gray-700 flex flex-col"
+        className="min-h-screen  bg-white pt-[15vh] font-light text-[#265147] flex flex-col"
         ref={screen}
       >
         <main className="w-full  pb-6">
           <div className="flex flex-col justify-center w-full items-center space-y-3 px-12 md:px-60">
-            <p className="text-5xl font-extralight w-full text-center text-black">
+            <p className="text-5xl font-extralight w-full text-center ">
               Hire Us
             </p>
             <p className=" text-center ">

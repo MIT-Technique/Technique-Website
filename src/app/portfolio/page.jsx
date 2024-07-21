@@ -3,7 +3,7 @@ import React, { useRef, useState } from "react";
 import Footer from "@/components/Footer/Footer";
 import SimpleCarousel from "@/components/SimpleCarousel/SimpleCarousel";
 import Image from "next/image";
-import Navbar from "@/components/Navbar_and_Sidebar/Navbar";
+import Navbar from "@/components/Navbar_and_Sidebar/Navbar_new";
 
 // Import Swiper React components
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -157,51 +157,48 @@ function page() {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen h-fit  pt-[12vh] relative bg-white">
-        <main className="w-full flex flex-col justify-center items-center h-fit">
-          <div className="bg-black w-full absolute top-0 h-[20vh]"></div>
-          <section
-            className="h-[100vh] w-full flex flex-col justify-center items-center  pb-[1%]"
-            id="section1"
-          >
-            <div className="w-full  py-[2%] flex flex-col items-center justify-center">
-              
-              <SimpleCarousel
-                images={events}
-                id="carousel1"
-                reverseDirection={false}
-              />
-              <div className="w-full flex  flex-col justify-center items-center">
-                <FaCircleArrowDown
-                  style={{
-                    width: "auto",
-                    height: "3.5rem",
-                    cursor: "pointer",
-                    color: "black",
-                  }}
-                  to="section2"
-                  onClick={handleScroll}
+      <div className="min-h-screen h-fit   relative bg-white lg:pt-[5vh] pt-[10vh]">
+        <main className="w-full flex flex-col justify-end items-center h-[205vh] bg-white ">
+          <div className="h-full lg:h-[200vh] w-full  bg-[#265147]  lg:rounded-t-xl">
+            <section
+              className="h-[100vh] w-full flex flex-col justify-center items-center  pb-[1%]"
+              id="section1"
+            >
+              <div className="w-full  py-[2%] flex flex-col items-center justify-center">
+                <SimpleCarousel
+                  images={events}
+                  id="carousel1"
+                  reverseDirection={false}
                 />
-                <p className="font-semibold">Go to Pretty</p>
+                <div className="w-full flex  flex-col justify-center items-center ">
+                  <FaCircleArrowDown
+                    style={{
+                      width: "auto",
+                      height: "3.5rem",
+                      cursor: "pointer",
+                      color: "white",
+                    }}
+                    to="section2"
+                    onClick={handleScroll}
+                  />
+                </div>
               </div>
-            </div>
-          </section>
-          <section
-            className="h-[100vh] w-full flex flex-col justify-center items-center relative"
-            id="section2"
-          >
-            <div className="w-full  py-[2%] flex flex-col items-center justify-center">
-              
-              <SimpleCarousel
-                images={niceThings}
-                id="carousel2"
-                reverseDirection={true}
-              />
-            </div>
-            <div className="bg-black w-full  h-[20vh] text-white absolute bottom-0"></div>
-          </section>
-          <Footer />
+            </section>
+            <section
+              className="h-[100vh] w-full flex flex-col justify-center items-center relative"
+              id="section2"
+            >
+              <div className="w-full  py-[2%] flex flex-col items-center justify-center">
+                <SimpleCarousel
+                  images={niceThings}
+                  id="carousel2"
+                  reverseDirection={true}
+                />
+              </div>
+            </section>
+          </div>
         </main>
+        <Footer />
       </div>
     </>
   );

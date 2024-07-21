@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import Footer from "@/components/Footer/Footer";
-import Navbar from "@/components/Navbar_and_Sidebar/Navbar";
+import Navbar from "@/components/Navbar_and_Sidebar/Navbar_new";
 import { Button } from "@mui/material";
 import Image from "next/image";
 
@@ -12,7 +12,7 @@ function page() {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-white flex flex-col pt-[15vh]">
+      <div className="min-h-screen bg-white flex flex-col lg:pt-[5vh] pt-[10vh]">
         <main className="h-full w-full px-12 pb-4 md:px-60 md:pb-20">
           <div className="flex flex-col justify-center w-full items-center space-y-3 text-gray-700">
             <div className="pb-1 md:pb-5">
@@ -65,11 +65,11 @@ function page() {
                 </Button>
               </div>
             </div>
-            <div className="pb-1 md:pb-5">
+            <div className="pb-1 md:pb-5 bg-[#265147] rounded-lg text-white p-5">
               <h1 className="text-3xl font-extralight w-full text-left">
                 Dress Code
               </h1>
-              <div>
+              <div className="">
                 <p>
                   There is no dress code for senior portraits. You can show up
                   in a suit, dress, or even your pajamas. We have even had

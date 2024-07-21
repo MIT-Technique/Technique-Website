@@ -94,7 +94,7 @@ function SimpleCarousel({ images, reverseDirection }) {
           return (
             <SwiperSlide
               key={key}
-              className="text-black  relative bg-black rounded-2xl"
+              className="text-black  relative bg-white rounded-2xl"
             >
               <Image
                 className="rounded-3xl relative"
@@ -110,7 +110,7 @@ function SimpleCarousel({ images, reverseDirection }) {
               >
                 Photo Credits: {photographer}
               </p>
-              <div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
+              <div className="swiper-lazy-preloader swiper-lazy-preloader-black"></div>
             </SwiperSlide>
           );
         })}

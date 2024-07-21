@@ -1,6 +1,6 @@
 import React from "react";
 import Footer from "@/components/Footer/Footer";
-import Navbar from "@/components/Navbar_and_Sidebar/Navbar";
+import Navbar from "@/components/Navbar_and_Sidebar/Navbar_new.jsx";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -8,7 +8,7 @@ function page() {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-white flex flex-col pt-[15vh] text-black">
+      <div className="min-h-screen bg-white flex flex-col lg:pt-[5vh] pt-[10vh] text-black">
         <main className="w-full h-full px-4 flex flex-col space-y-20">
           {/* <div className="flex flex-col justify-center w-full items-center space-y-3 px-12 md:px-60">
             <p className=" text-center ">HEY THERE</p>
@@ -82,7 +82,7 @@ function page() {
                 Photo Credits: Jade Chongsathapornpong
               </p>
             </div>
-            <div className="w-[100%] xl:w-1/3 h-[45vh] xl:h-[83vh] border-2 border-black rounded-[1rem] py-4 flex-col justify-center items-center">
+            <div className="w-[100%] xl:w-1/3 h-[45vh] xl:h-[83vh]  bg-[#265147]  rounded-[1rem] py-4 flex-col justify-center items-center text-white">
               <div className="flex flex-col space-y-1 items-center">
                 <h className=" text-lg font-[400]"> WANT TO GET IN TOUCH?</h>
                 <Link
@@ -92,7 +92,7 @@ function page() {
                   Email us!
                 </Link>
               </div>
-              <div className="flex flex-col items-center space-y-1 text-gray-500">
+              <div className="flex flex-col items-center space-y-1 ">
                 <h className=" text-base "> VISIT US IN PERSON</h>
                 <div className="flex flex-col items-center font-[250] text-sm">
                   <p>142 Memorial Dr.</p>
@@ -100,7 +100,7 @@ function page() {
                   <p>50-320</p>
                 </div>
               </div>
-              <div className="flex flex-col items-center  space-y-1 text-gray-500">
+              <div className="flex flex-col items-center  space-y-1 ">
                 <h className=" text-base "> MAILING ADDRESS</h>
                 <div className="flex flex-col items-center font-[250] text-sm">
                   <p>MIT Technique</p>
