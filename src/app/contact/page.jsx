@@ -19,7 +19,7 @@ function page() {
               Feel free to send us a message or find us in the office.
             </p>
           </div> */}
-          <div className="relative w-full flex space-x-3 h-full">
+          <div className="relative w-full flex flex-col xl:flex-row  space-y-3 xl:space-y-0 xl:space-x-3 h-full pb-5">
             {/* <div className=" flex flex-col items-center w-1/2 pt-5 space-y-3">
               <div className="flex flex-col space-y-1 items-center">
                 <h className=" text-lg font-[400]"> WANT TO GET IN TOUCH?</h>
@@ -65,7 +65,7 @@ function page() {
                 Photo Credits: Jade Chongsathapornpong
               </p>
             </div> */}
-            <div className="relative w-2/3 h-[83vh]">
+            <div className="relative w-[100%] xl:w-2/3 h-[45vh] xl:h-[83vh]">
               <Image
                 src="/images/other_images/Jade_Chongsathapornpong/DSC02130.jpg"
                 alt=""
@@ -82,7 +82,7 @@ function page() {
                 Photo Credits: Jade Chongsathapornpong
               </p>
             </div>
-            <div className="h-[83vh] w-1/3 border-2 border-black rounded-[1rem] py-4 flex-col justify-center items-center">
+            <div className="w-[100%] xl:w-1/3 h-[45vh] xl:h-[83vh] border-2 border-black rounded-[1rem] py-4 flex-col justify-center items-center">
               <div className="flex flex-col space-y-1 items-center">
                 <h className=" text-lg font-[400]"> WANT TO GET IN TOUCH?</h>
                 <Link
