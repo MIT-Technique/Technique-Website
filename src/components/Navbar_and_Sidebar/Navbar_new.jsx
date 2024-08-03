@@ -61,7 +61,7 @@ function Navbar() {
     <>
       <div className={`hidden  flex-col relative z-50 bg-transparent bg-white ${pathname == "/" ? "hidden" : " lg:flex"}`}>
         <nav
-          className={`h-[10vh]  text-[#265147]  top-0 w-full flex items-center`}
+          className={`h-[10vh]  text-[#043b28]  top-0 w-full flex items-center`}
           ref={navRef}
         >
           <Link
@@ -72,44 +72,44 @@ function Navbar() {
           </Link>
           <div className="flex space-x-9 text-xs w-full justify-center font-semibold">
             <Link
-              className={`nav-item ${pathname == "/" ? "active" : ""} ${(firstLoad && pathname == "/") ? "bg-[#FF581c] rounded-[4px]" : ""}`}
+              className={`nav-item ${pathname == "/" ? "active" : ""} ${(firstLoad && pathname == "/") ? "bg-[#043b28] rounded-[4px]" : ""}`}
               href="/"
             >
               HOME
             </Link>
             <Link
-              className={`nav-item ${pathname == "/about" ? "active" : ""} ${(firstLoad && pathname == "/about") ? "bg-[#FF581c] rounded-[4px]" : ""}`}
+              className={`nav-item ${pathname == "/about" ? "active" : ""} ${(firstLoad && pathname == "/about") ? "bg-[#043b28] rounded-[4px]" : ""}`}
               href="/about"
             >
               ABOUT
             </Link>
             <Link
-              className={`nav-item ${pathname == "/seniors" ? "active" : ""} ${(firstLoad && pathname == "/seniors") ? "bg-[#FF581c] rounded-[4px]" : ""}`}
+              className={`nav-item ${pathname == "/seniors" ? "active" : ""} ${(firstLoad && pathname == "/seniors") ? "bg-[#043b28] rounded-[4px]" : ""}`}
               href="/seniors"
             >
               SENIORS
             </Link>
             <Link
-              className={`nav-item ${pathname == "/hire" ? "active" : ""} ${(firstLoad && pathname == "/hire") ? "bg-[#FF581c] rounded-[4px]" : ""}`}
+              className={`nav-item ${pathname == "/hire" ? "active" : ""} ${(firstLoad && pathname == "/hire") ? "bg-[#043b28] rounded-[4px]" : ""}`}
               href="/hire"
             >
               HIRE US
             </Link>
 
             <Link
-              className={`nav-item ${pathname == "/archives" ? "active" : ""} ${(firstLoad && pathname == "/archives") ? "bg-[#FF581c] rounded-[4px]" : ""}`}
+              className={`nav-item ${pathname == "/archives" ? "active" : ""} ${(firstLoad && pathname == "/archives") ? "bg-[#043b28] rounded-[4px]" : ""}`}
               href="/archives"
             >
               ARCHIVES
             </Link>
             <Link
-              className={`nav-item ${pathname == "/portfolio" ? "active" : ""} ${(firstLoad && pathname == "/portfolio") ? "bg-[#FF581c] rounded-[4px]" : ""}`}
+              className={`nav-item ${pathname == "/portfolio" ? "active" : ""} ${(firstLoad && pathname == "/portfolio") ? "bg-[#043b28] rounded-[4px]" : ""}`}
               href="/portfolio"
             >
               PORTFOLIO
             </Link>
             <Link
-              className={`nav-item ${pathname == "/contact" ? "active" : ""} ${(firstLoad && pathname == "/contact") ? "bg-[#FF581c] rounded-[4px]" : ""}`}
+              className={`nav-item ${pathname == "/contact" ? "active" : ""} ${(firstLoad && pathname == "/contact") ? "bg-[#043b28] rounded-[4px]" : ""}`}
               href="/contact"
             >
               CONTACT

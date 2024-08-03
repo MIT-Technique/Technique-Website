@@ -28,7 +28,7 @@ function page() {
                 Photo Credits: Jade Chongsathapornpong
               </p>
             </div>
-            <div className="w-[100%] lg:w-1/3 h-[45vh] lg:h-[83vh]  bg-[#265147]  rounded-[1rem] py-4 flex-col justify-center items-center text-white">
+            <div className="w-[100%] lg:w-1/3 h-[45vh] lg:h-[83vh]  bg-[#043b28]  rounded-[1rem] py-4 flex-col justify-center items-center text-white">
               <div className="flex flex-col space-y-1 items-center">
                 <h className=" text-lg font-[400]"> WANT TO GET IN TOUCH?</h>
                 <Link

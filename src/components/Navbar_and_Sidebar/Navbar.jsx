@@ -53,7 +53,7 @@ function Navbar() {
           <Link
             className={`px-5 py-2 relative z-10 cursor-pointer ${
               pathname == "/"
-                ? "text-[#FF581c] underline underline-offset-3 decoration-2 hover:text-[#c4481b]"
+                ? "text-[#DD0002] underline underline-offset-3 decoration-2 hover:text-[#c4481b]"
                 : "hover:text-white"
             }`}
             href="/"
@@ -61,62 +61,38 @@ function Navbar() {
             HOME
           </Link>
           <Link
-            className={`px-5 py-2 relative z-10 cursor-pointer ${
-              pathname == "/about"
-                ? "text-[#FF581c] underline underline-offset-3 decoration-2 hover:text-[#c4481b]"
-                : "hover:text-white"
-            }`}
+            className={`px-5 py-2 relative z-10 cursor-pointer hover:text-white `}
             href="/about"
           >
             ABOUT
           </Link>
           <Link
-            className={`px-5 py-2 relative z-10 cursor-pointer ${
-              pathname == "/seniors"
-                ? "text-[#FF581c] underline underline-offset-3 decoration-2 hover:text-[#c4481b]"
-                : "hover:text-white"
-            }`}
+            className={`px-5 py-2 relative z-10 cursor-pointer hover:text-white `}
             href="/seniors"
           >
             SENIORS
           </Link>
           <Link
-            className={`px-5 py-2 relative z-10 cursor-pointer ${
-              pathname == "/hire"
-                ? "text-[#FF581c] underline underline-offset-3 decoration-2 hover:text-[#c4481b]"
-                : "hover:text-white"
-            }`}
+            className={`px-5 py-2 relative z-10 cursor-pointer hover:text-white`}
             href="/hire"
           >
             HIRE US
           </Link>
 
           <Link
-            className={`px-5 py-2 relative z-10 cursor-pointer ${
-              pathname == "/archives"
-                ? "text-[#FF581c] underline underline-offset-3 decoration-2 hover:text-[#c4481b]"
-                : "hover:text-white"
-            }`}
+            className={`px-5 py-2 relative z-10 cursor-pointer hover:text-white`}
             href="/archives"
           >
             ARCHIVES
           </Link>
           <Link
-            className={`px-5 py-2 relative z-10 cursor-pointer ${
-              pathname == "/portfolio"
-                ? "text-[#FF581c] underline underline-offset-3 decoration-2 hover:text-[#c4481b]"
-                : "hover:text-white"
-            }`}
+            className={`px-5 py-2 relative z-10 cursor-pointer hover:text-white`}
             href="/portfolio"
           >
             PORTFOLIO
           </Link>
           <Link
-            className={`px-5 py-2 relative z-10 cursor-pointer ${
-              pathname == "/contact"
-                ? "text-[#FF581c] underline underline-offset-3 decoration-2 hover:text-[#c4481b]"
-                : "hover:text-white"
-            }`}
+            className={`px-5 py-2 relative z-10 cursor-pointer hover:text-white`}
             href="/contact"
           >
             CONTACT

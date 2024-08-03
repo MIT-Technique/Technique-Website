@@ -35,7 +35,7 @@ function Sidebar({ isScrolled, pathname }) {
 
   return (
     <div
-      className={`  ${pathname === "/" ? "bg-black text-white " : "bg-white text-[#265147]"}  h-[10vh]  lg:hidden flex top-0 z-30 w-full items-center font-sans justify-between px-4  `}
+      className={`  ${pathname === "/" ? "bg-black text-white " : "bg-white text-[#043b28]"}  h-[10vh]  lg:hidden flex top-0 z-30 w-full items-center font-sans justify-between px-4  `}
     >
       <Link
         className="text-xl font-bold "
@@ -47,7 +47,7 @@ function Sidebar({ isScrolled, pathname }) {
         TECHNIQUE
       </Link>
       <VscThreeBars
-        style={{ color: pathname === "/" ? "white" : "#265147" }}
+        style={{ color: pathname === "/" ? "white" : "#043b28" }}
         onClick={() => setIsOpen(true)}
       />
       <Drawer
@@ -86,7 +86,7 @@ function Sidebar({ isScrolled, pathname }) {
                 <ListItemButton>
                   <ListItemIcon >
                     <HomeIcon
-                      sx={{ color: pathname === "/" ? "white" : "#265147", fontSize: "1.3rem" }}
+                      sx={{ color: pathname === "/" ? "white" : "#043b28", fontSize: "1.3rem" }}
                     />
                   </ListItemIcon>
 
@@ -95,7 +95,7 @@ function Sidebar({ isScrolled, pathname }) {
                     primaryTypographyProps={{
                       style: { fontSize: "0.8rem" },
                     }}
-                    sx={{color: pathname === "/" ? "white" : "#265147"}}
+                    sx={{color: pathname === "/" ? "white" : "#043b28"}}
                   />
                 </ListItemButton>
               </Link>
@@ -105,7 +105,7 @@ function Sidebar({ isScrolled, pathname }) {
                 <ListItemButton>
                   <ListItemIcon >
                     <InfoIcon
-                      sx={{ color: pathname === "/" ? "white" : "#265147", fontSize: "1.3rem" }}
+                      sx={{ color: pathname === "/" ? "white" : "#043b28", fontSize: "1.3rem" }}
                     />
                   </ListItemIcon>
                   <ListItemText
@@ -113,7 +113,7 @@ function Sidebar({ isScrolled, pathname }) {
                     primaryTypographyProps={{
                       style: { fontSize: "0.8rem" },
                     }}
-                    sx={{color: pathname === "/" ? "white" : "#265147"}}
+                    sx={{color: pathname === "/" ? "white" : "#043b28"}}
                   />
                 </ListItemButton>
               </Link>
@@ -123,7 +123,7 @@ function Sidebar({ isScrolled, pathname }) {
                 <ListItemButton>
                   <ListItemIcon >
                     <SchoolIcon
-                      sx={{ color: pathname === "/" ? "white" : "#265147", fontSize: "1.3rem" }}
+                      sx={{ color: pathname === "/" ? "white" : "#043b28", fontSize: "1.3rem" }}
                     />
                   </ListItemIcon>
                   <ListItemText
@@ -131,7 +131,7 @@ function Sidebar({ isScrolled, pathname }) {
                     primaryTypographyProps={{
                       style: { fontSize: "0.8rem" },
                     }}
-                    sx={{color: pathname === "/" ? "white" : "#265147"}}
+                    sx={{color: pathname === "/" ? "white" : "#043b28"}}
 
                   />
                 </ListItemButton>
@@ -142,7 +142,7 @@ function Sidebar({ isScrolled, pathname }) {
                 <ListItemButton>
                   <ListItemIcon >
                     <SearchIcon
-                      sx={{ color: pathname === "/" ? "white" : "#265147", fontSize: "1.3rem" }}
+                      sx={{ color: pathname === "/" ? "white" : "#043b28", fontSize: "1.3rem" }}
                     />
                   </ListItemIcon>
                   <ListItemText
@@ -150,7 +150,7 @@ function Sidebar({ isScrolled, pathname }) {
                     primaryTypographyProps={{
                       style: { fontSize: "0.8rem" },
                     }}
-                    sx={{color: pathname === "/" ? "white" : "#265147"}}
+                    sx={{color: pathname === "/" ? "white" : "#043b28"}}
 
                   />
                 </ListItemButton>
@@ -162,7 +162,7 @@ function Sidebar({ isScrolled, pathname }) {
                 <ListItemButton>
                   <ListItemIcon >
                     <InventoryIcon
-                      sx={{ color: pathname === "/" ? "white" : "#265147", fontSize: "1.3rem" }}
+                      sx={{ color: pathname === "/" ? "white" : "#043b28", fontSize: "1.3rem" }}
                     />
                   </ListItemIcon>
                   <ListItemText
@@ -170,7 +170,7 @@ function Sidebar({ isScrolled, pathname }) {
                     primaryTypographyProps={{
                       style: { fontSize: "0.8rem" },
                     }}
-                    sx={{color: pathname === "/" ? "white" : "#265147"}}
+                    sx={{color: pathname === "/" ? "white" : "#043b28"}}
 
                   />
                 </ListItemButton>
@@ -181,7 +181,7 @@ function Sidebar({ isScrolled, pathname }) {
                 <ListItemButton>
                   <ListItemIcon>
                     <FolderIcon
-                      sx={{  color: pathname === "/" ? "white" : "#265147", fontSize: "1.3rem" }}
+                      sx={{  color: pathname === "/" ? "white" : "#043b28", fontSize: "1.3rem" }}
                     />
                   </ListItemIcon>
                   <ListItemText
@@ -189,7 +189,7 @@ function Sidebar({ isScrolled, pathname }) {
                     primaryTypographyProps={{
                       style: { fontSize: "0.8rem" },
                     }}
-                    sx={{ color: pathname === "/" ? "white" : "#265147"}}
+                    sx={{ color: pathname === "/" ? "white" : "#043b28"}}
 
                   />
                 </ListItemButton>
@@ -200,13 +200,13 @@ function Sidebar({ isScrolled, pathname }) {
                 <ListItemButton>
                   <ListItemIcon >
                     <CallIcon
-                      sx={{ color: pathname === "/" ? "white" : "#265147", fontSize: "1.3rem" }}
+                      sx={{ color: pathname === "/" ? "white" : "#043b28", fontSize: "1.3rem" }}
                     />
                   </ListItemIcon>
                   <ListItemText
                     primary={"CONTACT"}
                     primaryTypographyProps={{
-                      style: { fontSize: "0.8rem", color: pathname === "/" ? "white" : "#265147" },
+                      style: { fontSize: "0.8rem", color: pathname === "/" ? "white" : "#043b28" },
                     }}
                   />
                 </ListItemButton>

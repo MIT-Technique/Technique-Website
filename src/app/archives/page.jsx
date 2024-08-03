@@ -289,7 +289,7 @@ function page() {
     <>
       <div className="min-h-screen  flex flex-col lg:pt-[5vh] pt-[10vh] bg-white ">
         <main className="h-full w-full md:px-12 lg:px-24 font-light  flex flex-col justify-center items-center ">
-          <div className="flex flex-col justify-center items-center bg-[#265147] rounded-t-lg text-white pt-4 w-full">
+          <div className="flex flex-col justify-center items-center bg-[#043b28] rounded-t-lg text-white pt-4 w-full">
             <div className="flex flex-col justify-center w-full items-center space-y-3 ">
               <p className="text-5xl font-extralight w-full text-center ">
                 Archive

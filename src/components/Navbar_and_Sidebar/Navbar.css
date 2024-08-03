@@ -37,20 +37,20 @@ nav {
 }
 
 .nav-item:hover {
-  color: #FF581c;
+  color: #ab936b;
 }
 
 .nav-item.active {
   color: white;
 }
 .nav-item.active:hover {
-  color: #265147;
+  color: #eeddbe;
 }
 
 .indicator {
   position: absolute;
   height: 100%;
-  background-color: #FF581c;
+  background-color: #043b28;
   /* transition: all 0.3s ease; */
   border-radius: 4px; /* Adjust the border-radius if needed */
   z-index: 5; /* Ensure the indicator is behind the nav items */

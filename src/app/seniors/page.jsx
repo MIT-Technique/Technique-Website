@@ -63,7 +63,7 @@ function page() {
                 </Button>
               </div>
             </div>
-            <div className="pb-1 md:pb-5 bg-[#265147] rounded-lg text-white p-5">
+            <div className="pb-1 md:pb-5 bg-[#043b28] rounded-lg text-white p-5">
               <h1 className="text-3xl font-extralight w-full text-left">
                 Dress Code
               </h1>
