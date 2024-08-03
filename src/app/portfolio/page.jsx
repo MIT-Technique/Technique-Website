@@ -3,7 +3,6 @@ import React, { useRef, useState } from "react";
 import Footer from "@/components/Footer/Footer";
 import SimpleCarousel from "@/components/SimpleCarousel/SimpleCarousel";
 import Image from "next/image";
-import Navbar from "@/components/Navbar_and_Sidebar/Navbar_new";
 
 // Import Swiper React components
 import { Swiper, SwiperSlide } from "swiper/react";

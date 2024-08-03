@@ -2,7 +2,6 @@
 import React, { useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Footer from "@/components/Footer/Footer";
-import Navbar from "@/components/Navbar_and_Sidebar/Navbar_new";
 import Image from "next/image";
 
 function page() {
@@ -14,6 +13,8 @@ function page() {
   const [isLoading, setIsLoading] = useState(true);
 
   useLayoutEffect(() => {
+    const containerCurrent = container.current
+    const screenCurrent = screen.current
     const resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const { width, height } = entry.contentRect;
@@ -37,9 +38,9 @@ function page() {
     resizeObserver2.observe(screen.current);
 
     return () => {
-      resizeObserver.unobserve(container.current);
+      resizeObserver.unobserve(containerCurrent);
       resizeObserver.disconnect();
-      resizeObserver2.unobserve(screen.current);
+      resizeObserver2.unobserve(screenCurrent);
       resizeObserver2.disconnect();
     };
   }, []);
@@ -47,7 +48,7 @@ function page() {
   return (
     <>
       <div
-        className="min-h-[90vh]  bg-white lg:pt-[5vh] pt-[10vh] font-light text-[#265147] flex flex-col"
+        className="min-h-[90vh]  bg-white lg:pt-[5vh] pt-[10vh] font-light text-black flex flex-col"
         ref={screen}
       >
         <main className="w-full  pb-6">
@@ -120,9 +121,9 @@ function page() {
             </div>
           </div>
 
-          <div className="mt-4 space-y-3 px-12 md:px-60">
-            <div className="space-y-2">
-              <p>
+          <div className="mt-4 space-y-3 px-12 lg:px-60">
+            <div className="space-y-2 w-full">
+              <p className="w-full">
                 We offer event photography services for all organizations and
                 groups affiliated with MIT. Technique matches you with one of
                 our trained staff photographers to capture every moment during

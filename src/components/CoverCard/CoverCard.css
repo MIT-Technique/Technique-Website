@@ -1,9 +1,9 @@
-.card{
+.cardArchive{
 
     transition: transform 1s cubic-bezier(0, 0, 0.2, 1);
 }
 
-.card:hover {
+.cardArchive:hover {
 
     transform: translateY(-5%);
  

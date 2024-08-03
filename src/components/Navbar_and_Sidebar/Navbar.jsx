@@ -44,7 +44,7 @@ function Navbar() {
         }`}
       >
         <Link
-          className="text-xl lg:text-2xl font-bold text-white absolute left-4"
+          className="text-sm xl:text-2xl font-bold text-white absolute  left-2  top-2 xl:left-4 xl:top-auto"
           href="/"
         >
           TECHNIQUE
@@ -123,7 +123,6 @@ function Navbar() {
           </Link>
         </div>
       </nav>
-      <Sidebar isScrolled={isScrolled} />
     </div>
   );
 }

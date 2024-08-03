@@ -27,12 +27,7 @@ body {
 }
 
 @layer base {
-  main {
-    @apply p-12 lg:px-48 md:pt-4;
-    @apply flex flex-col;
-    @apply bg-white;
-    @apply text-gray-700;
-  }
+  
   h1 {
     @apply text-6xl font-extralight;
     @apply pb-4;

@@ -2,7 +2,6 @@
 import React from "react";
 import Link from "next/link";
 import Footer from "@/components/Footer/Footer";
-import Navbar from "@/components/Navbar_and_Sidebar/Navbar_new";
 
 function page() {
   return (
@@ -41,8 +40,8 @@ function page() {
               </p>
             </div>
           </div>
-          <div className="flex flex-col lg:flex-row lg:space-x-2">
-            <div className="mt-4 space-y-3 bg-[#265147] rounded-lg text-white p-3 px-5 w-full lg:w-1/3">
+          <div className="flex flex-col xl:flex-row xl:space-x-4">
+            <div className="mt-4 space-y-3 bg-[#265147] rounded-lg text-white p-3 px-5 w-full xl:w-1/3">
               <p className="text-3xl font-extralight  w-full text-center">
                 H.R.H. Grogo
               </p>
@@ -62,8 +61,8 @@ function page() {
                 </p>
               </div>
             </div>
-            <div className="mt-4 space-y-3 bg-[#FF581c]  rounded-lg text-[#265147] p-3 px-5 w-full lg:w-1/3">
-              <p className="text-3xl font-extralight  w-full text-center">Weekly</p>
+            <div className="mt-4 space-y-3 bg-[#FF581c]  rounded-lg p-3 px-5 w-full xl:w-1/3">
+              <p className="text-3xl font-extralight  w-full text-center text-white">Weekly</p>
               <div className="space-y-2 text-white">
                 <p>
                   We hold regular meetings at 3pm on Saturday in the riverside
@@ -84,7 +83,7 @@ function page() {
                 </p>
               </div>
             </div>
-            <div className="mt-4 space-y-3 bg-[#265147] rounded-lg text-white p-3 px-5 w-full lg:w-1/3">
+            <div className="mt-4 space-y-3 bg-[#265147] rounded-lg text-white p-3 px-5 w-full xl:w-1/3">
               <p className="text-3xl font-extralight  w-full text-center">Staph</p>
               <div className="space-y-2">
                 <p>

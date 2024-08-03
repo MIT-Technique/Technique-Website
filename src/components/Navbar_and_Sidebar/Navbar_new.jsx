@@ -19,7 +19,6 @@ function Navbar() {
     let rect;
     let height1;
     const navElement = navRef.current
-    console.log(activeNavItem);
     let resizeObserver;
 
     if (activeNavItem && indicatorRef.current) {
@@ -66,7 +65,7 @@ function Navbar() {
           ref={navRef}
         >
           <Link
-            className="text-xl lg:text-2xl font-bold  absolute left-4 w-"
+            className="text-sm xl:text-2xl font-bold  absolute left-2  top-2 xl:left-4 xl:top-auto"
             href="/"
           >
             TECHNIQUE
@@ -119,7 +118,7 @@ function Navbar() {
           <div ref={indicatorRef} className="indicator"></div>
         </nav>
       </div>
-      <Sidebar isScrolled={isScrolled} />
+      <Sidebar isScrolled={isScrolled} pathname={pathname}/>
     </>
   );
 }

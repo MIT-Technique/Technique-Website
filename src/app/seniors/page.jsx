@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import Footer from "@/components/Footer/Footer";
-import Navbar from "@/components/Navbar_and_Sidebar/Navbar_new";
 import { Button } from "@mui/material";
 import Image from "next/image";
 
@@ -12,8 +11,8 @@ function page() {
   return (
     <>
       <div className="min-h-screen bg-white flex flex-col lg:pt-[5vh] pt-[10vh]">
-        <main className="h-full w-full px-12 pb-4 md:px-60 md:pb-20">
-          <div className="flex flex-col justify-center w-full items-center space-y-3 text-gray-700">
+        <main className="h-full w-full pb-4 px-12 md:px-48 md:pb-20">
+          <div className="flex flex-col justify-center w-full items-center space-y-3 ">
             <div className="pb-1 md:pb-5">
               <h1 className="text-5xl font-extralight w-full text-center">
                 Seniors

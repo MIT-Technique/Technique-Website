@@ -4,7 +4,6 @@ import Footer from "@/components/Footer/Footer";
 import CoverCard from "@/components/CoverCard/CoverCard";
 import Image from "next/image";
 import oneEightEightFive from "../../../public/images/covers/1885_Technique@2x.jpg";
-import Navbar from "@/components/Navbar_and_Sidebar/Navbar_new";
 const options = [
   {
     src: "/images/covers/1885_Technique@2x.jpg",
@@ -289,8 +288,8 @@ function page() {
   return (
     <>
       <div className="min-h-screen  flex flex-col lg:pt-[5vh] pt-[10vh] bg-white ">
-        <main className="h-full w-full px-12 md:px-52 font-light  flex flex-col justify-center items-center ">
-          <div className="flex flex-col justify-center items-center bg-[#265147] rounded-t-lg text-white pt-4">
+        <main className="h-full w-full md:px-12 lg:px-24 font-light  flex flex-col justify-center items-center ">
+          <div className="flex flex-col justify-center items-center bg-[#265147] rounded-t-lg text-white pt-4 w-full">
             <div className="flex flex-col justify-center w-full items-center space-y-3 ">
               <p className="text-5xl font-extralight w-full text-center ">
                 Archive
@@ -300,7 +299,7 @@ function page() {
               </p>
             </div>
             <div
-              className=" w-[65vw] h-full rounded-2xl pt-5 flex flex-wrap items-center justify-center pb-5"
+              className=" w-full h-full rounded-2xl pt-5 flex flex-wrap items-center justify-center pb-5"
               id="section1"
             >
               {options.map(({ src, alt, href, title }, i) => {
