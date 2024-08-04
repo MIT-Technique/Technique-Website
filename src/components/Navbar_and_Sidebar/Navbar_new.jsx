@@ -59,7 +59,7 @@ function Navbar() {
 
   return (
     <>
-      <div className={`hidden  flex-col relative z-50 bg-transparent bg-white ${pathname == "/" ? "hidden" : " lg:flex"}`}>
+      <div className={`hidden  flex-col relative z-50  bg-[#fffcf7] ${pathname == "/" ? "hidden" : " lg:flex"}`}>
         <nav
           className={`h-[10vh]  text-[#043b28]  top-0 w-full flex items-center`}
           ref={navRef}

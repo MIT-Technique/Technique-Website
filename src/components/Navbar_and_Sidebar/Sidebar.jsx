@@ -35,7 +35,7 @@ function Sidebar({ isScrolled, pathname }) {
 
   return (
     <div
-      className={`  ${pathname === "/" ? "bg-black text-white " : "bg-white text-[#043b28]"}  h-[10vh]  lg:hidden flex top-0 z-30 w-full items-center font-sans justify-between px-4  `}
+      className={`  ${pathname === "/" ? "bg-black text-white " : "bg-[#fffcf7] text-[#043b28]"}  h-[10vh]  lg:hidden flex top-0 z-30 w-full items-center font-sans justify-between px-4  `}
     >
       <Link
         className="text-xl font-bold "
@@ -66,7 +66,7 @@ function Sidebar({ isScrolled, pathname }) {
         <Box
           sx={{
             width: 250,
-            backgroundColor: pathname === "/" ? "black" : "white",
+            backgroundColor: pathname === "/" ? "black" : "#fffcf7",
             height: "100%",
             color: "white",
             overflowY: "auto",

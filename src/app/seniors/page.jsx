@@ -10,7 +10,7 @@ const preorder_discounted_price = 90;
 function page() {
   return (
     <>
-      <div className="min-h-screen bg-white flex flex-col lg:pt-[5vh] pt-[10vh]">
+      <div className="min-h-screen bg-[#fffcf7] flex flex-col lg:pt-[5vh] pt-[10vh]">
         <main className="h-full w-full pb-4 px-12 md:px-48 md:pb-20">
           <div className="flex flex-col justify-center w-full items-center space-y-3 ">
             <div className="pb-1 md:pb-5">

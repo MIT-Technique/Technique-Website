@@ -6,7 +6,7 @@ import Link from "next/link";
 function page() {
   return (
     <>
-      <div className="min-h-[90vh] bg-white flex flex-col lg:pt-[5vh] pt-[10vh] text-black">
+      <div className="min-h-[90vh] bg-[#fffcf7] flex flex-col lg:pt-[5vh] pt-[10vh] text-black">
         <main className="w-full h-full px-4 flex flex-col space-y-20">
           
           <div className="relative w-full flex flex-col lg:flex-row  space-y-3 lg:space-y-0 lg:space-x-3 h-full pb-5">

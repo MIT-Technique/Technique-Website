@@ -61,7 +61,7 @@ function page() {
                 </p>
               </div>
             </div>
-            <div className="mt-4 space-y-3 bg-[#bcab8d]  rounded-lg p-3 px-5 w-full xl:w-1/3">
+            <div className="mt-4 space-y-3 bg-[#4e3c1d]  rounded-lg p-3 px-5 w-full xl:w-1/3">
               <p className="text-3xl font-extralight  w-full text-center text-white">Weekly</p>
               <div className="space-y-2 text-white">
                 <p>

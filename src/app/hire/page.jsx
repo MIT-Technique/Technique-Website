@@ -48,7 +48,7 @@ function page() {
   return (
     <>
       <div
-        className="min-h-[90vh]  bg-white lg:pt-[5vh] pt-[10vh] font-light text-black flex flex-col"
+        className="min-h-[90vh]  bg-[#fffcf7] lg:pt-[5vh] pt-[10vh] font-light text-black flex flex-col"
         ref={screen}
       >
         <main className="w-full  pb-6">

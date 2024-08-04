@@ -155,9 +155,8 @@ function page() {
 
   return (
     <>
-      <div className="min-h-[90vh]    relative bg-white lg:pt-[5vh] pt-[10vh]">
-        {/* <main className="w-full flex flex-col justify-start items-center h-[100vh] bg-white "> */}
-          <div className="h-full  w-full  bg-white  lg:rounded-t-xl flex flex-col items-center">
+      <div className="min-h-[90vh]    relative bg-[#fffcf7] lg:pt-[5vh] pt-[10vh]">
+          <div className="h-full  w-full   lg:rounded-t-xl flex flex-col items-center">
             <SimpleCarousel
               images={events}
               id="carousel1"
@@ -168,33 +167,8 @@ function page() {
               id="carousel2"
               reverseDirection={true}
             />
-            {/* <section
-              className="h-[100vh] w-full flex flex-col justify-center items-center  pb-[1%]"
-              id="section1"
-            >
-              <div className="w-full  py-[2%] flex flex-col items-center justify-center">
-                <div className="w-full flex  flex-col justify-center items-center ">
-                  <FaCircleArrowDown
-                    style={{
-                      width: "auto",
-                      height: "3.5rem",
-                      cursor: "pointer",
-                      color: "white",
-                    }}
-                    to="section2"
-                    onClick={handleScroll}
-                  />
-                </div>
-              </div>
-            </section>
-            <section
-              className="h-[100vh] w-full flex flex-col justify-center items-center relative"
-              id="section2"
-            >
-              <div className="w-full  py-[2%] flex flex-col items-center justify-center"></div>
-            </section> */}
+            
           </div>
-        {/* </main> */}
       </div>
       <Footer />
     </>

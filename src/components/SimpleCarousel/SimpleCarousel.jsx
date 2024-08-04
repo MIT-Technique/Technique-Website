@@ -37,28 +37,7 @@ function SimpleCarousel({ images, reverseDirection }) {
 
   },[])
   return (
-    // <div className="w-[95vw]">
-    //   <Slider {...settings}>
-    //     {images.map(({ src }, key) => {
-    //       return (
-    //         <div key={key} className="text-black  relative overflow-hidden h-[30vh] bg-red-400 ">
-    //           {/* <div className="overflow-hidden  relative "> */}
-    //             {/* <div className=" w-full "> */}
-    //               <Image
-    //                 className="rounded-3xl"
-    //                 src={src}
-    //                 alt=""
-    //                 fill={true}
-    //                 style={{  borderRadius: "1rem", objectFit: "cover",}}
-    //               ></Image>
-    //             {/* </div> */}
-    //           {/* </div> */}
-    //           {/* <h3> {key} 1</h3> */}
-    //         </div>
-    //       );
-    //     })}
-    //   </Slider>
-    // </div>
+    
     <div className="w-[98vw] h-[40vh] flex justify-center items-center overflow-x-hidden bg-transparent">
       <Swiper
         slidesPerView={1}

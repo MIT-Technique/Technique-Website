@@ -287,7 +287,7 @@ const options = [
 function page() {
   return (
     <>
-      <div className="min-h-screen  flex flex-col lg:pt-[5vh] pt-[10vh] bg-white ">
+      <div className="min-h-screen  flex flex-col lg:pt-[5vh] pt-[10vh] bg-[#fffcf7] ">
         <main className="h-full w-full md:px-12 lg:px-24 font-light  flex flex-col justify-center items-center ">
           <div className="flex flex-col justify-center items-center bg-[#043b28] rounded-t-lg text-white pt-4 w-full">
             <div className="flex flex-col justify-center w-full items-center space-y-3 ">
