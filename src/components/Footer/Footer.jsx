@@ -12,11 +12,11 @@ export default function Footer() {
   return (
     <div
       className={`${
-        pathname === "/" ? "bg-black text-white " : "bg-[#fffcf7] text-black"
+        pathname === "/" ? "bg-black text-white" : "text-black"
       } h-[10vh] w-full z-50 relative p-12 flex items-center space-x-3 md:justify-between text-xs  `}
     >
       <div
-        className={`absolute top-0 w-[100%] px-3 h-2 left-0 ${
+        className={`absolute top-0 w-[100%] h-2 left-0 ${
           pathname === "/" ? "hidden" : "block"
         }`}
       >

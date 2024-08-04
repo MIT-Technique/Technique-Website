@@ -6,13 +6,13 @@ import Footer from "@/components/Footer/Footer";
 function page() {
   return (
     <>
-      <div className="min-h-screen  bg-[#fffcf7] lg:pt-[5vh] pt-[10vh] font-light text-gray-700 flex flex-col ">
+      <div className="min-h-screen lg:pt-[5vh] pt-[10vh] font-light text-gray-700 flex flex-col ">
         <main className="w-full px-12 md:px-48 pb-6 flex flex-col">
           <div>
             <div className="flex flex-col justify-center w-full items-center space-y-3 ">
-              <p className="text-5xl font-extralight w-full text-center text-black">
+              <h1 className="text-black">
                 About Us
-              </p>
+              </h1>
               <div>
                 <div className=" text-center ">
                   Since 1885, our staph have crafted a beautiful annual of
@@ -40,11 +40,11 @@ function page() {
               </p>
             </div>
           </div>
-          <div className="flex flex-col xl:flex-row xl:space-x-4">
-            <div className="mt-4 space-y-3 bg-[#043b28] rounded-lg text-white p-3 px-5 w-full xl:w-1/3">
-              <p className="text-3xl font-extralight  w-full text-center">
+          <div className="flex flex-col xl:flex-row">
+            <div className="card text-white bg-[#043b28]">
+              <h2 className="text-center">
                 H.R.H. Grogo
-              </p>
+              </h2>
               <div className="space-y-2">
                 <p>
                   If you hang around Technique often, you&apos;ll hear this name
@@ -61,9 +61,9 @@ function page() {
                 </p>
               </div>
             </div>
-            <div className="mt-4 space-y-3 bg-[#4e3c1d]  rounded-lg p-3 px-5 w-full xl:w-1/3">
-              <p className="text-3xl font-extralight  w-full text-center text-white">Weekly</p>
-              <div className="space-y-2 text-white">
+            <div className="card text-white bg-[#4e3c1d]">
+              <h2 className="text-center">Weekly</h2>
+              <div className="space-y-2">
                 <p>
                   We hold regular meetings at 3pm on Saturday in the riverside
                   lounge of Walker Memorial. Anyone is welcome to attend. We
@@ -83,8 +83,8 @@ function page() {
                 </p>
               </div>
             </div>
-            <div className="mt-4 space-y-3 bg-[#043b28] rounded-lg text-white p-3 px-5 w-full xl:w-1/3">
-              <p className="text-3xl font-extralight  w-full text-center">Staph</p>
+            <div className="card text-white bg-[#043b28]">
+              <h2 className="text-center">Staph</h2>
               <div className="space-y-2">
                 <p>
                   Many of our staph are part time (or full time) photographers

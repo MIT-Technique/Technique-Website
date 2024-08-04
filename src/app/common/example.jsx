@@ -26,6 +26,7 @@ function page() {
             <hr className="border-2 rounded-xl"/>
             <div id="blocks" className="my-4 p-4">
                 className = &quot;card-container&quot;: re-organizes elements in either a row or column, depending on viewport
+                <em className="text-sm">Note: &quot;card-container&quot; isn't used, but still available</em>
                 <div className="border-stone-500 border-4 card-container text-white">
                     <div className="card bg-orange-500">
                         <h3>className = &quot;card&quot;</h3>

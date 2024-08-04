@@ -155,20 +155,20 @@ function page() {
 
   return (
     <>
-      <div className="min-h-[90vh]    relative bg-[#fffcf7] lg:pt-[5vh] pt-[10vh]">
-          <div className="h-full  w-full   lg:rounded-t-xl flex flex-col items-center">
-            <SimpleCarousel
-              images={events}
-              id="carousel1"
-              reverseDirection={false}
-            />
-            <SimpleCarousel
-              images={niceThings}
-              id="carousel2"
-              reverseDirection={true}
-            />
-            
-          </div>
+      <div className="min-h-[90vh] relative lg:pt-[5vh] pt-[10vh]">
+        <div className="h-full w-full lg:rounded-t-xl flex flex-col items-center">
+          <SimpleCarousel
+            images={events}
+            id="carousel1"
+            reverseDirection={false}
+          />
+          <SimpleCarousel
+            images={niceThings}
+            id="carousel2"
+            reverseDirection={true}
+          />
+
+        </div>
       </div>
       <Footer />
     </>

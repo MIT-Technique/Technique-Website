@@ -10,11 +10,11 @@ const preorder_discounted_price = 90;
 function page() {
   return (
     <>
-      <div className="min-h-screen bg-[#fffcf7] flex flex-col lg:pt-[5vh] pt-[10vh]">
+      <div className="min-h-screen flex flex-col lg:pt-[5vh] pt-[10vh]">
         <main className="h-full w-full pb-4 px-12 md:px-48 md:pb-20">
           <div className="flex flex-col justify-center w-full items-center space-y-3 ">
             <div className="pb-1 md:pb-5">
-              <h1 className="text-5xl font-extralight w-full text-center">
+              <h1>
                 Seniors
               </h1>
               <p>
@@ -23,9 +23,9 @@ function page() {
               </p>
             </div>
             <div className="pb-1 md:pb-5">
-              <h1 className="text-3xl font-extralight w-full text-left">
+              <h2 className="text-left">
                 Scheduling
-              </h1>
+              </h2>
               <div>
                 <p>
                   For the purposes of the Technique yearbook, seniors are
@@ -63,11 +63,11 @@ function page() {
                 </Button>
               </div>
             </div>
-            <div className="pb-1 md:pb-5 bg-[#043b28] rounded-lg text-white p-5">
-              <h1 className="text-3xl font-extralight w-full text-left">
+            <div className="pb-4 md:pb-8 bg-[#043b28] rounded-lg text-white p-5">
+              <h2 className="text-left">
                 Dress Code
-              </h1>
-              <div className="">
+              </h2>
+              <div>
                 <p>
                   There is no dress code for senior portraits. You can show up
                   in a suit, dress, or even your pajamas. We have even had
@@ -76,7 +76,7 @@ function page() {
                   since your image will likely be on shelves of your peers for
                   decades to come.
                 </p>
-                <div className="flex flex-col md:flex-row items-start justify-center h-[50vh] w-full mt-[6vh] text-center">
+                <div className="flex flex-col md:flex-row items-center justify-center w-full mt-[6vh] text-center">
                   <div className=" flex flex-col relative rounded-[0.3rem] h-[57.6%] w-[86.4%] md:h-[100%] md:w-[100%] overflow-hidden">
                     <div className="relative aspect-square w-full h-auto">
                       <Image
@@ -89,7 +89,7 @@ function page() {
                         }}
                       />
                     </div>
-                    <p>Valid attire for photo </p>
+                    <p className="pt-4">Valid attire for photo</p>
                   </div>
                   <div className="flex flex-col relative rounded-[0.3rem] h-[57.6%] w-[86.4%] md:h-[100%] md:w-[100%] overflow-hidden">
                     <div className="relative aspect-square w-full h-auto">
@@ -103,15 +103,15 @@ function page() {
                         }}
                       />
                     </div>
-                    <p>Also valid attire for photo</p>
+                    <p className="pt-4">Also valid attire for photo</p>
                   </div>
                 </div>
               </div>
             </div>
             <div className="pb-1 md:pb-5">
-              <h1 className="text-3xl font-extralight w-full text-left">
+              <h2 className="text-left">
                 Senior (Class) Discount
-              </h1>
+              </h2>
               <div>
                 {/* Final prices not available */}
                 <p>
@@ -142,9 +142,9 @@ function page() {
               </div>
             </div>
             <div className="pb-1 md:pb-5">
-              <h1 className="text-3xl font-extralight w-full text-left">
+              <h2 className="text-left">
                 Biographical Information
-              </h1>
+              </h2>
               <div>
                 <p>
                   When you schedule your senior portrait, you will be able to
@@ -163,18 +163,16 @@ function page() {
               </div>
             </div>
             <div className="pb-1 md:pb-5">
-              <h1 className="text-3xl font-extralight w-full text-left">
+              <h2 className="text-left">
                 Missed Session or Issues?
-              </h1>
+              </h2>
               <div>
                 <p>
                   For all questions regarding scheduling senior portrait
                   sessions, late changes to biographical information, or any
                   other issues, please contact{" "}
-                  <a href="mailto:tnq-exec@mit.edu">
-                    <b className="text-sky-500 hover:text-blue-500">
-                      <u>tnq-exec@mit.edu</u>
-                    </b>
+                  <a className="text-blue-400" href="mailto:tnq-exec@mit.edu">
+                    tnq-exec@mit.edu
                   </a>
                   . Technique has a publication deadline for senior portraits,
                   so we unfortunately cannot accommodate any students who miss

@@ -48,20 +48,20 @@ function page() {
   return (
     <>
       <div
-        className="min-h-[90vh]  bg-[#fffcf7] lg:pt-[5vh] pt-[10vh] font-light text-black flex flex-col"
+        className="min-h-[90vh] lg:pt-[5vh] pt-[10vh] font-light text-black flex flex-col"
         ref={screen}
       >
-        <main className="w-full  pb-6">
+        <main className="w-full pb-6">
           <div className="flex flex-col justify-center w-full items-center space-y-3 px-12 md:px-60">
-            <p className="text-5xl font-extralight w-full text-center ">
+            <h1>
               Hire Us
-            </p>
+            </h1>
             <p className=" text-center ">
               If you need photography for an event, our community of MIT
               photographers can help.
             </p>
           </div>
-          <div className="flex mt-8  w-full bg-black relative" ref={container}>
+          <div className="flex mt-8 w-full bg-black relative" ref={container}>
             <div
               className="relative hidden md:block bg-black"
               style={{ minHeight: isLoading ? height || "300px" : "0px" }}
@@ -128,12 +128,12 @@ function page() {
                 groups affiliated with MIT. Technique matches you with one of
                 our trained staff photographers to capture every moment during
                 your event. To get a quote, please{" "}
-                <Link
+                <a
                   href="mailto:technique@mit.edu?subject=Event%20Photography%20Quote"
                   className="text-blue-400"
                 >
                   email us
-                </Link>{" "}
+                </a>{" "}
                 with the subject line &quot;Event Photography Quote&quot; and
                 more details about your event.
               </p>

@@ -30,7 +30,7 @@ function Navbar() {
       indicatorRef.current.style.width = `${rect.width}px`;
       indicatorRef.current.style.height = `${rect.height}px`;
       indicatorRef.current.style.transform = `translateX(${offsetLeft}px) `;
-      if(!firstLoad){
+      if (!firstLoad) {
         indicatorRef.current.style.transition = 'all 0.3s ease';
       }
       resizeObserver = new ResizeObserver((entries) => {
@@ -59,7 +59,7 @@ function Navbar() {
 
   return (
     <>
-      <div className={`hidden  flex-col relative z-50  bg-[#fffcf7] ${pathname == "/" ? "hidden" : " lg:flex"}`}>
+      <div className={`hidden bg-white flex-col relative z-50  ${pathname == "/" ? "hidden" : " lg:flex"}`}>
         <nav
           className={`h-[10vh]  text-[#043b28]  top-0 w-full flex items-center`}
           ref={navRef}
@@ -118,7 +118,7 @@ function Navbar() {
           <div ref={indicatorRef} className="indicator"></div>
         </nav>
       </div>
-      <Sidebar isScrolled={isScrolled} pathname={pathname}/>
+      <Sidebar isScrolled={isScrolled} pathname={pathname} />
     </>
   );
 }
