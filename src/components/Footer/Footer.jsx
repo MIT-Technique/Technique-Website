@@ -16,7 +16,7 @@ export default function Footer() {
       } h-[10vh] w-full z-50 relative p-12 flex items-center space-x-3 md:justify-between text-xs  `}
     >
       <div
-        className={`absolute top-0 w-[100%] h-2 left-0 ${
+        className={`absolute top-0 w-[100%] h-2 left-0 px-3 ${
           pathname === "/" ? "hidden" : "block"
         }`}
       >

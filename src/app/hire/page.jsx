@@ -72,7 +72,6 @@ function page() {
                 width={width / divider}
                 height={height}
                 onLoad={() => setIsLoading(false)}
-                className="relative z-30"
               />
               <p
                 className="absolute bottom-[1%] right-[2%] text-white"
