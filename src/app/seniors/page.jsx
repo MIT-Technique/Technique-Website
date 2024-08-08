@@ -44,7 +44,7 @@ function page() {
                 <Button
                   variant="outlined"
                   // comment out in order to enable
-                  // disabled
+                  disabled
                   sx={{
                     width: "auto",
                     borderColor: "black",
@@ -108,7 +108,7 @@ function page() {
                 </div>
               </div>
             </div>
-            <div className="pb-1 md:pb-5">
+            <div className="py-1 md:py-5">
               <h2 className="text-left">
                 Senior (Class) Discount
               </h2>
