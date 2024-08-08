@@ -14,7 +14,7 @@ function page() {
             <div className="relative w-[100%] lg:w-2/3 h-[45vh] lg:h-[83vh]">
               <Image
                 src="/images/other_images/Jade_Chongsathapornpong/DSC02130.jpg"
-                alt=""
+                alt="Contact Image showing Technique's Managing Board 2023-2024"
                 priority
                 quality={100}
                 fill={true}

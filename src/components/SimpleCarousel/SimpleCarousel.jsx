@@ -78,7 +78,7 @@ function SimpleCarousel({ images, reverseDirection }) {
               <Image
                 className="rounded-3xl relative"
                 src={src}
-                alt=""
+                alt={`Example Image ${key}`}
                 fill={true}
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 100vw"
                 style={{ borderRadius: "1rem", objectFit: "cover" }}

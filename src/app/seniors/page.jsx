@@ -81,7 +81,7 @@ function page() {
                     <div className="relative aspect-square w-full h-auto">
                       <Image
                         src="/images/Senior_Pictures/232010911.JPG"
-                        alt="Informal Dress"
+                        alt="Informal Dress in Senior Picture"
                         fill={true}
                         style={{
                           borderRadius: "0.3rem",
@@ -95,7 +95,7 @@ function page() {
                     <div className="relative aspect-square w-full h-auto">
                       <Image
                         src="/images/Senior_Pictures/232198679.JPG"
-                        alt="senior picture"
+                        alt="Formal Dress in Senior Picture"
                         fill={true}
                         style={{
                           borderRadius: "0.3rem",

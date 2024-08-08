@@ -68,7 +68,7 @@ function page() {
             >
               <Image
                 src="/images/other_images/Alison_Soong/20240915-P1050432.jpg"
-                alt=""
+                alt="People typing on laptops"
                 width={width / divider}
                 height={height}
                 onLoad={() => setIsLoading(false)}
@@ -86,7 +86,7 @@ function page() {
             >
               <Image
                 src="/images/other_images/Jade_Chongsathapornpong/_TNA2320.jpg"
-                alt=""
+                alt="People preforming and watching martial arts"
                 width={width / divider}
                 height={height}
                 priority
@@ -105,7 +105,7 @@ function page() {
             >
               <Image
                 src="/images/other_images/Jade_Chongsathapornpong/_TNA3975C.jpg"
-                alt=""
+                alt="Two People in Mask"
                 width={width / divider}
                 height={height}
                 priority
