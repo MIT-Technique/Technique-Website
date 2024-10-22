@@ -14,18 +14,14 @@ function page() {
         <main className="h-full w-full pb-4 px-12 md:px-48 md:pb-20">
           <div className="flex flex-col justify-center w-full items-center space-y-3 ">
             <div className="pb-1 md:pb-5">
-              <h1>
-                Seniors
-              </h1>
+              <h1>Seniors</h1>
               <p>
                 Important information regarding Techique senior portrait
                 sessions.
               </p>
             </div>
             <div className="pb-1 md:pb-5">
-              <h2 className="text-left">
-                Scheduling
-              </h2>
+              <h2 className="text-left">Scheduling</h2>
               <div>
                 <p>
                   For the purposes of the Technique yearbook, seniors are
@@ -44,7 +40,7 @@ function page() {
                 <Button
                   variant="outlined"
                   // comment out in order to enable
-                  disabled
+                  // disabled
                   sx={{
                     width: "auto",
                     borderColor: "black",
@@ -56,16 +52,17 @@ function page() {
                   }}
                   color="primary"
                   // Update to scheduling link when available
-                  href="/"
+                  href="https://seniors.legacystudios.com/massachusetts-institute-technology-cambridge-ma/"
                 >
                   {" "}
                   Schedule Here
                 </Button>
               </div>
             </div>
-            <div className="pb-4 md:pb-8 bg-[#043b28] rounded-lg text-white p-5">
-              <h2 className="text-left">
-                Dress Code
+            <div className="pb-4 md:pb-8  rounded-lg text-black p-5">
+              <h2 className="text-left flex flex-col pb-8">
+                <p>Dress Code</p>
+                <div className="w-full border-t-[3px] border-solid border-[#075d3e] h-full "></div>
               </h2>
               <div>
                 <p>
@@ -109,9 +106,7 @@ function page() {
               </div>
             </div>
             <div className="py-1 md:py-5">
-              <h2 className="text-left">
-                Senior (Class) Discount
-              </h2>
+              <h2 className="text-left">Senior (Class) Discount</h2>
               <div>
                 {/* Final prices not available */}
                 <p>
@@ -142,9 +137,7 @@ function page() {
               </div>
             </div>
             <div className="pb-1 md:pb-5">
-              <h2 className="text-left">
-                Biographical Information
-              </h2>
+              <h2 className="text-left">Biographical Information</h2>
               <div>
                 <p>
                   When you schedule your senior portrait, you will be able to
@@ -163,9 +156,7 @@ function page() {
               </div>
             </div>
             <div className="pb-1 md:pb-5">
-              <h2 className="text-left">
-                Missed Session or Issues?
-              </h2>
+              <h2 className="text-left">Missed Session or Issues?</h2>
               <div>
                 <p>
                   For all questions regarding scheduling senior portrait

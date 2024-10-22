@@ -10,9 +10,7 @@ function page() {
         <main className="w-full px-12 md:px-48 pb-6 flex flex-col">
           <div>
             <div className="flex flex-col justify-center w-full items-center space-y-3 ">
-              <h1 className="text-black">
-                About Us
-              </h1>
+              <h1 className="text-black">About Us</h1>
               <div>
                 <div className=" text-center ">
                   Since 1885, our staph have crafted a beautiful annual of
@@ -41,9 +39,10 @@ function page() {
             </div>
           </div>
           <div className="flex flex-col xl:flex-row">
-            <div className="card text-white bg-[#043b28]">
-              <h2 className="text-center">
-                H.R.H. Grogo
+            <div className="card text-black">
+              <h2 className="text-center flex flex-col ">
+                <p>H.R.H. Grogo</p>
+                <div className="w-full border-t-[3px] border-solid border-[#075d3e] h-full "></div>
               </h2>
               <div className="space-y-2">
                 <p>
@@ -61,8 +60,12 @@ function page() {
                 </p>
               </div>
             </div>
-            <div className="card text-white bg-[#4e3c1d]">
-              <h2 className="text-center">Weekly</h2>
+            <div className="card text-black ">
+              <h2 className="text-center flex flex-col ">
+                <p>Weekly</p>
+                <div className="w-full border-t-[3px] border-solid border-[#7c6132] h-full "></div>
+              </h2>
+
               <div className="space-y-2">
                 <p>
                   We hold regular meetings at 3pm on Saturday in the riverside
@@ -83,8 +86,11 @@ function page() {
                 </p>
               </div>
             </div>
-            <div className="card text-white bg-[#043b28]">
-              <h2 className="text-center">Staph</h2>
+            <div className="card text-black">
+              <h2 className="text-center flex flex-col ">
+                <p>Staph</p>
+                <div className="w-full border-t-[3px] border-solid border-[#075d3e] h-full "></div>
+              </h2>
               <div className="space-y-2">
                 <p>
                   Many of our staph are part time (or full time) photographers
