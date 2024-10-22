@@ -56,7 +56,7 @@ function page() {
                   H.R.H. Grogo has been there since the beginning, inscribed in
                   the back of the very first <i>Technique </i>, and has been
                   there ever since. We&apos;re not quite sure how or when he
-                  became a gorilla.
+                  became a gorilla. 
                 </p>
               </div>
             </div>
