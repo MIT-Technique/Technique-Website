@@ -34,7 +34,7 @@ function page() {
                 the campus photography community by providing equipment rentals,
                 event photography services, and studio space for students. We
                 manage a photo studio and darkroom in the Stratton Student
-                Center for convenient access.
+                Center for convenient access. 
               </p>
             </div>
           </div>
