@@ -113,13 +113,13 @@ function page() {
                   When you arrive at your appointment, you will be able to order
                   your yearbook for a special{" "}
                   <b>senior only discounted price</b>. This pricing only applies
-                  to seniors who pay in person at their appointment, and is not
-                  redeemable online.
+                  to seniors who attend their appointment, and is not redeemable
+                  online.
                 </p>
                 <p>
-                  If you do not wish to get your senior portrait, you are still
+                  {/* If you do not wish to get your senior portrait, you are still
                   able to pre-order your yearbook at the{" "}
-                  <b>pre-order discounted price</b> on our order page.
+                  <b>pre-order discounted price</b> on our order page. */}
                 </p>
                 {/* Set final prices
                 <p>
@@ -140,17 +140,26 @@ function page() {
               <h2 className="text-left">Biographical Information</h2>
               <div>
                 <p>
-                  When you schedule your senior portrait, you will be able to
+                  We typically ask the Registrar for biographical information to
+                  put in the book. This includes your name as you should like it
+                  to appear and your major(s)/minor. After all senior portraits
+                  are done, we will reach out and ask everyone to fill out a
+                  form with any corrections to their information to ensure that
+                  the correct biographical information is recorded in the
+                  yearbook. If you choose not to fill this information out, your
+                  name and academic information will appear as recorded by the
+                  Registrar&apos;s office.
+                  {/* When you schedule your senior portrait, you will be able to
                   add and update the biographical information you would like to
                   appear in the yearbook. This includes your name as you would
                   like it to appear, your major(s)/minor, and a quote. If you
                   choose not to fill this information out, your name and
                   academic information will appear as recorded by the
-                  Registrar&apos;s office.
+                  Registrar&apos;s office. */}
                 </p>
                 <p>
                   Students without a senior portrait will have their
-                  biographical information featured in a separate section for
+                  biographical information as recorded by the Registrar&apos;s office featured in a separate section for
                   those not pictured.
                 </p>
               </div>

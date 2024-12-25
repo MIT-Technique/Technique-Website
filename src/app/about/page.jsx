@@ -68,8 +68,7 @@ function page() {
 
               <div className="space-y-2">
                 <p>
-                  We hold regular meetings at 3pm on Saturday in the riverside
-                  lounge of Walker Memorial. Anyone is welcome to attend. We
+                  We hold regular meetings at 12pm on Saturday in 4-253. Anyone is welcome to attend. We
                   have photographic equipment for borrowing and often teach
                   various photography and design related seminars at this time.
                 </p>
