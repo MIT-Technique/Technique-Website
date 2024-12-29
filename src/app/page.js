@@ -43,7 +43,7 @@ export default function Home() {
         >
           <div className=" w-full relative h-[100vh]">
             <Image
-              src="/images/other_images/Jade_Chongsathapornpong/TNA9296_01.jpg"
+              src="/images/other_images/Michelle Xiang/DSC04240.jpg" 
               alt="cover picture"
               fill={true}
               style={{ objectFit: "cover", position: "absolute", zIndex: 1 }}
@@ -52,7 +52,7 @@ export default function Home() {
               photo credit:
               <br></br>
               <br></br>
-              Jade Chongsathapornpong | Technique 2024 Co-Editor-in-Chief
+              Michelle Xiang
             </p>
             <div className="flex flex-col justify-center h-full w-full relative z-20 space-y-3">
               <div className="w-full flex flex-col items-center justify-center">

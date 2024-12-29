@@ -134,8 +134,8 @@ function page() {
       photographer: "Alison Soong",
     },
     {
-      src: "/images/other_images/Jade_Chongsathapornpong/_TNA5489.jpg",
-      photographer: "Jade Chongsathapornpong",
+      src: "/images/other_images/Michelle Xiang/goofynextdiningLOL.jpg",
+      photographer: "Michelle Xiang",
     },
     {
       src: "/images/other_images/Jade_Chongsathapornpong/IMG_4075.jpg",
