@@ -3,6 +3,7 @@ import React from "react";
 import Footer from "@/components/Footer/Footer";
 import { Button } from "@mui/material";
 import Image from "next/image";
+import Link from "next/link";
 
 const senior_discounted_price = 60;
 const preorder_discounted_price = 90;
@@ -15,13 +16,27 @@ function page() {
           <div className="flex flex-col justify-center w-full items-center space-y-3 ">
             <div className="pb-1 md:pb-5">
               <h1>Seniors</h1>
-              <p>
-                Important information regarding Techique senior portrait
-                sessions.
-              </p>
+              <p>Important information regarding Techique for seniors.</p>
             </div>
             <div className="pb-1 md:pb-5">
-              <h2 className="text-left">Scheduling</h2>
+              <h2 className="text-left">Yearbook Preorder</h2>
+              <div>
+                <p>
+                  We’re excited to announce that Technique sales for the 140
+                  <sup>th</sup> edition of the yearbook are now open! You can
+                  preorder a copy at a discounted price of{" "}
+                  <b>$95 until 11:59 PM on 03/16</b>{" "}
+                  <a
+                    href="https://mit.universitytickets.com/w/event.aspx?id=2127"
+                    className="text-blue-400"
+                  >
+                    here.
+                  </a>
+                </p>
+              </div>
+            </div>
+            <div className="pb-1 md:pb-5">
+              <h2 className="text-left">Senior Photo Submission</h2>
               <div>
                 <p>
                   For the purposes of the Technique yearbook, seniors are
@@ -31,12 +46,17 @@ function page() {
                 <p>
                   Every Technique yearbook dedicates a section of the
                   publication to photos and biographical information of seniors.
-                  Seniors can schedule their senior portrait session using the
-                  button below. We strongly suggest you book your appointment as
-                  early as possible because spaces fill up fast.
+                  For those of you who missed senior photos in the fall you can
+                  submit your own high quality photos{" "}
+                  <a
+                    href="https://forms.gle/e5wXz1riVpxKAfoc9"
+                    className="text-blue-400"
+                  >
+                    here.
+                  </a>
                 </p>
               </div>
-              <div className="text-center pt-5">
+              {/* <div className="text-center pt-5">
                 <Button
                   variant="outlined"
                   // comment out in order to enable
@@ -52,12 +72,12 @@ function page() {
                   }}
                   color="primary"
                   // Update to scheduling link when available
-                  href="https://seniors.legacystudios.com/massachusetts-institute-technology-cambridge-ma/"
+                  href="https://forms.gle/e5wXz1riVpxKAfoc9"
                 >
                   {" "}
-                  Schedule Here
+                  Submit Here
                 </Button>
-              </div>
+              </div> */}
             </div>
             <div className="pb-4 md:pb-8  rounded-lg text-black p-5">
               <h2 className="text-left flex flex-col pb-8">
@@ -136,34 +156,7 @@ function page() {
                 </p> */}
               </div>
             </div>
-            <div className="pb-1 md:pb-5">
-              <h2 className="text-left">Biographical Information</h2>
-              <div>
-                <p>
-                  We typically ask the Registrar for biographical information to
-                  put in the book. This includes your name as you should like it
-                  to appear and your major(s)/minor. After all senior portraits
-                  are done, we will reach out and ask everyone to fill out a
-                  form with any corrections to their information to ensure that
-                  the correct biographical information is recorded in the
-                  yearbook. If you choose not to fill this information out, your
-                  name and academic information will appear as recorded by the
-                  Registrar&apos;s office.
-                  {/* When you schedule your senior portrait, you will be able to
-                  add and update the biographical information you would like to
-                  appear in the yearbook. This includes your name as you would
-                  like it to appear, your major(s)/minor, and a quote. If you
-                  choose not to fill this information out, your name and
-                  academic information will appear as recorded by the
-                  Registrar&apos;s office. */}
-                </p>
-                <p>
-                  Students without a senior portrait will have their
-                  biographical information as recorded by the Registrar&apos;s office featured in a separate section for
-                  those not pictured.
-                </p>
-              </div>
-            </div>
+
             <div className="pb-1 md:pb-5">
               <h2 className="text-left">Missed Session or Issues?</h2>
               <div>
