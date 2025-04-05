@@ -26,19 +26,18 @@ export default function Footer() {
         &copy; 2024 Technique. Images are property of their respective owners.
         All Rights Reserved.
       </div>
-      <Link href="mailto:technique@mit.edu">
-        <Tooltip title="Email Us" arrow>
-          <MailIcon />
-        </Tooltip>
-      </Link>
-      {/* <div className='flex  items-center justify-end'> */}
-      {/* Uncomment below when we get access again */}
-      {/* <a href='https://www.instagram.com/mit_tnq/'>
-          <Tooltip title="Follow us on Instagram" arrow>
-            <InstagramIcon/>
+      <div>
+        <a href="mailto:technique@mit.edu">
+          <Tooltip title="Email Us" arrow>
+            <MailIcon />
           </Tooltip>
-        </a> */}
-      {/* </div> */}
+        </a>
+        <a href="https://www.instagram.com/mit.tnq/" className="px-5" target="_blank" rel="noopener noreferrer">
+          <Tooltip title="Check us out!" arrow>
+            <InstagramIcon />
+          </Tooltip>
+        </a>
+      </div>
     </div>
   );
 }
