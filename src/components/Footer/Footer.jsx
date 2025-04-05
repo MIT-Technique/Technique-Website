@@ -34,7 +34,7 @@ export default function Footer() {
         </a>
         <a href="https://www.instagram.com/mit.tnq/" className="px-5" target="_blank" rel="noopener noreferrer">
           <Tooltip title="Check us out!" arrow>
-            <InstagramIcon />
+            <InstagramIcon/>
           </Tooltip>
         </a>
       </div>
