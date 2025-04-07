@@ -19,15 +19,14 @@ function page() {
               <p>Important information regarding Techique for seniors.</p>
             </div>
             <div className="pb-1 md:pb-5">
-              <h2 className="text-left">Yearbook Preorder</h2>
+              <h2 className="text-center mb-1">Yearbook Preorder</h2>
               <div>
-                <p>
+                <p className="text-center">
                   We’re excited to announce that Technique sales for the 140
                   <sup>th</sup> edition of the yearbook are now open! You can
-                  preorder a copy at a discounted price of{" "}
-                  <b>$95 until 11:59 PM on 03/16</b>{" "}
+                  order a copy at <b>$105 until 11:59 PM on 05/11</b>{" "}
                   <a
-                    href="https://mit.universitytickets.com/w/event.aspx?id=2127"
+                    href="https://technique.mit.edu/order"
                     className="text-blue-400"
                   >
                     here.
@@ -35,26 +34,18 @@ function page() {
                 </p>
               </div>
             </div>
-            <div className="pb-1 md:pb-5">
-              <h2 className="text-left">Senior Photo Submission</h2>
-              <div>
-                <p>
-                  For the purposes of the Technique yearbook, seniors are
-                  defined as undergraduate students who are in their fourth-year
-                  of their studies as determined by the Registrar&apos;s office.
-                </p>
-                <p>
-                  Every Technique yearbook dedicates a section of the
-                  publication to photos and biographical information of seniors.
-                  For those of you who missed senior photos in the fall you can
-                  submit your own high quality photos{" "}
-                  <a
-                    href="https://forms.gle/e5wXz1riVpxKAfoc9"
-                    className="text-blue-400"
-                  >
-                    here.
-                  </a>
-                </p>
+            <div className="pb-1 md:pb-5 overflow-hidden w-full h-1/2 flex flex-col items-center ">
+              <h2 className="text-center mb-3">Technique 2025 Cover Sneak Peak</h2>
+              <div className="w-[80%] aspect-[1312/809] overflow-hidden relative">
+                <Image
+                  src="/images/covers/TNQ_2025_Cover.jpg"
+                  alt="Contact Image showing Technique's Managing Board 2023-2024"
+                  priority
+                  quality={100}
+                  fill={true}
+                  sizes=""
+                  style={{  objectFit: "contain", objectPosition:"top"}}
+                />
               </div>
               {/* <div className="text-center pt-5">
                 <Button
@@ -79,7 +70,7 @@ function page() {
                 </Button>
               </div> */}
             </div>
-            <div className="pb-4 md:pb-8  rounded-lg text-black p-5">
+            {/* <div className="pb-4 md:pb-8  rounded-lg text-black p-5">
               <h2 className="text-left flex flex-col pb-8">
                 <p>Dress Code</p>
                 <div className="w-full border-t-[3px] border-solid border-[#075d3e] h-full "></div>
@@ -124,11 +115,11 @@ function page() {
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="py-1 md:py-5">
+            </div> */}
+            {/* <div className="py-1 md:py-5">
               <h2 className="text-left">Senior (Class) Discount</h2>
               <div>
-                {/* Final prices not available */}
+                Final prices not available
                 <p>
                   When you arrive at your appointment, you will be able to order
                   your yearbook for a special{" "}
@@ -137,11 +128,11 @@ function page() {
                   online.
                 </p>
                 <p>
-                  {/* If you do not wish to get your senior portrait, you are still
+                  If you do not wish to get your senior portrait, you are still
                   able to pre-order your yearbook at the{" "}
-                  <b>pre-order discounted price</b> on our order page. */}
+                  <b>pre-order discounted price</b> on our order page.
                 </p>
-                {/* Set final prices
+                Set final prices
                 <p>
                   When you arrive at your appointment, you will be able to order
                   your yearbook for the{" "}
@@ -153,11 +144,11 @@ function page() {
                   If you do not wish to get your senior portrait, you are still
                   able to pre-order your yearbook for $
                   <b>[INSERT PREORDER PRICE HERE]</b> on our order page.
-                </p> */}
+                </p>
               </div>
-            </div>
+            </div> */}
 
-            <div className="pb-1 md:pb-5">
+            {/* <div className="pb-1 md:pb-5">
               <h2 className="text-left">Missed Session or Issues?</h2>
               <div>
                 <p>
@@ -174,7 +165,7 @@ function page() {
                   feature senior portraits.
                 </p>
               </div>
-            </div>
+            </div> */}
           </div>
         </main>
       </div>
