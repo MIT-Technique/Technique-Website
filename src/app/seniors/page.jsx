@@ -19,7 +19,7 @@ function page() {
               <p>Important information regarding Techique for seniors.</p>
             </div>
             <div className="pb-1 md:pb-5">
-              <h2 className="text-center mb-1">Yearbook Preorder</h2>
+              <h2 className="text-center mb-1">Yearbook Order</h2>
               <div>
                 <p className="text-center">
                   We’re excited to announce that Technique sales for the 140
@@ -27,7 +27,7 @@ function page() {
                   order a copy at <b>$105 until 11:59 PM on 05/11</b>{" "}
                   <a
                     href="https://technique.mit.edu/order"
-                    className="text-blue-400"
+                    className="text-blue-400 font-bold"
                   >
                     here.
                   </a>
@@ -38,7 +38,7 @@ function page() {
               <h2 className="text-center mb-3">Technique 2025 Cover Sneak Peak</h2>
               <div className="w-[80%] aspect-[1312/809] overflow-hidden relative">
                 <Image
-                  src="/images/covers/TNQ_2025_Cover.jpg"
+                  src="/images/covers/TNQ_Cover_2025.jpg"
                   alt="Contact Image showing Technique's Managing Board 2023-2024"
                   priority
                   quality={100}
