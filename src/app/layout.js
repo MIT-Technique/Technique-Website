@@ -23,7 +23,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${inter.className} ${raleway.variable} overflow-y-auto scroll-smooth relative`} >
         <Navbar />
-        <div className="bg-[#fffcf7]">
+        <div className="bg-[#fffcf7] ">
           {children}
         </div>
       </body>

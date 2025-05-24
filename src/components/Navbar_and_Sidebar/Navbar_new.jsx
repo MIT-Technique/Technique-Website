@@ -114,6 +114,12 @@ function Navbar() {
             >
               CONTACT
             </Link>
+            <Link
+              className={`nav-item ${pathname == "/invoice" ? "active" : ""} ${(firstLoad && pathname == "/invoice") ? "bg-[#043b28] rounded-[4px]" : ""}`}
+              href="/invoice"
+            >
+              INVOICE
+            </Link>
           </div>
           <div ref={indicatorRef} className="indicator"></div>
         </nav>
