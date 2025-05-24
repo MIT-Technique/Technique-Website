@@ -8,6 +8,9 @@ import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import { Button } from "@mui/material";
 import Snackbar from "@mui/material/Snackbar";
+import CloseIcon from "@mui/icons-material/Close";
+import IconButton from "@mui/material/IconButton";
+import Alert from "@mui/material/Alert";
 function page() {
   const [orgName, setOrgName] = useState("");
   const [photographerName, setPhotographerName] = useState("");
@@ -16,7 +19,7 @@ function page() {
   const [totalHours, setTotalHours] = useState("");
   const [eventDate, setEventDate] = useState("");
   const [costObject, setCostObject] = useState("");
-
+  const [open, setOpen] = useState(false);
   const vertical = "top";
   const horizontal = "center";
 
@@ -32,6 +35,9 @@ function page() {
     cast9454cbe0383611f099c92fb5678df49d: "2025-05-24",
   };
 
+  function handleClose() {
+    setOpen(false);
+  }
   function formatToMMDDYYYY(dateString) {
     const date = new Date(dateString);
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -75,7 +81,7 @@ function page() {
       setPhotographerName("");
       setEventDate("");
       // Trigger download
-      alert("Invoice sent successfully");
+      setOpen(true);
     } catch (error) {
       console.error(error);
       alert(error.message);
@@ -246,6 +252,32 @@ function page() {
           </Box>
         </main>
       </div>
+      <Snackbar
+        anchorOrigin={{ vertical, horizontal }}
+        open={open}
+        onClose={handleClose}
+        message="Invoice Sent Successfully"
+        autoHideDuration={4000}
+        action={
+          <IconButton
+            aria-label="close"
+            color="inherit"
+            sx={{ p: 0.5 }}
+            onClick={handleClose}
+          >
+            <CloseIcon />
+          </IconButton>
+        }
+      >
+        <Alert
+          onClose={handleClose}
+          severity="success"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          Invoice Sent Successfully
+        </Alert>
+      </Snackbar>
       <Footer />
     </>
   );
