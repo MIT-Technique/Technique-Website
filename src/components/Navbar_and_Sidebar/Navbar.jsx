@@ -97,6 +97,12 @@ function Navbar() {
           >
             CONTACT
           </Link>
+          <Link
+            className={`px-5 py-2 relative z-10 cursor-pointer hover:text-white`}
+            href="/invoice"
+          >
+            INVOICE
+          </Link>
         </div>
       </nav>
     </div>
