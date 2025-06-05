@@ -1,7 +1,7 @@
 "use client";
 import React, { useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
-import Footer from "@/components/Footer/Footer";
+import Footer from "../../components/Footer/Footer";
 import Image from "next/image";
 
 function page() {

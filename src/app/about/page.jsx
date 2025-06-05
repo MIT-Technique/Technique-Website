@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
-import Link from "next/link";
-import Footer from "@/components/Footer/Footer";
+import Footer from "../../components/Footer/Footer";
 
 function page() {
   return (

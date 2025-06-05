@@ -1,7 +1,7 @@
 "use client";
 import React, { useRef, useState } from "react";
-import Footer from "@/components/Footer/Footer";
-import SimpleCarousel from "@/components/SimpleCarousel/SimpleCarousel";
+import Footer from "../../components/Footer/Footer";
+import SimpleCarousel from "../../components/SimpleCarousel/SimpleCarousel";
 import Image from "next/image";
 
 // Import Swiper React components

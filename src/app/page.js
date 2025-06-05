@@ -1,11 +1,11 @@
 "use client";
 import Image from "next/image";
-import Footer from "@/components/Footer/Footer";
+import Footer from "../components/Footer/Footer";
 import React, { useState, useEffect } from "react";
 import { ReactTyped } from "react-typed";
 import { FaCircleArrowDown } from "react-icons/fa6";
 import { IoArrowDownCircleSharp } from "react-icons/io5";
-import Navbar from "@/components/Navbar_and_Sidebar/Navbar";
+import Navbar from "../components/Navbar_and_Sidebar/Navbar";
 // import { Button } from "@chakra-ui/react";
 import { Button } from "@mui/material";
 

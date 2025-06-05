@@ -1,7 +1,6 @@
 "use client";
-import Footer from "@/components/Footer/Footer";
+import Footer from "../../components/Footer/Footer";
 import { useState } from "react";
-export default page;
 import * as React from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
@@ -11,7 +10,7 @@ import Snackbar from "@mui/material/Snackbar";
 import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import Alert from "@mui/material/Alert";
-function page() {
+export default function page() {
   const [orgName, setOrgName] = useState("");
   const [photographerName, setPhotographerName] = useState("");
   const [eventName, setEventName] = useState("");
@@ -23,21 +22,14 @@ function page() {
   const vertical = "top";
   const horizontal = "center";
 
-  const pdfData = {
-    cast9d67e7e0383511f099c92fb5678df49d: "2025-05-24",
-    caste96492b0383511f099c92fb5678df49d: 12345.67,
-    cast2704f0b0383611f099c92fb5678df49d: 12345.67,
-    cast340493b0383611f099c92fb5678df49d: 12345.67,
-    cast5a9096a0383611f099c92fb5678df49d: 12345.67,
-    cast7037cd20383611f099c92fb5678df49d: "Event Name",
-    cast81ba1210383611f099c92fb5678df49d: "Organization Name",
-    cast8b5f1860383611f099c92fb5678df49d: "Photographer Name",
-    cast9454cbe0383611f099c92fb5678df49d: "2025-05-24",
-  };
-
   function handleClose() {
     setOpen(false);
   }
+  /**
+   *
+   * @param  dateString string to format into a MMDDYYYY string
+   * @returns the formatted string with the month, day, and year seperated by backslash
+   */
   function formatToMMDDYYYY(dateString) {
     const date = new Date(dateString);
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -45,7 +37,15 @@ function page() {
     const year = date.getFullYear();
     return `${month}/${day}/${year}`;
   }
+
+  /**
+   * Sends a request to the backend to send the invoice to tnq-exec@mit.edu
+   *  based on values in the fields from the form. If you want to you can do a form submission similar
+   *  to sign in where the form just forwards the fields to the backend through the formData in the body, but
+   *  this is good enough.
+   */
   const sendInvoice = async () => {
+    //The reason for these keys is that this is what Anvil told me to do.
     const pdfData = {
       cast9d67e7e0383511f099c92fb5678df49d: formatToMMDDYYYY(Date.now()),
       caste96492b0383511f099c92fb5678df49d: totalHours,
@@ -59,7 +59,7 @@ function page() {
     };
 
     try {
-      const response = await fetch("/api/send_invoice", {
+      const response = await fetch("/api/sendInvoice", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -124,14 +124,6 @@ function page() {
             }}
             onSubmit={async (event) => {
               event.preventDefault();
-
-              const totalCost = totalHours * hourlyRate;
-              const currentDate = formatToMMDDYYYY(Date.now());
-              const date = new Date(eventDate);
-              const month = String(date.getMonth() + 1).padStart(2, "0");
-              const day = String(date.getDate() + 1).padStart(2, "0");
-              const year = date.getFullYear();
-              const newEventDate = `${month}-${day}-${year}`;
               await sendInvoice();
             }}
           >
@@ -146,6 +138,7 @@ function page() {
               onChange={(event) => {
                 setOrgName(event.target.value);
               }}
+              name="orgName"
             />
             <TextField
               required
@@ -158,6 +151,7 @@ function page() {
               onChange={(event) => {
                 setPhotographerName(event.target.value);
               }}
+              name="photographerName"
             />
             <TextField
               required
@@ -170,6 +164,7 @@ function page() {
               onChange={(event) => {
                 setEventName(event.target.value);
               }}
+              name="eventName"
             />
             <TextField
               required
@@ -183,6 +178,7 @@ function page() {
                 setCostObject(event.target.value);
               }}
               type="number"
+              name="costObject"
             />
             <TextField
               required
@@ -196,6 +192,7 @@ function page() {
               onChange={(event) => {
                 setHourlyRate(event.target.value);
               }}
+              name="hourlyRate"
             />
             <TextField
               required
@@ -210,6 +207,7 @@ function page() {
                 setTotalHours(event.target.value);
                 // console.log("total hours", event.target.value);
               }}
+              name="totalHours"
             />
 
             <TextField
@@ -225,6 +223,7 @@ function page() {
                 setEventDate(event.target.value);
                 // console.log("eventDate", event.target.value);
               }}
+              name="eventDate"
             />
             <Button
               type="submit"
