@@ -37,6 +37,5 @@ export async function GET(request: NextRequest) {
   }
 
   await session.save()
-
   return Response.redirect(clientConfig.post_login_route)
 }
