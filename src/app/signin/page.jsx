@@ -54,10 +54,10 @@ export default function page() {
               },
               marginBottom: "1rem",
             }}
-            method="POST"
-            action="/api/userSignIn"
+            method="GET"
+            action="/api/login"
           >
-            <TextField
+            {/* <TextField
               required
               label="MIT email"
               variant="outlined"
@@ -70,7 +70,7 @@ export default function page() {
               }}
               name="email"
               type="email"
-            />
+            /> */}
 
             <Button
               type="submit"
@@ -93,7 +93,7 @@ export default function page() {
                 width: "60%",
               }}
             >
-              Submit Invoice
+              SignIn
             </Button>
           </Box>
         </main>

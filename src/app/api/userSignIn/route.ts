@@ -1,13 +1,42 @@
-import { NextRequest, NextResponse } from "next/server";
-import axios from "axios";
-import sgMail from "@sendgrid/mail";
+import { getClientConfig, getSession, clientConfig } from '../../lib'
+import { headers } from 'next/headers'
+import { NextRequest } from 'next/server'
+import * as client from 'openid-client'
+export async function GET(request: NextRequest) {
+  console.log("IN USER SIGN IN");
+  const session = await getSession()
+  const openIdClientConfig = await getClientConfig()
+  const headerList = await headers()
+  const host = headerList.get('x-forwarded-host') || headerList.get('host') || 'localhost'
+  const protocol = headerList.get('x-forwarded-proto') || 'https'
+  console.log(`request.nextUrl.search=${request.nextUrl.search}`)
+  const currentUrl = new URL(
+    `${protocol}://${host}${request.nextUrl.pathname}${request.nextUrl.search}`
+  )
+   
+  console.log(`AFTER HERE 1 ${openIdClientConfig}`)
+  const tokenSet = await client.authorizationCodeGrant(openIdClientConfig, currentUrl, {
+    pkceCodeVerifier: session.code_verifier,
+    expectedState: session.state,
+    
+  })
+  console.log("AFTER HERE 2")
+  const { access_token } = tokenSet
+  session.isLoggedIn = true
+  session.access_token = access_token
+  let claims = tokenSet.claims()!
+  const { sub } = claims
+  // call userinfo endpoint to get user info
+  const userinfo = await client.fetchUserInfo(openIdClientConfig, access_token, sub)
+  // store userinfo in session
+  session.userInfo = {
+    sub: userinfo.sub,
+    name: userinfo.given_name!,
+    email: userinfo.email!,
+    email_verified: userinfo.email_verified!,
+  }
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-export async function POST(request:NextRequest, response:NextResponse):Promise<NextResponse> {
-  const ANVIL_API_KEY:string = process.env.ANVIL_API_KEY;
-  const RECIPIENT_EMAIL:string = "tnq-exec@mit.edu";
-  const FROM_EMAIL:string = "mittnq@gmail.com";
-  const email:FormDataEntryValue = (await request.formData()).get('email')
-  console.log(`userEmail:${email}`)
-return NextResponse.redirect(new URL('/signin', request.url));
+  await session.save()
+
+  return Response.redirect(clientConfig.post_login_route)
 }
