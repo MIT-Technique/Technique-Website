@@ -14,10 +14,10 @@ export async function GET() {
     code_challenge_method: clientConfig.code_challenge_method,
   };
   let state!: string;
-  if (!openIdClientConfig.serverMetadata().supportsPKCE()) {
-    state = client.randomState();
-    parameters.state = state;
-  }
+  state = client.randomState();
+  parameters.state = state;
+//   if (!openIdClientConfig.serverMetadata().supportsPKCE()) {
+//   }
   let redirectTo = client.buildAuthorizationUrl(openIdClientConfig, parameters);
   session.code_verifier = code_verifier;
   session.state = state;
