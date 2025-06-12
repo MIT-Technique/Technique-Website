@@ -15,6 +15,7 @@ export const clientConfig = {
   post_login_route: `${process.env.NEXT_PUBLIC_APP_URL}/bios`,
   code_challenge_method: "S256",
   token_endpoint: process.env.NEXT_PUBLIC_API_URL + "/oidc/token",
+  token_endpoint_auth_method: "client_secret_basic",
 };
 
 export interface SessionData {
@@ -28,6 +29,7 @@ export interface SessionData {
     email: string;
     email_verified: boolean;
   };
+  cookieVariable?: string;
 }
 
 export const defaultSession: SessionData = {
@@ -50,7 +52,9 @@ export const sessionOptions: SessionOptions = {
 };
 
 export async function getSession(): Promise<IronSession<SessionData>> {
-  const cookiesList = await cookies();
+  const cookiesList = cookies();
+  console.log(`COOKIE HEADERS1=${cookiesList}`);
+  console.log(`COOKIE HEADERS2=${JSON.stringify(cookiesList)}`);
   let session = await getIronSession<SessionData>(cookiesList, sessionOptions);
   if (!session.isLoggedIn) {
     session.access_token = defaultSession.access_token;
@@ -59,13 +63,22 @@ export async function getSession(): Promise<IronSession<SessionData>> {
   return session;
 }
 
+// export async function getSession(req: Request, res: Response) {
+//   const session = getIronSession<SessionData>(req, res, sessionOptions);
+//   return session;
+// }
+
 export async function getClientConfig() {
   const client = await openid.discovery(
     new URL(clientConfig.url!),
     clientConfig.client_id!,
     clientConfig.client_secret!
   );
-  //   console.log(`SERVER_METADATA=${JSON.stringify(client.serverMetadata(), null, 2)}`)
-  //   console.log(`CLIENT_METADATA=${JSON.stringify(client.clientMetadata(), null, 2)}`)
+  // console.log(
+  //   `SERVER_METADATA=${JSON.stringify(client.serverMetadata(), null, 2)}`
+  // );
+  // console.log(
+  //   `CLIENT_METADATA=${JSON.stringify(client.clientMetadata(), null, 2)}`
+  // );
   return client;
 }
