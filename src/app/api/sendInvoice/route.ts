@@ -19,7 +19,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const FROM_EMAIL: string = "mittnq@gmail.com";
 
   try {
-    console.log(`Files: ${await fs.promises.readdir(process.cwd())}`);
+    console.log(
+      `Files: ${await fs.promises.readdir(path.join(process.cwd(), "public"))}`
+    );
     const filePath = path.join(
       process.cwd(),
       "public",
