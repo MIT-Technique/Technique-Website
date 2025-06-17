@@ -29,7 +29,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     //  Read the raw binary PDF file from disk
     const arialFontBytes = fs.readFileSync(
-      path.join(process.cwd(), "public", "fonts", "arial.ttf")
+      path.join(process.cwd(), "src", "fonts", "arial.ttf")
     );
     const existingPdfBytes = await fs.promises.readFile(filePath);
     console.log(existingPdfBytes);
