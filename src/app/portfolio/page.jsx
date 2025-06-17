@@ -68,10 +68,7 @@ function page() {
       src: "/images/other_images/Jade_Chongsathapornpong/_TNA9725.jpg",
       photographer: "Jade Chongsathapornpong",
     },
-    {
-      src: "/images/other_images/Daniel_Jang/AeroAstro-5.jpg",
-      photographer: "Daniel Jang",
-    },
+    
     {
       src: "/images/other_images/Marcelo_Maza/MJM-21.jpg",
       photographer: "Marcelo Maza",
@@ -89,10 +86,7 @@ function page() {
       photographer: "Sebastian Ochoa",
     },
 
-    {
-      src: "/images/other_images/Andrew_Okyere/_MG_8744.jpg",
-      photographer: "Andrew Okyere",
-    },
+    
     {
       src: "/images/other_images/Ruhundaka_Ejilemele/DSC_5089.jpg",
       photographer: "Ruhundaka Ejilemele",
