@@ -9,7 +9,6 @@ import fontkit from "@pdf-lib/fontkit";
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-
 export async function POST(request: NextRequest): Promise<NextResponse> {
   console.log("HELLLOOOOO");
   //Grabbing API Key from environment variables. See all the keys on the tnq drive if you don't have this
@@ -27,11 +26,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       "Gig_Invoice_Template.pdf"
     );
 
+    const existingPdfBytes = await fs.promises.readFile(filePath);
     //  Read the raw binary PDF file from disk
     const arialFontBytes = fs.readFileSync(
-      path.join(process.cwd(), "src", "fonts", "arial.ttf")
+      path.join(process.cwd(), "public", "fonts", "arial.ttf")
     );
-    const existingPdfBytes = await fs.promises.readFile(filePath);
     console.log(existingPdfBytes);
     const pdfDoc = await PDFDocument.load(existingPdfBytes);
     pdfDoc.registerFontkit(fontkit);
