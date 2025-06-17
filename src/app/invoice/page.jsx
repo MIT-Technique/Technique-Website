@@ -57,6 +57,17 @@ export default function page() {
       cast8b5f1860383611f099c92fb5678df49d: photographerName,
       cast9454cbe0383611f099c92fb5678df49d: eventDate,
     };
+    const pdfData2 = {
+      invoiceDate: formatToMMDDYYYY(Date.now()),
+      totalHours: totalHours,
+      hourlyRate: hourlyRate,
+      totalCost: totalHours * hourlyRate,
+      eventName: eventName,
+      orgName: orgName,
+      photographerName: photographerName,
+      eventDate: eventDate,
+    };
+
 
     try {
       const response = await fetch("/api/sendInvoice", {
@@ -64,6 +75,7 @@ export default function page() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           anvilData: { data: pdfData },
+          pdfData: pdfData2,
           emailData: {
             orgName: orgName,
             eventDate: eventDate,
