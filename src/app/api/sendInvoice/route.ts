@@ -31,14 +31,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     const existingPdfBytes = await fs.promises.readFile(filePath);
     //  Read the raw binary PDF file from disk
-    const fontUrl = `${process.env.NEXT_PUBLIC_APP_URL}/fonts/arial.ttf`;
+    const fontUrl = `${process.env.NEXT_PUBLIC_APP_URL}/fonts/ARIAL.TTF`;
     const fontResponse = await fetch(fontUrl);
 
     if (!fontResponse.ok) {
       throw new Error(`Failed to fetch font: ${fontResponse.statusText}`);
     }
 
-    const arialFontBytes:ArrayBuffer = await fontResponse.arrayBuffer();
+    const arialFontBytes: ArrayBuffer = await fontResponse.arrayBuffer();
     // const arialFontBytes: ArrayBuffer = await fetch(
     //   `${process.env.NEXT_PUBLIC_APP_URL}/fonts/arial.ttf`
     // ).then((res) => res.arrayBuffer());
