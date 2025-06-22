@@ -74,11 +74,11 @@ export async function getClientConfig() {
     clientConfig.client_id!,
     clientConfig.client_secret!
   );
-  // console.log(
-  //   `SERVER_METADATA=${JSON.stringify(client.serverMetadata(), null, 2)}`
-  // );
-  // console.log(
-  //   `CLIENT_METADATA=${JSON.stringify(client.clientMetadata(), null, 2)}`
-  // );
+  console.log(
+    `SERVER_METADATA=${JSON.stringify(client.serverMetadata(), null, 2)}`
+  );
+  console.log(
+    `CLIENT_METADATA=${JSON.stringify(client.clientMetadata(), null, 2)}`
+  );
   return client;
 }
