@@ -41,7 +41,7 @@ export const defaultSession: SessionData = {
 };
 
 export const sessionOptions: SessionOptions = {
-  password: "complex_password_at_least_32_characters_long",
+  password: "complex_password_at_least_32_characters_longg",
   cookieName: "next_js_session",
   cookieOptions: {
     // secure only works in `https` environments
