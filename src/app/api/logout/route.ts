@@ -12,7 +12,7 @@ export async function GET(req: Request, res: Response) {
   const session: IronSession<SessionData> = await getSession();
   const openIdClientConfig = await getClientConfig();
   const endSessionUrl = client.buildEndSessionUrl(openIdClientConfig, {
-    post_logout_redirect_uri: clientConfig.post_logout_redirect_uri,
+    post_logout_redirect_uri: `${clientConfig.post_logout_redirect_uri}`,
     id_token_hint: session.access_token!,
   });
   session.isLoggedIn = defaultSession.isLoggedIn;
