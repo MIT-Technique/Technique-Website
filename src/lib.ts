@@ -71,7 +71,7 @@ export async function getSession(): Promise<IronSession<SessionData>> {
 export async function getClientConfig() {
   const client = await openid.discovery(
     new URL(process.env.AUTH_OIDC_ISSUER)!,
-    clientConfig.client_id!,
+    `${process.env.OIDC_CLIENT_ID}`!,
     clientConfig!,
     openid.ClientSecretBasic(process.env.OIDC_CLIENT_SECRET)
   );
