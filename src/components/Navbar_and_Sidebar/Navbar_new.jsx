@@ -109,16 +109,22 @@ function Navbar() {
               PORTFOLIO
             </Link>
             <Link
-              className={`nav-item ${pathname == "/contact" ? "active" : ""} ${(firstLoad && pathname == "/contact") ? "bg-[#043b28] rounded-[4px]" : ""}`}
-              href="/contact"
-            >
-              CONTACT
-            </Link>
-            <Link
               className={`nav-item ${pathname == "/invoice" ? "active" : ""} ${(firstLoad && pathname == "/invoice") ? "bg-[#043b28] rounded-[4px]" : ""}`}
               href="/invoice"
             >
               INVOICE
+            </Link>
+            <Link
+              className={`nav-item ${pathname == "/bio" ? "active" : ""} ${(firstLoad && pathname == "/invoice") ? "bg-[#043b28] rounded-[4px]" : ""}`}
+              href="/bio"
+            >
+              SENIOR BIO
+            </Link>
+            <Link
+              className={`nav-item ${pathname == "/contact" ? "active" : ""} ${(firstLoad && pathname == "/contact") ? "bg-[#043b28] rounded-[4px]" : ""}`}
+              href="/contact"
+            >
+              CONTACT
             </Link>
           </div>
           <div ref={indicatorRef} className="indicator"></div>

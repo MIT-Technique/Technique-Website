@@ -26,9 +26,13 @@ export default function page() {
 
   function handleClose() {
     setOpen(false);
-    setError(false)
+    setError(false);
   }
 
+  /**
+   * This function will send a request to the server to update the
+   *  senior infor with the new information that was provided
+   */
   async function updateBio() {
     try {
       const response = await fetch("/api/updateBio", {
@@ -260,7 +264,7 @@ export default function page() {
           variant="filled"
           sx={{ width: "100%" }}
         >
-           {error
+          {error
             ? "There was an error updating your bio"
             : "Your bio was updated successfully"}
         </Alert>

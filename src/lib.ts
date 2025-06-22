@@ -2,7 +2,7 @@ import { IronSession, SessionOptions, getIronSession } from "iron-session";
 import { cookies } from "next/headers";
 import * as openid from "openid-client";
 
-export const clientConfig:Partial<openid.ClientMetadata> = {
+export const clientConfig: Partial<openid.ClientMetadata> = {
   url: process.env.AUTH_OIDC_ISSUER,
   audience: process.env.NEXT_PUBLIC_APP_URL,
   client_id: process.env.OIDC_CLIENT_ID,
@@ -41,7 +41,7 @@ export const defaultSession: SessionData = {
 };
 
 export const sessionOptions: SessionOptions = {
-  password: "complex_password_at_least_32_characters_longg",
+  password: process.env.SESSION_PASSWORD,
   cookieName: "next_js_session",
   cookieOptions: {
     // secure only works in `https` environments

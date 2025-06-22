@@ -18,6 +18,7 @@ import FolderIcon from "@mui/icons-material/Folder";
 import CallIcon from "@mui/icons-material/Call";
 import { VscThreeBars } from "react-icons/vsc";
 import ReceiptIcon from "@mui/icons-material/Receipt";
+import FingerprintIcon from '@mui/icons-material/Fingerprint';
 function Sidebar({ isScrolled, pathname }) {
   const [close, setClose] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -215,29 +216,6 @@ function Sidebar({ isScrolled, pathname }) {
               </Link>
             </ListItem>
             <ListItem>
-              <Link href="/contact" onClick={() => setIsOpen(false)}>
-                <ListItemButton>
-                  <ListItemIcon>
-                    <CallIcon
-                      sx={{
-                        color: pathname === "/" ? "white" : "#043b28",
-                        fontSize: "1.3rem",
-                      }}
-                    />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={"CONTACT"}
-                    primaryTypographyProps={{
-                      style: {
-                        fontSize: "0.8rem",
-                        color: pathname === "/" ? "white" : "#043b28",
-                      },
-                    }}
-                  />
-                </ListItemButton>
-              </Link>
-            </ListItem>
-            <ListItem>
               <Link href="/invoice" onClick={() => setIsOpen(false)}>
                 <ListItemButton>
                   <ListItemIcon>
@@ -260,6 +238,54 @@ function Sidebar({ isScrolled, pathname }) {
                 </ListItemButton>
               </Link>
             </ListItem>
+            <ListItem>
+              <Link href="/bio" onClick={() => setIsOpen(false)}>
+                <ListItemButton>
+                  <ListItemIcon>
+                    <FingerprintIcon
+                      sx={{
+                        color: pathname === "/" ? "white" : "#043b28",
+                        fontSize: "1.3rem",
+                      }}
+                    />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={"SENIOR BIO"}
+                    primaryTypographyProps={{
+                      style: {
+                        fontSize: "0.8rem",
+                        color: pathname === "/" ? "white" : "#043b28",
+                      },
+                    }}
+                  />
+                </ListItemButton>
+              </Link>
+            </ListItem>
+            
+            <ListItem>
+              <Link href="/contact" onClick={() => setIsOpen(false)}>
+                <ListItemButton>
+                  <ListItemIcon>
+                    <CallIcon
+                      sx={{
+                        color: pathname === "/" ? "white" : "#043b28",
+                        fontSize: "1.3rem",
+                      }}
+                    />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={"CONTACT"}
+                    primaryTypographyProps={{
+                      style: {
+                        fontSize: "0.8rem",
+                        color: pathname === "/" ? "white" : "#043b28",
+                      },
+                    }}
+                  />
+                </ListItemButton>
+              </Link>
+            </ListItem>
+            
           </List>
         </Box>
       </Drawer>

@@ -11,7 +11,6 @@ import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import Alert from "@mui/material/Alert";
 export default function page() {
-  const [mitEmail, setMitEmail] = useState("");
   const [open, setOpen] = useState(false);
   const vertical = "top";
   const horizontal = "center";
@@ -56,22 +55,8 @@ export default function page() {
             }}
             method="GET"
             action="/api/login"
+            //Calls the api endpoint to log in the user
           >
-            {/* <TextField
-              required
-              label="MIT email"
-              variant="outlined"
-              InputLabelProps={{
-                shrink: true,
-              }}
-              value={mitEmail}
-              onChange={(event) => {
-                setMitEmail(event.target.value);
-              }}
-              name="email"
-              type="email"
-            /> */}
-
             <Button
               type="submit"
               variant="contained"
