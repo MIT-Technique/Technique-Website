@@ -19,11 +19,13 @@ export default function page() {
   const [eventDate, setEventDate] = useState("");
   const [costObject, setCostObject] = useState("");
   const [open, setOpen] = useState(false);
+  const [error, setError] = useState(false);
   const vertical = "top";
   const horizontal = "center";
 
   function handleClose() {
     setOpen(false);
+    setError(false);
   }
   /**
    *
@@ -68,7 +70,6 @@ export default function page() {
       eventDate: eventDate,
     };
 
-
     try {
       const response = await fetch("/api/sendInvoice", {
         method: "POST",
@@ -96,7 +97,8 @@ export default function page() {
       setOpen(true);
     } catch (error) {
       console.error(error);
-      alert(error.message);
+      setError(true);
+      setOpen(true);
     }
   };
 
@@ -282,11 +284,13 @@ export default function page() {
       >
         <Alert
           onClose={handleClose}
-          severity="success"
+          severity={error ? "error" : "success"}
           variant="filled"
           sx={{ width: "100%" }}
         >
-          Invoice Sent Successfully
+          {error
+            ? "There was an error sending your invoice"
+            : "Your invoice was sent successfully"}
         </Alert>
       </Snackbar>
       <Footer />
