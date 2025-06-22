@@ -15,7 +15,7 @@ export async function GET(request: NextRequest, response: NextResponse) {
     `${protocol}://${host}${request.nextUrl.pathname}${request.nextUrl.search}`
   );
 
-  console.log(`AFTER HERE 1 ${openIdClientConfig}`);
+  console.log(`AFTER HERE 1 ${JSON.stringify(openIdClientConfig)}`);
   const tokenSet = await client.authorizationCodeGrant(
     openIdClientConfig,
     currentUrl,
