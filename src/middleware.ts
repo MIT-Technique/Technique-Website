@@ -8,9 +8,9 @@ export async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
 
   // Only protect /bio and /api/updateBio
+  const session = await getSession();
   if (protectedRoutes.includes(path)) {
     // Read the session cookie
-    const session = await getSession();
 
     // If not logged in, redirect or block
     if (!session?.isLoggedIn) {
@@ -24,6 +24,12 @@ export async function middleware(req: NextRequest) {
       // For page route, redirect to login
       return NextResponse.redirect(new URL("/login", req.nextUrl));
     }
+  } else if (path.includes("/login")) {
+    if (!session?.isLoggedIn) {
+      return NextResponse.redirect(new URL("/bio", req.nextUrl));
+    } else {
+      return NextResponse.next();
+    }
   }
 
   // Allow all other requests through
@@ -32,5 +38,5 @@ export async function middleware(req: NextRequest) {
 
 // Only run middleware on /bio and /api/updateBio
 export const config = {
-  matcher: ["/bio", "/api/updateBio"],
+  matcher: ["/bio", "/api/updateBio", "/login"],
 };

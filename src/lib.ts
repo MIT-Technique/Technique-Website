@@ -12,7 +12,7 @@ export const clientConfig:Partial<openid.ClientMetadata> = {
   post_logout_redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL}`,
   response_type: "code",
   grant_type: "authorization_code",
-  post_login_route: `${process.env.NEXT_PUBLIC_APP_URL}/bios`,
+  post_login_route: `${process.env.NEXT_PUBLIC_APP_URL}/bio`,
   code_challenge_method: "S256",
   token_endpoint: process.env.NEXT_PUBLIC_API_URL + "/oidc/token",
   token_endpoint_auth_method: "client_secret_basic",
