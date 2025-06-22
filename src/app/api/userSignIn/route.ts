@@ -45,5 +45,5 @@ export async function GET(request: NextRequest, response: NextResponse) {
   };
 
   await session.save();
-  return Response.redirect(clientConfig.post_login_route);
+  return Response.redirect(`${clientConfig.post_login_route}`);
 }
