@@ -25,7 +25,7 @@ export async function middleware(req: NextRequest) {
       return NextResponse.redirect(new URL("/login", req.nextUrl));
     }
   } else if (path.includes("/login")) {
-    if (!session?.isLoggedIn) {
+    if (session?.isLoggedIn) {
       return NextResponse.redirect(new URL("/bio", req.nextUrl));
     } else {
       return NextResponse.next();
