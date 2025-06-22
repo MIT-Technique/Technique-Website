@@ -2,11 +2,11 @@ import { IronSession, SessionOptions, getIronSession } from "iron-session";
 import { cookies } from "next/headers";
 import * as openid from "openid-client";
 
-export const clientConfig = {
-  url: process.env.NEXT_PUBLIC_API_URL,
-  audience: process.env.NEXT_PUBLIC_API_URL,
-  client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
-  client_secret: process.env.PETROCK_SECRET,
+export const clientConfig:Partial<openid.ClientMetadata> = {
+  url: process.env.AUTH_OIDC_ISSUER,
+  audience: process.env.NEXT_PUBLIC_APP_URL,
+  client_id: process.env.OIDC_CLIENT_ID,
+  client_secret: process.env.OIDC_CLIENT_SECRET,
   scope: process.env.NEXT_PUBLIC_SCOPE,
   redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL}/api/userSignIn`,
   post_logout_redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL}`,
@@ -70,9 +70,10 @@ export async function getSession(): Promise<IronSession<SessionData>> {
 
 export async function getClientConfig() {
   const client = await openid.discovery(
-    new URL(clientConfig.url!),
+    new URL(process.env.AUTH_OIDC_ISSUER)!,
     clientConfig.client_id!,
-    clientConfig.client_secret!
+    clientConfig!,
+    openid.ClientSecretBasic(process.env.OIDC_CLIENT_SECRET)
   );
   console.log(
     `SERVER_METADATA=${JSON.stringify(client.serverMetadata(), null, 2)}`
