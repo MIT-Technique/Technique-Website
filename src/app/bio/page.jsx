@@ -236,7 +236,7 @@ export default function page() {
                 width: "60%",
               }}
             >
-              Submit Invoice
+              Update Bio
             </Button>
           </Box>
         </main>
