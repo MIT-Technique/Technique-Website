@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSession } from "./lib";
+import { getSession } from "./lib/lib";
 
 // Define the protected routes
 const protectedRoutes = ["/bio", "/api/updateBio"];

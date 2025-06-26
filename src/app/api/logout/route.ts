@@ -4,7 +4,7 @@ import {
   getSession,
   clientConfig,
   SessionData,
-} from "../../../lib";
+} from "../../../lib/lib";
 import { IronSession, SessionOptions, getIronSession } from "iron-session";
 import * as client from "openid-client";
 

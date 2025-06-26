@@ -1,4 +1,4 @@
-import { getClientConfig, getSession, clientConfig } from "../../../lib";
+import { getClientConfig, getSession, clientConfig } from "../../../lib/lib";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import * as client from "openid-client";

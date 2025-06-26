@@ -1,4 +1,4 @@
-import { defaultSession, getSession } from "../../../lib";
+import { defaultSession, getSession } from "../../../lib/lib";
 
 export async function GET(request: Request, response: Response) {
   try {
