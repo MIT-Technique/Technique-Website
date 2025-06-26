@@ -1,4 +1,10 @@
-import { MongoClient, ServerApiVersion, Db,Collection,Document } from "mongodb";
+import {
+  MongoClient,
+  ServerApiVersion,
+  Db,
+  Collection,
+  Document,
+} from "mongodb";
 
 export async function connectToDatabase(): Promise<Collection<Document>> {
   if (process.env.DB_URI) {
@@ -14,7 +20,9 @@ export async function connectToDatabase(): Promise<Collection<Document>> {
       await client.connect();
       console.log(">>>>>>CONNECTED TO THE DATABASE<<<<<<");
       const db: Db = client.db("SeniorBio");
-      return db.collection("DevBios");
+      return db.collection(
+        process.env.NODE_ENV === "production" ? "ProdBios" : "DevBios"
+      );
     } catch (err) {
       console.error(err);
     }

@@ -21,7 +21,7 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
     const body = await request.json();
     body.email = email;
     const parsed = studentSchema.safeParse(body);
-
+    console.log("Parsed");
     if (!parsed.success) {
       return new NextResponse(
         JSON.stringify({ error: z.treeifyError(parsed.error) }),
@@ -30,10 +30,12 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
         }
       );
     }
+    console.log("Parsed");
 
     const { ...updateFields } = parsed.data;
 
     const collection = await connectToDatabase();
+    console.log("Successfully Connected");
 
     const result = await collection.updateOne(
       { email },
@@ -44,7 +46,7 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
   } catch (error) {
     console.error("Error:", error.response?.body || error);
     return NextResponse.json(
-      { error: "Failed to send email" },
+      { error: "There was an error updating the bio" },
       { status: 500 }
     );
   }
