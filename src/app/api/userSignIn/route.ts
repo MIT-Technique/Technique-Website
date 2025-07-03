@@ -21,6 +21,7 @@ export async function GET(request: NextRequest, response: NextResponse) {
       expectedState: session.state,
     }
   );
+
   const { access_token } = tokenSet;
   session.isLoggedIn = true;
   session.access_token = access_token;
@@ -32,6 +33,7 @@ export async function GET(request: NextRequest, response: NextResponse) {
     access_token,
     sub
   );
+
   // store userinfo in session
   session.userInfo = {
     sub: userinfo.sub,

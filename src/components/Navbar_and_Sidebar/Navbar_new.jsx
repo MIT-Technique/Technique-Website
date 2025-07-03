@@ -11,14 +11,13 @@ function Navbar() {
   const indicatorRef = useRef(null);
   const width1 = useRef(null);
   const navRef = useRef();
-  const techniqueLabel = useRef()
-
+  const techniqueLabel = useRef();
 
   useLayoutEffect(() => {
     const activeNavItem = document.querySelector(".nav-item.active");
     let rect;
     let height1;
-    const navElement = navRef.current
+    const navElement = navRef.current;
     let resizeObserver;
 
     if (activeNavItem && indicatorRef.current) {
@@ -31,7 +30,7 @@ function Navbar() {
       indicatorRef.current.style.height = `${rect.height}px`;
       indicatorRef.current.style.transform = `translateX(${offsetLeft}px) `;
       if (!firstLoad) {
-        indicatorRef.current.style.transition = 'all 0.3s ease';
+        indicatorRef.current.style.transition = "all 0.3s ease";
       }
       resizeObserver = new ResizeObserver((entries) => {
         for (const entry of entries) {
@@ -48,7 +47,7 @@ function Navbar() {
       });
       resizeObserver.observe(navRef.current);
     }
-    setFirstLoad(false)
+    setFirstLoad(false);
     return () => {
       resizeObserver?.unobserve(navElement);
     };
@@ -59,7 +58,11 @@ function Navbar() {
 
   return (
     <>
-      <div className={`hidden bg-[#fffcf7] flex-col relative z-50  ${pathname == "/" ? "hidden" : " lg:flex"}`}>
+      <div
+        className={`hidden bg-[#fffcf7] flex-col relative z-50  ${
+          pathname == "/" ? "hidden" : " lg:flex"
+        }`}
+      >
         <nav
           className={`h-[10vh]  text-[#043b28]  top-0 w-full flex items-center`}
           ref={navRef}
@@ -72,56 +75,94 @@ function Navbar() {
           </Link>
           <div className="flex space-x-9 text-xs w-full justify-center font-semibold">
             <Link
-              className={`nav-item ${pathname == "/" ? "active" : ""} ${(firstLoad && pathname == "/") ? "bg-[#043b28] rounded-[4px]" : ""}`}
+              className={`nav-item ${pathname == "/" ? "active" : ""} ${
+                firstLoad && pathname == "/" ? "bg-[#043b28] rounded-[4px]" : ""
+              }`}
               href="/"
             >
               HOME
             </Link>
             <Link
-              className={`nav-item ${pathname == "/about" ? "active" : ""} ${(firstLoad && pathname == "/about") ? "bg-[#043b28] rounded-[4px]" : ""}`}
+              className={`nav-item ${pathname == "/about" ? "active" : ""} ${
+                firstLoad && pathname == "/about"
+                  ? "bg-[#043b28] rounded-[4px]"
+                  : ""
+              }`}
               href="/about"
             >
               ABOUT
             </Link>
             <Link
-              className={`nav-item ${pathname == "/seniors" ? "active" : ""} ${(firstLoad && pathname == "/seniors") ? "bg-[#043b28] rounded-[4px]" : ""}`}
+              className={`nav-item ${pathname == "/seniors" ? "active" : ""} ${
+                firstLoad && pathname == "/seniors"
+                  ? "bg-[#043b28] rounded-[4px]"
+                  : ""
+              }`}
               href="/seniors"
             >
               SENIORS
             </Link>
             <Link
-              className={`nav-item ${pathname == "/hire" ? "active" : ""} ${(firstLoad && pathname == "/hire") ? "bg-[#043b28] rounded-[4px]" : ""}`}
+              className={`nav-item ${pathname == "/hire" ? "active" : ""} ${
+                firstLoad && pathname == "/hire"
+                  ? "bg-[#043b28] rounded-[4px]"
+                  : ""
+              }`}
               href="/hire"
             >
               HIRE US
             </Link>
 
             <Link
-              className={`nav-item ${pathname == "/archives" ? "active" : ""} ${(firstLoad && pathname == "/archives") ? "bg-[#043b28] rounded-[4px]" : ""}`}
+              className={`nav-item ${pathname == "/archives" ? "active" : ""} ${
+                firstLoad && pathname == "/archives"
+                  ? "bg-[#043b28] rounded-[4px]"
+                  : ""
+              }`}
               href="/archives"
             >
               ARCHIVES
             </Link>
             <Link
-              className={`nav-item ${pathname == "/portfolio" ? "active" : ""} ${(firstLoad && pathname == "/portfolio") ? "bg-[#043b28] rounded-[4px]" : ""}`}
+              className={`nav-item ${
+                pathname == "/portfolio" ? "active" : ""
+              } ${
+                firstLoad && pathname == "/portfolio"
+                  ? "bg-[#043b28] rounded-[4px]"
+                  : ""
+              }`}
               href="/portfolio"
             >
               PORTFOLIO
             </Link>
             <Link
-              className={`nav-item ${pathname == "/invoice" ? "active" : ""} ${(firstLoad && pathname == "/invoice") ? "bg-[#043b28] rounded-[4px]" : ""}`}
+              className={`nav-item ${pathname == "/invoice" ? "active" : ""} ${
+                firstLoad && pathname == "/invoice"
+                  ? "bg-[#043b28] rounded-[4px]"
+                  : ""
+              }`}
               href="/invoice"
             >
               INVOICE
             </Link>
             <Link
-              className={`nav-item ${pathname == "/bio" ? "active" : ""} ${(firstLoad && pathname == "/invoice") ? "bg-[#043b28] rounded-[4px]" : ""}`}
-              href="/bio"
+              className={`nav-item ${
+                pathname == "/bio" || pathname == "/login" ? "active" : ""
+              } ${
+                firstLoad && (pathname == "/bio" || pathname == "/login")
+                  ? "bg-[#043b28] rounded-[4px]"
+                  : ""
+              }`}
+              href="/login"
             >
               SENIOR BIO
             </Link>
             <Link
-              className={`nav-item ${pathname == "/contact" ? "active" : ""} ${(firstLoad && pathname == "/contact") ? "bg-[#043b28] rounded-[4px]" : ""}`}
+              className={`nav-item ${pathname == "/contact" ? "active" : ""} ${
+                firstLoad && pathname == "/contact"
+                  ? "bg-[#043b28] rounded-[4px]"
+                  : ""
+              }`}
               href="/contact"
             >
               CONTACT
