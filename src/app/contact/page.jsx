@@ -26,7 +26,7 @@ function page() {
                 Photo Credits: MIT Technique
               </p>
             </div>
-            <div className="text-center w-[100%] h-[60vh] xs:h-[50vh] sm:h-[55vh] lg:h-[60vh] bg-[#043b28] rounded-2xl py-4 flex flex-row lg:flex-col justify-center items-center text-white m-0">
+            <div className="text-center w-[100%] h-[60vh] xs:h-[50vh] sm:h-[55vh] lg:h-[60vh] bg-[#790606] rounded-2xl py-4 flex flex-row lg:flex-col justify-center items-center text-white m-0">
               <div className="w-1/2 flex flex-col align-center justify-center">
                 <div className="flex flex-col space-y-1 items-center pb-3">
                   <h1 className=" text-lg font-[400] ">

@@ -50,7 +50,7 @@ nav {
 .indicator {
   position: absolute;
   height: 100%;
-  background-color: #043b28;
+  background-color: #790606;
   /* transition: all 0.3s ease; */
   border-radius: 4px; /* Adjust the border-radius if needed */
   z-index: 5; /* Ensure the indicator is behind the nav items */

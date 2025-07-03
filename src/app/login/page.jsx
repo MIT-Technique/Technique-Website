@@ -23,13 +23,13 @@ export default function page() {
     <>
       <div className="min-h-[90vh]  relative lg:pt-[5vh] pt-[10vh] flex flex-col">
         <main className="flex-1  flex items-center justify-start flex-col">
-          <h2 className="text-[#043b28] flex justify-center pb-4 font-medium">
+          <h2 className="text-[#790606] flex justify-center pb-4 font-medium">
             Sign In
           </h2>
           <Box
             component="form"
             sx={{
-              border: "1px solid #043b28",
+              border: "1px solid #790606",
               borderRadius: "0.3rem",
               borderColor: "",
               padding: "8px",
@@ -62,7 +62,7 @@ export default function page() {
               variant="contained"
               sx={{
                 margin: "8px",
-                backgroundColor: "#043b28",
+                backgroundColor: "#790606",
                 "&:hover": {
                   backgroundColor: "#06503a",
                   boxShadow:

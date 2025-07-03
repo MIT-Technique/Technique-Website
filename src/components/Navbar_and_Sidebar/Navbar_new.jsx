@@ -64,7 +64,7 @@ function Navbar() {
         }`}
       >
         <nav
-          className={`h-[10vh]  text-[#043b28]  top-0 w-full flex items-center`}
+          className={`h-[10vh]  text-[#790606]  top-0 w-full flex items-center`}
           ref={navRef}
         >
           <Link
@@ -76,7 +76,7 @@ function Navbar() {
           <div className="flex space-x-9 text-xs w-full justify-center font-semibold">
             <Link
               className={`nav-item ${pathname == "/" ? "active" : ""} ${
-                firstLoad && pathname == "/" ? "bg-[#043b28] rounded-[4px]" : ""
+                firstLoad && pathname == "/" ? "bg-[#790606] rounded-[4px]" : ""
               }`}
               href="/"
             >
@@ -85,7 +85,7 @@ function Navbar() {
             <Link
               className={`nav-item ${pathname == "/about" ? "active" : ""} ${
                 firstLoad && pathname == "/about"
-                  ? "bg-[#043b28] rounded-[4px]"
+                  ? "bg-[#790606] rounded-[4px]"
                   : ""
               }`}
               href="/about"
@@ -95,7 +95,7 @@ function Navbar() {
             <Link
               className={`nav-item ${pathname == "/seniors" ? "active" : ""} ${
                 firstLoad && pathname == "/seniors"
-                  ? "bg-[#043b28] rounded-[4px]"
+                  ? "bg-[#790606] rounded-[4px]"
                   : ""
               }`}
               href="/seniors"
@@ -105,7 +105,7 @@ function Navbar() {
             <Link
               className={`nav-item ${pathname == "/hire" ? "active" : ""} ${
                 firstLoad && pathname == "/hire"
-                  ? "bg-[#043b28] rounded-[4px]"
+                  ? "bg-[#790606] rounded-[4px]"
                   : ""
               }`}
               href="/hire"
@@ -116,7 +116,7 @@ function Navbar() {
             <Link
               className={`nav-item ${pathname == "/archives" ? "active" : ""} ${
                 firstLoad && pathname == "/archives"
-                  ? "bg-[#043b28] rounded-[4px]"
+                  ? "bg-[#790606] rounded-[4px]"
                   : ""
               }`}
               href="/archives"
@@ -128,7 +128,7 @@ function Navbar() {
                 pathname == "/portfolio" ? "active" : ""
               } ${
                 firstLoad && pathname == "/portfolio"
-                  ? "bg-[#043b28] rounded-[4px]"
+                  ? "bg-[#790606] rounded-[4px]"
                   : ""
               }`}
               href="/portfolio"
@@ -138,7 +138,7 @@ function Navbar() {
             <Link
               className={`nav-item ${pathname == "/invoice" ? "active" : ""} ${
                 firstLoad && pathname == "/invoice"
-                  ? "bg-[#043b28] rounded-[4px]"
+                  ? "bg-[#790606] rounded-[4px]"
                   : ""
               }`}
               href="/invoice"
@@ -150,7 +150,7 @@ function Navbar() {
                 pathname == "/bio" || pathname == "/login" ? "active" : ""
               } ${
                 firstLoad && (pathname == "/bio" || pathname == "/login")
-                  ? "bg-[#043b28] rounded-[4px]"
+                  ? "bg-[#790606] rounded-[4px]"
                   : ""
               }`}
               href="/login"
@@ -160,7 +160,7 @@ function Navbar() {
             <Link
               className={`nav-item ${pathname == "/contact" ? "active" : ""} ${
                 firstLoad && pathname == "/contact"
-                  ? "bg-[#043b28] rounded-[4px]"
+                  ? "bg-[#790606] rounded-[4px]"
                   : ""
               }`}
               href="/contact"
