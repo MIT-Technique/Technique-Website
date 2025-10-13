@@ -78,7 +78,7 @@ function page() {
                         alt="Informal Dress in Senior Picture"
                         fill={true}
                         style={{
-                          borderRadius: "0.3rem",
+                          borderRadius: "0.2rem",
                           objectFit: "contain",
                         }}
                       />
@@ -92,7 +92,7 @@ function page() {
                         alt="Formal Dress in Senior Picture"
                         fill={true}
                         style={{
-                          borderRadius: "0.3rem",
+                          borderRadius: "0.2rem",
                           objectFit: "contain",
                         }}
                       />
