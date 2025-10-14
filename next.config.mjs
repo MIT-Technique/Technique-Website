@@ -6,8 +6,9 @@ const nextConfig = {
   async redirects() {
     return [
       {
-        source: "/order",
-        destination: "https://mit.universitytickets.com/w/event.aspx?id=2196",
+        source: "/portrait",
+        destination:
+          "https://seniors.legacystudios.com/massachusetts-institute-technology-cambridge-ma/",
         permanent: false,
       },
     ];
