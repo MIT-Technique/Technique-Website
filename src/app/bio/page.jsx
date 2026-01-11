@@ -28,7 +28,7 @@ export default function page() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch("/api/student", {
+        const res = await fetch("/api/getUserData", {
           method: "GET",
         });
 
