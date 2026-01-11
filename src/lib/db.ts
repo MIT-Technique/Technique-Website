@@ -10,9 +10,7 @@ let client: MongoClient | null = null;
 
 export async function connectToDatabase(): Promise<Collection<Document>> {
   if (process.env.DB_URI) {
-
-    if(!client)
-    {
+    if (!client) {
       client = new MongoClient(process.env.DB_URI, {
         serverApi: {
           version: ServerApiVersion.v1,
@@ -23,6 +21,7 @@ export async function connectToDatabase(): Promise<Collection<Document>> {
     }
 
     try {
+      console.log("Before Database connect");
       await client.connect();
       console.log(">>>>>>CONNECTED TO THE DATABASE<<<<<<");
       const db: Db = client.db("SeniorBio");
