@@ -1,18 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import axios from "axios";
-import { AxiosResponse } from "axios";
-import sgMail from "@sendgrid/mail";
-import { PDFDocument, rgb, drawTextField } from "pdf-lib";
-import fs from "fs";
-import path from "path";
-import fontkit from "@pdf-lib/fontkit";
 import { connectToDatabase } from "../../../lib/db";
 import { getSession } from "../../../lib/lib";
-import clientPromise from "mongodb";
 import { studentSchema } from "../../../lib/studentSchema";
 import z from "zod/v4";
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 export async function PUT(request: NextRequest): Promise<NextResponse> {
   try {

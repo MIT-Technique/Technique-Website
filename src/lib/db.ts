@@ -6,15 +6,21 @@ import {
   Document,
 } from "mongodb";
 
+let client: MongoClient | null = null;
+
 export async function connectToDatabase(): Promise<Collection<Document>> {
   if (process.env.DB_URI) {
-    const client = new MongoClient(process.env.DB_URI, {
-      serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true,
-      },
-    });
+
+    if(!client)
+    {
+      client = new MongoClient(process.env.DB_URI, {
+        serverApi: {
+          version: ServerApiVersion.v1,
+          strict: true,
+          deprecationErrors: true,
+        },
+      });
+    }
 
     try {
       await client.connect();
