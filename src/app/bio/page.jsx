@@ -37,7 +37,12 @@ export default function page() {
         }
 
         const json = await res.json();
-        print(json.data);
+        console.log(json.data);
+        setFirstName(json.data.firstName);
+        setLastName(json.data.lastName);
+        setMajor(json.data.major);
+        setQuote(json.data.quote);
+        setEmail(json.data.email);
         // setData(json.data);
       } catch (err) {
         // setError(err.message);
