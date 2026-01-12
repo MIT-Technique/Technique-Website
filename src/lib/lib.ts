@@ -1,6 +1,7 @@
 import { IronSession, SessionOptions, getIronSession } from "iron-session";
 import { cookies } from "next/headers";
 import * as openid from "openid-client";
+import Cryptr from "cryptr";
 
 export const clientConfig: Partial<openid.ClientMetadata> = {
   url: process.env.AUTH_OIDC_ISSUER,
@@ -82,4 +83,9 @@ export async function getClientConfig() {
     `CLIENT_METADATA=${JSON.stringify(client.clientMetadata(), null, 2)}`
   );
   return client;
+}
+const cryptr = new Cryptr(process.env.CRYPTR_SECRET!);
+
+export function getCryptr() {
+  return cryptr;
 }
