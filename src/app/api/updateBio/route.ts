@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "../../../lib/db";
-import { getSession } from "../../../lib/lib";
+import { getSession, getCryptr } from "../../../lib/lib";
 import { studentSchema } from "../../../lib/studentSchema";
 import z from "zod/v4";
-
 
 export async function PUT(request: NextRequest): Promise<NextResponse> {
   try {
@@ -11,6 +10,9 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
     const { email } = session.userInfo;
     const body = await request.json();
     body.email = email;
+    const cryp = getCryptr();
+    body.firstName = cryp.encrypt(body.firstName);
+    body.lastName = cryp.encrypt(body.lastName);
     const parsed = studentSchema.safeParse(body);
     console.log("Parsed");
     if (!parsed.success) {
