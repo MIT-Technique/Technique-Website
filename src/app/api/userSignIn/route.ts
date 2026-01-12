@@ -3,7 +3,9 @@ import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import * as client from "openid-client";
 export async function GET(request: NextRequest, response: NextResponse) {
+  console.log("Getting Session");
   const session = await getSession();
+  console.log("Getting CLient Config");
   const openIdClientConfig = await getClientConfig();
   const headerList = headers();
   const host =
@@ -12,6 +14,7 @@ export async function GET(request: NextRequest, response: NextResponse) {
   const currentUrl = new URL(
     `${protocol}://${host}${request.nextUrl.pathname}${request.nextUrl.search}`
   );
+  console.log("Getting client auth code grant");
 
   const tokenSet = await client.authorizationCodeGrant(
     openIdClientConfig,
@@ -28,6 +31,8 @@ export async function GET(request: NextRequest, response: NextResponse) {
   let claims = tokenSet.claims()!;
   const { sub } = claims;
   // call userinfo endpoint to get user info
+  console.log("Getting client fetch user info");
+
   const userinfo = await client.fetchUserInfo(
     openIdClientConfig,
     access_token,
@@ -41,7 +46,8 @@ export async function GET(request: NextRequest, response: NextResponse) {
     email: userinfo.email!,
     email_verified: userinfo.email_verified!,
   };
-
+  console.log("Saving session");
   await session.save();
+  console.log("All async commands finished");
   return Response.redirect(`${clientConfig.post_login_route}`);
 }
