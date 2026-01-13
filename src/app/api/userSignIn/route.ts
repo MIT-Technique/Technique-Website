@@ -32,19 +32,19 @@ export async function GET(request: NextRequest, response: NextResponse) {
   const { sub } = claims;
   // call userinfo endpoint to get user info
   console.log("Getting client fetch user info");
-
-  const userinfo = await client.fetchUserInfo(
-    openIdClientConfig,
-    access_token,
-    sub
-  );
+  // const claims = tokenSet.claims();
+  // const userinfo = await client.fetchUserInfo(
+  //   openIdClientConfig,
+  //   access_token,
+  //   sub
+  // );
 
   // store userinfo in session
   session.userInfo = {
-    sub: userinfo.sub,
-    name: userinfo.given_name!,
-    email: userinfo.email!,
-    email_verified: userinfo.email_verified!,
+    sub: claims.sub,
+    name: claims.given_name! as string,
+    email: claims.email! as string,
+    email_verified: Boolean(claims.email_verified)!,
   };
   console.log("Saving session");
   await session.save();
