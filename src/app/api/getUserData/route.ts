@@ -15,6 +15,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const { email } = session?.userInfo;
     const collection = await connectToDatabase();
     console.log("After database connection");
+    console.log(`Email found: ${email}`);
 
     const user = await collection.findOne({ email });
     console.log("Found user");

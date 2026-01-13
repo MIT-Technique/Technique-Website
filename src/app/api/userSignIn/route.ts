@@ -47,6 +47,7 @@ export async function GET(request: NextRequest, response: NextResponse) {
     email_verified: Boolean(claims.email_verified)!,
   };
   console.log("Saving session");
+  console.log(`session user info: ${session.userInfo}`);
   await session.save();
   console.log("All async commands finished");
   return Response.redirect(`${clientConfig.post_login_route}`);
