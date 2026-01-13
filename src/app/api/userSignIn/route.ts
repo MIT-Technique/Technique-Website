@@ -38,6 +38,7 @@ export async function GET(request: NextRequest, response: NextResponse) {
   //   sub
   // );
 
+  console.log(`claims: ${JSON.stringify(claims, null, 2)}`);
   // store userinfo in session
   session.userInfo = {
     sub: claims.sub,
