@@ -43,8 +43,8 @@ export async function GET(request: NextRequest, response: NextResponse) {
   session.userInfo = {
     sub: claims.sub,
     name: claims.given_name! as string,
-    email: claims.email! as string,
-    email_verified: Boolean(claims.email_verified)!,
+    email: claims.sub as string,
+    email_verified: true,
   };
   console.log("Saving session");
   console.log(`session user info: ${JSON.stringify(session, null, 2)}`);
