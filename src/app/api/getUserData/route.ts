@@ -9,13 +9,13 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     console.log("Before Session grab");
     const session = await getSession();
     console.log("After Session grab");
-    if (!session?.userInfo?.sub) {
+    if (!session?.userInfo?.email) {
       console.log(
         `Session found before unauth: ${JSON.stringify(session, null, 2)}`
       );
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const email = session?.userInfo?.sub;
+    const {email} = session?.userInfo;
     const collection = await connectToDatabase();
     console.log("After database connection");
     console.log(`Email found: ${email}`);
