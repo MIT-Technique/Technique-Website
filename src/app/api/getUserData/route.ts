@@ -15,11 +15,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       );
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const {email} = session?.userInfo;
+    const { email } = session?.userInfo;
     const collection = await connectToDatabase();
     console.log("After database connection");
     console.log(`Email found: ${email}`);
-    console.log(`Session found: ${session}`);
+    console.log(`Session found: ${JSON.stringify(session, null, 2)}`);
 
     const user = await collection.findOne({ email });
     console.log("Found user");
