@@ -10,7 +10,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const session = await getSession();
     console.log("After Session grab");
     if (!session?.userInfo?.email) {
-      console.log(`Session found before unauth: ${session}`);
+      console.log(
+        `Session found before unauth: ${JSON.stringify(session, null, 2)}`
+      );
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const { email } = session?.userInfo;
