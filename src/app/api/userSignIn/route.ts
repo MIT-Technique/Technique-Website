@@ -32,7 +32,6 @@ export async function GET(request: NextRequest, response: NextResponse) {
   const { sub } = claims;
   // call userinfo endpoint to get user info
   console.log("Getting client fetch user info");
-  // const claims = tokenSet.claims();
   // const userinfo = await client.fetchUserInfo(
   //   openIdClientConfig,
   //   access_token,
