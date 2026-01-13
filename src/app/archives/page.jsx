@@ -284,42 +284,38 @@ const options = [
   },
 ];
 
-function page() {
+function ArchivesPage() {
   return (
     <>
-      <div className="min-h-screen flex flex-col lg:pt-[5vh] pt-[10vh] ">
-        <main className="h-full w-full md:px-12 lg:px-24 font-light flex flex-col justify-center items-center ">
-          <div className="flex flex-col justify-center items-center bg-[#790606] rounded-t-lg text-white pt-4 w-full">
-            <div className="flex flex-col justify-center w-full items-center space-y-3 ">
-              <h1>
-                Archive
-              </h1>
-              <p className=" text-center ">
-                Take a look at some past editions of Technique.
-              </p>
-            </div>
-            <div
-              className=" w-full h-full rounded-2xl pt-5 flex flex-wrap items-center justify-center pb-5"
-              id="section1"
-            >
-              {options.map(({ src, alt, href, title }, i) => {
-                return (
-                  <CoverCard
-                    src={src}
-                    alt={alt}
-                    href={href}
-                    title={title}
-                    key={i}
-                  ></CoverCard>
-                );
-              })}
+      <main className="min-h-screen pt-24 lg:pt-32">
+        {/* Hero Section */}
+        <section className="section-tight container-content text-center">
+          <h1 className="mb-4">Archives</h1>
+          <p className="text-lg text-text-secondary font-light max-w-text mx-auto">
+            Explore past editions of Technique, dating back to 1885.
+          </p>
+        </section>
+
+        {/* Cover Grid */}
+        <section className="section bg-bg-secondary">
+          <div className="container-content">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+              {options.map(({ src, alt, href, title }, i) => (
+                <CoverCard
+                  src={src}
+                  alt={alt}
+                  href={href}
+                  title={title}
+                  key={i}
+                />
+              ))}
             </div>
           </div>
-        </main>
-      </div>
+        </section>
+      </main>
       <Footer />
     </>
   );
 }
 
-export default page;
+export default ArchivesPage;

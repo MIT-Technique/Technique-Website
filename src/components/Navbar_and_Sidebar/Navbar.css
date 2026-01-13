@@ -1,57 +1,74 @@
-@keyframes fadeOut {
-  from {
-    background-color: rgba(0, 0, 0, 0.85);
-  }
-  to {
-    background-color: rgba(0, 0, 0, 0);
-  }
-}
-
-.fade-out {
-  animation: fadeOut 0.3s forwards ease-in;
-}
-
-@keyframes fadeIn {
-  from {
-    background-color: rgba(0, 0, 0, 0);
-  }
-  to {
-    background-color: rgba(0, 0, 0, 0.85);
-  }
-}
-
-.fade-in {
-  animation: fadeIn 0.3s forwards ease-in;
-}
-nav {
-  position: relative;
-  display: flex;
-}
-
 .nav-item {
-  padding: 10px 20px;
+  padding: 8px 0;
   cursor: pointer;
   position: relative;
-  z-index: 10; /* Ensure the nav items are above the indicator */
-  transition: color 0.3s;
+  transition: color 0.2s ease;
 }
 
-.nav-item:hover {
-  color: #ab936b;
-}
-
-.nav-item.active {
-  color: white;
-}
-.nav-item.active:hover {
-  color: #eeddbe;
-}
-
-.indicator {
+.nav-item::after {
+  content: '';
   position: absolute;
-  height: 100%;
-  background-color: #790606;
-  /* transition: all 0.3s ease; */
-  border-radius: 4px; /* Adjust the border-radius if needed */
-  z-index: 5; /* Ensure the indicator is behind the nav items */
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: transparent;
+  transition: background-color 0.2s ease, width 0.2s ease;
+}
+
+/* Standard pages - accent underline */
+.nav-item.active::after {
+  background-color: #750014;
+}
+
+.nav-item:hover::after {
+  background-color: #E5E5E5;
+}
+
+.nav-item.active:hover::after {
+  background-color: #750014;
+}
+
+/* Homepage - white underline */
+.nav-item.active-home::after {
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.nav-item.active-home:hover::after {
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+/* Dropdown button - no underline on hover, handled differently */
+.nav-item.nav-dropdown::after {
+  display: none;
+}
+
+/* Hire Us special styling - thin underline that expands on hover */
+.nav-item-hire {
+  display: inline-flex;
+  align-items: center;
+}
+
+.nav-item-hire::after {
+  width: 0;
+  left: 0;
+  right: auto;
+  height: 1px;
+  background-color: currentColor;
+  transition: width 0.3s ease;
+}
+
+.nav-item-hire:hover::after {
+  width: 100%;
+  background-color: currentColor;
+}
+
+.nav-item-hire.active::after {
+  width: 100%;
+  background-color: #750014;
+}
+
+.nav-item-hire.active-home::after {
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
 }

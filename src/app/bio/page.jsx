@@ -14,7 +14,23 @@ import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import Alert from "@mui/material/Alert";
 
-export default function page() {
+// Shared MUI text field styling
+const textFieldSx = {
+  "& .MuiOutlinedInput-root": {
+    "& fieldset": { borderColor: "#E5E5E5" },
+    "&:hover fieldset": { borderColor: "#D0D0D0" },
+    "&.Mui-focused fieldset": { borderColor: "#750014" },
+  },
+  "& .MuiInputLabel-root.Mui-focused": { color: "#750014" },
+};
+
+const selectSx = {
+  "& .MuiOutlinedInput-notchedOutline": { borderColor: "#E5E5E5" },
+  "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#D0D0D0" },
+  "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#750014" },
+};
+
+export default function BioPage() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [major, setMajor] = useState("");
@@ -37,17 +53,12 @@ export default function page() {
         }
 
         const json = await res.json();
-        console.log(json.data);
         setFirstName(json.data.firstName);
         setLastName(json.data.lastName);
         setMajor(json.data.major);
         setQuote(json.data.quote);
-        setEmail(json.data.email);
-        // setData(json.data);
       } catch (err) {
-        // setError(err.message);
-      } finally {
-        // setLoading(false);
+        // Handle error silently
       }
     };
 
@@ -59,10 +70,6 @@ export default function page() {
     setError(false);
   }
 
-  /**
-   * This function will send a request to the server to update the
-   *  senior infor with the new information that was provided
-   */
   async function updateBio() {
     try {
       const response = await fetch("/api/updateBio", {
@@ -76,206 +83,148 @@ export default function page() {
         }),
       });
 
-      if (!response.ok) throw new Error("Failed to generate PDF");
+      if (!response.ok) throw new Error("Failed to update bio");
       setOpen(true);
-    } catch {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
       setError(true);
       setOpen(true);
     }
   }
 
+  const majors = [
+    "1", "1-12", "1-ENG", "2", "2A", "2-OE", "3", "3-A", "3-C",
+    "4", "4-B", "5", "5-7", "6-1", "6-2", "6-3", "6-3A", "6-4",
+    "6-5", "6-7", "6-9", "6-14", "6-P", "7", "8", "9", "10",
+    "10-B", "10-C", "10-ENG", "11", "11-6", "12", "14-1", "14-2",
+    "15-1", "15-2", "15-3", "16", "16-ENG", "17", "17-M", "18",
+    "18-C", "21", "21A", "21-CMS", "21E", "21G", "21L", "21H",
+    "21M", "21T", "21S", "21W", "20", "22", "22-ENG", "24",
+    "24-1", "24-2", "STS"
+  ];
+
   return (
     <>
-      <div className="min-h-[90vh]  relative lg:pt-[5vh] pt-[10vh] flex flex-col">
-        <main className="flex-1  flex items-center justify-start flex-col">
-          <h2 className="text-[#790606] flex justify-center pb-4 font-medium">
-            Senior Bio
-          </h2>
+      <main className="min-h-screen pt-24 lg:pt-32">
+        <section className="section-tight container-narrow">
+          <div className="text-center mb-8">
+            <h1 className="mb-2">Senior Bio</h1>
+            <p className="text-text-secondary">
+              Update your information for the yearbook.
+            </p>
+          </div>
+
           <Box
             component="form"
+            className="card-elevated"
             sx={{
-              border: "1px solid #790606",
-              borderRadius: "0.3rem",
-              borderColor: "",
-              padding: "8px",
               display: "flex",
               flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              width: {
-                xs: "90%", // extra-small devices (phones)
-                sm: "70%", // small devices
-                md: "50%", // medium devices
-                lg: "40%", // large devices
-                xl: "40%", // extra-large devices
-              },
-              height: "90%",
-              paddingX: "12px",
-              "& > :not(button)": {
-                m: 1,
-                width: "100%",
-                flexShrink: 0,
-              },
-              marginBottom: "1rem",
+              gap: 2,
             }}
             onSubmit={async (event) => {
               event.preventDefault();
               await updateBio();
             }}
           >
-            <TextField
-              required
-              label="First Name"
-              variant="outlined"
-              InputLabelProps={{
-                shrink: true,
-              }}
-              value={firstName}
-              onChange={(event) => {
-                setFirstName(event.target.value);
-              }}
-              name="orgName"
-            />
-            <TextField
-              required
-              label="Last Name"
-              variant="outlined"
-              InputLabelProps={{
-                shrink: true,
-              }}
-              value={lastName}
-              onChange={(event) => {
-                setLastName(event.target.value);
-              }}
-              name="photographerName"
-            />
+            <div className="grid grid-cols-2 gap-4">
+              <TextField
+                required
+                label="First Name"
+                variant="outlined"
+                InputLabelProps={{ shrink: true }}
+                value={firstName}
+                onChange={(event) => setFirstName(event.target.value)}
+                name="firstName"
+                sx={textFieldSx}
+              />
+              <TextField
+                required
+                label="Last Name"
+                variant="outlined"
+                InputLabelProps={{ shrink: true }}
+                value={lastName}
+                onChange={(event) => setLastName(event.target.value)}
+                name="lastName"
+                sx={textFieldSx}
+              />
+            </div>
 
             <FormControl fullWidth>
-              <InputLabel id="demo-simple-select-label" shrink>
-                Major*
-              </InputLabel>
-              <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                value={major}
-                label="Major"
-                notched
-                required
-                onChange={(event) => {
-                  setMajor(event.target.value);
+              <InputLabel
+                id="major-label"
+                shrink
+                sx={{
+                  "&.Mui-focused": { color: "#750014" },
                 }}
               >
-                <MenuItem value={"1"}>1</MenuItem>
-                <MenuItem value={"1-12"}>1-12</MenuItem>
-                <MenuItem value={"1-ENG"}>1-ENG</MenuItem>
-                <MenuItem value={"2"}>2</MenuItem>
-                <MenuItem value={"2A"}>2A</MenuItem>
-                <MenuItem value={"2-OE"}>2-OE</MenuItem>
-                <MenuItem value={"3"}>3</MenuItem>
-                <MenuItem value={"3-A"}>3-A</MenuItem>
-                <MenuItem value={"3-C"}>3-C</MenuItem>
-                <MenuItem value={"4"}>4</MenuItem>
-                <MenuItem value={"4-B"}>4-B</MenuItem>
-                <MenuItem value={"5"}>5</MenuItem>
-                <MenuItem value={"5-7"}>5-7</MenuItem>
-                <MenuItem value={"6-1"}>6-1</MenuItem>
-                <MenuItem value={"6-2"}>6-2</MenuItem>
-                <MenuItem value={"6-3"}>6-3</MenuItem>
-                <MenuItem value={"6-3A"}>6-3</MenuItem>
-                <MenuItem value={"6-4"}>6-4</MenuItem>
-                <MenuItem value={"6-5"}>6-5</MenuItem>
-                <MenuItem value={"6-7"}>6-7</MenuItem>
-                <MenuItem value={"6-9"}>6-9</MenuItem>
-                <MenuItem value={"6-14"}>6-14</MenuItem>
-                <MenuItem value={"6-P"}>6-P</MenuItem>
-                <MenuItem value={"7"}>7</MenuItem>
-                <MenuItem value={"8"}>8</MenuItem>
-                <MenuItem value={"9"}>9</MenuItem>
-                <MenuItem value={"10"}>10</MenuItem>
-                <MenuItem value={"10-B"}>10-B</MenuItem>
-                <MenuItem value={"10-C"}>10-C</MenuItem>
-                <MenuItem value={"10-ENG"}>10-ENG</MenuItem>
-                <MenuItem value={"11"}>11</MenuItem>
-                <MenuItem value={"11-6"}>11-6</MenuItem>
-                <MenuItem value={"12"}>12</MenuItem>
-                <MenuItem value={"14-1"}>14-1</MenuItem>
-                <MenuItem value={"14-2"}>14-2</MenuItem>
-                <MenuItem value={"15-1"}>15-1</MenuItem>
-                <MenuItem value={"15-2"}>15-2</MenuItem>
-                <MenuItem value={"15-3"}>15-3</MenuItem>
-                <MenuItem value={"16"}>16</MenuItem>
-                <MenuItem value={"16-ENG"}>16-ENG</MenuItem>
-                <MenuItem value={"17"}>17</MenuItem>
-                <MenuItem value={"17-M"}>17-M</MenuItem>
-                <MenuItem value={"18"}>18</MenuItem>
-                <MenuItem value={"18-C"}>18-C</MenuItem>
-                <MenuItem value={"21"}>21</MenuItem>
-                <MenuItem value={"21A"}>21A</MenuItem>
-                <MenuItem value={"21-CMS"}>21-CMS</MenuItem>
-                <MenuItem value={"21E"}>21E</MenuItem>
-                <MenuItem value={"21G"}>21G</MenuItem>
-                <MenuItem value={"21L"}>21L</MenuItem>
-                <MenuItem value={"21H"}>21H</MenuItem>
-                <MenuItem value={"21M"}>21M</MenuItem>
-                <MenuItem value={"21T"}>21T</MenuItem>
-                <MenuItem value={"21S"}>21S</MenuItem>
-                <MenuItem value={"21W"}>21W</MenuItem>
-                <MenuItem value={"20"}>20</MenuItem>
-                <MenuItem value={"22"}>22</MenuItem>
-                <MenuItem value={"22-ENG"}>22-ENG</MenuItem>
-                <MenuItem value={"24"}>24</MenuItem>
-                <MenuItem value={"24-1"}>24-1</MenuItem>
-                <MenuItem value={"24-2"}>24-2</MenuItem>
-                <MenuItem value={"STS"}>STS</MenuItem>
+                Major *
+              </InputLabel>
+              <Select
+                labelId="major-label"
+                id="major-select"
+                value={major}
+                label="Major *"
+                notched
+                required
+                onChange={(event) => setMajor(event.target.value)}
+                sx={selectSx}
+              >
+                {majors.map((m) => (
+                  <MenuItem key={m} value={m}>
+                    {m}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
+
             <TextField
               label="Quote"
               variant="outlined"
-              InputLabelProps={{
-                shrink: true,
-              }}
+              InputLabelProps={{ shrink: true }}
               value={quote}
-              onChange={(event) => {
-                setQuote(event.target.value);
-              }}
-              name="eventName"
+              onChange={(event) => setQuote(event.target.value)}
+              name="quote"
               multiline
-              minRows={2}
+              minRows={3}
               maxRows={8}
+              sx={textFieldSx}
+              fullWidth
+              placeholder="Enter a quote for your yearbook entry (optional)"
             />
+
             <Button
               type="submit"
               variant="contained"
               sx={{
-                margin: "8px",
-                backgroundColor: "#790606",
+                mt: 2,
+                backgroundColor: "#750014",
                 "&:hover": {
-                  backgroundColor: "#06503a",
-                  boxShadow:
-                    "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
+                  backgroundColor: "#5C0010",
                 },
                 "&:active": {
-                  backgroundColor: "#03281d",
-                  boxShadow:
-                    "0px 5px 5px -3px rgba(0,0,0,0.2), 0px 8px 10px 1px rgba(0,0,0,0.14), 0px 3px 14px 2px rgba(0,0,0,0.12)",
+                  backgroundColor: "#5C0010",
                   transform: "translateY(1px)",
                 },
-                transition: "all 0.3s ease",
-                width: "60%",
+                transition: "all 0.2s ease",
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+                fontWeight: 500,
+                py: 1.5,
+                boxShadow: "none",
               }}
+              fullWidth
             >
               Update Bio
             </Button>
           </Box>
-        </main>
-      </div>
+        </section>
+      </main>
+
       <Snackbar
         anchorOrigin={{ vertical, horizontal }}
         open={open}
         onClose={handleClose}
-        message="Invoice Sent Successfully"
         autoHideDuration={4000}
         action={
           <IconButton

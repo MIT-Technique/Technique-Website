@@ -1,98 +1,44 @@
 "use client";
 import Image from "next/image";
 import Footer from "../components/Footer/Footer";
-import React, { useState, useEffect } from "react";
-import { ReactTyped } from "react-typed";
-import { FaCircleArrowDown } from "react-icons/fa6";
-import { IoArrowDownCircleSharp } from "react-icons/io5";
-import Navbar from "../components/Navbar_and_Sidebar/Navbar";
-// import { Button } from "@chakra-ui/react";
-import { Button } from "@mui/material";
+import React from "react";
 
 export default function Home() {
-  const [tnq, setTnq] = useState("");
-  const options = {
-    strings: [
-      "Photographers.",
-      "Photojournalists.",
-      "Designers.",
-      "Editors.",
-      "Yearbook.",
-    ],
-    loop: true,
-    typeSpeed: 100,
-    backDelay: 2000,
-    backspeed: 50,
-    showCursor: true,
-    smartBackspace: false,
-  };
-
-  function handleScroll() {
-    const target = document.getElementById("section2");
-
-    target?.scrollIntoView({ behavior: "smooth" });
-  }
-
   return (
-    <div className="relative h-fit">
-      <Navbar />
-      <div className=" h-[100vh] flex flex-col">
-        <section
-          className="h-fit bg-white flex flex-col justify-center items-center"
-          id="section1"
-        >
-          <div className=" w-full relative h-[100vh]">
-            <Image
-              src="/images/other_images/Michelle Xiang/DSC04240.jpg" 
-              alt="cover picture"
-              fill={true}
-              style={{ objectFit: "cover", position: "absolute", zIndex: 1 }}
-            ></Image>
-            <p className="absolute bottom-[6%] right-[3%] text-gray-300 z-10 text-right text-xs">
-              photo credit:
-              <br></br>
-              <br></br>
-              Michelle Xiang
-            </p>
-            <div className="flex flex-col justify-center h-full w-full relative z-20 space-y-3">
-              <div className="w-full flex flex-col items-center justify-center">
-                <p className=" text-center text-white">We are MIT&apos;s</p>
-                <div className="w-full flex justify-center">
-                  <ReactTyped
-                    strings={options.strings}
-                    loop={options.loop}
-                    typeSpeed={options.typeSpeed}
-                    backDelay={options.backDelay}
-                    backSpeed={options.backspeed}
-                    showCursor={options.showCursor}
-                    smartBackspace={options.smartBackspace}
-                    style={{
-                      fontSize: "2.25rem",
-                      lineHeight: "2.5rem",
-                      fontWeight: "300",
-                      background: "white",
-                      color: "white",
-                      background: "transparent",
-                    }}
-                  ></ReactTyped>
-                </div>
-              </div>
-              {/* <div className="w-full flex justify-center cursor-pointer">
-                <FaCircleArrowDown
-                  style={{
-                    width: "auto",
-                    height: "3.5rem",
-                    color: "white",
-                  }}
-                  to="section2"
-                  onClick={handleScroll}
-                />
-              </div> */}
-            </div>
-          </div>
-          <Footer />
-        </section>
-      </div>
+    <div className="relative">
+      {/* Hero Section - Full viewport, starts from top (behind transparent nav) */}
+      <section className="relative h-screen" id="section1">
+        {/* Hero Image */}
+        <Image
+          src="/images/other_images/Michelle Xiang/DSC04240.jpg"
+          alt="MIT Technique Photography"
+          fill={true}
+          priority
+          style={{ objectFit: "cover" }}
+        />
+
+        {/* Gradient Overlay for text legibility */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/30 z-10" />
+
+        {/* Hero Content */}
+        <div className="absolute inset-0 flex flex-col justify-end items-center pb-32 lg:pb-40 z-20">
+          <p className="text-xs uppercase tracking-[0.3em] text-white/70 mb-4">
+            MIT&apos;s Photography & Yearbook
+          </p>
+          <h1 className="text-4xl lg:text-6xl font-light text-white text-center tracking-tight">
+            Technique
+          </h1>
+          <p className="text-sm lg:text-base text-white/80 mt-4 font-light">
+            Memorializing MIT since 1885
+          </p>
+        </div>
+
+        {/* Photo Credit */}
+        <p className="absolute bottom-4 right-4 text-xs text-white/50 z-20">
+          Photo: Michelle Xiang
+        </p>
+      </section>
+      <Footer />
     </div>
   );
 }

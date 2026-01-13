@@ -4,13 +4,23 @@ import { useState } from "react";
 import * as React from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
-import InputAdornment from "@mui/material/InputAdornment";
 import { Button } from "@mui/material";
 import Snackbar from "@mui/material/Snackbar";
 import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import Alert from "@mui/material/Alert";
-export default function page() {
+
+// Shared MUI text field styling
+const textFieldSx = {
+  "& .MuiOutlinedInput-root": {
+    "& fieldset": { borderColor: "#E5E5E5" },
+    "&:hover fieldset": { borderColor: "#D0D0D0" },
+    "&.Mui-focused fieldset": { borderColor: "#750014" },
+  },
+  "& .MuiInputLabel-root.Mui-focused": { color: "#750014" },
+};
+
+export default function InvoicePage() {
   const [orgName, setOrgName] = useState("");
   const [photographerName, setPhotographerName] = useState("");
   const [eventName, setEventName] = useState("");
@@ -27,11 +37,7 @@ export default function page() {
     setOpen(false);
     setError(false);
   }
-  /**
-   *
-   * @param  dateString string to format into a MMDDYYYY string
-   * @returns the formatted string with the month, day, and year seperated by backslash
-   */
+
   function formatToMMDDYYYY(dateString) {
     const date = new Date(dateString);
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -40,14 +46,7 @@ export default function page() {
     return `${month}/${day}/${year}`;
   }
 
-  /**
-   * Sends a request to the backend to send the invoice to tnq-exec@mit.edu
-   *  based on values in the fields from the form. If you want to you can do a form submission similar
-   *  to sign in where the form just forwards the fields to the backend through the formData in the body, but
-   *  this is good enough.
-   */
   const sendInvoice = async () => {
-    //The reason for these keys is that this is what Anvil told me to do.
     const pdfData = {
       cast9d67e7e0383511f099c92fb5678df49d: formatToMMDDYYYY(Date.now()),
       caste96492b0383511f099c92fb5678df49d: totalHours,
@@ -93,7 +92,6 @@ export default function page() {
       setOrgName("");
       setPhotographerName("");
       setEventDate("");
-      // Trigger download
       setOpen(true);
     } catch (error) {
       console.error(error);
@@ -104,37 +102,22 @@ export default function page() {
 
   return (
     <>
-      <div className="min-h-[90vh]  relative lg:pt-[5vh] pt-[10vh] flex flex-col">
-        <main className="flex-1  flex items-center justify-start flex-col">
-          <h2 className="text-[#790606] flex justify-center pb-4 font-medium">
-            Invoice Form
-          </h2>
+      <main className="min-h-screen pt-24 lg:pt-32">
+        <section className="section-tight container-narrow">
+          <div className="text-center mb-8">
+            <h1 className="mb-2">Invoice Form</h1>
+            <p className="text-text-secondary">
+              Submit your photography invoice.
+            </p>
+          </div>
+
           <Box
             component="form"
+            className="card-elevated"
             sx={{
-              border: "1px solid #790606",
-              borderRadius: "0.3rem",
-              borderColor: "",
-              padding: "8px",
               display: "flex",
               flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              width: {
-                xs: "90%", // extra-small devices (phones)
-                sm: "70%", // small devices
-                md: "50%", // medium devices
-                lg: "40%", // large devices
-                xl: "40%", // extra-large devices
-              },
-              height: "90%",
-              paddingX: "12px",
-              "& > :not(button)": {
-                m: 1,
-                width: "100%",
-                flexShrink: 0,
-              },
-              marginBottom: "1rem",
+              gap: 2,
             }}
             onSubmit={async (event) => {
               event.preventDefault();
@@ -145,131 +128,114 @@ export default function page() {
               required
               label="Organization Name"
               variant="outlined"
-              InputLabelProps={{
-                shrink: true,
-              }}
+              InputLabelProps={{ shrink: true }}
               value={orgName}
-              onChange={(event) => {
-                setOrgName(event.target.value);
-              }}
+              onChange={(event) => setOrgName(event.target.value)}
               name="orgName"
+              sx={textFieldSx}
+              fullWidth
             />
             <TextField
               required
               label="Photographer Name"
               variant="outlined"
-              InputLabelProps={{
-                shrink: true,
-              }}
+              InputLabelProps={{ shrink: true }}
               value={photographerName}
-              onChange={(event) => {
-                setPhotographerName(event.target.value);
-              }}
+              onChange={(event) => setPhotographerName(event.target.value)}
               name="photographerName"
+              sx={textFieldSx}
+              fullWidth
             />
             <TextField
               required
               label="Event Name"
               variant="outlined"
-              InputLabelProps={{
-                shrink: true,
-              }}
+              InputLabelProps={{ shrink: true }}
               value={eventName}
-              onChange={(event) => {
-                setEventName(event.target.value);
-              }}
+              onChange={(event) => setEventName(event.target.value)}
               name="eventName"
+              sx={textFieldSx}
+              fullWidth
             />
             <TextField
               required
               label="Your Cost Object"
               variant="outlined"
-              InputLabelProps={{
-                shrink: true,
-              }}
+              InputLabelProps={{ shrink: true }}
               value={costObject}
-              onChange={(event) => {
-                setCostObject(event.target.value);
-              }}
+              onChange={(event) => setCostObject(event.target.value)}
               type="number"
               name="costObject"
+              sx={textFieldSx}
+              fullWidth
             />
-            <TextField
-              required
-              label="Hourly Rate"
-              variant="outlined"
-              type="number"
-              InputLabelProps={{
-                shrink: true,
-              }}
-              value={hourlyRate}
-              onChange={(event) => {
-                setHourlyRate(event.target.value);
-              }}
-              name="hourlyRate"
-            />
-            <TextField
-              required
-              label="Total Hours"
-              variant="outlined"
-              type="number"
-              InputLabelProps={{
-                shrink: true,
-              }}
-              value={totalHours}
-              onChange={(event) => {
-                setTotalHours(event.target.value);
-                // console.log("total hours", event.target.value);
-              }}
-              name="totalHours"
-            />
-
+            <div className="grid grid-cols-2 gap-4">
+              <TextField
+                required
+                label="Hourly Rate"
+                variant="outlined"
+                type="number"
+                InputLabelProps={{ shrink: true }}
+                value={hourlyRate}
+                onChange={(event) => setHourlyRate(event.target.value)}
+                name="hourlyRate"
+                sx={textFieldSx}
+              />
+              <TextField
+                required
+                label="Total Hours"
+                variant="outlined"
+                type="number"
+                InputLabelProps={{ shrink: true }}
+                value={totalHours}
+                onChange={(event) => setTotalHours(event.target.value)}
+                name="totalHours"
+                sx={textFieldSx}
+              />
+            </div>
             <TextField
               required
               label="Date of the Event"
               type="date"
-              InputLabelProps={{
-                shrink: true,
-              }}
-              sx={{}}
+              InputLabelProps={{ shrink: true }}
               value={eventDate}
-              onChange={(event) => {
-                setEventDate(event.target.value);
-                // console.log("eventDate", event.target.value);
-              }}
+              onChange={(event) => setEventDate(event.target.value)}
               name="eventDate"
+              sx={textFieldSx}
+              fullWidth
             />
             <Button
               type="submit"
               variant="contained"
               sx={{
-                margin: "8px",
-                backgroundColor: "#790606",
+                mt: 2,
+                backgroundColor: "#750014",
                 "&:hover": {
-                  backgroundColor: "#06503a",
-                  boxShadow:
-                    "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
+                  backgroundColor: "#5C0010",
                 },
                 "&:active": {
-                  backgroundColor: "#03281d",
-                  boxShadow:
-                    "0px 5px 5px -3px rgba(0,0,0,0.2), 0px 8px 10px 1px rgba(0,0,0,0.14), 0px 3px 14px 2px rgba(0,0,0,0.12)",
+                  backgroundColor: "#5C0010",
                   transform: "translateY(1px)",
                 },
-                transition: "all 0.3s ease",
-                width: "60%",
+                transition: "all 0.2s ease",
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+                fontWeight: 500,
+                py: 1.5,
+                boxShadow: "none",
               }}
+              fullWidth
             >
               Submit Invoice
             </Button>
           </Box>
-        </main>
-      </div>
+        </section>
+      </main>
+
       <Snackbar
         anchorOrigin={{ vertical, horizontal }}
         open={open}
         onClose={handleClose}
-        message="Invoice Sent Successfully"
         autoHideDuration={4000}
         action={
           <IconButton

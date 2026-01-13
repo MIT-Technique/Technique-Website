@@ -1,177 +1,174 @@
 "use client";
-import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
+import React, { useState } from "react";
 import Sidebar from "./Sidebar.jsx";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import Navbarcss from "./Navbar.css";
+import "./Navbar.css";
 
 function Navbar() {
   const pathname = usePathname();
-  const [firstLoad, setFirstLoad] = useState(true);
-  const indicatorRef = useRef(null);
-  const width1 = useRef(null);
-  const navRef = useRef();
-  const techniqueLabel = useRef();
+  const isHomePage = pathname === "/";
+  const [openDropdown, setOpenDropdown] = useState(null);
 
-  useLayoutEffect(() => {
-    const activeNavItem = document.querySelector(".nav-item.active");
-    let rect;
-    let height1;
-    const navElement = navRef.current;
-    let resizeObserver;
+  // Check if any item in a dropdown is active
+  const isDropdownActive = (items) => {
+    return items.some(item => {
+      if (item.href === "/login") return pathname === "/login" || pathname === "/bio";
+      return pathname === item.href || pathname.startsWith(item.href + "/");
+    });
+  };
 
-    if (activeNavItem && indicatorRef.current) {
-      const rect = activeNavItem.getBoundingClientRect();
-      const parentRect = activeNavItem.parentElement.getBoundingClientRect();
-      const offsetLeft = activeNavItem.offsetLeft - parentRect.left;
-      const offsetTop = activeNavItem.offsetTop - parentRect.top;
+  const isActive = (href) => {
+    if (href === "/") return pathname === "/";
+    if (href === "/login") return pathname === "/login" || pathname === "/bio";
+    return pathname === href || pathname.startsWith(href + "/");
+  };
 
-      indicatorRef.current.style.width = `${rect.width}px`;
-      indicatorRef.current.style.height = `${rect.height}px`;
-      indicatorRef.current.style.transform = `translateX(${offsetLeft}px) `;
-      if (!firstLoad) {
-        indicatorRef.current.style.transition = "all 0.3s ease";
-      }
-      resizeObserver = new ResizeObserver((entries) => {
-        for (const entry of entries) {
-          const rect = activeNavItem.getBoundingClientRect();
-          const parentRect =
-            activeNavItem.parentElement.getBoundingClientRect();
-          const offsetLeft = activeNavItem.offsetLeft - parentRect.left;
-          const offsetTop = activeNavItem.offsetTop - parentRect.top;
-
-          indicatorRef.current.style.width = `${rect.width}px`;
-          indicatorRef.current.style.height = `${rect.height}px`;
-          indicatorRef.current.style.transform = `translateX(${offsetLeft}px) `;
-        }
-      });
-      resizeObserver.observe(navRef.current);
-    }
-    setFirstLoad(false);
-    return () => {
-      resizeObserver?.unobserve(navElement);
-    };
-  }, [pathname]);
-
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+  // Navigation structure with dropdowns
+  const navStructure = [
+    {
+      label: "ABOUT",
+      dropdown: [
+        { href: "/about", label: "OUR HISTORY" },
+        { href: "/portfolio", label: "PORTFOLIO" },
+        { href: "/contact", label: "CONTACT" },
+      ],
+    },
+    { href: "/archives", label: "ARCHIVES" },
+    { href: "/invoice", label: "INVOICE" },
+    {
+      label: "SENIORS",
+      dropdown: [
+        { href: "/seniors", label: "PORTRAITS" },
+        { href: "/login", label: "SENIOR BIO" },
+      ],
+    },
+    { href: "/hire", label: "HIRE US", special: true },
+  ];
 
   return (
     <>
+      {/* Desktop Navigation */}
       <div
-        className={`hidden bg-[#fffcf7] flex-col relative z-50  ${
-          pathname == "/" ? "hidden" : " lg:flex"
+        className={`hidden lg:flex flex-col z-50 ${
+          isHomePage
+            ? "absolute top-0 left-0 right-0 bg-transparent"
+            : "relative bg-[#FFFAFA] border-b border-border"
         }`}
       >
-        <nav
-          className={`h-[10vh]  text-[#790606]  top-0 w-full flex items-center`}
-          ref={navRef}
-        >
+        <nav className="h-16 top-0 w-full flex items-center justify-between px-8 lg:px-12">
+          {/* Logo */}
           <Link
-            className="text-sm xl:text-2xl font-bold  absolute left-2  top-2 xl:left-4 xl:top-auto"
+            className={`text-lg font-medium tracking-wide transition-colors ${
+              isHomePage
+                ? "text-white hover:text-white/80"
+                : "text-text-primary hover:text-accent"
+            }`}
             href="/"
           >
             TECHNIQUE
           </Link>
-          <div className="flex space-x-9 text-xs w-full justify-center font-semibold">
-            <Link
-              className={`nav-item ${pathname == "/" ? "active" : ""} ${
-                firstLoad && pathname == "/" ? "bg-[#790606] rounded-[4px]" : ""
-              }`}
-              href="/"
-            >
-              HOME
-            </Link>
-            <Link
-              className={`nav-item ${pathname == "/about" ? "active" : ""} ${
-                firstLoad && pathname == "/about"
-                  ? "bg-[#790606] rounded-[4px]"
-                  : ""
-              }`}
-              href="/about"
-            >
-              ABOUT
-            </Link>
-            <Link
-              className={`nav-item ${pathname == "/seniors" ? "active" : ""} ${
-                firstLoad && pathname == "/seniors"
-                  ? "bg-[#790606] rounded-[4px]"
-                  : ""
-              }`}
-              href="/seniors"
-            >
-              SENIORS
-            </Link>
-            <Link
-              className={`nav-item ${pathname == "/hire" ? "active" : ""} ${
-                firstLoad && pathname == "/hire"
-                  ? "bg-[#790606] rounded-[4px]"
-                  : ""
-              }`}
-              href="/hire"
-            >
-              HIRE US
-            </Link>
 
-            <Link
-              className={`nav-item ${pathname == "/archives" ? "active" : ""} ${
-                firstLoad && pathname == "/archives"
-                  ? "bg-[#790606] rounded-[4px]"
-                  : ""
-              }`}
-              href="/archives"
-            >
-              ARCHIVES
-            </Link>
-            <Link
-              className={`nav-item ${
-                pathname == "/portfolio" ? "active" : ""
-              } ${
-                firstLoad && pathname == "/portfolio"
-                  ? "bg-[#790606] rounded-[4px]"
-                  : ""
-              }`}
-              href="/portfolio"
-            >
-              PORTFOLIO
-            </Link>
-            <Link
-              className={`nav-item ${pathname == "/invoice" ? "active" : ""} ${
-                firstLoad && pathname == "/invoice"
-                  ? "bg-[#790606] rounded-[4px]"
-                  : ""
-              }`}
-              href="/invoice"
-            >
-              INVOICE
-            </Link>
-            <Link
-              className={`nav-item ${
-                pathname == "/bio" || pathname == "/login" ? "active" : ""
-              } ${
-                firstLoad && (pathname == "/bio" || pathname == "/login")
-                  ? "bg-[#790606] rounded-[4px]"
-                  : ""
-              }`}
-              href="/login"
-            >
-              SENIOR BIO
-            </Link>
-            <Link
-              className={`nav-item ${pathname == "/contact" ? "active" : ""} ${
-                firstLoad && pathname == "/contact"
-                  ? "bg-[#790606] rounded-[4px]"
-                  : ""
-              }`}
-              href="/contact"
-            >
-              CONTACT
-            </Link>
+          {/* Nav Links */}
+          <div className="flex items-center gap-8">
+            {navStructure.map((item, index) => (
+              item.dropdown ? (
+                // Dropdown item
+                <div
+                  key={item.label}
+                  className="relative"
+                  onMouseEnter={() => setOpenDropdown(item.label)}
+                  onMouseLeave={() => setOpenDropdown(null)}
+                >
+                  <button
+                    className={`nav-item nav-dropdown text-xs uppercase tracking-widest font-medium transition-colors flex items-center gap-1 ${
+                      isHomePage
+                        ? isDropdownActive(item.dropdown)
+                          ? "text-white active-home"
+                          : "text-white/70 hover:text-white"
+                        : isDropdownActive(item.dropdown)
+                          ? "text-accent active"
+                          : "text-text-secondary hover:text-text-primary"
+                    }`}
+                  >
+                    {item.label}
+                    <svg
+                      className={`w-3 h-3 transition-transform ${openDropdown === item.label ? 'rotate-180' : ''}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  <div
+                    className={`absolute top-full left-1/2 -translate-x-1/2 pt-2 transition-all duration-200 ${
+                      openDropdown === item.label
+                        ? "opacity-100 visible translate-y-0"
+                        : "opacity-0 invisible -translate-y-2"
+                    }`}
+                  >
+                    <div
+                      className={`min-w-[160px] py-2 rounded shadow-lg ${
+                        isHomePage
+                          ? "bg-black/90 backdrop-blur-sm"
+                          : "bg-white border border-border"
+                      }`}
+                    >
+                      {item.dropdown.map((subItem) => (
+                        <Link
+                          key={subItem.href}
+                          href={subItem.href}
+                          className={`block px-4 py-2 text-xs uppercase tracking-wider transition-colors ${
+                            isHomePage
+                              ? isActive(subItem.href)
+                                ? "text-white bg-white/10"
+                                : "text-white/70 hover:text-white hover:bg-white/10"
+                              : isActive(subItem.href)
+                                ? "text-accent bg-accent/5"
+                                : "text-text-secondary hover:text-text-primary hover:bg-bg-secondary"
+                          }`}
+                        >
+                          {subItem.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                // Regular item or special (Hire Us)
+                <Link
+                  key={item.href}
+                  className={`nav-item text-xs uppercase tracking-widest font-medium transition-colors ${
+                    item.special ? 'nav-item-hire group' : ''
+                  } ${
+                    isHomePage
+                      ? isActive(item.href)
+                        ? "text-white active-home"
+                        : "text-white/70 hover:text-white"
+                      : isActive(item.href)
+                        ? "text-accent active"
+                        : "text-text-secondary hover:text-text-primary"
+                  }`}
+                  href={item.href}
+                >
+                  {item.label}
+                  {item.special && (
+                    <span className="inline-block ml-1 transition-transform duration-200 group-hover:translate-x-1">
+                      →
+                    </span>
+                  )}
+                </Link>
+              )
+            ))}
           </div>
-          <div ref={indicatorRef} className="indicator"></div>
         </nav>
       </div>
-      <Sidebar isScrolled={isScrolled} pathname={pathname} />
+
+      {/* Mobile Sidebar */}
+      <Sidebar pathname={pathname} />
     </>
   );
 }

@@ -1,67 +1,71 @@
+"use client";
 import React from "react";
 import Footer from "../../components/Footer/Footer";
 import Image from "next/image";
-import Link from "next/link";
 
-function page() {
+function ContactPage() {
   return (
     <>
-      <div className="min-h-[90vh] flex flex-col lg:pt-[5vh] pt-[10vh] text-black">
-        <main className="w-full h-full px-4 flex flex-col space-y-20">
-          <div className="relative w-[100%] flex flex-col sm:flex-col  lg:space-y-0  h-full pb-2">
-            <div className="relative w-[100%] lg:w-[100%] h-[45vh] sm:h-[80vh] lg:h-[83vh] mb-3">
-              <Image
-                src="/images/club_photo/DSC_0815-3.jpg"
-                alt="Contact Image showing Technique's Managing Board 2023-2024"
-                priority
-                quality={100}
-                fill={true}
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 100vw"
-                style={{ borderRadius: "1rem", objectFit: "cover" }}
-              />
-              <p
-                className="absolute bottom-[1%] right-[2%] text-white"
-                style={{ fontSize: "3%" }}
-              >
-                Photo Credits: MIT Technique
-              </p>
+      <main className="min-h-screen pt-24 lg:pt-32">
+        {/* Hero Image */}
+        <section className="container-content">
+          <div className="relative aspect-[16/9] lg:aspect-[21/9] rounded overflow-hidden">
+            <Image
+              src="/images/club_photo/DSC_0815-3.jpg"
+              alt="Technique Managing Board"
+              fill={true}
+              priority
+              quality={100}
+              style={{ objectFit: "cover" }}
+            />
+            <p className="absolute bottom-3 right-4 text-xs text-white/60">
+              MIT Technique
+            </p>
+          </div>
+        </section>
+
+        {/* Contact Info */}
+        <section className="section container-text">
+          <div className="text-center mb-12">
+            <h1 className="mb-4">Get in Touch</h1>
+            <a
+              href="mailto:technique@mit.edu"
+              className="btn-primary"
+            >
+              Email Us
+            </a>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Visit Us Card */}
+            <div className="card-elevated text-center">
+              <h4 className="mb-4">Visit Us</h4>
+              <address className="text-sm text-text-secondary not-italic leading-relaxed">
+                142 Memorial Dr.
+                <br />
+                Walker Memorial
+                <br />
+                Room 50-320
+              </address>
             </div>
-            <div className="text-center w-[100%] h-[60vh] xs:h-[50vh] sm:h-[55vh] lg:h-[60vh] bg-[#790606] rounded-2xl py-4 flex flex-row lg:flex-col justify-center items-center text-white m-0">
-              <div className="w-1/2 flex flex-col align-center justify-center">
-                <div className="flex flex-col space-y-1 items-center pb-3">
-                  <h1 className=" text-lg font-[400] ">
-                    {" "}
-                    WANT TO GET IN TOUCH?
-                  </h1>
-                  <a href="mailto:technique@mit.edu" className="text-blue-400">
-                    Email us!
-                  </a>
-                </div>
-                <div className="flex flex-col items-center space-y-1 pb-4">
-                  <h className=" text-base "> VISIT US IN PERSON</h>
-                  <div className="flex flex-col items-center font-[250] text-sm">
-                    <p className="pb-1">142 Memorial Dr.</p>
-                    <p className="pb-1">Walker Memorial</p>
-                    <p className="pb-1">50-320</p>
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col items-center space-y-1 w-1/2">
-                <h className=" text-base "> MAILING ADDRESS</h>
-                <div className="flex flex-col items-center font-[250] text-sm">
-                  <p className="pb-1">MIT Technique</p>
-                  <p className="pb-1">32 Vassar Street</p>
-                  <p className="pb-1">Cambridge, Ma, 02139</p>
-                  <p className="pb-1">50-320</p>
-                </div>
-              </div>
+
+            {/* Mailing Address Card */}
+            <div className="card-elevated text-center">
+              <h4 className="mb-4">Mailing Address</h4>
+              <address className="text-sm text-text-secondary not-italic leading-relaxed">
+                MIT Technique
+                <br />
+                32 Vassar Street
+                <br />
+                Cambridge, MA 02139
+              </address>
             </div>
           </div>
-        </main>
-      </div>
+        </section>
+      </main>
       <Footer />
     </>
   );
 }
 
-export default page;
+export default ContactPage;

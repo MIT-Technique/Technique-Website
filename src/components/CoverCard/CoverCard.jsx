@@ -1,21 +1,27 @@
 import React from "react";
 import Image from "next/image";
-import Link from "next/link";
-import Card from "./CoverCard.css"
 
-function CoverCard(props) {
+function CoverCard({ src, alt, href, title }) {
   return (
-    <div className="bg-gray-50 rounded-lg flex  flex-col w-fit p-5 items-center m-3 cardArchive  text-black colorChange shadow-md shadow-[#243e38]">
-      <a
-        href={props.href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex flex-col space-y-3"
-      >
-        <Image src={props.src} alt={props.alt} width={220} height={293} priority={true} style={{width: "220px", height:"293px"}}></Image>
-        <p className="font-semibold "> {props.title}</p>
-      </a>
-    </div>
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group block"
+    >
+      <div className="relative aspect-[3/4] overflow-hidden bg-white shadow-sm">
+        <Image
+          src={src}
+          alt={alt}
+          fill={true}
+          style={{ objectFit: "cover" }}
+          className="transition-transform duration-300 group-hover:scale-105"
+        />
+      </div>
+      <p className="text-xs text-center mt-2 text-text-secondary group-hover:text-accent transition-colors">
+        {title}
+      </p>
+    </a>
   );
 }
 

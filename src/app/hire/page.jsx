@@ -1,148 +1,80 @@
 "use client";
-import React, { useLayoutEffect, useRef, useState } from "react";
-import Link from "next/link";
+import React from "react";
 import Footer from "../../components/Footer/Footer";
 import Image from "next/image";
 
-function page() {
-  const container = useRef();
-  const screen = useRef();
-  const [width, setWidth] = useState(0);
-  const [height, setHeight] = useState(300);
-  const [divider, setDivider] = useState(3);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useLayoutEffect(() => {
-    const containerCurrent = container.current
-    const screenCurrent = screen.current
-    const resizeObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        const { width, height } = entry.contentRect;
-        setWidth(width);
-      }
-    });
-    resizeObserver.observe(container.current);
-    const resizeObserver2 = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        const { width, height } = entry.contentRect;
-        setHeight(height / 3);
-        if (width < 640) {
-          setDivider(1);
-        } else if (width < 768) {
-          setDivider(2);
-        } else {
-          setDivider(3);
-        }
-      }
-    });
-    resizeObserver2.observe(screen.current);
-
-    return () => {
-      resizeObserver.unobserve(containerCurrent);
-      resizeObserver.disconnect();
-      resizeObserver2.unobserve(screenCurrent);
-      resizeObserver2.disconnect();
-    };
-  }, []);
+function HirePage() {
+  const images = [
+    {
+      src: "/images/other_images/Alison_Soong/20240915-P1050432.jpg",
+      photographer: "Alison Soong",
+    },
+    {
+      src: "/images/other_images/Jade_Chongsathapornpong/_TNA2320.jpg",
+      photographer: "Jade Chongsathapornpong",
+    },
+    {
+      src: "/images/other_images/Jade_Chongsathapornpong/_TNA3975C.jpg",
+      photographer: "Jade Chongsathapornpong",
+    },
+  ];
 
   return (
     <>
-      <div
-        className="min-h-[90vh] lg:pt-[5vh] pt-[10vh] font-light text-black flex flex-col"
-        ref={screen}
-      >
-        <main className="w-full pb-6">
-          <div className="flex flex-col justify-center w-full items-center space-y-3 px-12 md:px-60">
-            <h1>
-              Hire Us
-            </h1>
-            <p className=" text-center ">
-              If you need photography for an event, our community of MIT
-              photographers can help.
-            </p>
-          </div>
-          <div className="flex mt-8 w-full bg-black relative" ref={container}>
-            <div
-              className="relative hidden md:block bg-black"
-              style={{ minHeight: isLoading ? height || "300px" : "0px" }}
-            >
-              <Image
-                src="/images/other_images/Alison_Soong/20240915-P1050432.jpg"
-                alt="People typing on laptops"
-                width={width / divider}
-                height={height}
-                onLoad={() => setIsLoading(false)}
-              />
-              <p
-                className="absolute bottom-[1%] right-[2%] text-white"
-                style={{ fontSize: "3%" }}
-              >
-                Photo Credits: Alison Soong
-              </p>
-            </div>
-            <div
-              className="relative bg-black"
-              style={{ minHeight: isLoading ? height || "300px" : "0px" }}
-            >
-              <Image
-                src="/images/other_images/Jade_Chongsathapornpong/_TNA2320.jpg"
-                alt="People preforming and watching martial arts"
-                width={width / divider}
-                height={height}
-                priority
-                onLoad={() => setIsLoading(false)}
-              />
-              <p
-                className="absolute bottom-[1%] right-[2%] text-white"
-                style={{ fontSize: "3%" }}
-              >
-                Photo Credits: Jade Chongsathapornpong
-              </p>
-            </div>
-            <div
-              className="relative hidden sm:block bg-black"
-              style={{ minHeight: isLoading ? height || "300px" : "0px" }}
-            >
-              <Image
-                src="/images/other_images/Jade_Chongsathapornpong/_TNA3975C.jpg"
-                alt="Two People in Mask"
-                width={width / divider}
-                height={height}
-                priority
-                onLoad={() => setIsLoading(false)}
-              />
-              <p
-                className="absolute bottom-[1%] right-[2%] text-white"
-                style={{ fontSize: "3%" }}
-              >
-                Photo Credits: Jade Chongsathapornpong
-              </p>
-            </div>
-          </div>
+      <main className="min-h-screen pt-24 lg:pt-32">
+        {/* Hero Section */}
+        <section className="section-tight container-text text-center">
+          <h1 className="mb-4">Hire Us</h1>
+          <p className="text-lg text-text-secondary font-light">
+            If you need photography for an event, our community of MIT
+            photographers can help.
+          </p>
+        </section>
 
-          <div className="mt-4 space-y-3 px-12 lg:px-60">
-            <div className="space-y-2 w-full">
-              <p className="w-full">
-                We offer event photography services for all organizations and
-                groups affiliated with MIT. Technique matches you with one of
-                our trained staff photographers to capture every moment during
-                your event. To get a quote, please{" "}
-                <a
-                  href="mailto:technique@mit.edu?subject=Event%20Photography%20Quote"
-                  className="text-blue-400"
-                >
-                  email us
-                </a>{" "}
-                with the subject line &quot;Event Photography Quote&quot; and
-                more details about your event.
-              </p>
-            </div>
+        {/* Image Gallery Strip */}
+        <section className="w-full mt-8">
+          <div className="grid grid-cols-1 md:grid-cols-3">
+            {images.map((image, index) => (
+              <figure key={index} className="relative aspect-[4/3] group overflow-hidden">
+                <Image
+                  src={image.src}
+                  alt={`Event photography by ${image.photographer}`}
+                  fill={true}
+                  style={{ objectFit: "cover" }}
+                  className="transition-transform duration-500 group-hover:scale-105"
+                />
+                {/* Hover overlay with photographer credit */}
+                <figcaption className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-end justify-end p-4">
+                  <span className="text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    {image.photographer}
+                  </span>
+                </figcaption>
+              </figure>
+            ))}
           </div>
-        </main>
-      </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="section container-text text-center">
+          <p className="mb-8">
+            We offer event photography services for all organizations and groups
+            affiliated with MIT. Technique matches you with one of our trained
+            staff photographers to capture every moment during your event.
+          </p>
+          <a
+            href="mailto:technique@mit.edu?subject=Event%20Photography%20Quote"
+            className="btn-primary"
+          >
+            Get a Quote
+          </a>
+          <p className="text-sm text-text-muted mt-4">
+            Email us with the subject line &quot;Event Photography Quote&quot;
+          </p>
+        </section>
+      </main>
       <Footer />
     </>
   );
 }
 
-export default page;
+export default HirePage;
