@@ -93,6 +93,8 @@ export default function page() {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        height: "100vh",
+        width: "100vw",
       }}
     >
       <CircularProgress sx={{ color: "#790606" }} />
