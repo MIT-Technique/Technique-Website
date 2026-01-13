@@ -10,7 +10,7 @@ function AboutPage() {
         <section className="section-tight container-text text-center">
           <h1 className="mb-6">About Us</h1>
           <p className="text-lg lg:text-xl text-text-secondary font-light leading-relaxed">
-            Since 1885, our staff have crafted a beautiful annual of photographs
+            Since 1885, our staph have crafted a beautiful annual of photographs
             and prose commemorating each year at MIT.
           </p>
         </section>
@@ -19,7 +19,7 @@ function AboutPage() {
         <section className="section-tight container-text">
           <p>
             We are MIT&apos;s photography, yearbook, and design student
-            organization. Every year, our staff send off our 400 page annual to
+            organization. Every year, our staph send off our 400 page annual to
             the publisher in February and release the book in May. As students
             and alumni of MIT, we take great care to showcase MIT in its truest
             form, candidly, at its best and at its worst. We know how tough the
@@ -81,17 +81,17 @@ function AboutPage() {
                 </p>
               </div>
 
-              {/* Staff Card */}
+              {/* staph Card */}
               <div className="card">
                 <div className="divider-accent mb-6" />
-                <h3>Staff</h3>
+                <h3>staph</h3>
                 <p>
-                  Many of our staff are part time (or full time) photographers
+                  Many of our staph are part time (or full time) photographers
                   and/or designers, as well as MIT students and alumni. Most of
-                  our staff are free of infection.
+                  our staph are free of infection.
                 </p>
                 <p>
-                  It takes no experience to join Technique. Our dedicated staff
+                  It takes no experience to join Technique. Our dedicated staph
                   are committed to helping everyone who&apos;s willing to learn,
                   especially when it&apos;s about photography or design.
                 </p>

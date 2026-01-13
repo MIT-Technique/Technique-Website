@@ -59,7 +59,7 @@ function HirePage() {
           <p className="mb-8">
             We offer event photography services for all organizations and groups
             affiliated with MIT. Technique matches you with one of our trained
-            staff photographers to capture every moment during your event.
+            staph photographers to capture every moment during your event.
           </p>
           <a
             href="mailto:technique@mit.edu?subject=Event%20Photography%20Quote"
