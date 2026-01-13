@@ -13,6 +13,8 @@ import Snackbar from "@mui/material/Snackbar";
 import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import Alert from "@mui/material/Alert";
+import CircularProgress from "@mui/material/CircularProgress";
+import Box from "@mui/material/Box";
 
 export default function page() {
   const [firstName, setFirstName] = useState("");
@@ -21,6 +23,7 @@ export default function page() {
   const [quote, setQuote] = useState("");
   const [open, setOpen] = useState(false);
   const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const vertical = "top";
   const horizontal = "center";
@@ -47,7 +50,7 @@ export default function page() {
       } catch (err) {
         // setError(err.message);
       } finally {
-        // setLoading(false);
+        setLoading(false);
       }
     };
 
@@ -85,7 +88,19 @@ export default function page() {
     }
   }
 
-  return (
+  return loading ? (
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100%",
+        width: "100%",
+      }}
+    >
+      <CircularProgress sx={{ color: "#790606" }} />
+    </Box>
+  ) : (
     <>
       <div className="min-h-[90vh]  relative lg:pt-[5vh] pt-[10vh] flex flex-col">
         <main className="flex-1  flex items-center justify-start flex-col">
