@@ -10,12 +10,14 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const session = await getSession();
     console.log("After Session grab");
     if (!session?.userInfo?.email) {
+      console.log(`Session found before unauth: ${session}`);
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const { email } = session?.userInfo;
     const collection = await connectToDatabase();
     console.log("After database connection");
     console.log(`Email found: ${email}`);
+    console.log(`Session found: ${session}`);
 
     const user = await collection.findOne({ email });
     console.log("Found user");
