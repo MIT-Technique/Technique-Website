@@ -2,42 +2,58 @@
 import React from "react";
 import MailIcon from "@mui/icons-material/Mail";
 import InstagramIcon from "@mui/icons-material/Instagram";
-import { Tooltip } from "@mui/material";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 export default function Footer() {
   const pathname = usePathname();
-  const size = 16;
+  const isHomePage = pathname === "/";
+
   return (
-    <div
+    <footer
       className={`${
-        pathname === "/" ? "bg-black text-white" : "text-black"
-      } h-[10vh] w-full z-50 relative p-12 flex items-center space-x-3 md:justify-between text-xs  `}
+        isHomePage ? "bg-black text-white" : "bg-white text-text-primary border-t border-border"
+      } w-full z-50 relative`}
     >
-      <div
-        className={`absolute top-0 w-[100%] h-2 left-0 px-3 ${
-          pathname === "/" ? "hidden" : "block"
-        }`}
-      >
-        <div className="w-full border-t-2 border-solid border-black h-full"></div>
+      <div className="container-content py-8 lg:py-12">
+        <div className="flex flex-col lg:flex-row justify-between items-center gap-6">
+          {/* Left: Copyright */}
+          <p
+            className={`text-xs pb-0 ${
+              isHomePage ? "text-white/60" : "text-text-muted"
+            }`}
+          >
+            &copy; 2024 Technique. All Rights Reserved.
+          </p>
+
+          {/* Right: Social Links */}
+          <div className="flex items-center gap-4">
+            <a
+              href="mailto:technique@mit.edu"
+              className={`${
+                isHomePage
+                  ? "text-white/60 hover:text-white"
+                  : "text-text-muted hover:text-accent"
+              } transition-colors`}
+              aria-label="Email us"
+            >
+              <MailIcon sx={{ fontSize: 18 }} />
+            </a>
+            <a
+              href="https://www.instagram.com/mit.tnq/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${
+                isHomePage
+                  ? "text-white/60 hover:text-white"
+                  : "text-text-muted hover:text-accent"
+              } transition-colors`}
+              aria-label="Follow us on Instagram"
+            >
+              <InstagramIcon sx={{ fontSize: 18 }} />
+            </a>
+          </div>
+        </div>
       </div>
-      <div>
-        &copy; 2024 Technique. Images are property of their respective owners.
-        All Rights Reserved.
-      </div>
-      <div>
-        <a href="mailto:technique@mit.edu">
-          <Tooltip title="Email Us" arrow>
-            <MailIcon />
-          </Tooltip>
-        </a>
-        <a href="https://www.instagram.com/mit.tnq/" className="px-5" target="_blank" rel="noopener noreferrer">
-          <Tooltip title="Check us out!" arrow>
-            <InstagramIcon/>
-          </Tooltip>
-        </a>
-      </div>
-    </div>
+    </footer>
   );
 }

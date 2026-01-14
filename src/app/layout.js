@@ -19,9 +19,9 @@ const raleway = Raleway({
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} ${raleway.variable} overflow-y-auto scroll-smooth relative`} >
+      <body className={`${inter.className} ${raleway.variable} bg-[#FFFAFA] overflow-y-auto scroll-smooth relative`}>
         <Navbar />
-        <div className="bg-[#fffcf7] ">
+        <div className="min-h-screen">
           {children}
         </div>
       </body>

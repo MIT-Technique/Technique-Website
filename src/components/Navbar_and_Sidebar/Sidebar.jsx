@@ -1,260 +1,174 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import SideBar from "./Sidebar.css";
+import React, { useState } from "react";
 import Link from "next/link";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import HomeIcon from "@mui/icons-material/Home";
-import InfoIcon from "@mui/icons-material/Info";
-import SchoolIcon from "@mui/icons-material/School";
-import SearchIcon from "@mui/icons-material/Search";
-import InventoryIcon from "@mui/icons-material/Inventory";
-import FolderIcon from "@mui/icons-material/Folder";
-import CallIcon from "@mui/icons-material/Call";
-import { VscThreeBars } from "react-icons/vsc";
-import ReceiptIcon from "@mui/icons-material/Receipt";
-import FingerprintIcon from "@mui/icons-material/Fingerprint";
-function Sidebar({ isScrolled, pathname }) {
-  const [close, setClose] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+import Collapse from "@mui/material/Collapse";
+import { VscThreeBars, VscClose, VscChevronDown } from "react-icons/vsc";
 
-  // const targetElement = document.getElementById("element100");
-  function handleClose() {
-    setClose(true);
-    setTimeout(function () {
-      setIsOpen(false);
-      setClose(false);
-    }, 400);
-  }
-  useEffect(() => {
-    console.log(pathname);
-  }, []);
+function Sidebar({ pathname }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
+  const [seniorsOpen, setSeniorsOpen] = useState(false);
+
+  const isHomePage = pathname === "/";
+  const textColor = isHomePage ? "#FFFFFF" : "#1A1A1A";
+  const mutedColor = isHomePage ? "rgba(255,255,255,0.6)" : "#666666";
+  const bgColor = isHomePage ? "#000000" : "#FFFAFA";
+  const borderColor = isHomePage ? "rgba(255,255,255,0.1)" : "#E5E5E5";
+
+  const isActive = (href) => {
+    if (href === "/login") return pathname === "/login" || pathname === "/bio";
+    return pathname === href || pathname.startsWith(href + "/");
+  };
+
+  const isAboutActive = ["/about", "/portfolio", "/contact"].some(isActive);
+  const isSeniorsActive = ["/seniors", "/login"].some(isActive);
 
   return (
     <div
-      className={`  ${
-        pathname === "/"
-          ? "bg-black text-white "
-          : "bg-[#fffcf7] text-[#790606]"
-      }  h-[10vh]  lg:hidden flex top-0 z-30 w-full items-center font-sans justify-between px-4  `}
+      className={`${
+        isHomePage ? "bg-black text-white" : "bg-[#FFFAFA] text-text-primary"
+      } h-16 lg:hidden flex top-0 z-30 w-full items-center font-sans justify-between px-6`}
     >
       <Link
-        className="text-xl font-bold "
+        className="text-lg font-medium tracking-wide"
         href="/"
-        onClick={() => {
-          setIsOpen(false);
-        }}
+        onClick={() => setIsOpen(false)}
+        style={{ color: textColor }}
       >
         TECHNIQUE
       </Link>
-      <VscThreeBars
-        style={{ color: pathname === "/" ? "white" : "#790606" }}
+
+      <button
         onClick={() => setIsOpen(true)}
-      />
+        className="p-2"
+        aria-label="Open menu"
+      >
+        <VscThreeBars size={24} style={{ color: textColor }} />
+      </button>
+
       <Drawer
         open={isOpen}
-        onClose={() => {
-          setIsOpen(false);
-        }}
+        onClose={() => setIsOpen(false)}
         anchor="right"
-        className="bg-transparent"
         sx={{
           "& .MuiDrawer-paper": {
-            background: "transparent",
+            backgroundColor: bgColor,
+            borderLeft: `1px solid ${borderColor}`,
           },
         }}
       >
         <Box
           sx={{
-            width: 250,
-            backgroundColor: pathname === "/" ? "black" : "#fffcf7",
+            width: 280,
             height: "100%",
-            color: "white",
-            overflowY: "auto",
+            display: "flex",
+            flexDirection: "column",
           }}
           role="presentation"
-          onClick={() => setIsOpen(false)}
-          onKeyDown={() => setIsOpen(false)}
-          className="text-sm"
         >
-          <List>
-            <ListItem>
-              <Link
-                href="/"
-                onClick={() => setIsOpen(false)}
-                // className="flex"
+          {/* Header with close button */}
+          <div
+            className="flex items-center justify-between px-6 h-16"
+            style={{ borderBottom: `1px solid ${borderColor}` }}
+          >
+            <span
+              className="text-lg font-medium tracking-wide"
+              style={{ color: textColor }}
+            >
+              MENU
+            </span>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="p-2"
+              aria-label="Close menu"
+            >
+              <VscClose size={24} style={{ color: textColor }} />
+            </button>
+          </div>
+
+          {/* Nav Items */}
+          <List sx={{ flex: 1, pt: 2 }}>
+            {/* About Dropdown */}
+            <ListItem disablePadding>
+              <ListItemButton
+                onClick={() => setAboutOpen(!aboutOpen)}
+                sx={{ px: 3, py: 1.5 }}
               >
-                <ListItemButton>
-                  <ListItemIcon>
-                    <HomeIcon
-                      sx={{
-                        color: pathname === "/" ? "white" : "#790606",
-                        fontSize: "1.3rem",
-                      }}
-                    />
-                  </ListItemIcon>
+                <ListItemText
+                  primary="ABOUT"
+                  primaryTypographyProps={{
+                    sx: {
+                      fontSize: "0.75rem",
+                      fontWeight: 500,
+                      letterSpacing: "0.1em",
+                      color: isAboutActive ? "#750014" : textColor,
+                    },
+                  }}
+                />
+                <VscChevronDown
+                  size={16}
+                  style={{
+                    color: isAboutActive ? "#750014" : textColor,
+                    transform: aboutOpen ? "rotate(180deg)" : "rotate(0deg)",
+                    transition: "transform 0.2s",
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
+            <Collapse in={aboutOpen} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                {[
+                  { href: "/about", label: "Our History" },
+                  { href: "/portfolio", label: "Portfolio" },
+                  { href: "/contact", label: "Contact" },
+                ].map((item) => (
+                  <ListItem key={item.href} disablePadding>
+                    <Link
+                      href={item.href}
+                      onClick={() => setIsOpen(false)}
+                      className="w-full"
+                    >
+                      <ListItemButton sx={{ pl: 6, py: 1 }}>
+                        <ListItemText
+                          primary={item.label}
+                          primaryTypographyProps={{
+                            sx: {
+                              fontSize: "0.7rem",
+                              fontWeight: 400,
+                              letterSpacing: "0.05em",
+                              color: isActive(item.href) ? "#750014" : mutedColor,
+                            },
+                          }}
+                        />
+                      </ListItemButton>
+                    </Link>
+                  </ListItem>
+                ))}
+              </List>
+            </Collapse>
 
+            {/* Archives */}
+            <ListItem disablePadding>
+              <Link
+                href="/archives"
+                onClick={() => setIsOpen(false)}
+                className="w-full"
+              >
+                <ListItemButton sx={{ px: 3, py: 1.5 }}>
                   <ListItemText
-                    primary={"HOME"}
+                    primary="ARCHIVES"
                     primaryTypographyProps={{
-                      style: { fontSize: "0.8rem" },
-                    }}
-                    sx={{ color: pathname === "/" ? "white" : "#790606" }}
-                  />
-                </ListItemButton>
-              </Link>
-            </ListItem>
-            <ListItem>
-              <Link href="/about" onClick={() => setIsOpen(false)}>
-                <ListItemButton>
-                  <ListItemIcon>
-                    <InfoIcon
-                      sx={{
-                        color: pathname === "/" ? "white" : "#790606",
-                        fontSize: "1.3rem",
-                      }}
-                    />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={"ABOUT"}
-                    primaryTypographyProps={{
-                      style: { fontSize: "0.8rem" },
-                    }}
-                    sx={{ color: pathname === "/" ? "white" : "#790606" }}
-                  />
-                </ListItemButton>
-              </Link>
-            </ListItem>
-            <ListItem>
-              <Link href="/seniors" onClick={() => setIsOpen(false)}>
-                <ListItemButton>
-                  <ListItemIcon>
-                    <SchoolIcon
-                      sx={{
-                        color: pathname === "/" ? "white" : "#790606",
-                        fontSize: "1.3rem",
-                      }}
-                    />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={"SENIORS"}
-                    primaryTypographyProps={{
-                      style: { fontSize: "0.8rem" },
-                    }}
-                    sx={{ color: pathname === "/" ? "white" : "#790606" }}
-                  />
-                </ListItemButton>
-              </Link>
-            </ListItem>
-            <ListItem>
-              <Link href="/hire" onClick={() => setIsOpen(false)}>
-                <ListItemButton>
-                  <ListItemIcon>
-                    <SearchIcon
-                      sx={{
-                        color: pathname === "/" ? "white" : "#790606",
-                        fontSize: "1.3rem",
-                      }}
-                    />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={"HIRE US"}
-                    primaryTypographyProps={{
-                      style: { fontSize: "0.8rem" },
-                    }}
-                    sx={{ color: pathname === "/" ? "white" : "#790606" }}
-                  />
-                </ListItemButton>
-              </Link>
-            </ListItem>
-
-            <ListItem>
-              <Link href="/archives" onClick={() => setIsOpen(false)}>
-                <ListItemButton>
-                  <ListItemIcon>
-                    <InventoryIcon
-                      sx={{
-                        color: pathname === "/" ? "white" : "#790606",
-                        fontSize: "1.3rem",
-                      }}
-                    />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={"ARCHIVES"}
-                    primaryTypographyProps={{
-                      style: { fontSize: "0.8rem" },
-                    }}
-                    sx={{ color: pathname === "/" ? "white" : "#790606" }}
-                  />
-                </ListItemButton>
-              </Link>
-            </ListItem>
-            <ListItem>
-              <Link href="/portfolio" onClick={() => setIsOpen(false)}>
-                <ListItemButton>
-                  <ListItemIcon>
-                    <FolderIcon
-                      sx={{
-                        color: pathname === "/" ? "white" : "#790606",
-                        fontSize: "1.3rem",
-                      }}
-                    />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={"PORTFOLIO"}
-                    primaryTypographyProps={{
-                      style: { fontSize: "0.8rem" },
-                    }}
-                    sx={{ color: pathname === "/" ? "white" : "#790606" }}
-                  />
-                </ListItemButton>
-              </Link>
-            </ListItem>
-            <ListItem>
-              <Link href="/invoice" onClick={() => setIsOpen(false)}>
-                <ListItemButton>
-                  <ListItemIcon>
-                    <ReceiptIcon
-                      sx={{
-                        color: pathname === "/" ? "white" : "#790606",
-                        fontSize: "1.3rem",
-                      }}
-                    />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={"INVOICE"}
-                    primaryTypographyProps={{
-                      style: {
-                        fontSize: "0.8rem",
-                        color: pathname === "/" ? "white" : "#790606",
-                      },
-                    }}
-                  />
-                </ListItemButton>
-              </Link>
-            </ListItem>
-            <ListItem>
-              <Link href="/bio" onClick={() => setIsOpen(false)}>
-                <ListItemButton>
-                  <ListItemIcon>
-                    <FingerprintIcon
-                      sx={{
-                        color: pathname === "/" ? "white" : "#790606",
-                        fontSize: "1.3rem",
-                      }}
-                    />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={"SENIOR BIO"}
-                    primaryTypographyProps={{
-                      style: {
-                        fontSize: "0.8rem",
-                        color: pathname === "/" ? "white" : "#790606",
+                      sx: {
+                        fontSize: "0.75rem",
+                        fontWeight: 500,
+                        letterSpacing: "0.1em",
+                        color: isActive("/archives") ? "#750014" : textColor,
                       },
                     }}
                   />
@@ -262,23 +176,103 @@ function Sidebar({ isScrolled, pathname }) {
               </Link>
             </ListItem>
 
-            <ListItem>
-              <Link href="/contact" onClick={() => setIsOpen(false)}>
-                <ListItemButton>
-                  <ListItemIcon>
-                    <CallIcon
-                      sx={{
-                        color: pathname === "/" ? "white" : "#790606",
-                        fontSize: "1.3rem",
-                      }}
-                    />
-                  </ListItemIcon>
+            {/* Invoice */}
+            <ListItem disablePadding>
+              <Link
+                href="/invoice"
+                onClick={() => setIsOpen(false)}
+                className="w-full"
+              >
+                <ListItemButton sx={{ px: 3, py: 1.5 }}>
                   <ListItemText
-                    primary={"CONTACT"}
+                    primary="INVOICE"
                     primaryTypographyProps={{
-                      style: {
-                        fontSize: "0.8rem",
-                        color: pathname === "/" ? "white" : "#790606",
+                      sx: {
+                        fontSize: "0.75rem",
+                        fontWeight: 500,
+                        letterSpacing: "0.1em",
+                        color: isActive("/invoice") ? "#750014" : textColor,
+                      },
+                    }}
+                  />
+                </ListItemButton>
+              </Link>
+            </ListItem>
+
+            {/* Seniors Dropdown */}
+            <ListItem disablePadding>
+              <ListItemButton
+                onClick={() => setSeniorsOpen(!seniorsOpen)}
+                sx={{ px: 3, py: 1.5 }}
+              >
+                <ListItemText
+                  primary="SENIORS"
+                  primaryTypographyProps={{
+                    sx: {
+                      fontSize: "0.75rem",
+                      fontWeight: 500,
+                      letterSpacing: "0.1em",
+                      color: isSeniorsActive ? "#750014" : textColor,
+                    },
+                  }}
+                />
+                <VscChevronDown
+                  size={16}
+                  style={{
+                    color: isSeniorsActive ? "#750014" : textColor,
+                    transform: seniorsOpen ? "rotate(180deg)" : "rotate(0deg)",
+                    transition: "transform 0.2s",
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
+            <Collapse in={seniorsOpen} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                {[
+                  { href: "/seniors", label: "Portraits" },
+                  { href: "/login", label: "Senior Bio" },
+                ].map((item) => (
+                  <ListItem key={item.href} disablePadding>
+                    <Link
+                      href={item.href}
+                      onClick={() => setIsOpen(false)}
+                      className="w-full"
+                    >
+                      <ListItemButton sx={{ pl: 6, py: 1 }}>
+                        <ListItemText
+                          primary={item.label}
+                          primaryTypographyProps={{
+                            sx: {
+                              fontSize: "0.7rem",
+                              fontWeight: 400,
+                              letterSpacing: "0.05em",
+                              color: isActive(item.href) ? "#750014" : mutedColor,
+                            },
+                          }}
+                        />
+                      </ListItemButton>
+                    </Link>
+                  </ListItem>
+                ))}
+              </List>
+            </Collapse>
+
+            {/* Hire Us */}
+            <ListItem disablePadding>
+              <Link
+                href="/hire"
+                onClick={() => setIsOpen(false)}
+                className="w-full"
+              >
+                <ListItemButton sx={{ px: 3, py: 1.5 }}>
+                  <ListItemText
+                    primary="HIRE US →"
+                    primaryTypographyProps={{
+                      sx: {
+                        fontSize: "0.75rem",
+                        fontWeight: 500,
+                        letterSpacing: "0.1em",
+                        color: isActive("/hire") ? "#750014" : textColor,
                       },
                     }}
                   />

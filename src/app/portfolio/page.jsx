@@ -1,24 +1,10 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React from "react";
 import Footer from "../../components/Footer/Footer";
-import SimpleCarousel from "../../components/SimpleCarousel/SimpleCarousel";
 import Image from "next/image";
 
-// Import Swiper React components
-import { Swiper, SwiperSlide } from "swiper/react";
-
-// Import Swiper styles
-import "swiper/css";
-import "swiper/css/pagination";
-import "swiper/css/navigation";
-
-// import required modules
-import { Autoplay, Pagination, Navigation } from "swiper/modules";
-
-import { FaCircleArrowDown } from "react-icons/fa6";
-
-function page() {
-  const events = [
+function PortfolioPage() {
+  const images = [
     {
       src: "/images/other_images/Jade_Chongsathapornpong/_TNA0925.jpg",
       photographer: "Jade Chongsathapornpong",
@@ -31,22 +17,18 @@ function page() {
       src: "/images/other_images/Jade_Chongsathapornpong/_TNA1149.jpg",
       photographer: "Jade Chongsathapornpong",
     },
-
     {
       src: "/images/other_images/Jade_Chongsathapornpong/_TNA2926.jpg",
       photographer: "Jade Chongsathapornpong",
     },
-
     {
       src: "/images/other_images/Sebastian_Ochoa/000045080009.jpg",
       photographer: "Sebastian Ochoa",
     },
-
     {
       src: "/images/other_images/Jade_Chongsathapornpong/_TNA4087.jpg",
       photographer: "Jade Chongsathapornpong",
     },
-
     {
       src: "/images/other_images/Ruhundaka_Ejilemele/DSC_4286.jpg",
       photographer: "Ruhundaka Ejilemele",
@@ -59,7 +41,6 @@ function page() {
       src: "/images/other_images/Andrew_Okyere/_MG_0677.jpg",
       photographer: "Andrew Okyere",
     },
-
     {
       src: "/images/other_images/Jade_Chongsathapornpong/_TNA7811.jpg",
       photographer: "Jade Chongsathapornpong",
@@ -68,7 +49,6 @@ function page() {
       src: "/images/other_images/Jade_Chongsathapornpong/_TNA9725.jpg",
       photographer: "Jade Chongsathapornpong",
     },
-    
     {
       src: "/images/other_images/Marcelo_Maza/MJM-21.jpg",
       photographer: "Marcelo Maza",
@@ -85,8 +65,6 @@ function page() {
       src: "/images/other_images/Sebastian_Ochoa/Y16333009673-R1-043-20.jpg",
       photographer: "Sebastian Ochoa",
     },
-
-    
     {
       src: "/images/other_images/Ruhundaka_Ejilemele/DSC_5089.jpg",
       photographer: "Ruhundaka Ejilemele",
@@ -95,12 +73,10 @@ function page() {
       src: "/images/other_images/Alison_Soong/20240915-P1050430.jpg",
       photographer: "Alison Soong",
     },
-
     {
       src: "/images/other_images/Ruhundaka_Ejilemele/DSC_4444.jpg",
       photographer: "Ruhundaka Ejilemele",
     },
-
     {
       src: "/images/other_images/Jade_Chongsathapornpong/_TNA3208.jpg",
       photographer: "Jade Chongsathapornpong",
@@ -109,8 +85,6 @@ function page() {
       src: "/images/other_images/Jade_Chongsathapornpong/_TNA2389.jpg",
       photographer: "Jade Chongsathapornpong",
     },
-  ];
-  const niceThings = [
     {
       src: "/images/other_images/Ruhundaka_Ejilemele/DSC_6569.jpg",
       photographer: "Ruhundaka Ejilemele",
@@ -127,46 +101,48 @@ function page() {
       src: "/images/other_images/Alison_Soong/20140118-_TNQ0052.jpg",
       photographer: "Alison Soong",
     },
-    {
-      src: "/images/other_images/Michelle Xiang/goofynextdiningLOL.jpg",
-      photographer: "Michelle Xiang",
-    },
-    {
-      src: "/images/other_images/Jade_Chongsathapornpong/IMG_4075.jpg",
-      photographer: "Jade Chongsathapornpong",
-    },
-    {
-      src: "/images/other_images/Ruhundaka_Ejilemele/DSC_7784.jpg",
-      photographer: "Ruhundaka Ejilemele",
-    },
   ];
-
-  function handleScroll() {
-    const target = document.getElementById("section2");
-
-    target?.scrollIntoView({ behavior: "smooth" });
-  }
 
   return (
     <>
-      <div className="min-h-[90vh] relative lg:pt-[5vh] pt-[10vh]">
-        <div className="h-full w-full lg:rounded-t-xl flex flex-col items-center">
-          <SimpleCarousel
-            images={events}
-            id="carousel1"
-            reverseDirection={false}
-          />
-          <SimpleCarousel
-            images={niceThings}
-            id="carousel2"
-            reverseDirection={true}
-          />
+      <main className="min-h-screen pt-24 lg:pt-32">
+        {/* Hero Section */}
+        <section className="section-tight container-content text-center">
+          <h1 className="mb-4">Portfolio</h1>
+          <p className="text-lg text-text-secondary font-light max-w-text mx-auto">
+            A selection of work by our photographers.
+          </p>
+        </section>
 
-        </div>
-      </div>
+        {/* Photo Grid */}
+        <section className="section container-content">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+            {images.map((image, index) => (
+              <figure
+                key={index}
+                className="relative aspect-square group overflow-hidden"
+              >
+                <Image
+                  src={image.src}
+                  alt={`Photography by ${image.photographer}`}
+                  fill={true}
+                  style={{ objectFit: "cover" }}
+                  className="transition-transform duration-500 group-hover:scale-105"
+                />
+                {/* Hover overlay with photographer credit */}
+                <figcaption className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                  <span className="text-xs text-white font-light">
+                    {image.photographer}
+                  </span>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </section>
+      </main>
       <Footer />
     </>
   );
 }
 
-export default page;
+export default PortfolioPage;

@@ -3,14 +3,13 @@ import Footer from "../../components/Footer/Footer";
 import { useState } from "react";
 import * as React from "react";
 import Box from "@mui/material/Box";
-import TextField from "@mui/material/TextField";
-import InputAdornment from "@mui/material/InputAdornment";
 import { Button } from "@mui/material";
 import Snackbar from "@mui/material/Snackbar";
 import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import Alert from "@mui/material/Alert";
-export default function page() {
+
+export default function LoginPage() {
   const [open, setOpen] = useState(false);
   const vertical = "top";
   const horizontal = "center";
@@ -21,73 +20,61 @@ export default function page() {
 
   return (
     <>
-      <div className="min-h-[90vh]  relative lg:pt-[5vh] pt-[10vh] flex flex-col">
-        <main className="flex-1  flex items-center justify-start flex-col">
-          <h2 className="text-[#790606] flex justify-center pb-4 font-medium">
-            Sign In
-          </h2>
+      <main className="min-h-screen pt-24 lg:pt-32">
+        <section className="section container-narrow">
+          <div className="text-center mb-8">
+            <h1 className="mb-2">Senior Bio</h1>
+            <p className="text-text-secondary">
+              Sign in to update your senior bio information.
+            </p>
+          </div>
+
           <Box
             component="form"
+            className="card-elevated"
             sx={{
-              border: "1px solid #790606",
-              borderRadius: "0.3rem",
-              borderColor: "",
-              padding: "8px",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              justifyContent: "center",
-              width: {
-                xs: "75%", // extra-small devices (phones)
-                sm: "55%", // small devices
-                md: "40%", // medium devices
-                lg: "30%", // large devices
-                xl: "30%", // extra-large devices
-              },
-              height: "25vh",
-              paddingX: "12px",
-              "& > :not(button)": {
-                m: 1,
-                width: "100%",
-                flexShrink: 0,
-              },
-              marginBottom: "1rem",
+              py: 6,
             }}
             method="GET"
             action="/api/login"
-            //Calls the api endpoint to log in the user
           >
+            <p className="text-sm text-text-secondary text-center mb-6 pb-0">
+              Click below to sign in with your MIT credentials.
+            </p>
             <Button
               type="submit"
               variant="contained"
               sx={{
-                margin: "8px",
-                backgroundColor: "#790606",
+                backgroundColor: "#750014",
                 "&:hover": {
-                  backgroundColor: "#06503a",
-                  boxShadow:
-                    "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
+                  backgroundColor: "#5C0010",
                 },
                 "&:active": {
-                  backgroundColor: "#03281d",
-                  boxShadow:
-                    "0px 5px 5px -3px rgba(0,0,0,0.2), 0px 8px 10px 1px rgba(0,0,0,0.14), 0px 3px 14px 2px rgba(0,0,0,0.12)",
+                  backgroundColor: "#5C0010",
                   transform: "translateY(1px)",
                 },
-                transition: "all 0.3s ease",
-                width: "60%",
+                transition: "all 0.2s ease",
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+                fontWeight: 500,
+                py: 1.5,
+                px: 6,
+                boxShadow: "none",
               }}
             >
-              SignIn
+              Sign In
             </Button>
           </Box>
-        </main>
-      </div>
+        </section>
+      </main>
+
       <Snackbar
         anchorOrigin={{ vertical, horizontal }}
         open={open}
         onClose={handleClose}
-        message="Invoice Sent Successfully"
         autoHideDuration={4000}
         action={
           <IconButton
@@ -106,7 +93,7 @@ export default function page() {
           variant="filled"
           sx={{ width: "100%" }}
         >
-          Invoice Sent Successfully
+          Signed in successfully
         </Alert>
       </Snackbar>
       <Footer />
