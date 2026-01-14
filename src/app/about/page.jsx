@@ -28,10 +28,8 @@ function AboutPage() {
           </p>
           <p>
             In addition to designing the MIT yearbook, Technique supports the
-            campus photography community by providing equipment rentals, event
-            photography services, and studio space for students. We manage a
-            photo studio and darkroom in the Stratton Student Center for
-            convenient access.
+            campus photography community by providing equipment rentals and
+            event photography services.
           </p>
         </section>
 
