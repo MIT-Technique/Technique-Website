@@ -22,7 +22,7 @@ export default function Footer() {
               isHomePage ? "text-white/60" : "text-text-muted"
             }`}
           >
-            &copy; 2024 Technique. All Rights Reserved.
+            &copy; 2026 Technique. All Rights Reserved.
           </p>
 
           {/* Right: Social Links */}
