@@ -36,6 +36,7 @@ export default function BioPage() {
   const [lastName, setLastName] = useState("");
   const [major, setMajor] = useState("");
   const [quote, setQuote] = useState("");
+  const [achievements, setAchievements] = useState("");
   const [open, setOpen] = useState(false);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -84,6 +85,7 @@ export default function BioPage() {
           lastName: lastName,
           major: major,
           quote: quote,
+          achievements: achievements,
         }),
       });
 
@@ -262,6 +264,20 @@ export default function BioPage() {
                   fullWidth
                   placeholder="Enter a quote for your yearbook entry (optional)"
                 />
+                <TextField
+                  label="Acheivements"
+                  variant="outlined"
+                  InputLabelProps={{ shrink: true }}
+                  value={achievements}
+                  onChange={(event) => setAchievements(event.target.value)}
+                  name="achievements"
+                  multiline
+                  minRows={3}
+                  maxRows={8}
+                  sx={textFieldSx}
+                  fullWidth
+                  placeholder="Enter the clubs/extracurriculars/societies that you have been part of as a student (optional)"
+                />
 
                 <Button
                   type="submit"
@@ -294,7 +310,7 @@ export default function BioPage() {
                 <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
                   <div className="card">
                     <div className="divider-accent mb-6" />
-                    <h3>Senior Quote Example 1</h3>
+                    <h3>Quote Example 1</h3>
                     <p>
                       Dearest of friends, I hope that you will be happy with
                       every moment of life, every breath every touch every
@@ -312,7 +328,7 @@ export default function BioPage() {
 
                   <div className="card">
                     <div className="divider-accent mb-6" />
-                    <h3>Senior Quote Example 2</h3>
+                    <h3>Quote Example 2</h3>
                     <p>
                       This place has the reputation of daling with education
                       from a one-sided, scientific viewpoint. The people I have
@@ -330,7 +346,7 @@ export default function BioPage() {
 
                   <div className="card">
                     <div className="divider-accent mb-6" />
-                    <h3>Senior Quote Example 3</h3>
+                    <h3>Quote Example 3</h3>
                     <p>
                       Graduation. Wow. From Midlothian H.S. to MIT. From
                       Virginia backwoods to the big city. From SAT to GMAT. From
