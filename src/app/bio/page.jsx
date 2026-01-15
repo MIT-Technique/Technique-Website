@@ -165,7 +165,7 @@ export default function BioPage() {
 
   return (
     <>
-      <main className="min-h-screen pt-24 lg:pt-32">
+      <main className="min-h-screen pt-18 lg:pt-24">
         {loading ? (
           <Box
             sx={{
@@ -262,7 +262,7 @@ export default function BioPage() {
                   maxRows={8}
                   sx={textFieldSx}
                   fullWidth
-                  placeholder="Enter a quote for your yearbook entry (optional)"
+                  placeholder="Enter a quote for your yearbook entry (see examples below)"
                 />
                 <TextField
                   label="Acheivements"
@@ -276,7 +276,7 @@ export default function BioPage() {
                   maxRows={8}
                   sx={textFieldSx}
                   fullWidth
-                  placeholder="Enter the clubs/extracurriculars/societies that you have been part of as a student (optional)"
+                  placeholder="Enter the clubs/extracurriculars/societies that you have been part of as a student"
                 />
 
                 <Button
@@ -314,7 +314,7 @@ export default function BioPage() {
                     <p>
                       Dearest of friends, I hope that you will be happy with
                       every moment of life, every breath every touch every
-                      sight, smell and sound. This is my wishof happiness for
+                      sight, smell and sound. This is my wish of happiness for
                       you, and my way of saying "I love you". May your dreams
                       never disappear with age, but may they continue as alive
                       and as beautiful as you with the knowledge that they will
@@ -330,7 +330,7 @@ export default function BioPage() {
                     <div className="divider-accent mb-6" />
                     <h3>Quote Example 2</h3>
                     <p>
-                      This place has the reputation of daling with education
+                      This place has the reputation of dealing with education
                       from a one-sided, scientific viewpoint. The people I have
                       met here, students, professors, fraternity brothers,
                       teammates and friends, have proven far from one-sided. The
