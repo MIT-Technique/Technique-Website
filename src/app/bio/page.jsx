@@ -165,7 +165,7 @@ export default function BioPage() {
 
   return (
     <>
-      <main className="min-h-screen pt-18 lg:pt-24">
+      <main className="min-h-screen pt-16 lg:pt-18">
         {loading ? (
           <Box
             sx={{
