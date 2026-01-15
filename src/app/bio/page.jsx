@@ -36,7 +36,7 @@ export default function BioPage() {
   const [lastName, setLastName] = useState("");
   const [major, setMajor] = useState("");
   const [quote, setQuote] = useState("");
-  const [achievements, setAchievements] = useState("");
+  const [extracurriculars, setExtracurriculars] = useState("");
   const [open, setOpen] = useState(false);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -85,7 +85,7 @@ export default function BioPage() {
           lastName: lastName,
           major: major,
           quote: quote,
-          achievements: achievements,
+          achievements: extracurriculars,
         }),
       });
 
@@ -265,12 +265,12 @@ export default function BioPage() {
                   placeholder="Enter a quote for your yearbook entry (see examples below)"
                 />
                 <TextField
-                  label="Acheivements"
+                  label="Extracurriculars"
                   variant="outlined"
                   InputLabelProps={{ shrink: true }}
-                  value={achievements}
-                  onChange={(event) => setAchievements(event.target.value)}
-                  name="achievements"
+                  value={extracurriculars}
+                  onChange={(event) => setExtracurriculars(event.target.value)}
+                  name="extracurriculars"
                   multiline
                   minRows={3}
                   maxRows={8}
