@@ -175,119 +175,177 @@ export default function BioPage() {
             <CircularProgress sx={{ color: "#790606" }} />
           </Box>
         ) : (
-          <section className="section-tight container-narrow">
-            <div className="text-center mb-8">
-              <h1 className="mb-2">Senior Bio</h1>
-              <p className="text-text-secondary">
-                Update your information for the yearbook.
-              </p>
-            </div>
-
-            <Box
-              component="form"
-              className="card-elevated"
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 2,
-              }}
-              onSubmit={async (event) => {
-                event.preventDefault();
-                await updateBio();
-              }}
-            >
-              <div className="grid grid-cols-2 gap-4">
-                <TextField
-                  required
-                  label="First Name"
-                  variant="outlined"
-                  InputLabelProps={{ shrink: true }}
-                  value={firstName}
-                  onChange={(event) => setFirstName(event.target.value)}
-                  name="firstName"
-                  sx={textFieldSx}
-                />
-                <TextField
-                  required
-                  label="Last Name"
-                  variant="outlined"
-                  InputLabelProps={{ shrink: true }}
-                  value={lastName}
-                  onChange={(event) => setLastName(event.target.value)}
-                  name="lastName"
-                  sx={textFieldSx}
-                />
+          <>
+            <section className="section-tight container-narrow">
+              <div className="text-center mb-8">
+                <h1 className="mb-2">Senior Bio</h1>
+                <p className="text-text-secondary">
+                  Update your information for the yearbook.
+                </p>
               </div>
 
-              <FormControl fullWidth>
-                <InputLabel
-                  id="major-label"
-                  shrink
-                  sx={{
-                    "&.Mui-focused": { color: "#750014" },
-                  }}
-                >
-                  Major *
-                </InputLabel>
-                <Select
-                  labelId="major-label"
-                  id="major-select"
-                  value={major}
-                  label="Major *"
-                  notched
-                  required
-                  onChange={(event) => setMajor(event.target.value)}
-                  sx={selectSx}
-                >
-                  {majors.map((m) => (
-                    <MenuItem key={m} value={m}>
-                      {m}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              <TextField
-                label="Quote"
-                variant="outlined"
-                InputLabelProps={{ shrink: true }}
-                value={quote}
-                onChange={(event) => setQuote(event.target.value)}
-                name="quote"
-                multiline
-                minRows={3}
-                maxRows={8}
-                sx={textFieldSx}
-                fullWidth
-                placeholder="Enter a quote for your yearbook entry (optional)"
-              />
-
-              <Button
-                type="submit"
-                variant="contained"
+              <Box
+                component="form"
+                className="card-elevated"
                 sx={{
-                  mt: 2,
-                  backgroundColor: "#750014",
-                  "&:hover": {
-                    backgroundColor: "#5C0010",
-                  },
-                  "&:active": {
-                    backgroundColor: "#5C0010",
-                    transform: "translateY(1px)",
-                  },
-                  transition: "all 0.2s ease",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.05em",
-                  fontWeight: 500,
-                  py: 1.5,
-                  boxShadow: "none",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 2,
                 }}
-                fullWidth
+                onSubmit={async (event) => {
+                  event.preventDefault();
+                  await updateBio();
+                }}
               >
-                Update Bio
-              </Button>
-            </Box>
-          </section>
+                <div className="grid grid-cols-2 gap-4">
+                  <TextField
+                    required
+                    label="First Name"
+                    variant="outlined"
+                    InputLabelProps={{ shrink: true }}
+                    value={firstName}
+                    onChange={(event) => setFirstName(event.target.value)}
+                    name="firstName"
+                    sx={textFieldSx}
+                  />
+                  <TextField
+                    required
+                    label="Last Name"
+                    variant="outlined"
+                    InputLabelProps={{ shrink: true }}
+                    value={lastName}
+                    onChange={(event) => setLastName(event.target.value)}
+                    name="lastName"
+                    sx={textFieldSx}
+                  />
+                </div>
+
+                <FormControl fullWidth>
+                  <InputLabel
+                    id="major-label"
+                    shrink
+                    sx={{
+                      "&.Mui-focused": { color: "#750014" },
+                    }}
+                  >
+                    Major *
+                  </InputLabel>
+                  <Select
+                    labelId="major-label"
+                    id="major-select"
+                    value={major}
+                    label="Major *"
+                    notched
+                    required
+                    onChange={(event) => setMajor(event.target.value)}
+                    sx={selectSx}
+                  >
+                    {majors.map((m) => (
+                      <MenuItem key={m} value={m}>
+                        {m}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                <TextField
+                  label="Quote"
+                  variant="outlined"
+                  InputLabelProps={{ shrink: true }}
+                  value={quote}
+                  onChange={(event) => setQuote(event.target.value)}
+                  name="quote"
+                  multiline
+                  minRows={3}
+                  maxRows={8}
+                  sx={textFieldSx}
+                  fullWidth
+                  placeholder="Enter a quote for your yearbook entry (optional)"
+                />
+
+                <Button
+                  type="submit"
+                  variant="contained"
+                  sx={{
+                    mt: 2,
+                    backgroundColor: "#750014",
+                    "&:hover": {
+                      backgroundColor: "#5C0010",
+                    },
+                    "&:active": {
+                      backgroundColor: "#5C0010",
+                      transform: "translateY(1px)",
+                    },
+                    transition: "all 0.2s ease",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    fontWeight: 500,
+                    py: 1.5,
+                    boxShadow: "none",
+                  }}
+                  fullWidth
+                >
+                  Update Bio
+                </Button>
+              </Box>
+            </section>
+            <section className="section bg-bg-secondary">
+              <div className="container-content">
+                <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
+                  <div className="card">
+                    <div className="divider-accent mb-6" />
+                    <h3>Senior Quote Example 1</h3>
+                    <p>
+                      Dearest of friends, I hope that you will be happy with
+                      every moment of life, every breath every touch every
+                      sight, smell and sound. This is my wishof happiness for
+                      you, and my way of saying "I love you". May your dreams
+                      never disappear with age, but may they continue as alive
+                      and as beautiful as you with the knowledge that they will
+                      someday come true.
+                    </p>
+                    <p>
+                      {" "}
+                      <i>- Vivienne Lee</i>
+                    </p>
+                  </div>
+
+                  <div className="card">
+                    <div className="divider-accent mb-6" />
+                    <h3>Senior Quote Example 2</h3>
+                    <p>
+                      This place has the reputation of daling with education
+                      from a one-sided, scientific viewpoint. The people I have
+                      met here, students, professors, fraternity brothers,
+                      teammates and friends, have proven far from one-sided. The
+                      things I have learned and the challenges I have been
+                      presented have been exhilarating, but it is the people I
+                      have spent these years with that I will remember when I
+                      look back fondly on my days at MIT.
+                    </p>
+                    <p>
+                      <i>- Christopher F DeBlois</i>
+                    </p>
+                  </div>
+
+                  <div className="card">
+                    <div className="divider-accent mb-6" />
+                    <h3>Senior Quote Example 3</h3>
+                    <p>
+                      Graduation. Wow. From Midlothian H.S. to MIT. From
+                      Virginia backwoods to the big city. From SAT to GMAT. From
+                      lightweight to alcoholic. From boyhood to manhood (?). Did
+                      I learn anything? Is this random enough to get into the
+                      MIT yearbook?
+                    </p>
+                    <p>
+                      <i>- Steve Jones</i>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </>
         )}
       </main>
 
