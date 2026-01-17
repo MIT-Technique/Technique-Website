@@ -20,7 +20,7 @@ function YearbookPage() {
           <div className="divider-accent mb-8 mx-auto" />
 
           <p>
-            Every year, Technique publishes a 400-page yearbook commemorating
+            Every year, Technique publishes a 280-page yearbook commemorating
             life at MIT. Our dedicated staff of photographers, designers, and
             writers work throughout the year to capture the essence of the
             MIT experience.
@@ -32,8 +32,20 @@ function YearbookPage() {
             athletics, and the unique culture that makes MIT special.
           </p>
 
+          {/* Yearbook Cover */}
+          <div className="flex justify-center mt-12 mb-8">
+            <div className="relative w-64 h-80">
+              <Image
+                src="/images/covers/2026_Yearbook_Cover_TNQ.webp"
+                alt="2026 Technique Yearbook Cover"
+                fill={true}
+                style={{ objectFit: "contain" }}
+              />
+            </div>
+          </div>
+
           {/* Preorder CTA */}
-          <div className="text-center mt-12 mb-8">
+          <div className="text-center mb-8">
             <a
               href="https://mit.universitytickets.com/w/event.aspx?id=1889"
               target="_blank"
@@ -66,7 +78,7 @@ function YearbookPage() {
                 <div className="divider-accent mb-4" />
                 <h4>Release</h4>
                 <p className="text-sm pb-0">
-                  The yearbook is released each May. Preorder copies can be
+                  The yearbook is released late Spring. Preorder copies can be
                   picked up on campus. Please reach out if you require delivery 
                   as a graduate or under other circumstances. Accomodations can 
                   be discussed and arranged, but are not guaranteed.
