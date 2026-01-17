@@ -22,14 +22,14 @@ function YearbookPage() {
           <p>
             Every year, Technique publishes a 280-page yearbook commemorating
             life at MIT. Our dedicated staff of photographers, designers, and
-            writers work throughout the year to capture the essence of the
-            MIT experience.
+            writers work throughout the year to capture the essence of the MIT
+            experience.
           </p>
 
           <p>
-            The yearbook features senior portraits, candid photography of
-            campus life, coverage of major events, student organizations,
-            athletics, and the unique culture that makes MIT special.
+            The yearbook features senior portraits, candid photography of campus
+            life, coverage of major events, student organizations, athletics,
+            and the unique culture that makes MIT special.
           </p>
 
           {/* Yearbook Cover */}
@@ -47,7 +47,7 @@ function YearbookPage() {
           {/* Preorder CTA */}
           <div className="text-center mb-8">
             <a
-              href="https://mit.universitytickets.com/w/event.aspx?id=1889"
+              href="https://engage.mit.edu/technique/rsvp_boot?id=916938"
               target="_blank"
               rel="noopener noreferrer"
               className="btn-primary"
@@ -68,20 +68,44 @@ function YearbookPage() {
                 <div className="divider-accent mb-4" />
                 <h4>For Seniors</h4>
                 <p className="text-sm pb-0">
-                  Seniors who have a picture are highly encouraged to fill
-                  out their information on the <a href="/bio" className="text-accent hover:text-accent-hover">Senior Bio</a> page.
-                  If you do not have a picture, schedule a time <a href="/bio" className="text-accent hover:text-accent-hover">here</a>.
-                  Email us at <a href="mailto:tnq-exec@mit.edu" className="text-accent hover:text-accent-hover">tnq-exec@mit.edu</a> if you have any extenuating circumstances.
+                  Seniors who have a picture are highly encouraged to fill out
+                  their information on the{" "}
+                  <a
+                    href="/bio"
+                    className="text-accent hover:text-accent-hover"
+                  >
+                    Senior Bio
+                  </a>{" "}
+                  page. If you do not have a picture, schedule a time{" "}
+                  <a
+                    href="/portrait"
+                    className="text-accent hover:text-accent-hover"
+                  >
+                    here
+                  </a>
+                  . Email us at{" "}
+                  <a
+                    href="mailto:tnq-exec@mit.edu"
+                    className="text-accent hover:text-accent-hover"
+                  >
+                    tnq-exec@mit.edu
+                  </a>{" "}
+                  if you have any extenuating circumstances.
                 </p>
               </div>
               <div className="card">
                 <div className="divider-accent mb-4" />
                 <h4>Release</h4>
                 <p className="text-sm pb-0">
-                  The yearbook is released late Spring. Preorder copies can be
-                  picked up on campus. Please reach out if you require delivery 
-                  as a graduate or under other circumstances. Accomodations can 
-                  be discussed and arranged, but are not guaranteed.
+                  The yearbook is released late Spring. Purchased copies must be
+                  picked up on campus. Email us at{" "}
+                  <a
+                    href="mailto:tnq-exec@mit.edu"
+                    className="text-accent hover:text-accent-hover"
+                  >
+                    tnq-exec@mit.edu
+                  </a>{" "}
+                  if you have any questions, concerns, or issues.
                 </p>
               </div>
             </div>
