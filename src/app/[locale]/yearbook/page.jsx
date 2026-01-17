@@ -47,7 +47,7 @@ function YearbookPage() {
           {/* Preorder CTA */}
           <div className="text-center mb-8">
             <a
-              href="https://mit.universitytickets.com/w/event.aspx?id=1889"
+              href="https://engage.mit.edu/technique/rsvp_boot?id=916938"
               target="_blank"
               rel="noopener noreferrer"
               className="btn-primary"
