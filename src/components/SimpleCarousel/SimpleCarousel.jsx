@@ -6,6 +6,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { useTranslations } from 'next-intl';
 
 // Import Swiper styles
 import "swiper/css";
@@ -16,6 +17,7 @@ import "swiper/css/navigation";
 import { Autoplay, Pagination, Navigation } from "swiper/modules";
 
 function SimpleCarousel({ images, reverseDirection }) {
+  const t = useTranslations('carousel');
   var settings = {
     dots: true,
     infinite: true,
@@ -87,7 +89,7 @@ function SimpleCarousel({ images, reverseDirection }) {
                 className="absolute bottom-[1%] right-[2%] text-white"
                 style={{ fontSize: "3%" }}
               >
-                Photo Credits: {photographer}
+                {t('photoCredit', { photographer })}
               </p>
               <div className="swiper-lazy-preloader swiper-lazy-preloader-black"></div>
             </SwiperSlide>

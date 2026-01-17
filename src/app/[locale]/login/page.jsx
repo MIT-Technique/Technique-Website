@@ -1,5 +1,5 @@
 "use client";
-import Footer from "../../components/Footer/Footer";
+import Footer from "../../../components/Footer/Footer";
 import { useState } from "react";
 import * as React from "react";
 import Box from "@mui/material/Box";
@@ -8,8 +8,10 @@ import Snackbar from "@mui/material/Snackbar";
 import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import Alert from "@mui/material/Alert";
+import { useTranslations } from 'next-intl';
 
 export default function LoginPage() {
+  const t = useTranslations('pages.login');
   const [open, setOpen] = useState(false);
   const vertical = "top";
   const horizontal = "center";
@@ -23,9 +25,9 @@ export default function LoginPage() {
       <main className="min-h-screen pt-24 lg:pt-32">
         <section className="section container-narrow">
           <div className="text-center mb-8">
-            <h1 className="mb-2">Senior Bio</h1>
+            <h1 className="mb-2">{t('title')}</h1>
             <p className="text-text-secondary">
-              Sign in to update your senior bio information.
+              {t('description')}
             </p>
           </div>
 
@@ -42,7 +44,7 @@ export default function LoginPage() {
             action="/api/login"
           >
             <p className="text-sm text-text-secondary text-center mb-6 pb-0">
-              Click below to sign in with your MIT credentials.
+              {t('instructionText')}
             </p>
             <Button
               type="submit"
@@ -65,7 +67,7 @@ export default function LoginPage() {
                 boxShadow: "none",
               }}
             >
-              Sign In
+              {t('signInButton')}
             </Button>
           </Box>
         </section>
@@ -93,7 +95,7 @@ export default function LoginPage() {
           variant="filled"
           sx={{ width: "100%" }}
         >
-          Signed in successfully
+          {t('success')}
         </Alert>
       </Snackbar>
       <Footer />

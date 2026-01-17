@@ -1,5 +1,5 @@
 "use client";
-import Footer from "../../components/Footer/Footer";
+import Footer from "../../../components/Footer/Footer";
 import { useState, useEffect } from "react";
 import * as React from "react";
 import Box from "@mui/material/Box";
@@ -13,6 +13,7 @@ import Snackbar from "@mui/material/Snackbar";
 import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import Alert from "@mui/material/Alert";
+import { useTranslations } from 'next-intl';
 
 // Shared MUI text field styling
 const textFieldSx = {
@@ -31,6 +32,7 @@ const selectSx = {
 };
 
 export default function BioPage() {
+  const t = useTranslations('pages.bio');
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [major, setMajor] = useState("");
@@ -108,9 +110,9 @@ export default function BioPage() {
       <main className="min-h-screen pt-24 lg:pt-32">
         <section className="section-tight container-narrow">
           <div className="text-center mb-8">
-            <h1 className="mb-2">Senior Bio</h1>
+            <h1 className="mb-2">{t('title')}</h1>
             <p className="text-text-secondary">
-              Update your information for the yearbook.
+              {t('description')}
             </p>
           </div>
 
@@ -130,7 +132,7 @@ export default function BioPage() {
             <div className="grid grid-cols-2 gap-4">
               <TextField
                 required
-                label="First Name"
+                label={t('fields.firstName')}
                 variant="outlined"
                 InputLabelProps={{ shrink: true }}
                 value={firstName}
@@ -140,7 +142,7 @@ export default function BioPage() {
               />
               <TextField
                 required
-                label="Last Name"
+                label={t('fields.lastName')}
                 variant="outlined"
                 InputLabelProps={{ shrink: true }}
                 value={lastName}
@@ -158,13 +160,13 @@ export default function BioPage() {
                   "&.Mui-focused": { color: "#750014" },
                 }}
               >
-                Major *
+                {t('fields.major')} *
               </InputLabel>
               <Select
                 labelId="major-label"
                 id="major-select"
                 value={major}
-                label="Major *"
+                label={`${t('fields.major')} *`}
                 notched
                 required
                 onChange={(event) => setMajor(event.target.value)}
@@ -179,7 +181,7 @@ export default function BioPage() {
             </FormControl>
 
             <TextField
-              label="Quote"
+              label={t('fields.quote')}
               variant="outlined"
               InputLabelProps={{ shrink: true }}
               value={quote}
@@ -190,7 +192,7 @@ export default function BioPage() {
               maxRows={8}
               sx={textFieldSx}
               fullWidth
-              placeholder="Enter a quote for your yearbook entry (optional)"
+              placeholder={t('fields.quotePlaceholder')}
             />
 
             <Button
@@ -215,7 +217,7 @@ export default function BioPage() {
               }}
               fullWidth
             >
-              Update Bio
+              {t('submitButton')}
             </Button>
           </Box>
         </section>
@@ -243,9 +245,7 @@ export default function BioPage() {
           variant="filled"
           sx={{ width: "100%" }}
         >
-          {error
-            ? "There was an error updating your bio"
-            : "Your bio was updated successfully"}
+          {error ? t('error') : t('success')}
         </Alert>
       </Snackbar>
       <Footer />

@@ -1,12 +1,15 @@
 "use client";
 import React from "react";
-import Footer from "../../components/Footer/Footer";
+import Footer from "../../../components/Footer/Footer";
 import Image from "next/image";
+import { useTranslations } from 'next-intl';
 
 function HirePage() {
+  const t = useTranslations('pages.hire');
+
   const images = [
     {
-      src: "/images/other_images/Alison_Soong/20260915-P1050432.jpg",
+      src: "/images/other_images/Alison_Soong/20240915-P1050432.jpg",
       photographer: "Alison Soong",
     },
     {
@@ -24,10 +27,9 @@ function HirePage() {
       <main className="min-h-screen pt-24 lg:pt-32">
         {/* Hero Section */}
         <section className="section-tight container-text text-center">
-          <h1 className="mb-4">Hire Us</h1>
+          <h1 className="mb-4">{t('title')}</h1>
           <p className="text-lg text-text-secondary font-light">
-            If you need photography for an event, our community of MIT
-            photographers can help.
+            {t('hero')}
           </p>
         </section>
 
@@ -38,7 +40,7 @@ function HirePage() {
               <figure key={index} className="relative aspect-[4/3] group overflow-hidden">
                 <Image
                   src={image.src}
-                  alt={`Event photography by ${image.photographer}`}
+                  alt={t('imageAlt', { photographer: image.photographer })}
                   fill={true}
                   style={{ objectFit: "cover" }}
                   className="transition-transform duration-500 group-hover:scale-105"
@@ -57,18 +59,16 @@ function HirePage() {
         {/* CTA Section */}
         <section className="section container-text text-center">
           <p className="mb-8">
-            We offer event photography services for all organizations and groups
-            affiliated with MIT. Technique matches you with one of our trained
-            staph photographers to capture every moment during your event.
+            {t('description')}
           </p>
           <a
             href="mailto:technique@mit.edu?subject=Event%20Photography%20Quote"
             className="btn-primary"
           >
-            Get a Quote
+            {t('ctaButton')}
           </a>
           <p className="text-sm text-text-muted mt-4">
-            Email us with the subject line &quot;Event Photography Quote&quot;
+            {t('ctaHint')}
           </p>
         </section>
       </main>

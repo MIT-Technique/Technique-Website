@@ -1,3 +1,7 @@
+import createNextIntlPlugin from 'next-intl/plugin';
+
+const withNextIntl = createNextIntlPlugin('./src/i18n/request.js');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
@@ -5,6 +9,11 @@ const nextConfig = {
   },
   async redirects() {
     return [
+      {
+        source: "/",
+        destination: "/en",
+        permanent: false,
+      },
       {
         source: "/portrait",
         destination:
@@ -15,4 +24,4 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

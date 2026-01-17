@@ -1,0 +1,212 @@
+{
+  "common": {
+    "siteTitle": "MIT Technique",
+    "siteDescription": "自1885年以来纪念MIT",
+    "siteName": "Technique",
+    "tagline": "自1885年以来纪念MIT"
+  },
+
+  "nav": {
+    "about": "关于我们",
+    "archive": "档案",
+    "yearbook": "年鉴",
+    "invoice": "发票",
+    "seniors": "毕业生",
+    "hireUs": "雇用我们",
+    "dropdown": {
+      "ourHistory": "我们的历史",
+      "portfolio": "作品集",
+      "contact": "联系",
+      "portraits": "肖像",
+      "seniorBio": "毕业生简介"
+    }
+  },
+
+  "footer": {
+    "copyright": "© 2026 Technique。版权所有。",
+    "emailLabel": "给我们发邮件",
+    "instagramLabel": "在Instagram上关注我们"
+  },
+
+  "languageSwitcher": {
+    "selectLanguage": "选择语言"
+  },
+
+  "carousel": {
+    "photoCredit": "照片提供：{photographer}"
+  },
+
+  "pages": {
+    "home": {
+      "subtitle": "MIT的摄影与年鉴",
+      "hero": "Technique",
+      "tagline": "自1885年以来纪念MIT",
+      "photoCredit": "照片：{photographer}"
+    },
+
+    "about": {
+      "title": "关于我们",
+      "metaTitle": "关于我们 - MIT Technique",
+      "metaDescription": "了解MIT Technique，自1885年以来的摄影和年鉴组织。",
+      "hero": "自1885年以来，我们的员工精心制作了美丽的年度摄影和散文集，纪念MIT的每一年。",
+      "paragraph1": "我们是MIT的摄影、年鉴和设计学生组织。每年，我们的员工在二月将400页的年鉴送往出版商，并在五月发布这本书。作为MIT的学生和校友，我们非常小心地以最真实的形式展示MIT，坦率地展示它最好和最坏的时刻。我们知道这所学院有多艰难，我们也知道到达彼岸是多么有意义。",
+      "paragraph2": "除了设计MIT年鉴外，Technique还通过提供设备租赁和活动摄影服务来支持校园摄影社区。",
+      "grogo": {
+        "title": "H.R.H. Grogo",
+        "paragraph1": "如果你经常在Technique附近，你会听到这个名字。你还会在我们所有的商品上看到他美丽的面孔。这是因为我们的吉祥物是一只大猩猩，他的名字叫H.R.H. Grogo。",
+        "paragraph2": "\"但为什么？\"你问道。我们也不知道，但H.R.H. Grogo从一开始就在那里，刻在第一本Technique的背面，从那时起就一直在那里。我们不太确定他是如何或何时成为大猩猩的。"
+      },
+      "weekly": {
+        "title": "每周活动",
+        "paragraph1": "我们每周六中午12点在4-253举行定期会议。欢迎任何人参加。我们有摄影设备可供借用，并经常在此时教授各种与摄影和设计相关的研讨会。",
+        "paragraph2": "在图书季节，从秋季学期到早春学期，我们在工作日举行定期会议，Technique各部分的各种编辑会来工作。这是参与制作年鉴过程的最佳时机。",
+        "paragraph3": "我们还不时享受摄影漫步和不同的摄影探险！"
+      },
+      "staph": {
+        "title": "员工",
+        "paragraph1": "我们的许多员工都是兼职（或全职）摄影师和/或设计师，以及MIT的学生和校友。我们的大多数员工都没有感染。",
+        "paragraph2": "加入Technique不需要任何经验。我们敬业的员工致力于帮助每一个愿意学习的人，尤其是在摄影或设计方面。"
+      }
+    },
+
+    "yearbook": {
+      "title": "年鉴",
+      "metaTitle": "年鉴 - MIT Technique",
+      "metaDescription": "用官方Technique年鉴保存你的MIT回忆。",
+      "hero": "用官方Technique年鉴保存你的MIT回忆。",
+      "description1": "每年，Technique出版一本280页的年鉴，纪念MIT的生活。我们敬业的摄影师、设计师和作家团队全年工作，捕捉MIT体验的精髓。",
+      "description2": "年鉴包括毕业生肖像、校园生活的坦率摄影、重大活动的报道、学生组织、体育运动，以及使MIT与众不同的独特文化。",
+      "coverAlt": "2026 Technique年鉴封面",
+      "preorderButton": "预订您的副本",
+      "preorderHint": "以优惠的预订价格获得您的年鉴。",
+      "forSeniors": {
+        "title": "致毕业生",
+        "content": "强烈鼓励有照片的毕业生在毕业生简介页面上填写他们的信息。如果您没有照片，请在此处安排时间。如果您有任何特殊情况，请发送电子邮件至{email}。",
+        "seniorBioLink": "毕业生简介",
+        "scheduleLink": "此处"
+      },
+      "release": {
+        "title": "发布",
+        "content": "年鉴将在春季晚些时候发布。预订的副本可以在校园内领取。如果您需要作为毕业生或在其他情况下送货，请联系我们。可以讨论和安排住宿，但不保证。"
+      }
+    },
+
+    "contact": {
+      "title": "联系我们",
+      "metaTitle": "联系 - MIT Technique",
+      "metaDescription": "与MIT Technique联系。",
+      "emailButton": "给我们发邮件",
+      "imageAlt": "Technique管理委员会",
+      "imageCredit": "MIT Technique",
+      "visit": {
+        "title": "访问我们",
+        "address1": "142 Memorial Dr.",
+        "address2": "Walker Memorial",
+        "address3": "50-320室"
+      },
+      "mail": {
+        "title": "邮寄地址",
+        "address1": "MIT Technique",
+        "address2": "32 Vassar Street",
+        "address3": "Cambridge, MA 02139"
+      }
+    },
+
+    "hire": {
+      "title": "雇用我们",
+      "metaTitle": "雇用我们 - MIT Technique摄影",
+      "metaDescription": "MIT Technique摄影师提供的专业活动摄影服务。",
+      "hero": "如果您需要活动摄影，我们的MIT摄影师社区可以提供帮助。",
+      "description": "我们为所有与MIT相关的组织和团体提供活动摄影服务。Technique将您与我们训练有素的员工摄影师之一匹配，以捕捉您活动期间的每一刻。",
+      "ctaButton": "获取报价",
+      "ctaHint": "请以\"活动摄影报价\"为主题给我们发送电子邮件",
+      "imageAlt": "{photographer}的活动摄影"
+    },
+
+    "invoice": {
+      "title": "发票表格",
+      "metaTitle": "发票 - MIT Technique",
+      "metaDescription": "提交您的摄影发票。",
+      "description": "提交您的摄影发票。",
+      "fields": {
+        "orgName": "组织名称",
+        "photographerName": "摄影师姓名",
+        "eventName": "活动名称",
+        "costObject": "您的成本对象",
+        "hourlyRate": "小时费率",
+        "totalHours": "总小时数",
+        "eventDate": "活动日期"
+      },
+      "submitButton": "提交发票",
+      "success": "您的发票已成功发送",
+      "error": "发送您的发票时出错"
+    },
+
+    "login": {
+      "title": "毕业生简介",
+      "metaTitle": "登录 - MIT Technique",
+      "metaDescription": "登录以更新您的毕业生简介信息。",
+      "description": "登录以更新您的毕业生简介信息。",
+      "instructionText": "点击下方使用您的MIT凭据登录。",
+      "signInButton": "登录",
+      "success": "成功登录"
+    },
+
+    "portfolio": {
+      "title": "作品集",
+      "metaTitle": "作品集 - MIT Technique摄影",
+      "metaDescription": "我们摄影师的作品选集。",
+      "description": "我们摄影师的作品选集。",
+      "imageAlt": "{photographer}的摄影"
+    },
+
+    "seniors": {
+      "title": "毕业生",
+      "metaTitle": "毕业生肖像 - MIT Technique",
+      "metaDescription": "有关Technique毕业生肖像会话的信息。",
+      "hero": "毕业生肖像会话持续开放。",
+      "scheduleButton": "安排您的肖像",
+      "dressCode": {
+        "title": "着装要求",
+        "content": "毕业生肖像没有着装要求。您可以穿西装、礼服，甚至睡衣出现。我们甚至有学生带来他们的乐器和宠物。我们建议穿您觉得舒适的衣服拍照，因为您的形象可能会在您同龄人的书架上保存数十年。",
+        "informalCaption": "休闲装",
+        "formalCaption": "正装",
+        "informalAlt": "休闲装示例",
+        "formalAlt": "正装示例"
+      },
+      "discount": {
+        "title": "毕业生折扣",
+        "paragraph1": "在您的毕业生照片预约后，您将能够以仅限毕业生肖像的特别折扣价格订购您的年鉴。此价格仅适用于参加预约的毕业生。",
+        "paragraph2": "如果您不希望拍摄毕业生肖像，您仍然可以在我们的订购页面上以预订折扣价格预订您的年鉴。"
+      },
+      "issues": {
+        "title": "错过会话或有问题？",
+        "content": "有关安排毕业生肖像会话、生平信息的延迟更改或任何其他问题的所有问题，请联系{email}。Technique有毕业生肖像的出版截止日期，因此我们遗憾地无法容纳错过所有预定毕业生肖像会话的任何学生。请放心，您的姓名将出现在年鉴中不包含毕业生肖像的部分。"
+      }
+    },
+
+    "bio": {
+      "title": "毕业生简介",
+      "metaTitle": "毕业生简介 - MIT Technique",
+      "metaDescription": "更新您的MIT Technique年鉴信息。",
+      "description": "更新您的年鉴信息。",
+      "fields": {
+        "firstName": "名字",
+        "lastName": "姓氏",
+        "major": "专业",
+        "quote": "引言",
+        "quotePlaceholder": "输入您年鉴条目的引言（可选）"
+      },
+      "submitButton": "更新简介",
+      "success": "您的简介已成功更新",
+      "error": "更新您的简介时出错"
+    },
+
+    "archives": {
+      "title": "档案",
+      "metaTitle": "档案 - MIT Technique年鉴",
+      "metaDescription": "探索可追溯到1885年的Technique年鉴过去版本。",
+      "description": "探索可追溯到1885年的Technique过去版本。"
+    }
+  }
+}

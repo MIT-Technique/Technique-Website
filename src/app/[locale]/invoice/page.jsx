@@ -1,5 +1,5 @@
 "use client";
-import Footer from "../../components/Footer/Footer";
+import Footer from "../../../components/Footer/Footer";
 import { useState } from "react";
 import * as React from "react";
 import Box from "@mui/material/Box";
@@ -9,6 +9,7 @@ import Snackbar from "@mui/material/Snackbar";
 import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import Alert from "@mui/material/Alert";
+import { useTranslations } from 'next-intl';
 
 // Shared MUI text field styling
 const textFieldSx = {
@@ -21,6 +22,7 @@ const textFieldSx = {
 };
 
 export default function InvoicePage() {
+  const t = useTranslations('pages.invoice');
   const [orgName, setOrgName] = useState("");
   const [photographerName, setPhotographerName] = useState("");
   const [eventName, setEventName] = useState("");
@@ -105,9 +107,9 @@ export default function InvoicePage() {
       <main className="min-h-screen pt-24 lg:pt-32">
         <section className="section-tight container-narrow">
           <div className="text-center mb-8">
-            <h1 className="mb-2">Invoice Form</h1>
+            <h1 className="mb-2">{t('title')}</h1>
             <p className="text-text-secondary">
-              Submit your photography invoice.
+              {t('description')}
             </p>
           </div>
 
@@ -126,7 +128,7 @@ export default function InvoicePage() {
           >
             <TextField
               required
-              label="Organization Name"
+              label={t('fields.orgName')}
               variant="outlined"
               InputLabelProps={{ shrink: true }}
               value={orgName}
@@ -137,7 +139,7 @@ export default function InvoicePage() {
             />
             <TextField
               required
-              label="Photographer Name"
+              label={t('fields.photographerName')}
               variant="outlined"
               InputLabelProps={{ shrink: true }}
               value={photographerName}
@@ -148,7 +150,7 @@ export default function InvoicePage() {
             />
             <TextField
               required
-              label="Event Name"
+              label={t('fields.eventName')}
               variant="outlined"
               InputLabelProps={{ shrink: true }}
               value={eventName}
@@ -159,7 +161,7 @@ export default function InvoicePage() {
             />
             <TextField
               required
-              label="Your Cost Object"
+              label={t('fields.costObject')}
               variant="outlined"
               InputLabelProps={{ shrink: true }}
               value={costObject}
@@ -172,7 +174,7 @@ export default function InvoicePage() {
             <div className="grid grid-cols-2 gap-4">
               <TextField
                 required
-                label="Hourly Rate"
+                label={t('fields.hourlyRate')}
                 variant="outlined"
                 type="number"
                 InputLabelProps={{ shrink: true }}
@@ -183,7 +185,7 @@ export default function InvoicePage() {
               />
               <TextField
                 required
-                label="Total Hours"
+                label={t('fields.totalHours')}
                 variant="outlined"
                 type="number"
                 InputLabelProps={{ shrink: true }}
@@ -195,7 +197,7 @@ export default function InvoicePage() {
             </div>
             <TextField
               required
-              label="Date of the Event"
+              label={t('fields.eventDate')}
               type="date"
               InputLabelProps={{ shrink: true }}
               value={eventDate}
@@ -226,7 +228,7 @@ export default function InvoicePage() {
               }}
               fullWidth
             >
-              Submit Invoice
+              {t('submitButton')}
             </Button>
           </Box>
         </section>
@@ -254,9 +256,7 @@ export default function InvoicePage() {
           variant="filled"
           sx={{ width: "100%" }}
         >
-          {error
-            ? "There was an error sending your invoice"
-            : "Your invoice was sent successfully"}
+          {error ? t('error') : t('success')}
         </Alert>
       </Snackbar>
       <Footer />

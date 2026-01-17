@@ -3,48 +3,53 @@ import React, { useState } from "react";
 import Sidebar from "./Sidebar.jsx";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations, useLocale } from 'next-intl';
+import LanguageSwitcher from "../LanguageSwitcher/LanguageSwitcher";
 import "./Navbar.css";
 
 function Navbar() {
   const pathname = usePathname();
-  const isHomePage = pathname === "/";
+  const locale = useLocale();
+  const t = useTranslations('nav');
+  const tCommon = useTranslations('common');
+  const isHomePage = pathname === `/${locale}`;
   const [openDropdown, setOpenDropdown] = useState(null);
 
   // Check if any item in a dropdown is active
   const isDropdownActive = (items) => {
     return items.some(item => {
-      if (item.href === "/login") return pathname === "/login" || pathname === "/bio";
+      if (item.href === `/${locale}/login`) return pathname === `/${locale}/login` || pathname === `/${locale}/bio`;
       return pathname === item.href || pathname.startsWith(item.href + "/");
     });
   };
 
   const isActive = (href) => {
-    if (href === "/") return pathname === "/";
-    if (href === "/login") return pathname === "/login" || pathname === "/bio";
+    if (href === `/${locale}`) return pathname === `/${locale}`;
+    if (href === `/${locale}/login`) return pathname === `/${locale}/login` || pathname === `/${locale}/bio`;
     return pathname === href || pathname.startsWith(href + "/");
   };
 
   // Navigation structure with dropdowns
   const navStructure = [
     {
-      label: "ABOUT",
+      label: t('about'),
       dropdown: [
-        { href: "/about", label: "OUR HISTORY" },
-        { href: "/portfolio", label: "PORTFOLIO" },
-        { href: "/contact", label: "CONTACT" },
+        { href: `/${locale}/about`, label: t('dropdown.ourHistory') },
+        { href: `/${locale}/portfolio`, label: t('dropdown.portfolio') },
+        { href: `/${locale}/contact`, label: t('dropdown.contact') },
       ],
     },
-    { href: "/archives", label: "ARCHIVE" },
-    { href: "/yearbook", label: "YEARBOOK" },
-    { href: "/invoice", label: "INVOICE" },
+    { href: `/${locale}/archives`, label: t('archive') },
+    { href: `/${locale}/yearbook`, label: t('yearbook') },
+    { href: `/${locale}/invoice`, label: t('invoice') },
     {
-      label: "SENIORS",
+      label: t('seniors'),
       dropdown: [
-        { href: "/seniors", label: "PORTRAITS" },
-        { href: "/login", label: "SENIOR BIO" },
+        { href: `/${locale}/seniors`, label: t('dropdown.portraits') },
+        { href: `/${locale}/login`, label: t('dropdown.seniorBio') },
       ],
     },
-    { href: "/hire", label: "HIRE US", special: true },
+    { href: `/${locale}/hire`, label: t('hireUs'), special: true },
   ];
 
   return (
@@ -65,13 +70,15 @@ function Navbar() {
                 ? "text-white hover:text-white/80"
                 : "text-text-primary hover:text-accent"
             }`}
-            href="/"
+            href={`/${locale}`}
           >
-            TECHNIQUE
+            {tCommon('siteName')}
           </Link>
 
           {/* Nav Links */}
           <div className="flex items-center gap-8">
+            {/* Language Switcher */}
+            <LanguageSwitcher />
             {navStructure.map((item, index) => (
               item.dropdown ? (
                 // Dropdown item
