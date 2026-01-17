@@ -9,25 +9,30 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import Collapse from "@mui/material/Collapse";
 import { VscThreeBars, VscClose, VscChevronDown } from "react-icons/vsc";
+import { useTranslations, useLocale } from 'next-intl';
+import LanguageSwitcher from "../LanguageSwitcher/LanguageSwitcher";
 
 function Sidebar({ pathname }) {
+  const locale = useLocale();
+  const t = useTranslations('nav');
+  const tCommon = useTranslations('common');
   const [isOpen, setIsOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [seniorsOpen, setSeniorsOpen] = useState(false);
 
-  const isHomePage = pathname === "/";
+  const isHomePage = pathname === `/${locale}`;
   const textColor = isHomePage ? "#FFFFFF" : "#1A1A1A";
   const mutedColor = isHomePage ? "rgba(255,255,255,0.6)" : "#666666";
   const bgColor = isHomePage ? "#000000" : "#FFFAFA";
   const borderColor = isHomePage ? "rgba(255,255,255,0.1)" : "#E5E5E5";
 
   const isActive = (href) => {
-    if (href === "/login") return pathname === "/login" || pathname === "/bio";
+    if (href === `/${locale}/login`) return pathname === `/${locale}/login` || pathname === `/${locale}/bio`;
     return pathname === href || pathname.startsWith(href + "/");
   };
 
-  const isAboutActive = ["/about", "/portfolio", "/contact"].some(isActive);
-  const isSeniorsActive = ["/seniors", "/login"].some(isActive);
+  const isAboutActive = [`/${locale}/about`, `/${locale}/portfolio`, `/${locale}/contact`].some(isActive);
+  const isSeniorsActive = [`/${locale}/seniors`, `/${locale}/login`].some(isActive);
 
   return (
     <div
@@ -37,11 +42,11 @@ function Sidebar({ pathname }) {
     >
       <Link
         className="text-lg font-medium tracking-wide"
-        href="/"
+        href={`/${locale}`}
         onClick={() => setIsOpen(false)}
         style={{ color: textColor }}
       >
-        TECHNIQUE
+        {tCommon('siteName')}
       </Link>
 
       <button
@@ -101,7 +106,7 @@ function Sidebar({ pathname }) {
                 sx={{ px: 3, py: 1.5 }}
               >
                 <ListItemText
-                  primary="ABOUT"
+                  primary={t('about')}
                   primaryTypographyProps={{
                     sx: {
                       fontSize: "0.75rem",
@@ -124,9 +129,9 @@ function Sidebar({ pathname }) {
             <Collapse in={aboutOpen} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 {[
-                  { href: "/about", label: "Our History" },
-                  { href: "/portfolio", label: "Portfolio" },
-                  { href: "/contact", label: "Contact" },
+                  { href: `/${locale}/about`, label: t('dropdown.ourHistory') },
+                  { href: `/${locale}/portfolio`, label: t('dropdown.portfolio') },
+                  { href: `/${locale}/contact`, label: t('dropdown.contact') },
                 ].map((item) => (
                   <ListItem key={item.href} disablePadding>
                     <Link
@@ -156,13 +161,13 @@ function Sidebar({ pathname }) {
             {/* Archive */}
             <ListItem disablePadding>
               <Link
-                href="/archives"
+                href={`/${locale}/archives`}
                 onClick={() => setIsOpen(false)}
                 className="w-full"
               >
                 <ListItemButton sx={{ px: 3, py: 1.5 }}>
                   <ListItemText
-                    primary="ARCHIVE"
+                    primary={t('archive')}
                     primaryTypographyProps={{
                       sx: {
                         fontSize: "0.75rem",
@@ -179,13 +184,13 @@ function Sidebar({ pathname }) {
             {/* Yearbook */}
             <ListItem disablePadding>
               <Link
-                href="/yearbook"
+                href={`/${locale}/yearbook`}
                 onClick={() => setIsOpen(false)}
                 className="w-full"
               >
                 <ListItemButton sx={{ px: 3, py: 1.5 }}>
                   <ListItemText
-                    primary="YEARBOOK"
+                    primary={t('yearbook')}
                     primaryTypographyProps={{
                       sx: {
                         fontSize: "0.75rem",
@@ -202,13 +207,13 @@ function Sidebar({ pathname }) {
             {/* Invoice */}
             <ListItem disablePadding>
               <Link
-                href="/invoice"
+                href={`/${locale}/invoice`}
                 onClick={() => setIsOpen(false)}
                 className="w-full"
               >
                 <ListItemButton sx={{ px: 3, py: 1.5 }}>
                   <ListItemText
-                    primary="INVOICE"
+                    primary={t('invoice')}
                     primaryTypographyProps={{
                       sx: {
                         fontSize: "0.75rem",
@@ -229,7 +234,7 @@ function Sidebar({ pathname }) {
                 sx={{ px: 3, py: 1.5 }}
               >
                 <ListItemText
-                  primary="SENIORS"
+                  primary={t('seniors')}
                   primaryTypographyProps={{
                     sx: {
                       fontSize: "0.75rem",
@@ -252,8 +257,8 @@ function Sidebar({ pathname }) {
             <Collapse in={seniorsOpen} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 {[
-                  { href: "/seniors", label: "Portraits" },
-                  { href: "/login", label: "Senior Bio" },
+                  { href: `/${locale}/seniors`, label: t('dropdown.portraits') },
+                  { href: `/${locale}/login`, label: t('dropdown.seniorBio') },
                 ].map((item) => (
                   <ListItem key={item.href} disablePadding>
                     <Link
@@ -283,13 +288,13 @@ function Sidebar({ pathname }) {
             {/* Hire Us */}
             <ListItem disablePadding>
               <Link
-                href="/hire"
+                href={`/${locale}/hire`}
                 onClick={() => setIsOpen(false)}
                 className="w-full"
               >
                 <ListItemButton sx={{ px: 3, py: 1.5 }}>
                   <ListItemText
-                    primary="HIRE US →"
+                    primary={`${t('hireUs')} →`}
                     primaryTypographyProps={{
                       sx: {
                         fontSize: "0.75rem",
@@ -301,6 +306,11 @@ function Sidebar({ pathname }) {
                   />
                 </ListItemButton>
               </Link>
+            </ListItem>
+
+            {/* Language Switcher */}
+            <ListItem disablePadding sx={{ mt: 2, px: 3 }}>
+              <LanguageSwitcher />
             </ListItem>
           </List>
         </Box>

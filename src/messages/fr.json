@@ -1,0 +1,212 @@
+{
+  "common": {
+    "siteTitle": "MIT Technique",
+    "siteDescription": "Mémorisant MIT depuis 1885",
+    "siteName": "Technique",
+    "tagline": "Mémorisant MIT depuis 1885"
+  },
+
+  "nav": {
+    "about": "À PROPOS",
+    "archive": "ARCHIVES",
+    "yearbook": "ANNUAIRE",
+    "invoice": "FACTURE",
+    "seniors": "SENIORS",
+    "hireUs": "ENGAGEZ-NOUS",
+    "dropdown": {
+      "ourHistory": "NOTRE HISTOIRE",
+      "portfolio": "PORTFOLIO",
+      "contact": "CONTACT",
+      "portraits": "PORTRAITS",
+      "seniorBio": "BIO SENIOR"
+    }
+  },
+
+  "footer": {
+    "copyright": "© 2026 Technique. Tous droits réservés.",
+    "emailLabel": "Envoyez-nous un e-mail",
+    "instagramLabel": "Suivez-nous sur Instagram"
+  },
+
+  "languageSwitcher": {
+    "selectLanguage": "Sélectionner la langue"
+  },
+
+  "carousel": {
+    "photoCredit": "Crédits photo : {photographer}"
+  },
+
+  "pages": {
+    "home": {
+      "subtitle": "Photographie et annuaire du MIT",
+      "hero": "Technique",
+      "tagline": "Mémorisant MIT depuis 1885",
+      "photoCredit": "Photo : {photographer}"
+    },
+
+    "about": {
+      "title": "À propos de nous",
+      "metaTitle": "À propos de nous - MIT Technique",
+      "metaDescription": "Découvrez MIT Technique, l'organisation de photographie et d'annuaire depuis 1885.",
+      "hero": "Depuis 1885, notre équipe a créé un magnifique recueil annuel de photographies et de prose commémorant chaque année au MIT.",
+      "paragraph1": "Nous sommes l'organisation étudiante de photographie, d'annuaire et de design du MIT. Chaque année, notre équipe envoie notre annuaire de 400 pages à l'éditeur en février et publie le livre en mai. En tant qu'étudiants et anciens élèves du MIT, nous prenons grand soin de présenter le MIT sous sa forme la plus vraie, avec franchise, à son meilleur et à son pire. Nous savons à quel point l'Institut peut être difficile, et nous savons à quel point il est gratifiant d'arriver de l'autre côté.",
+      "paragraph2": "En plus de concevoir l'annuaire du MIT, Technique soutient la communauté photographique du campus en fournissant des locations d'équipement et des services de photographie d'événements.",
+      "grogo": {
+        "title": "S.A.R. Grogo",
+        "paragraph1": "Si vous traînez souvent chez Technique, vous entendrez ce nom circuler. Vous verrez également son beau visage sur tous nos produits. C'est parce que notre mascotte est un gorille et son nom est S.A.R. Grogo.",
+        "paragraph2": "\"Mais pourquoi ?\" demandez-vous. Nous ne le savons pas non plus, mais S.A.R. Grogo a été là depuis le début, inscrit au dos de la toute première Technique, et y est resté depuis. Nous ne sommes pas tout à fait sûrs de comment ou quand il est devenu un gorille."
+      },
+      "weekly": {
+        "title": "Hebdomadaire",
+        "paragraph1": "Nous tenons des réunions régulières à 12h le samedi dans 4-253. Tout le monde est le bienvenu. Nous avons du matériel photographique à emprunter et enseignons souvent divers séminaires liés à la photographie et au design à ce moment-là.",
+        "paragraph2": "Pendant la saison du livre, du semestre d'automne au début du semestre de printemps, nous tenons des réunions régulières pendant la semaine où les différents éditeurs de chaque section de Technique viennent travailler. C'est le meilleur moment pour s'impliquer dans le processus de création d'un annuaire.",
+        "paragraph3": "Nous aimons aussi faire des promenades photo et différentes excursions photographiques de temps en temps !"
+      },
+      "staph": {
+        "title": "équipe",
+        "paragraph1": "Beaucoup de nos membres d'équipe sont des photographes et/ou des designers à temps partiel (ou à temps plein), ainsi que des étudiants et des anciens élèves du MIT. La plupart de notre équipe est sans infection.",
+        "paragraph2": "Aucune expérience n'est nécessaire pour rejoindre Technique. Notre équipe dévouée s'engage à aider tous ceux qui sont prêts à apprendre, en particulier en matière de photographie ou de design."
+      }
+    },
+
+    "yearbook": {
+      "title": "Annuaire",
+      "metaTitle": "Annuaire - MIT Technique",
+      "metaDescription": "Préservez vos souvenirs du MIT avec l'annuaire officiel Technique.",
+      "hero": "Préservez vos souvenirs du MIT avec l'annuaire officiel Technique.",
+      "description1": "Chaque année, Technique publie un annuaire de 280 pages commémorant la vie au MIT. Notre équipe dévouée de photographes, designers et écrivains travaille tout au long de l'année pour capturer l'essence de l'expérience MIT.",
+      "description2": "L'annuaire présente des portraits de seniors, de la photographie candide de la vie du campus, une couverture d'événements majeurs, des organisations étudiantes, de l'athlétisme et la culture unique qui rend le MIT spécial.",
+      "coverAlt": "Couverture de l'annuaire Technique 2026",
+      "preorderButton": "Précommandez votre exemplaire",
+      "preorderHint": "Sécurisez votre annuaire au prix de précommande réduit.",
+      "forSeniors": {
+        "title": "Pour les seniors",
+        "content": "Les seniors qui ont une photo sont fortement encouragés à remplir leurs informations sur la page Bio Senior. Si vous n'avez pas de photo, planifiez un rendez-vous ici. Envoyez-nous un e-mail à {email} si vous avez des circonstances atténuantes.",
+        "seniorBioLink": "Bio Senior",
+        "scheduleLink": "ici"
+      },
+      "release": {
+        "title": "Publication",
+        "content": "L'annuaire est publié fin du printemps. Les exemplaires précommandés peuvent être récupérés sur le campus. Veuillez nous contacter si vous avez besoin d'une livraison en tant que diplômé ou dans d'autres circonstances. Des arrangements peuvent être discutés et organisés, mais ne sont pas garantis."
+      }
+    },
+
+    "contact": {
+      "title": "Contactez-nous",
+      "metaTitle": "Contact - MIT Technique",
+      "metaDescription": "Contactez MIT Technique.",
+      "emailButton": "Envoyez-nous un e-mail",
+      "imageAlt": "Conseil de direction de Technique",
+      "imageCredit": "MIT Technique",
+      "visit": {
+        "title": "Visitez-nous",
+        "address1": "142 Memorial Dr.",
+        "address2": "Walker Memorial",
+        "address3": "Salle 50-320"
+      },
+      "mail": {
+        "title": "Adresse postale",
+        "address1": "MIT Technique",
+        "address2": "32 Vassar Street",
+        "address3": "Cambridge, MA 02139"
+      }
+    },
+
+    "hire": {
+      "title": "Engagez-nous",
+      "metaTitle": "Engagez-nous - Photographie MIT Technique",
+      "metaDescription": "Services professionnels de photographie d'événements par les photographes MIT Technique.",
+      "hero": "Si vous avez besoin de photographie pour un événement, notre communauté de photographes du MIT peut vous aider.",
+      "description": "Nous offrons des services de photographie d'événements pour toutes les organisations et groupes affiliés au MIT. Technique vous met en relation avec l'un de nos photographes d'équipe formés pour capturer chaque moment lors de votre événement.",
+      "ctaButton": "Demander un devis",
+      "ctaHint": "Envoyez-nous un e-mail avec l'objet \"Devis de photographie d'événement\"",
+      "imageAlt": "Photographie d'événement par {photographer}"
+    },
+
+    "invoice": {
+      "title": "Formulaire de facture",
+      "metaTitle": "Facture - MIT Technique",
+      "metaDescription": "Soumettez votre facture de photographie.",
+      "description": "Soumettez votre facture de photographie.",
+      "fields": {
+        "orgName": "Nom de l'organisation",
+        "photographerName": "Nom du photographe",
+        "eventName": "Nom de l'événement",
+        "costObject": "Votre objet de coût",
+        "hourlyRate": "Tarif horaire",
+        "totalHours": "Heures totales",
+        "eventDate": "Date de l'événement"
+      },
+      "submitButton": "Soumettre la facture",
+      "success": "Votre facture a été envoyée avec succès",
+      "error": "Une erreur s'est produite lors de l'envoi de votre facture"
+    },
+
+    "login": {
+      "title": "Bio Senior",
+      "metaTitle": "Connexion - MIT Technique",
+      "metaDescription": "Connectez-vous pour mettre à jour vos informations de bio senior.",
+      "description": "Connectez-vous pour mettre à jour vos informations de bio senior.",
+      "instructionText": "Cliquez ci-dessous pour vous connecter avec vos identifiants MIT.",
+      "signInButton": "Se connecter",
+      "success": "Connexion réussie"
+    },
+
+    "portfolio": {
+      "title": "Portfolio",
+      "metaTitle": "Portfolio - Photographie MIT Technique",
+      "metaDescription": "Une sélection de travaux de nos photographes.",
+      "description": "Une sélection de travaux de nos photographes.",
+      "imageAlt": "Photographie par {photographer}"
+    },
+
+    "seniors": {
+      "title": "Seniors",
+      "metaTitle": "Portraits de seniors - MIT Technique",
+      "metaDescription": "Informations sur les séances de portraits de seniors avec Technique.",
+      "hero": "Les séances de portraits de seniors s'ouvrent en continu.",
+      "scheduleButton": "Planifiez votre portrait",
+      "dressCode": {
+        "title": "Code vestimentaire",
+        "content": "Il n'y a pas de code vestimentaire pour les portraits de seniors. Vous pouvez vous présenter en costume, en robe ou même en pyjama. Nous avons même eu des étudiants qui ont apporté leurs instruments et leurs animaux de compagnie. Nous recommandons de porter quelque chose dans lequel vous êtes à l'aise d'être photographié, car votre image sera probablement sur les étagères de vos pairs pendant des décennies.",
+        "informalCaption": "Tenue décontractée",
+        "formalCaption": "Tenue formelle",
+        "informalAlt": "Exemple de tenue décontractée",
+        "formalAlt": "Exemple de tenue formelle"
+      },
+      "discount": {
+        "title": "Réduction pour les seniors",
+        "paragraph1": "Après votre rendez-vous photo de senior, vous pourrez commander votre annuaire à un prix spécial réduit réservé aux portraits de seniors. Ce tarif ne s'applique qu'aux seniors qui assistent à leur rendez-vous.",
+        "paragraph2": "Si vous ne souhaitez pas obtenir votre portrait de senior, vous pouvez toujours précommander votre annuaire au prix de précommande réduit sur notre page de commande."
+      },
+      "issues": {
+        "title": "Séance manquée ou problèmes ?",
+        "content": "Pour toutes les questions concernant la planification des séances de portraits de seniors, les changements tardifs aux informations biographiques ou tout autre problème, veuillez contacter {email}. Technique a une date limite de publication pour les portraits de seniors, nous ne pouvons donc malheureusement pas accueillir les étudiants qui manquent toutes les séances de portraits de seniors programmées. Soyez assuré que votre nom apparaîtra dans l'annuaire dans une section qui ne présente pas de portraits de seniors."
+      }
+    },
+
+    "bio": {
+      "title": "Bio Senior",
+      "metaTitle": "Bio Senior - MIT Technique",
+      "metaDescription": "Mettez à jour vos informations pour l'annuaire MIT Technique.",
+      "description": "Mettez à jour vos informations pour l'annuaire.",
+      "fields": {
+        "firstName": "Prénom",
+        "lastName": "Nom de famille",
+        "major": "Spécialité",
+        "quote": "Citation",
+        "quotePlaceholder": "Entrez une citation pour votre entrée d'annuaire (facultatif)"
+      },
+      "submitButton": "Mettre à jour la bio",
+      "success": "Votre bio a été mise à jour avec succès",
+      "error": "Une erreur s'est produite lors de la mise à jour de votre bio"
+    },
+
+    "archives": {
+      "title": "Archives",
+      "metaTitle": "Archives - Annuaires MIT Technique",
+      "metaDescription": "Explorez les éditions passées des annuaires Technique datant de 1885.",
+      "description": "Explorez les éditions passées de Technique, datant de 1885."
+    }
+  }
+}

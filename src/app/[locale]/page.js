@@ -1,9 +1,11 @@
 "use client";
 import Image from "next/image";
-import Footer from "../components/Footer/Footer";
+import Footer from "../../components/Footer/Footer";
 import React from "react";
+import { useTranslations } from 'next-intl';
 
 export default function Home() {
+  const t = useTranslations('pages.home');
   return (
     <div className="relative">
       {/* Hero Section - Full viewport, starts from top (behind transparent nav) */}
@@ -23,19 +25,19 @@ export default function Home() {
         {/* Hero Content */}
         <div className="absolute inset-0 flex flex-col justify-end items-center pb-32 lg:pb-40 z-20">
           <p className="text-xs uppercase tracking-[0.3em] text-white/70 mb-4">
-            MIT&apos;s Photography & Yearbook
+            {t('subtitle')}
           </p>
           <h1 className="text-4xl lg:text-6xl font-light text-white text-center tracking-tight">
-            Technique
+            {t('hero')}
           </h1>
           <p className="text-sm lg:text-base text-white/80 mt-4 font-light">
-            Memorializing MIT since 1885
+            {t('tagline')}
           </p>
         </div>
 
         {/* Photo Credit */}
         <p className="absolute bottom-4 right-4 text-xs text-white/50 z-20">
-          Photo: Michelle Xiang
+          {t('photoCredit', { photographer: 'Michelle Xiang' })}
         </p>
       </section>
       <Footer />

@@ -1,9 +1,12 @@
 "use client";
 import React from "react";
-import Footer from "../../components/Footer/Footer";
+import Footer from "../../../components/Footer/Footer";
 import Image from "next/image";
+import { useTranslations } from 'next-intl';
 
 function PortfolioPage() {
+  const t = useTranslations('pages.portfolio');
+
   const images = [
     {
       src: "/images/other_images/Jade_Chongsathapornpong/_TNA0925.jpg",
@@ -108,9 +111,9 @@ function PortfolioPage() {
       <main className="min-h-screen pt-24 lg:pt-32">
         {/* Hero Section */}
         <section className="section-tight container-content text-center">
-          <h1 className="mb-4">Portfolio</h1>
+          <h1 className="mb-4">{t('title')}</h1>
           <p className="text-lg text-text-secondary font-light max-w-text mx-auto">
-            A selection of work by our photographers.
+            {t('description')}
           </p>
         </section>
 
@@ -124,7 +127,7 @@ function PortfolioPage() {
               >
                 <Image
                   src={image.src}
-                  alt={`Photography by ${image.photographer}`}
+                  alt={t('imageAlt', { photographer: image.photographer })}
                   fill={true}
                   style={{ objectFit: "cover" }}
                   className="transition-transform duration-500 group-hover:scale-105"

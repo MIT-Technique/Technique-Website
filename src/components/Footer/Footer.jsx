@@ -3,10 +3,13 @@ import React from "react";
 import MailIcon from "@mui/icons-material/Mail";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import { usePathname } from "next/navigation";
+import { useTranslations, useLocale } from 'next-intl';
 
 export default function Footer() {
   const pathname = usePathname();
-  const isHomePage = pathname === "/";
+  const locale = useLocale();
+  const t = useTranslations('footer');
+  const isHomePage = pathname === `/${locale}`;
 
   return (
     <footer
@@ -22,7 +25,7 @@ export default function Footer() {
               isHomePage ? "text-white/60" : "text-text-muted"
             }`}
           >
-            &copy; 2026 Technique. All Rights Reserved.
+            {t('copyright')}
           </p>
 
           {/* Right: Social Links */}
@@ -34,7 +37,7 @@ export default function Footer() {
                   ? "text-white/60 hover:text-white"
                   : "text-text-muted hover:text-accent"
               } transition-colors`}
-              aria-label="Email us"
+              aria-label={t('emailLabel')}
             >
               <MailIcon sx={{ fontSize: 18 }} />
             </a>
@@ -47,7 +50,7 @@ export default function Footer() {
                   ? "text-white/60 hover:text-white"
                   : "text-text-muted hover:text-accent"
               } transition-colors`}
-              aria-label="Follow us on Instagram"
+              aria-label={t('instagramLabel')}
             >
               <InstagramIcon sx={{ fontSize: 18 }} />
             </a>

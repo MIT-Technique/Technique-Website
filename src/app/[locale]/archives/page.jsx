@@ -1,9 +1,10 @@
 "use client";
 import React from "react";
-import Footer from "../../components/Footer/Footer";
-import CoverCard from "../../components/CoverCard/CoverCard";
+import Footer from "../../../components/Footer/Footer";
+import CoverCard from "../../../components/CoverCard/CoverCard";
 import Image from "next/image";
-import oneEightEightFive from "../../../public/images/covers/1885_Technique@2x.jpg";
+import { useTranslations } from 'next-intl';
+import oneEightEightFive from "../../../../public/images/covers/1885_Technique@2x.jpg";
 const options = [
   {
     src: "/images/covers/1885_Technique@2x.jpg",
@@ -285,14 +286,16 @@ const options = [
 ];
 
 function ArchivesPage() {
+  const t = useTranslations('pages.archives');
+
   return (
     <>
       <main className="min-h-screen pt-24 lg:pt-32">
         {/* Hero Section */}
         <section className="section-tight container-content text-center">
-          <h1 className="mb-4">Archive</h1>
+          <h1 className="mb-4">{t('title')}</h1>
           <p className="text-lg text-text-secondary font-light max-w-text mx-auto">
-            Explore past editions of Technique, dating back to 1885.
+            {t('description')}
           </p>
         </section>
 

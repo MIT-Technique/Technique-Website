@@ -1,17 +1,20 @@
 "use client";
 import React from "react";
-import Footer from "../../components/Footer/Footer";
+import Footer from "../../../components/Footer/Footer";
 import Image from "next/image";
+import { useTranslations } from 'next-intl';
 
 function SeniorsPage() {
+  const t = useTranslations('pages.seniors');
+
   return (
     <>
       <main className="min-h-screen pt-24 lg:pt-32">
         {/* Hero Section */}
         <section className="section-tight container-text text-center">
-          <h1 className="mb-4">Seniors</h1>
+          <h1 className="mb-4">{t('title')}</h1>
           <p className="text-lg text-text-secondary font-light mb-8">
-            Senior portrait sessions open on a rolling basis.
+            {t('hero')}
           </p>
           <a
             href="https://seniors.legacystudios.com/massachusetts-institute-technology-cambridge-ma/"
@@ -19,20 +22,16 @@ function SeniorsPage() {
             rel="noopener noreferrer"
             className="btn-primary"
           >
-            Schedule Your Portrait
+            {t('scheduleButton')}
           </a>
         </section>
 
         {/* Dress Code Section */}
         <section className="section container-text">
           <div className="divider-accent mb-6" />
-          <h2 className="mb-4">Dress Code</h2>
+          <h2 className="mb-4">{t('dressCode.title')}</h2>
           <p>
-            There is no dress code for senior portraits. You can show up in a
-            suit, dress, or even your pajamas. We have even had students bring
-            their instruments and pets. We recommend wearing something that you
-            are comfortable being pictured in, since your image will likely be
-            on shelves of your peers for decades to come.
+            {t('dressCode.content')}
           </p>
 
           {/* Example Images */}
@@ -41,26 +40,26 @@ function SeniorsPage() {
               <div className="relative aspect-square overflow-hidden rounded">
                 <Image
                   src="/images/Senior_Pictures/232010911.JPG"
-                  alt="Informal attire example"
+                  alt={t('dressCode.informalAlt')}
                   fill={true}
                   style={{ objectFit: "cover" }}
                 />
               </div>
               <figcaption className="text-sm text-text-muted mt-3 text-center">
-                Informal attire
+                {t('dressCode.informalCaption')}
               </figcaption>
             </figure>
             <figure>
               <div className="relative aspect-square overflow-hidden rounded">
                 <Image
                   src="/images/Senior_Pictures/232198679.JPG"
-                  alt="Formal attire example"
+                  alt={t('dressCode.formalAlt')}
                   fill={true}
                   style={{ objectFit: "cover" }}
                 />
               </div>
               <figcaption className="text-sm text-text-muted mt-3 text-center">
-                Formal attire
+                {t('dressCode.formalCaption')}
               </figcaption>
             </figure>
           </div>
@@ -69,23 +68,19 @@ function SeniorsPage() {
         {/* Senior Discount Section */}
         <section className="section-tight container-text">
           <div className="divider-accent mb-6" />
-          <h2 className="mb-4">Senior Discount</h2>
+          <h2 className="mb-4">{t('discount.title')}</h2>
           <p>
-            After your senior photo appointment, you will be able to order your
-            yearbook for a special <strong>senior portrait only discounted price</strong>.
-            This pricing only applies to seniors who attend their appointment.
+            {t('discount.paragraph1')}
           </p>
           <p>
-            If you do not wish to get your senior portrait, you are still able
-            to pre-order your yearbook at the <strong>pre-order discounted price</strong>{" "}
-            on our order page.
+            {t('discount.paragraph2')}
           </p>
         </section>
 
         {/* Issues Section */}
         <section className="section-tight container-text">
           <div className="divider-accent mb-6" />
-          <h2 className="mb-4">Missed Session or Issues?</h2>
+          <h2 className="mb-4">{t('issues.title')}</h2>
           <p>
             For all questions regarding scheduling senior portrait sessions,
             late changes to biographical information, or any other issues,
