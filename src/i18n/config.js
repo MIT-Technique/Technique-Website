@@ -1,10 +1,10 @@
-export const locales = ['en', 'es', 'zh'];
-export const defaultLocale = 'en';
+export const locales = ["en", "es", "zh"];
+export const defaultLocale = "en";
 
 export const localeNames = {
-  en: 'English',
-  es: 'Español',
-  zh: '中文'
+  en: "English",
+  es: "Español",
+  zh: "中文",
 };
 
 export const localeDirection = {
