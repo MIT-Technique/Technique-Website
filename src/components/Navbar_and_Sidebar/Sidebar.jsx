@@ -153,7 +153,7 @@ function Sidebar({ pathname }) {
               </List>
             </Collapse>
 
-            {/* Archives */}
+            {/* Archive */}
             <ListItem disablePadding>
               <Link
                 href="/archives"
@@ -162,13 +162,36 @@ function Sidebar({ pathname }) {
               >
                 <ListItemButton sx={{ px: 3, py: 1.5 }}>
                   <ListItemText
-                    primary="ARCHIVES"
+                    primary="ARCHIVE"
                     primaryTypographyProps={{
                       sx: {
                         fontSize: "0.75rem",
                         fontWeight: 500,
                         letterSpacing: "0.1em",
                         color: isActive("/archives") ? "#750014" : textColor,
+                      },
+                    }}
+                  />
+                </ListItemButton>
+              </Link>
+            </ListItem>
+
+            {/* Yearbook */}
+            <ListItem disablePadding>
+              <Link
+                href="/yearbook"
+                onClick={() => setIsOpen(false)}
+                className="w-full"
+              >
+                <ListItemButton sx={{ px: 3, py: 1.5 }}>
+                  <ListItemText
+                    primary="YEARBOOK"
+                    primaryTypographyProps={{
+                      sx: {
+                        fontSize: "0.75rem",
+                        fontWeight: 500,
+                        letterSpacing: "0.1em",
+                        color: isActive("/yearbook") ? "#750014" : textColor,
                       },
                     }}
                   />

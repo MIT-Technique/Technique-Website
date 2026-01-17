@@ -290,7 +290,7 @@ function ArchivesPage() {
       <main className="min-h-screen pt-24 lg:pt-32">
         {/* Hero Section */}
         <section className="section-tight container-content text-center">
-          <h1 className="mb-4">Archives</h1>
+          <h1 className="mb-4">Archive</h1>
           <p className="text-lg text-text-secondary font-light max-w-text mx-auto">
             Explore past editions of Technique, dating back to 1885.
           </p>
