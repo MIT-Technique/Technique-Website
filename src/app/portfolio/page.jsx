@@ -70,7 +70,7 @@ function PortfolioPage() {
       photographer: "Ruhundaka Ejilemele",
     },
     {
-      src: "/images/other_images/Alison_Soong/20240915-P1050430.jpg",
+      src: "/images/other_images/Alison_Soong/20260915-P1050430.jpg",
       photographer: "Alison Soong",
     },
     {

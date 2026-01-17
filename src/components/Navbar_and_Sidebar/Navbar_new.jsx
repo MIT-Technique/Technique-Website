@@ -34,7 +34,8 @@ function Navbar() {
         { href: "/contact", label: "CONTACT" },
       ],
     },
-    { href: "/archives", label: "ARCHIVES" },
+    { href: "/archives", label: "ARCHIVE" },
+    { href: "/yearbook", label: "YEARBOOK" },
     { href: "/invoice", label: "INVOICE" },
     {
       label: "SENIORS",

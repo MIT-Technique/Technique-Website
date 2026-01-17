@@ -6,7 +6,7 @@ import Image from "next/image";
 function HirePage() {
   const images = [
     {
-      src: "/images/other_images/Alison_Soong/20240915-P1050432.jpg",
+      src: "/images/other_images/Alison_Soong/20260915-P1050432.jpg",
       photographer: "Alison Soong",
     },
     {
