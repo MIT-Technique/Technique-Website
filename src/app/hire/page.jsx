@@ -6,7 +6,7 @@ import Image from "next/image";
 function HirePage() {
   const images = [
     {
-      src: "/images/other_images/Alison_Soong/20260915-P1050432.jpg",
+      src: "/images/other_images/Alison_Soong/20240915-P1050432.jpg",
       photographer: "Alison Soong",
     },
     {
@@ -35,7 +35,10 @@ function HirePage() {
         <section className="w-full mt-8">
           <div className="grid grid-cols-1 md:grid-cols-3">
             {images.map((image, index) => (
-              <figure key={index} className="relative aspect-[4/3] group overflow-hidden">
+              <figure
+                key={index}
+                className="relative aspect-[4/3] group overflow-hidden"
+              >
                 <Image
                   src={image.src}
                   alt={`Event photography by ${image.photographer}`}
