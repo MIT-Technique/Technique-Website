@@ -37,7 +37,10 @@ function HirePage() {
         <section className="w-full mt-8">
           <div className="grid grid-cols-1 md:grid-cols-3">
             {images.map((image, index) => (
-              <figure key={index} className="relative aspect-[4/3] group overflow-hidden">
+              <figure
+                key={index}
+                className="relative aspect-[4/3] group overflow-hidden"
+              >
                 <Image
                   src={image.src}
                   alt={t('imageAlt', { photographer: image.photographer })}
