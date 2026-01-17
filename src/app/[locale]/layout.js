@@ -1,8 +1,8 @@
 import { Inter, Raleway } from "next/font/google";
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
-import { notFound } from 'next/navigation';
-import { locales, localeDirection } from '../../i18n/config';
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages } from "next-intl/server";
+import { notFound } from "next/navigation";
+import { locales, localeDirection } from "../../i18n/config";
 import "../globals.css";
 import Navbar from "../../components/Navbar_and_Sidebar/Navbar_new";
 import "slick-carousel/slick/slick.css";
@@ -19,7 +19,8 @@ export async function generateMetadata({ params: { locale } }) {
 
   return {
     title: messages.common?.siteTitle || "MIT Technique",
-    description: messages.common?.siteDescription || "Memorializing MIT since 1885",
+    description:
+      messages.common?.siteDescription || "Memorializing MIT since 1885",
   };
 }
 
@@ -30,16 +31,17 @@ export default async function RootLayout({ children, params: { locale } }) {
   }
 
   const messages = await getMessages({ locale });
-  const direction = localeDirection[locale] || 'ltr';
+  const direction = localeDirection[locale] || "ltr";
 
   return (
     <html lang={locale} dir={direction}>
-      <body className={`${inter.className} ${raleway.variable} bg-[#FFFAFA] overflow-y-auto scroll-smooth relative`} suppressHydrationWarning>
+      <body
+        className={`${inter.className} ${raleway.variable} bg-[#FFFAFA] overflow-y-auto scroll-smooth relative`}
+        suppressHydrationWarning
+      >
         <NextIntlClientProvider messages={messages} locale={locale}>
           <Navbar />
-          <div className="min-h-screen">
-            {children}
-          </div>
+          <div className="min-h-screen">{children}</div>
         </NextIntlClientProvider>
       </body>
     </html>

@@ -436,6 +436,11 @@ function Sidebar({ pathname }) {
             <ListItem disablePadding sx={{ mt: 2, px: 3 }}>
               <LanguageSwitcher />
             </ListItem>
+
+            {/* Language Switcher */}
+            <ListItem disablePadding sx={{ mt: 2, px: 3 }}>
+              <LanguageSwitcher />
+            </ListItem>
           </List>
         </Box>
       </Drawer>
