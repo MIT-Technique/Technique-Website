@@ -1,0 +1,212 @@
+{
+  "common": {
+    "siteTitle": "MIT Technique",
+    "siteDescription": "1885年からMITを記録",
+    "siteName": "Technique",
+    "tagline": "1885年からMITを記録"
+  },
+
+  "nav": {
+    "about": "私たちについて",
+    "archive": "アーカイブ",
+    "yearbook": "年鑑",
+    "invoice": "請求書",
+    "seniors": "卒業生",
+    "hireUs": "雇用する",
+    "dropdown": {
+      "ourHistory": "私たちの歴史",
+      "portfolio": "ポートフォリオ",
+      "contact": "連絡先",
+      "portraits": "ポートレート",
+      "seniorBio": "卒業生プロフィール"
+    }
+  },
+
+  "footer": {
+    "copyright": "© 2026 Technique。全著作権所有。",
+    "emailLabel": "メールを送る",
+    "instagramLabel": "Instagramでフォロー"
+  },
+
+  "languageSwitcher": {
+    "selectLanguage": "言語を選択"
+  },
+
+  "carousel": {
+    "photoCredit": "写真提供：{photographer}"
+  },
+
+  "pages": {
+    "home": {
+      "subtitle": "MITの写真と年鑑",
+      "hero": "Technique",
+      "tagline": "1885年からMITを記録",
+      "photoCredit": "写真：{photographer}"
+    },
+
+    "about": {
+      "title": "私たちについて",
+      "metaTitle": "私たちについて - MIT Technique",
+      "metaDescription": "1885年以来の写真と年鑑組織、MIT Techniqueについて学ぶ。",
+      "hero": "1885年以来、私たちのスタッフはMITの毎年を記念する美しい写真と散文の年次集を作成してきました。",
+      "paragraph1": "私たちはMITの写真、年鑑、デザインの学生組織です。毎年、私たちのスタッフは2月に400ページの年次集を出版社に送り、5月に本を発売します。MITの学生と卒業生として、私たちはMITを最も真実な形で、率直に、最高の時も最悪の時も示すことに細心の注意を払っています。私たちは研究所がどれほど厳しいかを知っており、反対側に到達することがどれほどやりがいがあるかを知っています。",
+      "paragraph2": "MIT年鑑の設計に加えて、Techniqueは機器レンタルとイベント写真サービスを提供することで、キャンパス写真コミュニティをサポートしています。",
+      "grogo": {
+        "title": "H.R.H. Grogo",
+        "paragraph1": "Techniqueによく立ち寄ると、この名前が飛び交うのを耳にするでしょう。また、私たちのすべての商品に彼の美しい顔が見られます。これは、私たちのマスコットがゴリラで、彼の名前がH.R.H. Grogoだからです。",
+        "paragraph2": "「でも、なぜ？」とあなたは尋ねます。私たちも知りません。しかし、H.R.H. Grogoは最初から存在し、最初のTechniqueの裏に刻まれており、それ以来ずっとそこにいます。彼がいつ、どのようにしてゴリラになったのかは定かではありません。"
+      },
+      "weekly": {
+        "title": "週次",
+        "paragraph1": "毎週土曜日の正午12時に4-253で定例会議を開催しています。誰でも参加できます。貸し出し用の写真機器があり、この時に写真やデザインに関連するさまざまなセミナーを教えることがよくあります。",
+        "paragraph2": "ブックシーズン中、秋学期から早春学期にかけて、Techniqueの各セクションのさまざまな編集者が集まって作業する平日の定例会議を開催します。これは年鑑を作成するプロセスに参加する最良の時期です。",
+        "paragraph3": "時々、写真散歩やさまざまな写真遠足を楽しむこともあります！"
+      },
+      "staph": {
+        "title": "スタッフ",
+        "paragraph1": "私たちのスタッフの多くは、パートタイム（またはフルタイム）の写真家やデザイナーであり、MITの学生や卒業生でもあります。私たちのスタッフのほとんどは感染していません。",
+        "paragraph2": "Techniqueに参加するのに経験は必要ありません。私たちの献身的なスタッフは、特に写真やデザインに関して、学ぶ意欲のあるすべての人を支援することに取り組んでいます。"
+      }
+    },
+
+    "yearbook": {
+      "title": "年鑑",
+      "metaTitle": "年鑑 - MIT Technique",
+      "metaDescription": "公式Technique年鑑でMITの思い出を保存します。",
+      "hero": "公式Technique年鑑でMITの思い出を保存します。",
+      "description1": "毎年、TechniqueはMITでの生活を記念する280ページの年鑑を出版しています。写真家、デザイナー、ライターの専任スタッフが一年中働いて、MIT体験の本質を捉えます。",
+      "description2": "年鑑には、卒業生のポートレート、キャンパス生活のキャンディッド写真、主要イベントの報道、学生組織、運動競技、MITを特別なものにするユニークな文化が含まれています。",
+      "coverAlt": "2026 Technique年鑑表紙",
+      "preorderButton": "コピーを事前注文",
+      "preorderHint": "割引価格で年鑑を確保してください。",
+      "forSeniors": {
+        "title": "卒業生向け",
+        "content": "写真を持っている卒業生は、卒業生プロフィールページで情報を記入することを強くお勧めします。写真がない場合は、ここで時間を予約してください。特別な事情がある場合は、{email}にメールしてください。",
+        "seniorBioLink": "卒業生プロフィール",
+        "scheduleLink": "ここ"
+      },
+      "release": {
+        "title": "リリース",
+        "content": "年鑑は春の終わりにリリースされます。事前注文のコピーはキャンパスで受け取ることができます。卒業生として、または他の状況で配達が必要な場合はご連絡ください。宿泊施設について話し合い、手配することができますが、保証されていません。"
+      }
+    },
+
+    "contact": {
+      "title": "お問い合わせ",
+      "metaTitle": "連絡先 - MIT Technique",
+      "metaDescription": "MIT Techniqueに連絡する。",
+      "emailButton": "メールを送る",
+      "imageAlt": "Technique管理委員会",
+      "imageCredit": "MIT Technique",
+      "visit": {
+        "title": "訪問する",
+        "address1": "142 Memorial Dr.",
+        "address2": "Walker Memorial",
+        "address3": "50-320室"
+      },
+      "mail": {
+        "title": "郵送先住所",
+        "address1": "MIT Technique",
+        "address2": "32 Vassar Street",
+        "address3": "Cambridge, MA 02139"
+      }
+    },
+
+    "hire": {
+      "title": "雇用する",
+      "metaTitle": "雇用する - MIT Technique写真",
+      "metaDescription": "MIT Technique写真家によるプロのイベント写真サービス。",
+      "hero": "イベントの写真が必要な場合、MITの写真家のコミュニティがお手伝いできます。",
+      "description": "MITに所属するすべての組織とグループにイベント写真サービスを提供しています。Techniqueは、イベント中のすべての瞬間を捉えるために、訓練を受けたスタッフ写真家の1人とあなたをマッチングします。",
+      "ctaButton": "見積もりを取得",
+      "ctaHint": "件名「イベント写真の見積もり」でメールを送信してください",
+      "imageAlt": "{photographer}によるイベント写真"
+    },
+
+    "invoice": {
+      "title": "請求書フォーム",
+      "metaTitle": "請求書 - MIT Technique",
+      "metaDescription": "写真の請求書を提出します。",
+      "description": "写真の請求書を提出します。",
+      "fields": {
+        "orgName": "組織名",
+        "photographerName": "写真家名",
+        "eventName": "イベント名",
+        "costObject": "コストオブジェクト",
+        "hourlyRate": "時給",
+        "totalHours": "合計時間",
+        "eventDate": "イベント日"
+      },
+      "submitButton": "請求書を提出",
+      "success": "請求書が正常に送信されました",
+      "error": "請求書の送信中にエラーが発生しました"
+    },
+
+    "login": {
+      "title": "卒業生プロフィール",
+      "metaTitle": "ログイン - MIT Technique",
+      "metaDescription": "卒業生プロフィール情報を更新するためにログインします。",
+      "description": "卒業生プロフィール情報を更新するためにログインします。",
+      "instructionText": "MIT資格情報でログインするには、下をクリックしてください。",
+      "signInButton": "ログイン",
+      "success": "ログインに成功しました"
+    },
+
+    "portfolio": {
+      "title": "ポートフォリオ",
+      "metaTitle": "ポートフォリオ - MIT Technique写真",
+      "metaDescription": "私たちの写真家による作品選。",
+      "description": "私たちの写真家による作品選。",
+      "imageAlt": "{photographer}による写真"
+    },
+
+    "seniors": {
+      "title": "卒業生",
+      "metaTitle": "卒業生ポートレート - MIT Technique",
+      "metaDescription": "Techniqueの卒業生ポートレートセッションに関する情報。",
+      "hero": "卒業生ポートレートセッションは随時開いています。",
+      "scheduleButton": "ポートレートを予約",
+      "dressCode": {
+        "title": "ドレスコード",
+        "content": "卒業生ポートレートにドレスコードはありません。スーツ、ドレス、またはパジャマで来ることもできます。楽器やペットを持参した学生もいます。何十年も仲間の棚に置かれる可能性があるため、写真に写るのに快適なものを着用することをお勧めします。",
+        "informalCaption": "カジュアルな服装",
+        "formalCaption": "フォーマルな服装",
+        "informalAlt": "カジュアルな服装の例",
+        "formalAlt": "フォーマルな服装の例"
+      },
+      "discount": {
+        "title": "卒業生割引",
+        "paragraph1": "卒業生写真の予約後、卒業生ポートレート限定の特別割引価格で年鑑を注文できます。この価格は予約に出席した卒業生にのみ適用されます。",
+        "paragraph2": "卒業生ポートレートを撮りたくない場合でも、注文ページで事前注文割引価格で年鑑を事前注文できます。"
+      },
+      "issues": {
+        "title": "セッションを逃したか問題がありますか？",
+        "content": "卒業生ポートレートセッションのスケジューリング、経歴情報の遅延変更、またはその他の問題に関するすべての質問については、{email}に連絡してください。Techniqueには卒業生ポートレートの出版期限があるため、残念ながら、すべての予定された卒業生ポートレートセッションを逃した学生に対応することはできません。卒業生ポートレートを特集しないセクションで、あなたの名前が年鑑に表示されることを保証します。"
+      }
+    },
+
+    "bio": {
+      "title": "卒業生プロフィール",
+      "metaTitle": "卒業生プロフィール - MIT Technique",
+      "metaDescription": "MIT Technique年鑑の情報を更新します。",
+      "description": "年鑑の情報を更新します。",
+      "fields": {
+        "firstName": "名",
+        "lastName": "姓",
+        "major": "専攻",
+        "quote": "引用",
+        "quotePlaceholder": "年鑑エントリの引用を入力してください（オプション）"
+      },
+      "submitButton": "プロフィールを更新",
+      "success": "プロフィールが正常に更新されました",
+      "error": "プロフィールの更新中にエラーが発生しました"
+    },
+
+    "archives": {
+      "title": "アーカイブ",
+      "metaTitle": "アーカイブ - MIT Technique年鑑",
+      "metaDescription": "1885年にさかのぼるTechnique年鑑の過去版を探索します。",
+      "description": "1885年にさかのぼるTechniqueの過去版を探索します。"
+    }
+  }
+}
