@@ -82,7 +82,7 @@ function AboutPage() {
               {/* staph Card */}
               <div className="card">
                 <div className="divider-accent mb-6" />
-                <h3>staph</h3>
+                <h3>Staph</h3>
                 <p>
                   Many of our staph are part time (or full time) photographers
                   and/or designers, as well as MIT students and alumni. Most of
