@@ -10,20 +10,32 @@
     "about": "ACERCA DE",
     "archive": "ARCHIVO",
     "yearbook": "ANUARIO",
-    "invoice": "FACTURA",
+    "parents": "PADRES",
+    "alumni": "EXALUMNOS",
+    "forms": "FORMULARIOS",
     "seniors": "SENIORS",
-    "hireUs": "CONTRÁTANOS",
+    "getStarted": "COMENZAR",
     "dropdown": {
       "ourHistory": "NUESTRA HISTORIA",
       "portfolio": "PORTAFOLIO",
       "contact": "CONTACTO",
       "portraits": "RETRATOS",
-      "seniorBio": "BIO DE SENIOR"
+      "students": "ESTUDIANTES",
+      "community": "COMUNIDAD",
+      "seniorBio": "BIO DE SENIOR",
+      "invoice": "FACTURA",
+      "parent": "PADRE",
+      "alumni": "EXALUMNO",
+      "clubs": "CLUBES",
+      "studentWork": "TRABAJO ESTUDIANTIL",
+      "hireUs": "CONTRÁTANOS",
+      "joinUs": "ÚNETE"
     }
   },
 
   "footer": {
     "copyright": "© 2026 Technique. Todos los derechos reservados.",
+    "privacyPolicy": "Política de Privacidad",
     "emailLabel": "Envíanos un correo",
     "instagramLabel": "Síguenos en Instagram"
   },
@@ -77,17 +89,21 @@
       "description1": "Cada año, Technique publica un anuario de 280 páginas que conmemora la vida en MIT. Nuestro personal dedicado de fotógrafos, diseñadores y escritores trabaja durante todo el año para capturar la esencia de la experiencia MIT.",
       "description2": "El anuario presenta retratos de seniors, fotografía espontánea de la vida del campus, cobertura de eventos importantes, organizaciones estudiantiles, atletismo y la cultura única que hace especial a MIT.",
       "coverAlt": "Portada del Anuario Technique 2026",
+      "coverCredit": "Diseño por Kathleen Yick",
       "preorderButton": "Preordena Tu Copia",
       "preorderHint": "Asegura tu anuario al precio de preventa con descuento.",
       "forSeniors": {
         "title": "Para Seniors",
-        "content": "Se alienta encarecidamente a los seniors que tienen una foto a completar su información en la página de Bio de Senior. Si no tienes una foto, programa un tiempo aquí. Envíanos un correo a {email} si tienes alguna circunstancia especial.",
-        "seniorBioLink": "Bio de Senior",
-        "scheduleLink": "aquí"
+        "content": "Se alienta encarecidamente a los seniors que tienen una foto a completar su información en la página de <seniorBioLink>Bio de Senior</seniorBioLink>. Si no tienes una foto, programa un tiempo <scheduleLink>aquí</scheduleLink>. Envíanos un correo a {email} si tienes alguna circunstancia especial."
       },
       "release": {
         "title": "Lanzamiento",
         "content": "El anuario se lanza a finales de la primavera. Las copias de preventa se pueden recoger en el campus. Por favor, comunícate si necesitas entrega como graduado o bajo otras circunstancias. Se pueden discutir y organizar adaptaciones, pero no están garantizadas."
+      },
+      "forms": {
+        "title": "Aparece en el Anuario",
+        "clubsButton": "Formulario de Clubes",
+        "studentWorkButton": "Trabajo Estudiantil"
       }
     },
 
@@ -207,6 +223,234 @@
       "metaTitle": "Archivo - Anuarios MIT Technique",
       "metaDescription": "Explora ediciones pasadas de los anuarios Technique que datan de 1885.",
       "description": "Explora ediciones pasadas de Technique, que datan de 1885."
+    },
+
+    "parents": {
+      "title": "Padres",
+      "metaTitle": "Padres - MIT Technique",
+      "metaDescription": "Información para padres de estudiantes de MIT.",
+      "hero": "Gracias por apoyar a su estudiante y a MIT Technique.",
+      "preorder": {
+        "title": "Preordenar Anuarios",
+        "content": "Preordene anuarios a un precio con descuento antes de la fecha de lanzamiento.",
+        "button": "Preordenar Ahora"
+      },
+      "inquiries": {
+        "title": "¿Preguntas o Problemas?",
+        "content": "Para consultas sobre anuncios de padres, compra de anuarios antiguos, problemas de entrega u otras preguntas, utilice nuestro formulario de consulta o envíenos un correo electrónico.",
+        "formButton": "Formulario de Consulta",
+        "emailButton": "Envíenos un Correo"
+      }
+    },
+
+    "alumni": {
+      "title": "Exalumnos",
+      "metaTitle": "Exalumnos - MIT Technique",
+      "metaDescription": "Información para exalumnos de MIT.",
+      "hero": "Revive tus recuerdos de MIT a través de Technique.",
+      "visit": {
+        "title": "Visítenos",
+        "content": "¡Bienvenido de nuevo a Technique! Normalmente estaremos en la Sala 4-253 de 12-2pm los sábados. Nos encantaría reconectarnos con antiguos miembros del staph y exalumnos de MIT."
+      },
+      "outreach": {
+        "title": "Póngase en Contacto",
+        "content": "¿Busca comprar anuarios antiguos, preguntar sobre funciones para exalumnos o reconectarse? Contáctenos a través de nuestro formulario de consulta o correo electrónico.",
+        "formButton": "Formulario de Consulta",
+        "emailButton": "Envíenos un Correo"
+      }
+    },
+
+    "join": {
+      "title": "Únete a Nosotros",
+      "metaTitle": "Únete a Technique - MIT Technique",
+      "metaDescription": "Únete al equipo de fotografía y anuario de MIT Technique.",
+      "hero": "Sé parte de la tradición de fotografía y anuario de MIT.",
+      "description": "Technique da la bienvenida a estudiantes de todos los niveles de experiencia. Ya sea que te interese la fotografía, el diseño, la escritura, o simplemente quieras ser parte de nuestra comunidad, hay un lugar para ti.",
+      "welcome": "Technique da la bienvenida a estudiantes de todos los niveles de experiencia. Ya seas principiante o experimentado, hay un lugar para ti en nuestra comunidad.",
+      "photography": {
+        "title": "Fotografía",
+        "description": "Únete a paseos fotográficos, asiste a talleres de cámara y toma prestado equipo a través de nuestro programa de préstamo de cámaras. Aprende fotografía de manera práctica mientras capturas la vida en MIT."
+      },
+      "design": {
+        "title": "Diseño",
+        "description": "Trabaja en proyectos de diseño gráfico y diseño web. Recibe capacitación en Adobe InDesign, Illustrator y Photoshop mientras diseñas el anuario y contenido digital."
+      },
+      "business": {
+        "title": "Negocios",
+        "description": "Ayuda con divulgación, organización de eventos y gestión de redes sociales. Organiza eventos y construye conexiones en toda la comunidad MIT."
+      },
+      "collaboration": {
+        "title": "Colaboración",
+        "description": "Trabaja junto a estudiantes apasionados de todos los orígenes. Los principiantes son bienvenidos: proporcionamos capacitación y mentoría para ayudarte a crecer."
+      },
+      "pastWork": {
+        "title": "Trabajo Anterior",
+        "description": "Mira ejemplos de páginas del anuario diseñadas por nuestro equipo."
+      },
+      "cta": {
+        "button": "Involúcrate",
+        "hint": "Envíanos un correo para saber más sobre cómo unirte a Technique"
+      }
+    },
+
+    "parentInquiry": {
+      "title": "Consulta de Padres",
+      "metaTitle": "Consulta de Padres - MIT Technique",
+      "metaDescription": "Envíe una consulta como padre.",
+      "description": "Envíe su consulta y nos pondremos en contacto con usted.",
+      "fields": {
+        "name": "Su Nombre",
+        "email": "Dirección de Correo Electrónico",
+        "studentName": "Nombre del Estudiante (si aplica)",
+        "category": "Tipo de Consulta",
+        "categoryOptions": {
+          "parentAd": "Anuncio de Padres",
+          "purchaseOldYearbook": "Comprar Anuario Antiguo",
+          "yearbookNotDelivered": "Anuario No Entregado",
+          "other": "Otro"
+        },
+        "message": "Mensaje"
+      },
+      "submitButton": "Enviar Consulta",
+      "success": "Su consulta fue enviada exitosamente",
+      "error": "Hubo un error al enviar su consulta"
+    },
+
+    "alumniInquiry": {
+      "title": "Consulta de Exalumnos",
+      "metaTitle": "Consulta de Exalumnos - MIT Technique",
+      "metaDescription": "Envíe una consulta como exalumno.",
+      "description": "Envíe su consulta y nos pondremos en contacto con usted.",
+      "fields": {
+        "name": "Su Nombre",
+        "email": "Dirección de Correo Electrónico",
+        "graduationYear": "Año de Graduación (si aplica)",
+        "category": "Tipo de Consulta",
+        "categoryOptions": {
+          "oldYearbooks": "Anuarios Antiguos",
+          "oldPictures": "Fotos Antiguas",
+          "other": "Otras Consultas"
+        },
+        "message": "Mensaje"
+      },
+      "submitButton": "Enviar Consulta",
+      "success": "Su consulta fue enviada exitosamente",
+      "error": "Hubo un error al enviar su consulta"
+    },
+
+    "activities": {
+      "title": "Formulario de Clubes",
+      "metaTitle": "Formulario de Clubes - MIT Technique",
+      "metaDescription": "Envíe su club para el anuario.",
+      "description": "Envíe información sobre su club u organización para posible cobertura en el anuario.",
+      "cta": {
+        "button": "Enviar Club",
+        "hint": "Complete el formulario para enviar la información y fotos de su club"
+      }
+    },
+
+    "studentWorkFeature": {
+      "title": "Trabajo Estudiantil",
+      "metaTitle": "Trabajo Estudiantil - MIT Technique",
+      "metaDescription": "Envíe su trabajo estudiantil para aparecer en el anuario.",
+      "description": "Muestra tus proyectos académicos, investigación o trabajos creativos en el anuario.",
+      "cta": {
+        "button": "Enviar Trabajo",
+        "hint": "Complete el formulario para enviar su trabajo para consideración"
+      }
+    },
+
+    "privacy": {
+      "title": "Política de Privacidad",
+      "metaTitle": "Política de Privacidad - MIT Technique",
+      "metaDescription": "Conozca cómo MIT Technique recopila y utiliza su información.",
+      "lastUpdated": "Última actualización: 17 de enero de 2026",
+
+      "translation": {
+        "title": "Aviso de Traducción",
+        "content": "Este sitio web está disponible en varios idiomas para mayor accesibilidad. Aunque nos esforzamos por la precisión, las traducciones pueden contener errores o variaciones de la versión original en inglés. En caso de discrepancias, prevalecerá la versión en inglés. Si nota algún error de traducción, contáctenos en technique@mit.edu."
+      },
+
+      "collection": {
+        "title": "Información que Recopilamos",
+        "intro": "Recopilamos información que usted nos proporciona directamente e información recopilada automáticamente cuando utiliza nuestro sitio web.",
+        "personalInfo": {
+          "title": "Información Personal (solo para estudiantes de MIT)",
+          "items": {
+            "name": "Nombre (nombre y apellido)",
+            "email": "Dirección de correo electrónico de MIT",
+            "major": "Especialidad académica/número de curso",
+            "quote": "Cita opcional para el anuario",
+            "photos": "Fotografías de retrato de seniors"
+          }
+        },
+        "cookies": {
+          "title": "Cookies y Seguimiento",
+          "content": "Utilizamos cookies y tecnologías similares para mejorar su experiencia:",
+          "items": {
+            "language": "Cookie de preferencia de idioma (almacena su idioma seleccionado)",
+            "session": "Cookies de sesión para autenticación (MIT Touchstone)"
+          }
+        },
+        "analytics": {
+          "title": "Datos de Uso",
+          "content": "Podemos recopilar datos de uso anónimos como páginas visitadas, tiempo en el sitio e información del navegador para mejorar nuestros servicios."
+        }
+      },
+
+      "usage": {
+        "title": "Cómo Usamos su Información",
+        "items": {
+          "yearbook": "Para incluir su información y foto en el anuario de MIT Technique",
+          "communication": "Para comunicarnos con usted sobre pedidos de anuarios, sesiones de retratos y actualizaciones de la organización",
+          "services": "Para proporcionar servicios como fotografía de eventos y procesamiento de facturas",
+          "improvement": "Para mejorar nuestro sitio web y la experiencia del usuario"
+        }
+      },
+
+      "storage": {
+        "title": "Almacenamiento y Seguridad de Datos",
+        "content": "Su información personal se almacena de forma segura en MongoDB Atlas con cifrado estándar de la industria. Conservamos la información biográfica de seniors para fines de publicación del anuario y archivos históricos. Implementamos medidas de seguridad razonables para proteger sus datos, pero ningún método de transmisión por Internet es 100% seguro."
+      },
+
+      "thirdParty": {
+        "title": "Servicios de Terceros",
+        "intro": "Utilizamos los siguientes servicios de terceros:",
+        "services": {
+          "touchstone": "Para autenticación usando sus credenciales de MIT (consulte la política de privacidad de MIT)",
+          "mongodb": "Para almacenamiento seguro de bases de datos",
+          "vercel": "Para alojamiento y despliegue del sitio web"
+        }
+      },
+
+      "rights": {
+        "title": "Sus Derechos",
+        "intro": "Usted tiene derecho a:",
+        "items": {
+          "access": "Acceder a su información personal almacenada en nuestra base de datos",
+          "correction": "Solicitar corrección de información inexacta",
+          "deletion": "Solicitar eliminación de su información (sujeto a requisitos de publicación del anuario)",
+          "optOut": "Optar por no recibir cookies no esenciales ajustando la configuración de su navegador"
+        },
+        "contact": "Para ejercer estos derechos, contáctenos en technique@mit.edu."
+      },
+
+      "children": {
+        "title": "Privacidad de Menores",
+        "content": "Nuestros servicios están destinados a estudiantes de MIT (típicamente mayores de 18 años). No recopilamos a sabiendas información de personas menores de 18 años sin el consentimiento de los padres."
+      },
+
+      "changes": {
+        "title": "Cambios a Esta Política",
+        "content": "Podemos actualizar esta política de privacidad de vez en cuando. Le notificaremos de cualquier cambio material publicando la nueva política en esta página con una fecha de 'Última actualización' actualizada."
+      },
+
+      "contact": {
+        "title": "Contáctenos",
+        "content": "Si tiene preguntas sobre esta política de privacidad o nuestras prácticas de datos, contáctenos:",
+        "office": "Oficina:",
+        "address": "Dirección Postal:"
+      }
     }
   }
 }

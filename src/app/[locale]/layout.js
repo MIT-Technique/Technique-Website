@@ -34,7 +34,7 @@ export default async function RootLayout({ children, params: { locale } }) {
 
   return (
     <html lang={locale} dir={direction}>
-      <body className={`${inter.className} ${raleway.variable} bg-[#FFFAFA] overflow-y-auto scroll-smooth relative`}>
+      <body className={`${inter.className} ${raleway.variable} bg-[#FFFAFA] overflow-y-auto scroll-smooth relative`} suppressHydrationWarning>
         <NextIntlClientProvider messages={messages} locale={locale}>
           <Navbar />
           <div className="min-h-screen">

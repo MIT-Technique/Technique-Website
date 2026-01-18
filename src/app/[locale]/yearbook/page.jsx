@@ -34,13 +34,21 @@ function YearbookPage() {
 
           {/* Yearbook Cover */}
           <div className="flex justify-center mt-12 mb-8">
-            <div className="relative w-64 h-80">
+            <div className="relative w-64 h-80 group overflow-hidden">
               <Image
                 src="/images/covers/2026_Yearbook_Cover_TNQ.webp"
                 alt={t('coverAlt')}
                 fill={true}
+                sizes="256px"
                 style={{ objectFit: "contain" }}
+                className="transition-transform duration-500 group-hover:scale-105"
               />
+              {/* Photo Credit on Hover */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                <span className="text-xs text-white font-light">
+                  {t('coverCredit')}
+                </span>
+              </div>
             </div>
           </div>
 
@@ -68,10 +76,11 @@ function YearbookPage() {
                 <div className="divider-accent mb-4" />
                 <h4>{t('forSeniors.title')}</h4>
                 <p className="text-sm pb-0">
-                  Seniors who have a picture are highly encouraged to fill
-                  out their information on the <Link href={`/${locale}/bio`} className="text-accent hover:text-accent-hover">{t('forSeniors.seniorBioLink')}</Link> page.
-                  If you do not have a picture, schedule a time <Link href={`/${locale}/bio`} className="text-accent hover:text-accent-hover">{t('forSeniors.scheduleLink')}</Link>.
-                  Email us at <a href="mailto:tnq-exec@mit.edu" className="text-accent hover:text-accent-hover">tnq-exec@mit.edu</a> if you have any extenuating circumstances.
+                  {t.rich('forSeniors.content', {
+                    email: 'tnq-exec@mit.edu',
+                    seniorBioLink: (chunks) => <Link href={`/${locale}/bio`} className="text-accent hover:text-accent-hover">{chunks}</Link>,
+                    scheduleLink: (chunks) => <Link href={`/${locale}/bio`} className="text-accent hover:text-accent-hover">{chunks}</Link>,
+                  })}
                 </p>
               </div>
               <div className="card">
@@ -82,6 +91,26 @@ function YearbookPage() {
                 </p>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* Forms Section */}
+        <section className="section container-text text-center">
+          <div className="divider-accent mb-8 mx-auto" />
+          <h3 className="mb-6">{t('forms.title')}</h3>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link
+              href={`/${locale}/clubs`}
+              className="btn-secondary"
+            >
+              {t('forms.clubsButton')}
+            </Link>
+            <Link
+              href={`/${locale}/student-work-feature`}
+              className="btn-secondary"
+            >
+              {t('forms.studentWorkButton')}
+            </Link>
           </div>
         </section>
       </main>

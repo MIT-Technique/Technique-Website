@@ -42,6 +42,7 @@ function SeniorsPage() {
                   src="/images/Senior_Pictures/232010911.JPG"
                   alt={t('dressCode.informalAlt')}
                   fill={true}
+                  sizes="(max-width: 768px) 100vw, 50vw"
                   style={{ objectFit: "cover" }}
                 />
               </div>
@@ -55,6 +56,7 @@ function SeniorsPage() {
                   src="/images/Senior_Pictures/232198679.JPG"
                   alt={t('dressCode.formalAlt')}
                   fill={true}
+                  sizes="(max-width: 768px) 100vw, 50vw"
                   style={{ objectFit: "cover" }}
                 />
               </div>

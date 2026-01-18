@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import Link from "next/link";
 import MailIcon from "@mui/icons-material/Mail";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import { usePathname } from "next/navigation";
@@ -19,14 +20,26 @@ export default function Footer() {
     >
       <div className="container-content py-8 lg:py-12">
         <div className="flex flex-col lg:flex-row justify-between items-center gap-6">
-          {/* Left: Copyright */}
-          <p
-            className={`text-xs pb-0 ${
-              isHomePage ? "text-white/60" : "text-text-muted"
-            }`}
-          >
-            {t('copyright')}
-          </p>
+          {/* Left: Copyright & Privacy */}
+          <div className="flex flex-col lg:flex-row items-center gap-2 lg:gap-4">
+            <p
+              className={`text-xs pb-0 ${
+                isHomePage ? "text-white/60" : "text-text-muted"
+              }`}
+            >
+              {t('copyright')}
+            </p>
+            <Link
+              href={`/${locale}/privacy`}
+              className={`text-xs ${
+                isHomePage
+                  ? "text-white/60 hover:text-white"
+                  : "text-text-muted hover:text-accent"
+              } transition-colors underline`}
+            >
+              {t('privacyPolicy')}
+            </Link>
+          </div>
 
           {/* Right: Social Links */}
           <div className="flex items-center gap-4">

@@ -17,6 +17,7 @@ function ContactPage() {
               src="/images/club_photo/DSC_0815-3.jpg"
               alt={t('imageAlt')}
               fill={true}
+              sizes="(max-width: 1280px) 100vw, 1280px"
               priority
               quality={100}
               style={{ objectFit: "cover" }}

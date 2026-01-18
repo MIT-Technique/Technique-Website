@@ -10,20 +10,32 @@
     "about": "关于我们",
     "archive": "档案",
     "yearbook": "年鉴",
-    "invoice": "发票",
+    "parents": "家长",
+    "alumni": "校友",
+    "forms": "表格",
     "seniors": "毕业生",
-    "hireUs": "雇用我们",
+    "getStarted": "开始",
     "dropdown": {
       "ourHistory": "我们的历史",
       "portfolio": "作品集",
       "contact": "联系",
       "portraits": "肖像",
-      "seniorBio": "毕业生简介"
+      "students": "学生",
+      "community": "社区",
+      "seniorBio": "毕业生简介",
+      "invoice": "发票",
+      "parent": "家长",
+      "alumni": "校友",
+      "clubs": "社团",
+      "studentWork": "学生作品",
+      "hireUs": "雇用我们",
+      "joinUs": "加入我们"
     }
   },
 
   "footer": {
     "copyright": "© 2026 Technique。版权所有。",
+    "privacyPolicy": "隐私政策",
     "emailLabel": "给我们发邮件",
     "instagramLabel": "在Instagram上关注我们"
   },
@@ -77,17 +89,21 @@
       "description1": "每年，Technique出版一本280页的年鉴，纪念MIT的生活。我们敬业的摄影师、设计师和作家团队全年工作，捕捉MIT体验的精髓。",
       "description2": "年鉴包括毕业生肖像、校园生活的坦率摄影、重大活动的报道、学生组织、体育运动，以及使MIT与众不同的独特文化。",
       "coverAlt": "2026 Technique年鉴封面",
+      "coverCredit": "设计：Kathleen Yick",
       "preorderButton": "预订您的副本",
       "preorderHint": "以优惠的预订价格获得您的年鉴。",
       "forSeniors": {
         "title": "致毕业生",
-        "content": "强烈鼓励有照片的毕业生在毕业生简介页面上填写他们的信息。如果您没有照片，请在此处安排时间。如果您有任何特殊情况，请发送电子邮件至{email}。",
-        "seniorBioLink": "毕业生简介",
-        "scheduleLink": "此处"
+        "content": "强烈鼓励有照片的毕业生在<seniorBioLink>毕业生简介</seniorBioLink>页面上填写他们的信息。如果您没有照片，请在<scheduleLink>此处</scheduleLink>安排时间。如果您有任何特殊情况，请发送电子邮件至{email}。"
       },
       "release": {
         "title": "发布",
         "content": "年鉴将在春季晚些时候发布。预订的副本可以在校园内领取。如果您需要作为毕业生或在其他情况下送货，请联系我们。可以讨论和安排住宿，但不保证。"
+      },
+      "forms": {
+        "title": "展示在年鉴中",
+        "clubsButton": "社团表格",
+        "studentWorkButton": "学生作品展示"
       }
     },
 
@@ -207,6 +223,234 @@
       "metaTitle": "档案 - MIT Technique年鉴",
       "metaDescription": "探索可追溯到1885年的Technique年鉴过去版本。",
       "description": "探索可追溯到1885年的Technique过去版本。"
+    },
+
+    "parents": {
+      "title": "家长",
+      "metaTitle": "家长 - MIT Technique",
+      "metaDescription": "MIT学生家长信息。",
+      "hero": "感谢您支持您的学生和MIT Technique。",
+      "preorder": {
+        "title": "预订年鉴",
+        "content": "在发布日期前以折扣价预订年鉴。",
+        "button": "立即预订"
+      },
+      "inquiries": {
+        "title": "有问题或疑问？",
+        "content": "如有关于家长广告、购买旧年鉴、配送问题或其他问题的咨询，请使用我们的咨询表格或发送电子邮件。",
+        "formButton": "咨询表格",
+        "emailButton": "发送邮件"
+      }
+    },
+
+    "alumni": {
+      "title": "校友",
+      "metaTitle": "校友 - MIT Technique",
+      "metaDescription": "MIT校友信息。",
+      "hero": "通过Technique重温您的MIT回忆。",
+      "visit": {
+        "title": "拜访我们",
+        "content": "欢迎回到Technique！周六下午12-2点我们通常会在4-253室。我们很乐意与前staph成员和MIT校友重新联系。"
+      },
+      "outreach": {
+        "title": "联系我们",
+        "content": "想购买旧年鉴、咨询校友功能或重新联系？请通过咨询表格或电子邮件与我们联系。",
+        "formButton": "咨询表格",
+        "emailButton": "发送邮件"
+      }
+    },
+
+    "join": {
+      "title": "加入我们",
+      "metaTitle": "加入Technique - MIT Technique",
+      "metaDescription": "加入MIT Technique的摄影和年鉴团队。",
+      "hero": "成为MIT摄影和年鉴传统的一部分。",
+      "description": "Technique欢迎各种经验水平的学生。无论您对摄影、设计、写作感兴趣，还是只想成为我们社区的一员，这里都有您的位置。",
+      "welcome": "Technique欢迎所有经验水平的学生。无论您是初学者还是有经验的人，我们社区都有您的位置。",
+      "photography": {
+        "title": "摄影",
+        "description": "参加摄影漫步，参加相机研讨会，通过我们的相机借用计划借用设备。在捕捉MIT生活的同时亲身学习摄影。"
+      },
+      "design": {
+        "title": "设计",
+        "description": "从事平面设计和网页设计项目。在设计年鉴和数字内容的同时接受Adobe InDesign、Illustrator和Photoshop培训。"
+      },
+      "business": {
+        "title": "商务",
+        "description": "协助外展、活动设置和社交媒体管理。组织活动并在整个MIT社区中建立联系。"
+      },
+      "collaboration": {
+        "title": "协作",
+        "description": "与来自各种背景的热情学生一起工作。欢迎初学者——我们提供培训和指导，帮助您成长。"
+      },
+      "pastWork": {
+        "title": "过往作品",
+        "description": "查看我们团队设计的年鉴跨页示例。"
+      },
+      "cta": {
+        "button": "参与进来",
+        "hint": "发送邮件了解如何加入Technique"
+      }
+    },
+
+    "parentInquiry": {
+      "title": "家长咨询",
+      "metaTitle": "家长咨询 - MIT Technique",
+      "metaDescription": "以家长身份提交咨询。",
+      "description": "提交您的咨询，我们会尽快回复您。",
+      "fields": {
+        "name": "您的姓名",
+        "email": "电子邮件地址",
+        "studentName": "学生姓名（如适用）",
+        "category": "咨询类型",
+        "categoryOptions": {
+          "parentAd": "家长广告",
+          "purchaseOldYearbook": "购买旧年鉴",
+          "yearbookNotDelivered": "年鉴未送达",
+          "other": "其他"
+        },
+        "message": "留言"
+      },
+      "submitButton": "提交咨询",
+      "success": "您的咨询已成功提交",
+      "error": "提交咨询时出错"
+    },
+
+    "alumniInquiry": {
+      "title": "校友咨询",
+      "metaTitle": "校友咨询 - MIT Technique",
+      "metaDescription": "以校友身份提交咨询。",
+      "description": "提交您的咨询，我们会尽快回复您。",
+      "fields": {
+        "name": "您的姓名",
+        "email": "电子邮件地址",
+        "graduationYear": "毕业年份（如适用）",
+        "category": "咨询类型",
+        "categoryOptions": {
+          "oldYearbooks": "旧年鉴",
+          "oldPictures": "旧照片",
+          "other": "其他咨询"
+        },
+        "message": "留言"
+      },
+      "submitButton": "提交咨询",
+      "success": "您的咨询已成功提交",
+      "error": "提交咨询时出错"
+    },
+
+    "activities": {
+      "title": "社团表格",
+      "metaTitle": "社团表格 - MIT Technique",
+      "metaDescription": "提交您的社团或组织信息以便可能在年鉴中报道。",
+      "description": "提交您的社团或组织信息以便可能在年鉴中报道。",
+      "cta": {
+        "button": "提交社团",
+        "hint": "填写表格提交您的社团信息和照片"
+      }
+    },
+
+    "studentWorkFeature": {
+      "title": "学生作品展示",
+      "metaTitle": "学生作品展示 - MIT Technique",
+      "metaDescription": "在年鉴中展示您的学术项目、研究或创意作品。",
+      "description": "在年鉴中展示您的学术项目、研究或创意作品。",
+      "cta": {
+        "button": "提交作品",
+        "hint": "填写表格提交您的作品以供考虑"
+      }
+    },
+
+    "privacy": {
+      "title": "隐私政策",
+      "metaTitle": "隐私政策 - MIT Technique",
+      "metaDescription": "了解MIT Technique如何收集和使用您的信息。",
+      "lastUpdated": "最后更新：2026年1月17日",
+
+      "translation": {
+        "title": "翻译免责声明",
+        "content": "本网站提供多种语言版本以提高可访问性。虽然我们力求准确，但翻译可能包含与原始英文版本的错误或差异。如有任何不一致之处，以英文版本为准。如果您发现任何翻译错误，请通过technique@mit.edu与我们联系。"
+      },
+
+      "collection": {
+        "title": "我们收集的信息",
+        "intro": "我们收集您直接提供给我们的信息以及您使用我们网站时自动收集的信息。",
+        "personalInfo": {
+          "title": "个人信息（仅限MIT学生）",
+          "items": {
+            "name": "姓名（名和姓）",
+            "email": "MIT电子邮件地址",
+            "major": "学术专业/课程编号",
+            "quote": "可选年鉴引言",
+            "photos": "毕业生肖像照片"
+          }
+        },
+        "cookies": {
+          "title": "Cookie和跟踪",
+          "content": "我们使用cookie和类似技术来增强您的体验：",
+          "items": {
+            "language": "语言偏好cookie（存储您选择的语言）",
+            "session": "用于身份验证的会话cookie（MIT Touchstone）"
+          }
+        },
+        "analytics": {
+          "title": "使用数据",
+          "content": "我们可能会收集匿名使用数据，如访问的页面、网站停留时间和浏览器信息，以改进我们的服务。"
+        }
+      },
+
+      "usage": {
+        "title": "我们如何使用您的信息",
+        "items": {
+          "yearbook": "将您的信息和照片包含在MIT Technique年鉴中",
+          "communication": "就年鉴订单、肖像会话和组织更新与您沟通",
+          "services": "提供活动摄影和发票处理等服务",
+          "improvement": "改进我们的网站和用户体验"
+        }
+      },
+
+      "storage": {
+        "title": "数据存储和安全",
+        "content": "您的个人信息使用行业标准加密安全存储在MongoDB Atlas中。我们保留毕业生简介信息用于年鉴出版和历史档案。我们实施合理的安全措施来保护您的数据，但通过互联网传输的方法都不是100%安全的。"
+      },
+
+      "thirdParty": {
+        "title": "第三方服务",
+        "intro": "我们使用以下第三方服务：",
+        "services": {
+          "touchstone": "使用MIT凭据进行身份验证（请参阅MIT隐私政策）",
+          "mongodb": "用于安全数据库存储",
+          "vercel": "用于网站托管和部署"
+        }
+      },
+
+      "rights": {
+        "title": "您的权利",
+        "intro": "您有权：",
+        "items": {
+          "access": "访问存储在我们数据库中的个人信息",
+          "correction": "请求更正不准确的信息",
+          "deletion": "请求删除您的信息（受年鉴出版要求限制）",
+          "optOut": "通过调整浏览器设置选择退出非必要cookie"
+        },
+        "contact": "要行使这些权利，请通过technique@mit.edu与我们联系。"
+      },
+
+      "children": {
+        "title": "儿童隐私",
+        "content": "我们的服务面向MIT学生（通常为18岁或以上）。我们不会在未经父母同意的情况下故意收集18岁以下个人的信息。"
+      },
+
+      "changes": {
+        "title": "本政策的变更",
+        "content": "我们可能会不时更新此隐私政策。我们将通过在此页面上发布新政策并更新「最后更新」日期来通知您任何重大变更。"
+      },
+
+      "contact": {
+        "title": "联系我们",
+        "content": "如果您对此隐私政策或我们的数据实践有疑问，请联系我们：",
+        "office": "办公室：",
+        "address": "邮寄地址："
+      }
     }
   }
 }

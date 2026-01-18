@@ -15,6 +15,7 @@ export default function Home() {
           src="/images/other_images/Michelle Xiang/DSC04240.jpg"
           alt="MIT Technique Photography"
           fill={true}
+          sizes="100vw"
           priority
           style={{ objectFit: "cover" }}
         />
