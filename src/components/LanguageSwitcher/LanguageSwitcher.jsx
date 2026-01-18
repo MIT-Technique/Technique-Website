@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { locales, localeNames } from '../../i18n/config';
 import LanguageIcon from '@mui/icons-material/Language';
 
-export default function LanguageSwitcher() {
+export default function LanguageSwitcher({ openDirection = 'down' }) {
   const router = useRouter();
   const pathname = usePathname();
   const currentLocale = useLocale();
@@ -43,7 +43,9 @@ export default function LanguageSwitcher() {
           />
 
           {/* Dropdown */}
-          <div className="absolute right-0 mt-2 w-48 bg-white border border-border rounded shadow-lg z-50">
+          <div className={`absolute right-0 w-48 bg-white border border-border rounded shadow-lg z-50 ${
+            openDirection === 'up' ? 'bottom-full mb-2' : 'mt-2'
+          }`}>
             {locales.map((locale) => (
               <button
                 key={locale}

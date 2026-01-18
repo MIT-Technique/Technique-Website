@@ -95,23 +95,36 @@ function YearbookPage() {
         </section>
 
         {/* Forms Section */}
-        <section className="section container-text text-center">
+        <section className="section-tight container-text text-center">
           <div className="divider-accent mb-8 mx-auto" />
           <h3 className="mb-6">{t('forms.title')}</h3>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href={`/${locale}/clubs`}
-              className="btn-secondary"
+              className="btn-secondary hover:!bg-accent hover:!border-accent"
             >
               {t('forms.clubsButton')}
             </Link>
             <Link
               href={`/${locale}/student-work-feature`}
-              className="btn-secondary"
+              className="btn-secondary hover:!bg-accent hover:!border-accent"
             >
               {t('forms.studentWorkButton')}
             </Link>
           </div>
+        </section>
+
+        {/* Archive Section */}
+        <section className="section-tight container-text text-center">
+          <div className="divider-accent mb-8 mx-auto" />
+          <h3 className="mb-6">{t('archive.title')}</h3>
+          <p className="text-text-secondary mb-6">{t('archive.description')}</p>
+          <Link
+            href={`/${locale}/archives`}
+            className="btn-secondary hover:!bg-accent hover:!border-accent"
+          >
+            {t('archive.button')}
+          </Link>
         </section>
       </main>
       <Footer />

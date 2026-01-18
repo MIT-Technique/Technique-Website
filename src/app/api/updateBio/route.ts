@@ -1,18 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
-import { connectToDatabase } from "../../../lib/db";
-import { getSession, getCryptr } from "../../../lib/lib";
+import { createServiceSupabaseClient } from "../../../lib/supabase-server";
+import { getSession } from "../../../lib/lib";
 import { studentSchema } from "../../../lib/studentSchema";
 import z from "zod/v4";
 
 export async function PUT(request: NextRequest): Promise<NextResponse> {
   try {
     const session = await getSession();
+    if (!session?.userInfo?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const { email } = session.userInfo;
     const body = await request.json();
     body.email = email;
-    const cryp = getCryptr();
-    body.firstName = cryp.encrypt(body.firstName);
-    body.lastName = cryp.encrypt(body.lastName);
+
+    // Note: No encryption needed - Supabase encrypts at rest
     const parsed = studentSchema.safeParse(body);
     console.log("Parsed");
     if (!parsed.success) {
@@ -23,21 +25,40 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
         }
       );
     }
-    console.log("Parsed");
+    console.log("Validation passed");
 
-    const { ...updateFields } = parsed.data;
+    // Create Supabase client with service role (bypasses RLS)
+    const supabase = await createServiceSupabaseClient();
+    console.log("Successfully Connected to Supabase");
 
-    const collection = await connectToDatabase();
-    console.log("Successfully Connected");
+    // Map camelCase to snake_case for database
+    const updateFields = {
+      email: parsed.data.email,
+      first_name: parsed.data.firstName,
+      last_name: parsed.data.lastName,
+      major: parsed.data.major,
+      quote: parsed.data.quote || '',
+    };
 
-    const result = await collection.updateOne(
-      { email },
-      { $set: updateFields }
-    );
-    console.log(request.body);
+    // Use upsert to insert if not exists, update if exists
+    const { error } = await supabase
+      .from('bios')
+      .upsert(updateFields, {
+        onConflict: 'email',
+      });
+
+    if (error) {
+      console.error("Supabase error:", error);
+      return NextResponse.json(
+        { error: "Database error" },
+        { status: 500 }
+      );
+    }
+
+    console.log("Bio updated successfully");
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error:", error.response?.body || error);
+    console.error("Error:", error);
     return NextResponse.json(
       { error: "There was an error updating the bio" },
       { status: 500 }

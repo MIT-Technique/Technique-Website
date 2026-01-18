@@ -11,6 +11,7 @@ import Collapse from "@mui/material/Collapse";
 import { VscThreeBars, VscClose, VscChevronDown } from "react-icons/vsc";
 import { useTranslations, useLocale } from 'next-intl';
 import LanguageSwitcher from "../LanguageSwitcher/LanguageSwitcher";
+import UserMenu from "../UserMenu/UserMenu";
 
 function Sidebar({ pathname }) {
   const locale = useLocale();
@@ -56,7 +57,11 @@ function Sidebar({ pathname }) {
         className="p-2"
         aria-label="Open menu"
       >
-        <VscThreeBars size={24} style={{ color: textColor }} />
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={textColor} strokeWidth="1">
+          <line x1="4" y1="7" x2="20" y2="7" />
+          <line x1="4" y1="12" x2="20" y2="12" />
+          <line x1="4" y1="17" x2="20" y2="17" />
+        </svg>
       </button>
 
       <Drawer
@@ -432,11 +437,20 @@ function Sidebar({ pathname }) {
               </List>
             </Collapse>
 
-            {/* Language Switcher */}
-            <ListItem disablePadding sx={{ mt: 2, px: 3 }}>
-              <LanguageSwitcher />
+            {/* User Menu / Login - centered with border */}
+            <ListItem disablePadding sx={{ mt: 3, px: 3 }}>
+              <div className="w-full flex justify-center">
+                <div className={`border px-6 py-2 transition-colors hover:bg-accent hover:border-accent hover:text-white ${isHomePage ? 'border-white/30' : 'border-border'}`}>
+                  <UserMenu isHomePage={isHomePage} inSidebar={true} />
+                </div>
+              </div>
             </ListItem>
           </List>
+
+          {/* Language Switcher - at bottom */}
+          <div className="px-6 py-4 border-t" style={{ borderColor: borderColor }}>
+            <LanguageSwitcher openDirection="up" />
+          </div>
         </Box>
       </Drawer>
     </div>

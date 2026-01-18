@@ -2,10 +2,13 @@
 import React from "react";
 import Footer from "../../../components/Footer/Footer";
 import Image from "next/image";
-import { useTranslations } from 'next-intl';
+import Link from "next/link";
+import { useTranslations, useLocale } from 'next-intl';
 
 function ContactPage() {
   const t = useTranslations('pages.contact');
+  const tNav = useTranslations('nav.dropdown');
+  const locale = useLocale();
 
   return (
     <>
@@ -32,12 +35,20 @@ function ContactPage() {
         <section className="section container-text">
           <div className="text-center mb-12">
             <h1 className="mb-4">{t('title')}</h1>
-            <a
-              href="mailto:technique@mit.edu"
-              className="btn-primary"
-            >
-              {t('emailButton')}
-            </a>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a
+                href="mailto:technique@mit.edu"
+                className="btn-primary"
+              >
+                {t('emailButton')}
+              </a>
+              <Link
+                href={`/${locale}/join`}
+                className="btn-secondary hover:!bg-accent hover:!border-accent"
+              >
+                {tNav('joinUs')}
+              </Link>
+            </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">

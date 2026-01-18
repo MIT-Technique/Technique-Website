@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations, useLocale } from 'next-intl';
 import LanguageSwitcher from "../LanguageSwitcher/LanguageSwitcher";
+import UserMenu from "../UserMenu/UserMenu";
 import "./Navbar.css";
 
 function Navbar() {
@@ -104,7 +105,8 @@ function Navbar() {
             {/* Language Switcher */}
             <LanguageSwitcher />
             {navStructure.map((item, index) => (
-              item.dropdown ? (
+              <>
+                {item.dropdown ? (
                 // Dropdown item
                 <div
                   key={item.label}
@@ -234,8 +236,10 @@ function Navbar() {
                     </span>
                   )}
                 </Link>
-              )
+              )}
+              </>
             ))}
+            <UserMenu isHomePage={isHomePage} />
           </div>
         </nav>
       </div>

@@ -2,10 +2,12 @@
 import React from "react";
 import Footer from "../../../components/Footer/Footer";
 import Image from "next/image";
-import { useTranslations } from 'next-intl';
+import Link from "next/link";
+import { useTranslations, useLocale } from 'next-intl';
 
 function SeniorsPage() {
   const t = useTranslations('pages.seniors');
+  const locale = useLocale();
 
   return (
     <>
@@ -16,14 +18,22 @@ function SeniorsPage() {
           <p className="text-lg text-text-secondary font-light mb-8">
             {t('hero')}
           </p>
-          <a
-            href="https://seniors.legacystudios.com/massachusetts-institute-technology-cambridge-ma/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-primary"
-          >
-            {t('scheduleButton')}
-          </a>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="https://seniors.legacystudios.com/massachusetts-institute-technology-cambridge-ma/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary"
+            >
+              {t('scheduleButton')}
+            </a>
+            <Link
+              href={`/${locale}/bio`}
+              className="btn-secondary hover:!bg-accent hover:!border-accent"
+            >
+              {t('seniorBioButton')}
+            </Link>
+          </div>
         </section>
 
         {/* Dress Code Section */}

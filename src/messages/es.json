@@ -15,6 +15,10 @@
     "forms": "FORMULARIOS",
     "seniors": "SENIORS",
     "getStarted": "COMENZAR",
+    "login": "INICIAR SESIÓN",
+    "logout": "CERRAR SESIÓN",
+    "dashboard": "PANEL",
+    "myAccount": "MI CUENTA",
     "dropdown": {
       "ourHistory": "NUESTRA HISTORIA",
       "portfolio": "PORTAFOLIO",
@@ -103,7 +107,12 @@
       "forms": {
         "title": "Aparece en el Anuario",
         "clubsButton": "Formulario de Clubes",
-        "studentWorkButton": "Trabajo Estudiantil"
+        "studentWorkButton": "Envío de Trabajo Estudiantil"
+      },
+      "archive": {
+        "title": "Anuarios Anteriores",
+        "description": "Explora casi 100 años de historia del MIT a través de nuestro archivo de anuarios.",
+        "button": "Ver Archivo"
       }
     },
 
@@ -182,6 +191,7 @@
       "metaDescription": "Información sobre las sesiones de retratos de seniors con Technique.",
       "hero": "Las sesiones de retratos de seniors se abren de forma continua.",
       "scheduleButton": "Programa Tu Retrato",
+      "seniorBioButton": "Bio de Senior",
       "dressCode": {
         "title": "Código de Vestimenta",
         "content": "No hay código de vestimenta para los retratos de seniors. Puedes presentarte con un traje, vestido o incluso tu pijama. Incluso hemos tenido estudiantes que traen sus instrumentos y mascotas. Recomendamos usar algo en lo que te sientas cómodo siendo fotografiado, ya que tu imagen probablemente estará en los estantes de tus compañeros durante décadas.",
@@ -450,6 +460,27 @@
         "content": "Si tiene preguntas sobre esta política de privacidad o nuestras prácticas de datos, contáctenos:",
         "office": "Oficina:",
         "address": "Dirección Postal:"
+      }
+    },
+
+    "dashboard": {
+      "title": "Panel",
+      "welcome": "Bienvenido, {name}",
+      "quickLinks": "Enlaces Rápidos",
+      "notLoggedIn": "No Has Iniciado Sesión",
+      "pleaseLogin": "Por favor inicia sesión con tu cuenta MIT para acceder a tu panel.",
+      "placeholder": "Más funciones próximamente. Vuelve más tarde para ver actualizaciones en tu panel de cuenta.",
+      "seniorBio": {
+        "title": "Bio de Senior",
+        "description": "Actualiza la información de tu biografía del anuario incluyendo tu nombre, carrera y cita."
+      },
+      "invoice": {
+        "title": "Enviar Factura",
+        "description": "Envía facturas de fotografía para reembolso."
+      },
+      "clubs": {
+        "title": "Envío de Club",
+        "description": "Envía tu club u organización para incluirlo en el anuario."
       }
     }
   }

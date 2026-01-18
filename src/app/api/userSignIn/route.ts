@@ -1,7 +1,9 @@
 import { getClientConfig, getSession, clientConfig } from "../../../lib/lib";
+import { createServiceSupabaseClient } from "../../../lib/supabase-server";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import * as client from "openid-client";
+
 export async function GET(request: NextRequest, response: NextResponse) {
   console.log("Getting Session");
   const session = await getSession();
@@ -30,14 +32,6 @@ export async function GET(request: NextRequest, response: NextResponse) {
   session.access_token = access_token;
   let claims = tokenSet.claims()!;
   const { sub } = claims;
-  // call userinfo endpoint to get user info
-  console.log("Getting client fetch user info");
-  // const claims = tokenSet.claims();
-  // const userinfo = await client.fetchUserInfo(
-  //   openIdClientConfig,
-  //   access_token,
-  //   sub
-  // );
 
   // store userinfo in session
   session.userInfo = {
@@ -47,8 +41,33 @@ export async function GET(request: NextRequest, response: NextResponse) {
     email_verified: Boolean(claims.email_verified)!,
   };
   console.log("Saving session");
-  console.log(`session user info: ${session.userInfo}`);
+  console.log(`session user info: ${JSON.stringify(session.userInfo)}`);
   await session.save();
+
+  // Create/update user in Supabase
+  try {
+    const supabase = await createServiceSupabaseClient();
+    const { error } = await supabase
+      .from('users')
+      .upsert({
+        email: session.userInfo.email,
+        name: session.userInfo.name,
+        mit_sub: session.userInfo.sub,
+      }, {
+        onConflict: 'email',
+      });
+
+    if (error) {
+      console.error("Supabase user creation error:", error);
+      // Don't fail the login if Supabase write fails - user is still authenticated
+    } else {
+      console.log("User created/updated in Supabase");
+    }
+  } catch (err) {
+    console.error("Error creating Supabase user:", err);
+    // Don't fail the login if Supabase write fails
+  }
+
   console.log("All async commands finished");
   return Response.redirect(`${clientConfig.post_login_route}`);
 }

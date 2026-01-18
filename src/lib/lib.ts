@@ -1,7 +1,6 @@
 import { IronSession, SessionOptions, getIronSession } from "iron-session";
 import { cookies } from "next/headers";
 import * as openid from "openid-client";
-import Cryptr from "cryptr";
 
 export const clientConfig: Partial<openid.ClientMetadata> = {
   url: process.env.AUTH_OIDC_ISSUER,
@@ -13,7 +12,7 @@ export const clientConfig: Partial<openid.ClientMetadata> = {
   post_logout_redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL}`,
   response_type: "code",
   grant_type: "authorization_code",
-  post_login_route: `${process.env.NEXT_PUBLIC_APP_URL}/bio`,
+  post_login_route: `${process.env.NEXT_PUBLIC_APP_URL}/en/dashboard`,
   code_challenge_method: "S256",
   token_endpoint: process.env.NEXT_PUBLIC_API_URL + "/oidc/token",
   token_endpoint_auth_method: "client_secret_basic",
@@ -84,8 +83,4 @@ export async function getClientConfig() {
   );
   return client;
 }
-const cryptr = new Cryptr(process.env.CRYPTR_SECRET!);
-
-export function getCryptr() {
-  return cryptr;
-}
+// Note: Cryptr encryption removed - Supabase provides encryption at rest

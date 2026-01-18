@@ -600,6 +600,7 @@ When working on this project:
 5. **Keep API routes separate** - they are NOT localized
 6. **Follow existing patterns** - use `useTranslations` hook consistently
 7. **Clean build cache** if encountering module errors
+8. **Button hover styling** - Black bordered buttons (`btn-secondary`) should always have red hover. Use `hover:!bg-accent hover:!border-accent` to override the default black hover
 
 ### Common Issues
 

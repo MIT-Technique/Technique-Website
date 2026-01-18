@@ -15,6 +15,10 @@
     "forms": "FORMS",
     "seniors": "SENIORS",
     "getStarted": "GET STARTED",
+    "login": "LOG IN",
+    "logout": "LOG OUT",
+    "dashboard": "DASHBOARD",
+    "myAccount": "MY ACCOUNT",
     "dropdown": {
       "ourHistory": "OUR HISTORY",
       "portfolio": "PORTFOLIO",
@@ -103,7 +107,12 @@
       "forms": {
         "title": "Get Featured",
         "clubsButton": "Club Form",
-        "studentWorkButton": "Student Work Feature"
+        "studentWorkButton": "Student Work Submission"
+      },
+      "archive": {
+        "title": "Past Yearbooks",
+        "description": "Explore nearly 100 years of MIT history through our yearbook archive.",
+        "button": "View Archive"
       }
     },
 
@@ -182,6 +191,7 @@
       "metaDescription": "Information about MIT senior portrait sessions with Technique.",
       "hero": "Senior portrait sessions open on a rolling basis.",
       "scheduleButton": "Schedule Your Portrait",
+      "seniorBioButton": "Senior Bio",
       "dressCode": {
         "title": "Dress Code",
         "content": "There is no dress code for senior portraits. You can show up in a suit, dress, or even your pajamas. We have even had students bring their instruments and pets. We recommend wearing something that you are comfortable being pictured in, since your image will likely be on shelves of your peers for decades to come.",
@@ -449,6 +459,27 @@
         "content": "If you have questions about this privacy policy or our data practices, please contact us:",
         "office": "Office:",
         "address": "Mailing Address:"
+      }
+    },
+
+    "dashboard": {
+      "title": "Dashboard",
+      "welcome": "Welcome, {name}",
+      "quickLinks": "Quick Links",
+      "notLoggedIn": "Not Logged In",
+      "pleaseLogin": "Please log in with your MIT account to access your dashboard.",
+      "placeholder": "More features coming soon. Check back later for updates to your account dashboard.",
+      "seniorBio": {
+        "title": "Senior Bio",
+        "description": "Update your yearbook bio information including your name, major, and quote."
+      },
+      "invoice": {
+        "title": "Submit Invoice",
+        "description": "Submit photography invoices for reimbursement."
+      },
+      "clubs": {
+        "title": "Club Submission",
+        "description": "Submit your club or organization for inclusion in the yearbook."
       }
     }
   }

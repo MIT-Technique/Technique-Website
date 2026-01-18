@@ -147,3 +147,19 @@
 .slick-slide > div {
   margin: 0 2%;
 }
+
+/* Chinese text styling - wider letter spacing and bolder for readability */
+:lang(zh) p,
+:lang(zh) .text-sm,
+:lang(zh) .text-lg,
+:lang(zh) address {
+  letter-spacing: 0.05em;
+  font-weight: 400;
+}
+
+:lang(zh) .btn-primary,
+:lang(zh) .btn-secondary,
+:lang(zh) .nav-item,
+:lang(zh) a[href="/api/login"] {
+  font-weight: 600;
+}

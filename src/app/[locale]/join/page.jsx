@@ -2,10 +2,13 @@
 import React from "react";
 import Footer from "../../../components/Footer/Footer";
 import Image from "next/image";
-import { useTranslations } from 'next-intl';
+import Link from "next/link";
+import { useTranslations, useLocale } from 'next-intl';
 
 function JoinPage() {
   const t = useTranslations('pages.join');
+  const tNav = useTranslations('nav');
+  const locale = useLocale();
 
   return (
     <>
@@ -120,12 +123,20 @@ function JoinPage() {
         {/* CTA Section */}
         <section className="section-tight container-text text-center">
           <div className="divider-accent mb-8 mx-auto" />
-          <a
-            href="mailto:technique@mit.edu?subject=Joining%20Technique"
-            className="btn-primary"
-          >
-            {t('cta.button')}
-          </a>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="mailto:technique@mit.edu?subject=Joining%20Technique"
+              className="btn-primary"
+            >
+              {t('cta.button')}
+            </a>
+            <Link
+              href={`/${locale}/archives`}
+              className="btn-secondary hover:!bg-accent hover:!border-accent"
+            >
+              {tNav('archive')}
+            </Link>
+          </div>
           <p className="text-sm text-text-muted mt-4">
             {t('cta.hint')}
           </p>
