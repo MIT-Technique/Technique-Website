@@ -29,7 +29,7 @@ function PortfolioPage() {
       photographer: "Ruhundaka Ejilemele",
     },
     {
-      src: "/images/other_images/Ruhundaka_Ejilemele/DSC_5089.jpg",
+      src: "/images/other_images/Ruhundaka_Ejilemele/DSC_4444.jpg",
       photographer: "Ruhundaka Ejilemele",
     },
     {
@@ -37,7 +37,7 @@ function PortfolioPage() {
       photographer: "Jade Chongsathapornpong",
     },
     {
-      src: "/images/other_images/Ruhundaka_Ejilemele/DSC_4444.jpg",
+      src: "/images/other_images/Ruhundaka_Ejilemele/DSC_5089.jpg",
       photographer: "Ruhundaka Ejilemele",
     },
     {
