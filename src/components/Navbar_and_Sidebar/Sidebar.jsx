@@ -436,6 +436,36 @@ function Sidebar({ pathname }) {
             <ListItem disablePadding sx={{ mt: 2, px: 3 }}>
               <LanguageSwitcher />
             </ListItem>
+            <Collapse in={getStartedOpen} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                {[
+                  { href: `/${locale}/hire`, label: t('dropdown.hireUs') },
+                  { href: `/${locale}/join`, label: t('dropdown.joinUs') },
+                ].map((item) => (
+                  <ListItem key={item.href} disablePadding>
+                    <Link
+                      href={item.href}
+                      onClick={() => setIsOpen(false)}
+                      className="w-full"
+                    >
+                      <ListItemButton sx={{ pl: 6, py: 1 }}>
+                        <ListItemText
+                          primary={item.label}
+                          primaryTypographyProps={{
+                            sx: {
+                              fontSize: "0.7rem",
+                              fontWeight: 400,
+                              letterSpacing: "0.05em",
+                              color: isActive(item.href) ? "#750014" : mutedColor,
+                            },
+                          }}
+                        />
+                      </ListItemButton>
+                    </Link>
+                  </ListItem>
+                ))}
+              </List>
+            </Collapse>
 
             {/* Language Switcher */}
             <ListItem disablePadding sx={{ mt: 2, px: 3 }}>
