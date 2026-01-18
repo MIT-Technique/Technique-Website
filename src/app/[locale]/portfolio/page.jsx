@@ -9,31 +9,27 @@ function PortfolioPage() {
 
   const images = [
     {
-      src: "/images/other_images/Jade_Chongsathapornpong/_TNA0925.jpg",
-      photographer: "Jade Chongsathapornpong",
+      src: "/images/other_images/Marcelo_Maza/MJM-21.jpg",
+      photographer: "Marcelo Maza",
     },
     {
       src: "/images/other_images/Andrew_Okyere/_MG_1028-Enhanced-NR.jpg",
       photographer: "Andrew Okyere",
     },
     {
-      src: "/images/other_images/Jade_Chongsathapornpong/_TNA1149.jpg",
-      photographer: "Jade Chongsathapornpong",
+      src: "/images/other_images/Andrew_Okyere/_MG_0677.jpg",
+      photographer: "Andrew Okyere",
     },
     {
       src: "/images/other_images/Jade_Chongsathapornpong/_TNA2926.jpg",
       photographer: "Jade Chongsathapornpong",
     },
     {
-      src: "/images/other_images/Sebastian_Ochoa/000045080009.jpg",
-      photographer: "Sebastian Ochoa",
+      src: "/images/other_images/Ruhundaka_Ejilemele/IMG_7711-2.jpg",
+      photographer: "Ruhundaka Ejilemele",
     },
     {
-      src: "/images/other_images/Robin_Xiong/RQ_03296.jpg",
-      photographer: "Robin Xiong",
-    },
-    {
-      src: "/images/other_images/Ruhundaka_Ejilemele/DSC_4286.jpg",
+      src: "/images/other_images/Ruhundaka_Ejilemele/DSC_5089.jpg",
       photographer: "Ruhundaka Ejilemele",
     },
     {
@@ -41,23 +37,7 @@ function PortfolioPage() {
       photographer: "Jade Chongsathapornpong",
     },
     {
-      src: "/images/other_images/Andrew_Okyere/_MG_0677.jpg",
-      photographer: "Andrew Okyere",
-    },
-    {
-      src: "/images/other_images/Robin_Xiong/RQ_05596.jpg",
-      photographer: "Robin Xiong",
-    },
-    {
-      src: "/images/other_images/Jade_Chongsathapornpong/_TNA9725.jpg",
-      photographer: "Jade Chongsathapornpong",
-    },
-    {
-      src: "/images/other_images/Marcelo_Maza/MJM-21.jpg",
-      photographer: "Marcelo Maza",
-    },
-    {
-      src: "/images/other_images/Ruhundaka_Ejilemele/IMG_7711-2.jpg",
+      src: "/images/other_images/Ruhundaka_Ejilemele/DSC_4444.jpg",
       photographer: "Ruhundaka Ejilemele",
     },
     {
@@ -65,20 +45,32 @@ function PortfolioPage() {
       photographer: "Jade Chongsathapornpong",
     },
     {
-      src: "/images/other_images/Sebastian_Ochoa/Y16333009673-R1-043-20.jpg",
+      src: "/images/other_images/Sebastian_Ochoa/000045080009.jpg",
       photographer: "Sebastian Ochoa",
     },
     {
-      src: "/images/other_images/Ruhundaka_Ejilemele/DSC_5089.jpg",
-      photographer: "Ruhundaka Ejilemele",
+      src: "/images/other_images/Sebastian_Ochoa/Y16333009673-R1-043-20.jpg",
+      photographer: "Sebastian Ochoa",
     },
     {
       src: "/images/other_images/Alison_Soong/20240915-P1050430.jpg",
       photographer: "Alison Soong",
     },
     {
-      src: "/images/other_images/Ruhundaka_Ejilemele/DSC_4444.jpg",
-      photographer: "Ruhundaka Ejilemele",
+      src: "/images/other_images/Jade_Chongsathapornpong/_TNA4087.jpg",
+      photographer: "Jade Chongsathapornpong",
+    },
+    {
+      src: "/images/other_images/Jade_Chongsathapornpong/_TNA9725.jpg",
+      photographer: "Jade Chongsathapornpong",
+    },
+    {
+      src: "/images/other_images/Jade_Chongsathapornpong/_TNA2438.jpg",
+      photographer: "Jade Chongsathapornpong",
+    },
+    {
+      src: "/images/other_images/Jade_Chongsathapornpong/_TNA1149.jpg",
+      photographer: "Jade Chongsathapornpong",
     },
     {
       src: "/images/other_images/Jade_Chongsathapornpong/_TNA3208.jpg",
@@ -91,10 +83,6 @@ function PortfolioPage() {
     {
       src: "/images/other_images/Ruhundaka_Ejilemele/DSC_6569.jpg",
       photographer: "Ruhundaka Ejilemele",
-    },
-    {
-      src: "/images/other_images/Jade_Chongsathapornpong/_TNA2438.jpg",
-      photographer: "Jade Chongsathapornpong",
     },
     {
       src: "/images/other_images/Jade_Chongsathapornpong/_TNA3772.jpg",
