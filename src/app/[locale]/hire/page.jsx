@@ -45,6 +45,8 @@ function HirePage() {
                   src={image.src}
                   alt={t('imageAlt', { photographer: image.photographer })}
                   fill={true}
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  priority={index < 3}
                   style={{ objectFit: "cover" }}
                   className="transition-transform duration-500 group-hover:scale-105"
                 />
