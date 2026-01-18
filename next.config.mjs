@@ -1,6 +1,6 @@
-import createNextIntlPlugin from 'next-intl/plugin';
+import createNextIntlPlugin from "next-intl/plugin";
 
-const withNextIntl = createNextIntlPlugin('./src/i18n/request.js');
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.js");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -21,7 +21,7 @@ const nextConfig = {
         permanent: false,
       },
       {
-        source: "/purchase",
+        source: "/:locale/purchase",
         destination: "https://engage.mit.edu/technique/rsvp_boot?id=916938",
         permanent: false,
       },
