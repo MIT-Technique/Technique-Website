@@ -7,7 +7,7 @@ import z from "zod/v4";
 export async function PUT(request: NextRequest): Promise<NextResponse> {
   try {
     const session = await getSession();
-    console.log(`claims: ${JSON.stringify(session)}`);
+    // console.log(`session: ${JSON.stringify(session)}`);
     const { email } = session.userInfo;
     const body = await request.json();
     body.email = email;
@@ -15,7 +15,7 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
     body.firstName = cryp.encrypt(body.firstName);
     body.lastName = cryp.encrypt(body.lastName);
     const parsed = studentSchema.safeParse(body);
-    console.log("Parsed");
+    // console.log("Parsed");
     if (!parsed.success) {
       return new NextResponse(
         JSON.stringify({ error: z.treeifyError(parsed.error) }),
@@ -24,18 +24,18 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
         }
       );
     }
-    console.log("Parsed");
+    // console.log("Parsed");
 
     const { ...updateFields } = parsed.data;
 
     const collection = await connectToDatabase();
-    console.log("Successfully Connected");
+    // console.log("Successfully Connected");
 
     const result = await collection.updateOne(
       { email },
       { $set: updateFields }
     );
-    console.log(request.body);
+    // console.log(body);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error:", error.response?.body || error);
