@@ -333,7 +333,7 @@ export default function BioPage() {
                       "&.Mui-focused": { color: "#750014" },
                     }}
                   >
-                    Second Major
+                    Second Major *
                   </InputLabel>
                   <Select
                     labelId="second-major-label"
