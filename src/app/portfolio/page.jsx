@@ -26,8 +26,8 @@ function PortfolioPage() {
       photographer: "Sebastian Ochoa",
     },
     {
-      src: "/images/other_images/Jade_Chongsathapornpong/_TNA4087.jpg",
-      photographer: "Jade Chongsathapornpong",
+      src: "/images/other_images/Robin_Xiong/RQ_03296.jpg",
+      photographer: "Robin Xiong",
     },
     {
       src: "/images/other_images/Ruhundaka_Ejilemele/DSC_4286.jpg",
@@ -42,8 +42,8 @@ function PortfolioPage() {
       photographer: "Andrew Okyere",
     },
     {
-      src: "/images/other_images/Jade_Chongsathapornpong/_TNA7811.jpg",
-      photographer: "Jade Chongsathapornpong",
+      src: "/images/other_images/Robin_Xiong/RQ_05596.jpg",
+      photographer: "Robin Xiong",
     },
     {
       src: "/images/other_images/Jade_Chongsathapornpong/_TNA9725.jpg",
