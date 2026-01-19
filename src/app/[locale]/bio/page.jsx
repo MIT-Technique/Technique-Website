@@ -67,6 +67,7 @@ export default function BioPage() {
           setSecondMajor(json.data.second_major);
         }
         setQuote(json.data.quote);
+        setExtracurriculars(json.data.achievements);
       } catch (err) {
         // setError(err.message);
       } finally {
