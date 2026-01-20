@@ -1,14 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import axios from "axios";
-import { AxiosResponse } from "axios";
-import sgMail from "@sendgrid/mail";
-import { PDFDocument, rgb, drawTextField } from "pdf-lib";
+import { PDFDocument } from "pdf-lib";
 import fs from "fs";
 import path from "path";
 import fontkit from "@pdf-lib/fontkit";
 import nodemailer from "nodemailer";
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -16,21 +12,14 @@ const transporter = nodemailer.createTransport({
     pass: process.env.GOOGLE_PASSWORD,
   },
 });
+const RECIPIENT_EMAIL: string = "tnq-exec@mit.edu";
+const FROM_EMAIL: string = "mittnq@gmail.com";
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
-  // console.log("HELLLOOOOO");
   //Grabbing API Key from environment variables. See all the keys on the tnq drive if you don't have this
-  // const ANVIL_API_KEY: string = process.env.ANVIL_API_KEY;
   //DO NOT COMMIT THE API KEYS TO GITHUB!!!!!!!!!!!!!!
 
-  // const RECIPIENT_EMAIL: string = "tnq-exec@mit.edu";
-  const RECIPIENT_EMAIL: string = "tnq-exec@mit.edu";
-  const FROM_EMAIL: string = "mittnq@gmail.com";
-
   try {
-    // console.log(
-    //   `Files: ${await fs.promises.readdir(path.join(process.cwd(), "public"))}`
-    // );
     const filePath = path.join(
       process.cwd(),
       "public",
@@ -40,21 +29,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     const existingPdfBytes = await fs.promises.readFile(filePath);
     //  Read the raw binary PDF file from disk
-    const fontUrl = `${process.env.NEXT_PUBLIC_APP_URL}/fonts/ARIAL.TTF`;
-    const fontResponse = await fetch(fontUrl);
 
-    if (!fontResponse.ok) {
-      throw new Error(`Failed to fetch font: ${fontResponse.statusText}`);
-    }
-
-    const arialFontBytes: ArrayBuffer = await fontResponse.arrayBuffer();
-    // const arialFontBytes: ArrayBuffer = await fetch(
-    //   `${process.env.NEXT_PUBLIC_APP_URL}/fonts/arial.ttf`
-    // ).then((res) => res.arrayBuffer());
-    // console.log(existingPdfBytes);
     const pdfDoc = await PDFDocument.load(existingPdfBytes);
     pdfDoc.registerFontkit(fontkit);
-    // const arialFont = await pdfDoc.embedFont(arialFontBytes);
     const pdfForm = pdfDoc.getForm();
     const photographerNameField = pdfForm.getTextField("photographerName");
     const invoiceDateField = pdfForm.getTextField("invoiceDate");
@@ -88,44 +65,18 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     eventDateField.setText(`${eventDate}`);
     pdfForm.flatten();
     const pdfBytes = await pdfDoc.save();
-    // const outputPath = path.join(
-    //   process.cwd(),
-    //   "public",
-    //   "modified_sample.pdf"
-    // );
 
-    // const pdfBase64 = Buffer.from(pdfBytes).toString("base64");
     const pdfBase64 = Buffer.from(pdfBytes);
 
-    //message containing invoice to send to tnq-exec
-    // const msg = {
-    //   to: RECIPIENT_EMAIL,
-    //   from: FROM_EMAIL,
-    //   subject: `New Invoice for Photography Job Technique did for ${emailData.orgName} that happened on ${emailData.eventDate}`,
-    //   text: "Please find the invoice attached.",
-    //   html: `<p>Cost Object: ${emailData.costObject}</p>`,
-    //   attachments: [
-    //     {
-    //       content: pdfBase64,
-    //       filename: "invoice.pdf",
-    //       type: "application/pdf",
-    //       disposition: "attachment",
-    //     },
-    //   ],
-    // };
-    // console.log("About to send email");
-    // await sgMail.send(msg);
     await transporter.sendMail({
-      from: `${process.env.GMAIL_EMAIL}`,
-      to: "ruejilem@mit.edu",
-      subject: "Your Invoice",
-      text: "Please find your invoice attached.",
+      from: `${FROM_EMAIL}`,
+      to: `${RECIPIENT_EMAIL}`,
+      subject: `New Invoice for Photography Job Technique did for ${orgName} that happened on ${eventDate}`,
+      text: "Please find the invoice attached.",
       attachments: [
         { filename: `invoice_${eventName}.pdf`, content: pdfBase64 },
       ],
     });
-
-    // console.log("After email send");
 
     return NextResponse.json({ success: true });
   } catch (error) {
