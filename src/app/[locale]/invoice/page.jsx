@@ -87,7 +87,7 @@ export default function InvoicePage() {
       });
 
       if (!response.ok) throw new Error("Failed to generate PDF");
-      console.log("Invoice sent successfully");
+      // console.log("Invoice sent successfully");
       setTotalHours("");
       setHourlyRate("");
       setEventName("");

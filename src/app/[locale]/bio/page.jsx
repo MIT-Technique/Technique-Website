@@ -36,9 +36,12 @@ export default function BioPage() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [major, setMajor] = useState("");
+  const [secondMajor, setSecondMajor] = useState("");
   const [quote, setQuote] = useState("");
+  const [extracurriculars, setExtracurriculars] = useState("");
   const [open, setOpen] = useState(false);
   const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const vertical = "top";
   const horizontal = "center";
@@ -58,9 +61,17 @@ export default function BioPage() {
         setFirstName(json.data.firstName);
         setLastName(json.data.lastName);
         setMajor(json.data.major);
+        if (json.data.second_major.length === 0) {
+          setSecondMajor("None");
+        } else {
+          setSecondMajor(json.data.second_major);
+        }
         setQuote(json.data.quote);
+        setExtracurriculars(json.data.achievements);
       } catch (err) {
-        // Handle error silently
+        // setError(err.message);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -81,28 +92,153 @@ export default function BioPage() {
           firstName: firstName,
           lastName: lastName,
           major: major,
+          second_major: secondMajor === "None" ? "" : secondMajor,
           quote: quote,
+          achievements: extracurriculars,
         }),
       });
 
-      if (!response.ok) throw new Error("Failed to update bio");
-      setOpen(true);
+      if (!response.ok) {
+        setOpen(true);
+        setError(true);
+      } else {
+        setOpen(true);
+      }
     } catch (err) {
-      console.error(err);
+      // console.error(err);
       setError(true);
       setOpen(true);
     }
   }
 
   const majors = [
-    "1", "1-12", "1-ENG", "2", "2A", "2-OE", "3", "3-A", "3-C",
-    "4", "4-B", "5", "5-7", "6-1", "6-2", "6-3", "6-3A", "6-4",
-    "6-5", "6-7", "6-9", "6-14", "6-P", "7", "8", "9", "10",
-    "10-B", "10-C", "10-ENG", "11", "11-6", "12", "14-1", "14-2",
-    "15-1", "15-2", "15-3", "16", "16-ENG", "17", "17-M", "18",
-    "18-C", "21", "21A", "21-CMS", "21E", "21G", "21L", "21H",
-    "21M", "21T", "21S", "21W", "20", "22", "22-ENG", "24",
-    "24-1", "24-2", "STS"
+    "1",
+    "1-12",
+    "1-ENG",
+    "2",
+    "2A",
+    "2-OE",
+    "3",
+    "3-A",
+    "3-C",
+    "4",
+    "4-B",
+    "5",
+    "5-7",
+    "6-1",
+    "6-2",
+    "6-3",
+    "6-3A",
+    "6-4",
+    "6-5",
+    "6-7",
+    "6-9",
+    "6-14",
+    "6-P",
+    "7",
+    "8",
+    "9",
+    "10",
+    "10-B",
+    "10-C",
+    "10-ENG",
+    "11",
+    "11-6",
+    "12",
+    "14-1",
+    "14-2",
+    "15-1",
+    "15-2",
+    "15-3",
+    "16",
+    "16-ENG",
+    "17",
+    "17-M",
+    "18",
+    "18-C",
+    "21",
+    "21A",
+    "21-CMS",
+    "21E",
+    "21G",
+    "21L",
+    "21H",
+    "21M",
+    "21T",
+    "21S",
+    "21W",
+    "20",
+    "22",
+    "22-ENG",
+    "24",
+    "24-1",
+    "24-2",
+    "STS",
+  ];
+  const second_majors = [
+    "None",
+    "1",
+    "1-12",
+    "1-ENG",
+    "2",
+    "2A",
+    "2-OE",
+    "3",
+    "3-A",
+    "3-C",
+    "4",
+    "4-B",
+    "5",
+    "5-7",
+    "6-1",
+    "6-2",
+    "6-3",
+    "6-3A",
+    "6-4",
+    "6-5",
+    "6-7",
+    "6-9",
+    "6-14",
+    "6-P",
+    "7",
+    "8",
+    "9",
+    "10",
+    "10-B",
+    "10-C",
+    "10-ENG",
+    "11",
+    "11-6",
+    "12",
+    "14-1",
+    "14-2",
+    "15-1",
+    "15-2",
+    "15-3",
+    "16",
+    "16-ENG",
+    "17",
+    "17-M",
+    "18",
+    "18-C",
+    "21",
+    "21A",
+    "21-CMS",
+    "21E",
+    "21G",
+    "21L",
+    "21H",
+    "21M",
+    "21T",
+    "21S",
+    "21W",
+    "20",
+    "22",
+    "22-ENG",
+    "24",
+    "24-1",
+    "24-2",
+    "STS",
   ];
 
   return (

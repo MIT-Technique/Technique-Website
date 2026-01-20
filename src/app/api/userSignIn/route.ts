@@ -3,9 +3,9 @@ import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import * as client from "openid-client";
 export async function GET(request: NextRequest, response: NextResponse) {
-  console.log("Getting Session");
+  // console.log("Getting Session");
   const session = await getSession();
-  console.log("Getting CLient Config");
+  // console.log("Getting CLient Config");
   const openIdClientConfig = await getClientConfig();
   const headerList = headers();
   const host =
@@ -14,7 +14,7 @@ export async function GET(request: NextRequest, response: NextResponse) {
   const currentUrl = new URL(
     `${protocol}://${host}${request.nextUrl.pathname}${request.nextUrl.search}`
   );
-  console.log("Getting client auth code grant");
+  // console.log("Getting client auth code grant");
 
   const tokenSet = await client.authorizationCodeGrant(
     openIdClientConfig,
@@ -31,14 +31,16 @@ export async function GET(request: NextRequest, response: NextResponse) {
   let claims = tokenSet.claims()!;
   const { sub } = claims;
   // call userinfo endpoint to get user info
-  console.log("Getting client fetch user info");
+  // console.log("Getting client fetch user info");
+
+  //This call is what was making logging in timeout for Max
   // const userinfo = await client.fetchUserInfo(
   //   openIdClientConfig,
   //   access_token,
   //   sub
   // );
 
-  console.log(`claims: ${JSON.stringify(claims, null, 2)}`);
+  // console.log(`claims: ${JSON.stringify(claims, null, 2)}`);
   // store userinfo in session
   session.userInfo = {
     sub: claims.sub,
@@ -46,9 +48,9 @@ export async function GET(request: NextRequest, response: NextResponse) {
     email: claims.sub as string,
     email_verified: true,
   };
-  console.log("Saving session");
-  console.log(`session user info: ${JSON.stringify(session, null, 2)}`);
+  // console.log("Saving session");
+  // console.log(`session user info: ${JSON.stringify(session, null, 2)}`);
   await session.save();
-  console.log("All async commands finished");
+  // console.log("All async commands finished");
   return Response.redirect(`${clientConfig.post_login_route}`);
 }

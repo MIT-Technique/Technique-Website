@@ -54,8 +54,8 @@ export const sessionOptions: SessionOptions = {
 
 export async function getSession(): Promise<IronSession<SessionData>> {
   const cookiesList = cookies();
-  console.log(`COOKIE HEADERS1=${cookiesList}`);
-  console.log(`COOKIE HEADERS2=${JSON.stringify(cookiesList)}`);
+  // console.log(`COOKIE HEADERS1=${cookiesList}`);
+  // console.log(`COOKIE HEADERS2=${JSON.stringify(cookiesList)}`);
   let session = await getIronSession<SessionData>(cookiesList, sessionOptions);
   if (!session.isLoggedIn) {
     session.access_token = defaultSession.access_token;

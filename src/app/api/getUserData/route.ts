@@ -6,13 +6,13 @@ import z from "zod/v4";
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
-    console.log("Before Session grab");
+    // console.log("Before Session grab");
     const session = await getSession();
-    console.log("After Session grab");
+    // console.log("After Session grab");
     if (!session?.userInfo?.email) {
-      console.log(
-        `Session found before unauth: ${JSON.stringify(session, null, 2)}`
-      );
+      // console.log(
+      //   `Session found before unauth: ${JSON.stringify(session, null, 2)}`
+      // );
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const { email } = session?.userInfo;
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     console.log(`Session found: ${JSON.stringify(session, null, 2)}`);
 
     const user = await collection.findOne({ email });
-    console.log("Found user");
+    // console.log("Found user");
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
