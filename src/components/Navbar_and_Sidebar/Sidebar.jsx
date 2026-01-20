@@ -11,6 +11,7 @@ import Collapse from "@mui/material/Collapse";
 import { VscThreeBars, VscClose, VscChevronDown } from "react-icons/vsc";
 import { useTranslations, useLocale } from 'next-intl';
 import LanguageSwitcher from "../LanguageSwitcher/LanguageSwitcher";
+import { LineWeight } from "@mui/icons-material";
 
 function Sidebar({ pathname }) {
   const locale = useLocale();
@@ -53,10 +54,12 @@ function Sidebar({ pathname }) {
 
       <button
         onClick={() => setIsOpen(true)}
-        className="p-2"
+        className="p-2 flex flex-col justify-center gap-1"
         aria-label="Open menu"
       >
-        <VscThreeBars size={24} style={{ color: textColor }} />
+        <div style={{ width: 20, height: 1, backgroundColor: textColor }} />
+        <div style={{ width: 20, height: 1, backgroundColor: textColor }} />
+        <div style={{ width: 20, height: 1, backgroundColor: textColor }} />
       </button>
 
       <Drawer
@@ -439,7 +442,6 @@ function Sidebar({ pathname }) {
             <Collapse in={getStartedOpen} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 {[
-                  { href: `/${locale}/hire`, label: t('dropdown.hireUs') },
                   { href: `/${locale}/join`, label: t('dropdown.joinUs') },
                 ].map((item) => (
                   <ListItem key={item.href} disablePadding>
@@ -466,16 +468,6 @@ function Sidebar({ pathname }) {
                 ))}
               </List>
             </Collapse>
-
-            {/* Language Switcher */}
-            <ListItem disablePadding sx={{ mt: 2, px: 3 }}>
-              <LanguageSwitcher />
-            </ListItem>
-
-            {/* Language Switcher */}
-            <ListItem disablePadding sx={{ mt: 2, px: 3 }}>
-              <LanguageSwitcher />
-            </ListItem>
           </List>
         </Box>
       </Drawer>
