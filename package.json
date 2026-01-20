@@ -26,6 +26,7 @@
     "iron-session": "^8.0.4",
     "mongodb": "^6.17.0",
     "next": "14.2.3",
+    "nodemailer": "^7.0.12",
     "openid-client": "^6.5.0",
     "pdf-lib": "^1.17.1",
     "react": "^18",

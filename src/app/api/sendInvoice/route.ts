@@ -6,15 +6,24 @@ import { PDFDocument, rgb, drawTextField } from "pdf-lib";
 import fs from "fs";
 import path from "path";
 import fontkit from "@pdf-lib/fontkit";
+import nodemailer from "nodemailer";
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "mittnq@gmail.com",
+    pass: process.env.GOOGLE_PASSWORD,
+  },
+});
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   // console.log("HELLLOOOOO");
   //Grabbing API Key from environment variables. See all the keys on the tnq drive if you don't have this
-  const ANVIL_API_KEY: string = process.env.ANVIL_API_KEY;
+  // const ANVIL_API_KEY: string = process.env.ANVIL_API_KEY;
   //DO NOT COMMIT THE API KEYS TO GITHUB!!!!!!!!!!!!!!
 
+  // const RECIPIENT_EMAIL: string = "tnq-exec@mit.edu";
   const RECIPIENT_EMAIL: string = "tnq-exec@mit.edu";
   const FROM_EMAIL: string = "mittnq@gmail.com";
 
@@ -45,7 +54,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     // console.log(existingPdfBytes);
     const pdfDoc = await PDFDocument.load(existingPdfBytes);
     pdfDoc.registerFontkit(fontkit);
-    const arialFont = await pdfDoc.embedFont(arialFontBytes);
+    // const arialFont = await pdfDoc.embedFont(arialFontBytes);
     const pdfForm = pdfDoc.getForm();
     const photographerNameField = pdfForm.getTextField("photographerName");
     const invoiceDateField = pdfForm.getTextField("invoiceDate");
@@ -85,26 +94,38 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     //   "modified_sample.pdf"
     // );
 
-    const pdfBase64 = Buffer.from(pdfBytes).toString("base64");
+    // const pdfBase64 = Buffer.from(pdfBytes).toString("base64");
+    const pdfBase64 = Buffer.from(pdfBytes);
 
     //message containing invoice to send to tnq-exec
-    const msg = {
-      to: RECIPIENT_EMAIL,
-      from: FROM_EMAIL,
-      subject: `New Invoice for Photography Job Technique did for ${emailData.orgName} that happened on ${emailData.eventDate}`,
-      text: "Please find the invoice attached.",
-      html: `<p>Cost Object: ${emailData.costObject}</p>`,
+    // const msg = {
+    //   to: RECIPIENT_EMAIL,
+    //   from: FROM_EMAIL,
+    //   subject: `New Invoice for Photography Job Technique did for ${emailData.orgName} that happened on ${emailData.eventDate}`,
+    //   text: "Please find the invoice attached.",
+    //   html: `<p>Cost Object: ${emailData.costObject}</p>`,
+    //   attachments: [
+    //     {
+    //       content: pdfBase64,
+    //       filename: "invoice.pdf",
+    //       type: "application/pdf",
+    //       disposition: "attachment",
+    //     },
+    //   ],
+    // };
+    // console.log("About to send email");
+    // await sgMail.send(msg);
+    await transporter.sendMail({
+      from: `${process.env.GMAIL_EMAIL}`,
+      to: "ruejilem@mit.edu",
+      subject: "Your Invoice",
+      text: "Please find your invoice attached.",
       attachments: [
-        {
-          content: pdfBase64,
-          filename: "invoice.pdf",
-          type: "application/pdf",
-          disposition: "attachment",
-        },
+        { filename: `invoice_${eventName}.pdf`, content: pdfBase64 },
       ],
-    };
+    });
 
-    await sgMail.send(msg);
+    // console.log("After email send");
 
     return NextResponse.json({ success: true });
   } catch (error) {
