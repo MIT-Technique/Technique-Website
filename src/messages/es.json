@@ -248,14 +248,17 @@
       "metaTitle": "Exalumnos - MIT Technique",
       "metaDescription": "Información para exalumnos de MIT.",
       "hero": "Revive tus recuerdos de MIT a través de Technique.",
-      "visit": {
-        "title": "Visítenos",
-        "content": "¡Bienvenido de nuevo a Technique! Normalmente estaremos en la Sala 4-253 de 12-2pm los sábados. Nos encantaría reconectarnos con antiguos miembros del staph y exalumnos de MIT."
-      },
-      "outreach": {
+      "mitAlumni": {
+        "sectionTitle": "Exalumnos de MIT",
         "title": "Póngase en Contacto",
-        "content": "¿Busca comprar anuarios antiguos, preguntar sobre funciones para exalumnos o reconectarse? Contáctenos a través de nuestro formulario de consulta o correo electrónico.",
-        "formButton": "Formulario de Consulta",
+        "content": "¿Busca comprar anuarios antiguos, preguntar sobre funciones para exalumnos o reconectarse con MIT? Contáctenos a través de nuestro formulario de consulta.",
+        "formButton": "Formulario de Consulta"
+      },
+      "techniqueAlumni": {
+        "sectionTitle": "Exalumnos de Technique",
+        "title": "Visítenos",
+        "content": "¡Bienvenido de nuevo a Technique! Nos encantaría reconectarnos con antiguos miembros del staph. Pase a charlar, hojear viejos anuarios o déjenos mostrarle el lugar. Normalmente estamos en la Sala 4-253 de 12-2pm los sábados.",
+        "contact": "Los exalumnos de Technique pueden comunicarse directamente por correo electrónico para programar una visita.",
         "emailButton": "Envíenos un Correo"
       }
     },

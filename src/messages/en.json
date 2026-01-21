@@ -248,14 +248,17 @@
       "metaTitle": "Alumni - MIT Technique",
       "metaDescription": "Information for MIT alumni.",
       "hero": "Relive your MIT memories through Technique.",
-      "visit": {
-        "title": "Visit Us",
-        "content": "Welcome back to Technique! We'll typically be in Room 4-253 from 12-2pm on Saturdays. We'd love to reconnect with former staph members and MIT alumni."
-      },
-      "outreach": {
+      "mitAlumni": {
+        "sectionTitle": "MIT Alumni",
         "title": "Get in Touch",
-        "content": "Looking to purchase past yearbooks, inquire about alumni features, or reconnect? Reach out via our inquiry form or email.",
-        "formButton": "Inquiry Form",
+        "content": "Looking to purchase past yearbooks, inquire about alumni features, or reconnect with MIT? Reach out via our inquiry form.",
+        "formButton": "Inquiry Form"
+      },
+      "techniqueAlumni": {
+        "sectionTitle": "Technique Alumni",
+        "title": "Visit Us",
+        "content": "Welcome back to Technique! We'd love to reconnect with former staph members. Stop by to chat, flip through old yearbooks, or let us show you around. We're typically in Room 4-253 from 12-2pm on Saturdays.",
+        "contact": "Technique alumni can reach out directly via email to arrange a visit.",
         "emailButton": "Email Us"
       }
     },

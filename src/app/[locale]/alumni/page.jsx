@@ -19,41 +19,45 @@ function AlumniPage() {
           </p>
         </section>
 
-        {/* Info Section */}
+        {/* MIT Alumni Section */}
         <section className="section-tight bg-bg-secondary">
           <div className="container-text">
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Visit Card */}
-              <div className="card">
-                <div className="divider-accent mb-4" />
-                <h4>{t('visit.title')}</h4>
-                <p className="text-sm pb-0">
-                  {t('visit.content')}
-                </p>
-              </div>
+            <h2 className="text-sm uppercase tracking-widest text-text-muted mb-6">{t('mitAlumni.sectionTitle')}</h2>
+            <div className="card">
+              <div className="divider-accent mb-4" />
+              <h4>{t('mitAlumni.title')}</h4>
+              <p className="text-sm pb-4">
+                {t('mitAlumni.content')}
+              </p>
+              <Link
+                href={`/${locale}/alumni-inquiry`}
+                className="btn-secondary inline-block hover:!bg-accent hover:!border-accent"
+              >
+                {t('mitAlumni.formButton')}
+              </Link>
+            </div>
+          </div>
+        </section>
 
-              {/* Outreach Card */}
-              <div className="card">
-                <div className="divider-accent mb-4" />
-                <h4>{t('outreach.title')}</h4>
-                <p className="text-sm pb-4">
-                  {t('outreach.content')}
-                </p>
-                <div className="flex flex-wrap gap-3">
-                  <Link
-                    href={`/${locale}/alumni-inquiry`}
-                    className="btn-secondary inline-block hover:!bg-accent hover:!border-accent"
-                  >
-                    {t('outreach.formButton')}
-                  </Link>
-                  <a
-                    href="mailto:technique@mit.edu"
-                    className="btn-secondary inline-block hover:!bg-accent hover:!border-accent"
-                  >
-                    {t('outreach.emailButton')}
-                  </a>
-                </div>
-              </div>
+        {/* Technique Alumni Section */}
+        <section className="section-tight">
+          <div className="container-text">
+            <h2 className="text-sm uppercase tracking-widest text-text-muted mb-6">{t('techniqueAlumni.sectionTitle')}</h2>
+            <div className="card">
+              <div className="divider-accent mb-4" />
+              <h4>{t('techniqueAlumni.title')}</h4>
+              <p className="text-sm pb-2">
+                {t('techniqueAlumni.content')}
+              </p>
+              <p className="text-sm pb-4 text-text-secondary">
+                {t('techniqueAlumni.contact')}
+              </p>
+              <a
+                href="mailto:technique@mit.edu?subject=Technique%20Alumni%20Visit"
+                className="btn-secondary inline-block hover:!bg-accent hover:!border-accent"
+              >
+                {t('techniqueAlumni.emailButton')}
+              </a>
             </div>
           </div>
         </section>

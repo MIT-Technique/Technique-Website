@@ -248,14 +248,17 @@
       "metaTitle": "校友 - MIT Technique",
       "metaDescription": "MIT校友信息。",
       "hero": "通过Technique重温您的MIT回忆。",
-      "visit": {
-        "title": "拜访我们",
-        "content": "欢迎回到Technique！周六下午12-2点我们通常会在4-253室。我们很乐意与前staph成员和MIT校友重新联系。"
-      },
-      "outreach": {
+      "mitAlumni": {
+        "sectionTitle": "MIT校友",
         "title": "联系我们",
-        "content": "想购买旧年鉴、咨询校友功能或重新联系？请通过咨询表格或电子邮件与我们联系。",
-        "formButton": "咨询表格",
+        "content": "想购买旧年鉴、咨询校友功能或重新联系MIT？请通过咨询表格与我们联系。",
+        "formButton": "咨询表格"
+      },
+      "techniqueAlumni": {
+        "sectionTitle": "Technique校友",
+        "title": "拜访我们",
+        "content": "欢迎回到Technique！我们很乐意与前staph成员重新联系。欢迎来聊天、翻阅旧年鉴，或让我们带您参观。周六下午12-2点我们通常会在4-253室。",
+        "contact": "Technique校友可以直接通过电子邮件联系我们安排参观。",
         "emailButton": "发送邮件"
       }
     },
