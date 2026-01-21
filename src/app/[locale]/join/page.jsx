@@ -79,15 +79,10 @@ function JoinPage() {
             </p>
           </div>
 
-          {/* Image Gallery */}
-          <div
-            className="overflow-x-auto pb-4"
-            style={{
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none'
-            }}
-          >
-            <div className="flex gap-3" style={{ width: 'max-content' }}>
+          {/* Infinite Scroll Gallery */}
+          <div className="overflow-hidden rounded">
+            <div className="flex animate-scroll hover:pause-animation">
+              {/* First set of images */}
               {[
                 { src: '/images/design/Max Zhu/Activities.jpg', alt: 'Activities Spread' },
                 { src: '/images/design/Max Zhu/Endgame.jpg', alt: 'Endgame Spread' },
@@ -97,7 +92,28 @@ function JoinPage() {
                 { src: '/images/design/Max Zhu/Seniors.jpg', alt: 'Seniors Spread' },
                 { src: '/images/design/Max Zhu/Sports.jpg', alt: 'Sports Spread' },
               ].map((image, index) => (
-                <div key={index} className="relative w-48 h-64 flex-shrink-0 overflow-hidden rounded group">
+                <div key={index} className="relative w-48 h-64 flex-shrink-0 overflow-hidden rounded group mx-1.5">
+                  <Image
+                    src={image.src}
+                    alt={image.alt}
+                    fill={true}
+                    sizes="192px"
+                    style={{ objectFit: "contain" }}
+                    className="transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
+              ))}
+              {/* Duplicate set for seamless loop */}
+              {[
+                { src: '/images/design/Max Zhu/Activities.jpg', alt: 'Activities Spread' },
+                { src: '/images/design/Max Zhu/Endgame.jpg', alt: 'Endgame Spread' },
+                { src: '/images/design/Max Zhu/Journal.jpg', alt: 'Journal Spread' },
+                { src: '/images/design/Max Zhu/LIH.jpg', alt: 'LIH Spread' },
+                { src: '/images/design/Max Zhu/Living Groups.jpg', alt: 'Living Groups Spread' },
+                { src: '/images/design/Max Zhu/Seniors.jpg', alt: 'Seniors Spread' },
+                { src: '/images/design/Max Zhu/Sports.jpg', alt: 'Sports Spread' },
+              ].map((image, index) => (
+                <div key={`dup-${index}`} className="relative w-48 h-64 flex-shrink-0 overflow-hidden rounded group mx-1.5">
                   <Image
                     src={image.src}
                     alt={image.alt}
@@ -109,12 +125,23 @@ function JoinPage() {
                 </div>
               ))}
             </div>
-            <style jsx>{`
-              div::-webkit-scrollbar {
-                display: none;
-              }
-            `}</style>
           </div>
+          <style jsx>{`
+            @keyframes scroll {
+              0% {
+                transform: translateX(0);
+              }
+              100% {
+                transform: translateX(-50%);
+              }
+            }
+            .animate-scroll {
+              animation: scroll 40s linear infinite;
+            }
+            .animate-scroll:hover {
+              animation-play-state: paused;
+            }
+          `}</style>
         </section>
 
         {/* CTA Section */}
