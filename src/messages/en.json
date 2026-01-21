@@ -305,7 +305,7 @@
         "categoryOptions": {
           "parentAd": "Parent Ad",
           "purchaseOldYearbook": "Purchase Older Yearbook",
-          "yearbookNotDelivered": "Yearbook Not Delivered",
+          "yearbookNotDelivered": "Yearbook Inquiry",
           "other": "Other"
         },
         "message": "Message"

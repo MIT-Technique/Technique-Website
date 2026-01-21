@@ -306,7 +306,7 @@
         "categoryOptions": {
           "parentAd": "Anuncio de Padres",
           "purchaseOldYearbook": "Comprar Anuario Antiguo",
-          "yearbookNotDelivered": "Anuario No Entregado",
+          "yearbookNotDelivered": "Consulta de Anuario",
           "other": "Otro"
         },
         "message": "Mensaje"
