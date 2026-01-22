@@ -52,5 +52,6 @@ export async function GET(request: NextRequest, response: NextResponse) {
   // console.log(`session user info: ${JSON.stringify(session, null, 2)}`);
   await session.save();
   // console.log("All async commands finished");
+  
   return Response.redirect(`${clientConfig.post_login_route}`);
 }

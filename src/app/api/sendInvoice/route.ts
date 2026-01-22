@@ -16,15 +16,12 @@ const RECIPIENT_EMAIL: string = "tnq-exec@mit.edu";
 const FROM_EMAIL: string = "mittnq@gmail.com";
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
-  //Grabbing API Key from environment variables. See all the keys on the tnq drive if you don't have this
-  //DO NOT COMMIT THE API KEYS TO GITHUB!!!!!!!!!!!!!!
-
   try {
     const filePath = path.join(
       process.cwd(),
       "public",
       "pdfs",
-      "Gig_Invoice_Template.pdf"
+      "Gig_Invoice_Template.pdf",
     );
 
     const existingPdfBytes = await fs.promises.readFile(filePath);
@@ -83,7 +80,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     console.error("Error:", error.response?.body || error);
     return NextResponse.json(
       { error: "Failed to send email" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

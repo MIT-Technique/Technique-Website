@@ -1,0 +1,458 @@
+{
+  "common": {
+    "siteTitle": "MIT Technique",
+    "siteDescription": "Memorializing MIT since 1885",
+    "siteName": "TECHNIQUE",
+    "tagline": "Memorializing MIT since 1885"
+  },
+
+  "nav": {
+    "about": "ABOUT",
+    "archive": "ARCHIVE",
+    "yearbook": "YEARBOOK",
+    "parents": "PARENTS",
+    "alumni": "ALUMNI",
+    "forms": "FORMS",
+    "seniors": "SENIORS",
+    "getStarted": "GET STARTED",
+    "dropdown": {
+      "ourHistory": "OUR HISTORY",
+      "portfolio": "PORTFOLIO",
+      "contact": "CONTACT",
+      "portraits": "PORTRAITS",
+      "students": "STUDENTS",
+      "community": "COMMUNITY",
+      "seniorBio": "SENIOR BIO",
+      "invoice": "INVOICE",
+      "parent": "PARENT",
+      "alumni": "ALUMNI",
+      "clubs": "CLUBS",
+      "studentWork": "STUDENT WORK",
+      "hireUs": "HIRE US",
+      "joinUs": "JOIN US"
+    }
+  },
+
+  "footer": {
+    "copyright": "© 2026 Technique. All Rights Reserved.",
+    "privacyPolicy": "Privacy Policy",
+    "emailLabel": "Email us",
+    "instagramLabel": "Follow us on Instagram"
+  },
+
+  "languageSwitcher": {
+    "selectLanguage": "Select language"
+  },
+
+  "carousel": {
+    "photoCredit": "Photo Credits: {photographer}"
+  },
+
+  "pages": {
+    "home": {
+      "subtitle": "MIT's Photography & Yearbook",
+      "hero": "Technique",
+      "tagline": "Memorializing MIT since 1885",
+      "photoCredit": "Photo: {photographer}"
+    },
+
+    "about": {
+      "title": "About Us",
+      "metaTitle": "About Us - MIT Technique",
+      "metaDescription": "Learn about MIT Technique, the photography and yearbook organization since 1885.",
+      "hero": "Since 1885, our staph have crafted a beautiful annual of photographs and prose commemorating each year at MIT.",
+      "paragraph1": "We are MIT's photography, yearbook, and design student organization. Every year, our staph send off our 400 page annual to the publisher in February and release the book in May. As students and alumni of MIT, we take great care to showcase MIT in its truest form, candidly, at its best and at its worst. We know how tough the Institute can be, and we know how rewarding it is to get to the other side.",
+      "paragraph2": "In addition to designing the MIT yearbook, Technique supports the campus photography community by providing equipment rentals and event photography services.",
+      "grogo": {
+        "title": "H.R.H. Grogo",
+        "paragraph1": "If you hang around Technique often, you'll hear this name being tossed around. You'll also see his beautiful face on all our merch. This is because our mascot is a gorilla and his name is H.R.H. Grogo.",
+        "paragraph2": "\"But why?\" you ask. We don't know either, but H.R.H. Grogo has been there since the beginning, inscribed in the back of the very first Technique, and has been there ever since. We're not quite sure how or when he became a gorilla."
+      },
+      "weekly": {
+        "title": "Weekly",
+        "paragraph1": "We hold regular meetings at 12pm on Saturday in 4-253. Anyone is welcome to attend. We have photographic equipment for borrowing and often teach various photography and design related seminars at this time.",
+        "paragraph2": "During book season, fall term through early spring term, we hold regular meetings during the week where the various editors of each Technique section come in and do work. This is the best time to get involved with the process of crafting a yearbook.",
+        "paragraph3": "We also enjoy going on photowalks and different photographic excursions from time to time!"
+      },
+      "staph": {
+        "title": "staph",
+        "paragraph1": "Many of our staph are part time (or full time) photographers and/or designers, as well as MIT students and alumni. Most of our staph are free of infection.",
+        "paragraph2": "It takes no experience to join Technique. Our dedicated staph are committed to helping everyone who's willing to learn, especially when it's about photography or design."
+      }
+    },
+
+    "yearbook": {
+      "title": "Yearbook",
+      "metaTitle": "Yearbook - MIT Technique",
+      "metaDescription": "Preserve your MIT memories with the official Technique yearbook.",
+      "hero": "Preserve your MIT memories with the official Technique yearbook.",
+      "description1": "Every year, Technique publishes a 280-page yearbook commemorating life at MIT. Our dedicated staff of photographers, designers, and writers work throughout the year to capture the essence of the MIT experience.",
+      "description2": "The yearbook features senior portraits, candid photography of campus life, coverage of major events, student organizations, athletics, and the unique culture that makes MIT special.",
+      "coverAlt": "2026 Technique Yearbook Cover",
+      "coverCredit": "Design by Kathleen Yick",
+      "preorderButton": "Preorder Your Copy",
+      "preorderHint": "Secure your yearbook at the discounted preorder price.",
+      "forSeniors": {
+        "title": "For Seniors",
+        "content": "Seniors who have a picture are highly encouraged to fill out their information on the <seniorBioLink>Senior Bio</seniorBioLink> page. If you do not have a picture, schedule a time <scheduleLink>here</scheduleLink>. Email us at {email} if you have any extenuating circumstances."
+      },
+      "release": {
+        "title": "Release",
+        "content": "The yearbook is released late Spring. Preorder copies can be picked up on campus. Please reach out if you require delivery as a graduate or under other circumstances. Accommodations can be discussed and arranged, but are not guaranteed."
+      },
+      "forms": {
+        "title": "Get Featured",
+        "clubsButton": "Club Form",
+        "studentWorkButton": "Student Work Feature"
+      }
+    },
+
+    "contact": {
+      "title": "Get in Touch",
+      "metaTitle": "Contact - MIT Technique",
+      "metaDescription": "Get in touch with MIT Technique.",
+      "emailButton": "Email Us",
+      "imageAlt": "Technique Managing Board",
+      "imageCredit": "MIT Technique",
+      "visit": {
+        "title": "Visit Us",
+        "address1": "142 Memorial Dr.",
+        "address2": "Walker Memorial",
+        "address3": "Room 50-320"
+      },
+      "mail": {
+        "title": "Mailing Address",
+        "address1": "MIT Technique",
+        "address2": "32 Vassar Street",
+        "address3": "Cambridge, MA 02139"
+      }
+    },
+
+    "hire": {
+      "title": "Hire Us",
+      "metaTitle": "Hire Us - MIT Technique Photography",
+      "metaDescription": "Professional event photography services from MIT Technique photographers.",
+      "hero": "If you need photography for an event, our community of MIT photographers can help.",
+      "description": "We offer event photography services for all organizations and groups affiliated with MIT. Technique matches you with one of our trained staph photographers to capture every moment during your event.",
+      "ctaButton": "Get a Quote",
+      "ctaHint": "Email us with the subject line \"Event Photography Quote\"",
+      "imageAlt": "Event photography by {photographer}"
+    },
+
+    "invoice": {
+      "title": "Invoice Form",
+      "metaTitle": "Invoice - MIT Technique",
+      "metaDescription": "Submit your photography invoice.",
+      "description": "Submit your photography invoice.",
+      "fields": {
+        "orgName": "Organization Name",
+        "photographerName": "Photographer Name",
+        "eventName": "Event Name",
+        "costObject": "Your Cost Object",
+        "hourlyRate": "Hourly Rate",
+        "totalHours": "Total Hours",
+        "eventDate": "Date of the Event"
+      },
+      "submitButton": "Submit Invoice",
+      "success": "Your invoice was sent successfully",
+      "error": "There was an error sending your invoice"
+    },
+
+    "login": {
+      "title": "Senior Bio",
+      "metaTitle": "Login - MIT Technique",
+      "metaDescription": "Sign in to update your senior bio information.",
+      "description": "Sign in to update your senior bio information.",
+      "instructionText": "Click below to sign in with your MIT credentials.",
+      "signInButton": "Sign In",
+      "success": "Signed in successfully"
+    },
+
+    "portfolio": {
+      "title": "Portfolio",
+      "metaTitle": "Portfolio - MIT Technique Photography",
+      "metaDescription": "A selection of work by our photographers.",
+      "description": "A selection of work by our photographers.",
+      "imageAlt": "Photography by {photographer}"
+    },
+
+    "seniors": {
+      "title": "Seniors",
+      "metaTitle": "Senior Portraits - MIT Technique",
+      "metaDescription": "Information about MIT senior portrait sessions with Technique.",
+      "hero": "Senior portrait sessions open on a rolling basis.",
+      "scheduleButton": "Schedule Your Portrait",
+      "dressCode": {
+        "title": "Dress Code",
+        "content": "There is no dress code for senior portraits. You can show up in a suit, dress, or even your pajamas. We have even had students bring their instruments and pets. We recommend wearing something that you are comfortable being pictured in, since your image will likely be on shelves of your peers for decades to come.",
+        "informalCaption": "Informal attire",
+        "formalCaption": "Formal attire",
+        "informalAlt": "Informal attire example",
+        "formalAlt": "Formal attire example"
+      },
+      "discount": {
+        "title": "Senior Discount",
+        "paragraph1": "After your senior photo appointment, you will be able to order your yearbook for a special senior portrait only discounted price. This pricing only applies to seniors who attend their appointment.",
+        "paragraph2": "If you do not wish to get your senior portrait, you are still able to pre-order your yearbook at the pre-order discounted price on our order page."
+      },
+      "issues": {
+        "title": "Missed Session or Issues?",
+        "content": "For all questions regarding scheduling senior portrait sessions, late changes to biographical information, or any other issues, please contact {email}. Technique has a publication deadline for senior portraits, so we unfortunately cannot accommodate any students who miss all scheduled senior portrait sessions. Rest assured that your name will appear in the yearbook in a section that does not feature senior portraits."
+      }
+    },
+
+    "bio": {
+      "title": "Senior Bio",
+      "metaTitle": "Senior Bio - MIT Technique",
+      "metaDescription": "Update your information for the MIT Technique yearbook.",
+      "description": "Update your information for the yearbook.",
+      "fields": {
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "major": "Major",
+        "quote": "Quote",
+        "quotePlaceholder": "Enter a quote for your yearbook entry (optional)"
+      },
+      "submitButton": "Update Bio",
+      "success": "Your bio was updated successfully",
+      "error": "There was an error updating your bio"
+    },
+
+    "archives": {
+      "title": "Archive",
+      "metaTitle": "Archive - MIT Technique Yearbooks",
+      "metaDescription": "Explore past editions of Technique yearbooks dating back to 1885.",
+      "description": "Explore past editions of Technique, dating back to 1885."
+    },
+
+    "parents": {
+      "title": "Parents",
+      "metaTitle": "Parents - MIT Technique",
+      "metaDescription": "Information for parents of MIT students.",
+      "hero": "Thank you for supporting your student and MIT Technique.",
+      "preorder": {
+        "title": "Preorder Yearbooks",
+        "content": "Preorder yearbooks at a discounted price before the release date.",
+        "button": "Preorder Now"
+      },
+      "inquiries": {
+        "title": "Questions or Issues?",
+        "content": "For inquiries about parent ads, purchasing older yearbooks, delivery issues, or other questions, please use our inquiry form or email us.",
+        "formButton": "Inquiry Form",
+        "emailButton": "Email Us"
+      }
+    },
+
+    "alumni": {
+      "title": "Alumni",
+      "metaTitle": "Alumni - MIT Technique",
+      "metaDescription": "Information for MIT alumni.",
+      "hero": "Relive your MIT memories through Technique.",
+      "mitAlumni": {
+        "sectionTitle": "MIT Alumni",
+        "title": "Get in Touch",
+        "content": "Looking to purchase past yearbooks, inquire about alumni features, or reconnect with MIT? Reach out via our inquiry form.",
+        "formButton": "Inquiry Form"
+      },
+      "techniqueAlumni": {
+        "sectionTitle": "Technique Alumni",
+        "title": "Visit Us",
+        "content": "Welcome back to Technique! We'd love to reconnect with former staph members. Stop by to chat, flip through old yearbooks, or let us show you around. We're typically in Room 4-253 from 12-2pm on Saturdays.",
+        "contact": "Technique alumni can reach out directly via email to arrange a visit.",
+        "emailButton": "Email Us"
+      }
+    },
+
+    "join": {
+      "title": "Join Us",
+      "metaTitle": "Join Technique - MIT Technique",
+      "metaDescription": "Join MIT Technique's photography and yearbook team.",
+      "hero": "Become part of MIT's photography and yearbook tradition.",
+      "welcome": "Technique welcomes students of all experience levels. Whether you're a beginner or experienced, there's a place for you in our community.",
+      "photography": {
+        "title": "Photography",
+        "description": "Join photo walks, attend camera workshops, and borrow equipment through our camera lending program. Learn photography hands-on while capturing MIT life."
+      },
+      "design": {
+        "title": "Design",
+        "description": "Work on graphic design and web design projects. Receive training in Adobe InDesign, Illustrator, and Photoshop while designing the yearbook and digital content."
+      },
+      "business": {
+        "title": "Business",
+        "description": "Help with outreach, event setup, and social media management. Organize events and build connections across the MIT community."
+      },
+      "collaboration": {
+        "title": "Collaboration",
+        "description": "Work alongside passionate students from all backgrounds. Beginners are welcome—we provide training and mentorship to help you grow."
+      },
+      "pastWork": {
+        "title": "Past Work",
+        "description": "See examples of yearbook spreads designed by our team."
+      },
+      "cta": {
+        "button": "Get Involved",
+        "hint": "Email us to learn about joining Technique"
+      }
+    },
+
+    "parentInquiry": {
+      "title": "Parent Inquiry",
+      "metaTitle": "Parent Inquiry - MIT Technique",
+      "metaDescription": "Submit an inquiry as a parent.",
+      "description": "Submit your inquiry and we'll get back to you.",
+      "fields": {
+        "name": "Your Name",
+        "email": "Email Address",
+        "studentName": "Student Name (if applicable)",
+        "category": "Inquiry Type",
+        "categoryOptions": {
+          "parentAd": "Parent Ad",
+          "purchaseOldYearbook": "Purchase Older Yearbook",
+          "yearbookNotDelivered": "Yearbook Inquiry",
+          "other": "Other"
+        },
+        "message": "Message"
+      },
+      "submitButton": "Submit Inquiry",
+      "success": "Your inquiry was submitted successfully",
+      "error": "There was an error submitting your inquiry"
+    },
+
+    "alumniInquiry": {
+      "title": "Alumni Inquiry",
+      "metaTitle": "Alumni Inquiry - MIT Technique",
+      "metaDescription": "Submit an inquiry as an alumni.",
+      "description": "Submit your inquiry and we'll get back to you.",
+      "fields": {
+        "name": "Your Name",
+        "email": "Email Address",
+        "graduationYear": "Graduation Year (if applicable)",
+        "category": "Inquiry Type",
+        "categoryOptions": {
+          "oldYearbooks": "Old Yearbooks",
+          "oldPictures": "Old Pictures",
+          "other": "Other Inquiries"
+        },
+        "message": "Message"
+      },
+      "submitButton": "Submit Inquiry",
+      "success": "Your inquiry was submitted successfully",
+      "error": "There was an error submitting your inquiry"
+    },
+
+    "activities": {
+      "title": "Clubs Form",
+      "metaTitle": "Clubs Form - MIT Technique",
+      "metaDescription": "Submit your club for the yearbook.",
+      "description": "Submit information about your club or organization for potential yearbook coverage.",
+      "cta": {
+        "button": "Submit Club",
+        "hint": "Complete the form to submit your club information and photos"
+      }
+    },
+
+    "studentWorkFeature": {
+      "title": "Student Work Feature",
+      "metaTitle": "Student Work Feature - MIT Technique",
+      "metaDescription": "Submit your student work for a chance to be featured in the yearbook.",
+      "description": "Showcase your academic projects, research, or creative work in the yearbook.",
+      "cta": {
+        "button": "Submit Work",
+        "hint": "Complete the form to submit your work for consideration"
+      }
+    },
+
+    "privacy": {
+      "title": "Privacy Policy",
+      "metaTitle": "Privacy Policy - MIT Technique",
+      "metaDescription": "Learn about how MIT Technique collects and uses your information.",
+      "lastUpdated": "Last Updated: January 17, 2026",
+
+      "translation": {
+        "title": "Translation Disclaimer",
+        "content": "This website is available in multiple languages for accessibility. While we strive for accuracy, translations may contain errors or variations from the original English version. In case of any discrepancies, the English version shall prevail. If you notice any translation errors, please contact us at technique@mit.edu."
+      },
+
+      "collection": {
+        "title": "Information We Collect",
+        "intro": "We collect information that you provide directly to us and information automatically collected when you use our website.",
+        "personalInfo": {
+          "title": "Personal Information (for MIT students only)",
+          "items": {
+            "name": "Name (first and last)",
+            "email": "MIT email address",
+            "major": "Academic major/course number",
+            "quote": "Optional yearbook quote",
+            "photos": "Senior portrait photographs"
+          }
+        },
+        "cookies": {
+          "title": "Cookies and Tracking",
+          "content": "We use cookies and similar technologies to enhance your experience:",
+          "items": {
+            "language": "Language preference cookie (stores your selected language)",
+            "session": "Session cookies for authentication (MIT Touchstone)"
+          }
+        },
+        "analytics": {
+          "title": "Usage Data",
+          "content": "We may collect anonymous usage data such as pages visited, time spent on site, and browser information to improve our services."
+        }
+      },
+
+      "usage": {
+        "title": "How We Use Your Information",
+        "items": {
+          "yearbook": "To include your information and photo in the MIT Technique yearbook",
+          "communication": "To communicate with you about yearbook orders, portrait sessions, and organization updates",
+          "services": "To provide services such as event photography and invoice processing",
+          "improvement": "To improve our website and user experience"
+        }
+      },
+
+      "storage": {
+        "title": "Data Storage and Security",
+        "content": "Your personal information is stored securely in MongoDB Atlas with industry-standard encryption. We retain senior bio information for yearbook publication purposes and historical archives. We implement reasonable security measures to protect your data, but no method of transmission over the internet is 100% secure."
+      },
+
+      "thirdParty": {
+        "title": "Third-Party Services",
+        "intro": "We use the following third-party services:",
+        "services": {
+          "touchstone": "For authentication using your MIT credentials (see MIT's privacy policy)",
+          "mongodb": "For secure database storage",
+          "vercel": "For website hosting and deployment"
+        }
+      },
+
+      "rights": {
+        "title": "Your Rights",
+        "intro": "You have the right to:",
+        "items": {
+          "access": "Access your personal information stored in our database",
+          "correction": "Request correction of inaccurate information",
+          "deletion": "Request deletion of your information (subject to yearbook publication requirements)",
+          "optOut": "Opt out of non-essential cookies by adjusting your browser settings"
+        },
+        "contact": "To exercise these rights, please contact us at technique@mit.edu."
+      },
+
+      "children": {
+        "title": "Children's Privacy",
+        "content": "Our services are intended for MIT students (typically 18 years or older). We do not knowingly collect information from individuals under 18 without parental consent."
+      },
+
+      "changes": {
+        "title": "Changes to This Policy",
+        "content": "We may update this privacy policy from time to time. We will notify you of any material changes by posting the new policy on this page with an updated 'Last Updated' date."
+      },
+
+      "contact": {
+        "title": "Contact Us",
+        "content": "If you have questions about this privacy policy or our data practices, please contact us:",
+        "office": "Office:",
+        "address": "Mailing Address:"
+      }
+    }
+  }
+}

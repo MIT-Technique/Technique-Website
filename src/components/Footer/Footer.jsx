@@ -1,12 +1,16 @@
 "use client";
 import React from "react";
+import Link from "next/link";
 import MailIcon from "@mui/icons-material/Mail";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import { usePathname } from "next/navigation";
+import { useTranslations, useLocale } from 'next-intl';
 
 export default function Footer() {
   const pathname = usePathname();
-  const isHomePage = pathname === "/";
+  const locale = useLocale();
+  const t = useTranslations('footer');
+  const isHomePage = pathname === `/${locale}`;
 
   return (
     <footer
@@ -16,14 +20,26 @@ export default function Footer() {
     >
       <div className="container-content py-8 lg:py-12">
         <div className="flex flex-col lg:flex-row justify-between items-center gap-6">
-          {/* Left: Copyright */}
-          <p
-            className={`text-xs pb-0 ${
-              isHomePage ? "text-white/60" : "text-text-muted"
-            }`}
-          >
-            &copy; 2026 Technique. All Rights Reserved.
-          </p>
+          {/* Left: Copyright & Privacy */}
+          <div className="flex flex-col lg:flex-row items-center gap-2 lg:gap-4">
+            <p
+              className={`text-xs pb-0 ${
+                isHomePage ? "text-white/60" : "text-text-muted"
+              }`}
+            >
+              {t('copyright')}
+            </p>
+            <Link
+              href={`/${locale}/privacy`}
+              className={`text-xs ${
+                isHomePage
+                  ? "text-white/60 hover:text-white"
+                  : "text-text-muted hover:text-accent"
+              } transition-colors underline`}
+            >
+              {t('privacyPolicy')}
+            </Link>
+          </div>
 
           {/* Right: Social Links */}
           <div className="flex items-center gap-4">
@@ -34,7 +50,7 @@ export default function Footer() {
                   ? "text-white/60 hover:text-white"
                   : "text-text-muted hover:text-accent"
               } transition-colors`}
-              aria-label="Email us"
+              aria-label={t('emailLabel')}
             >
               <MailIcon sx={{ fontSize: 18 }} />
             </a>
@@ -47,7 +63,7 @@ export default function Footer() {
                   ? "text-white/60 hover:text-white"
                   : "text-text-muted hover:text-accent"
               } transition-colors`}
-              aria-label="Follow us on Instagram"
+              aria-label={t('instagramLabel')}
             >
               <InstagramIcon sx={{ fontSize: 18 }} />
             </a>

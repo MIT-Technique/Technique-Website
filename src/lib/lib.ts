@@ -13,7 +13,7 @@ export const clientConfig: Partial<openid.ClientMetadata> = {
   post_logout_redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL}`,
   response_type: "code",
   grant_type: "authorization_code",
-  post_login_route: `${process.env.NEXT_PUBLIC_APP_URL}/bio`,
+  post_login_route: `${process.env.NEXT_PUBLIC_APP_URL}/en/bio`,
   code_challenge_method: "S256",
   token_endpoint: process.env.NEXT_PUBLIC_API_URL + "/oidc/token",
   token_endpoint_auth_method: "client_secret_basic",
@@ -74,13 +74,13 @@ export async function getClientConfig() {
     new URL(process.env.AUTH_OIDC_ISSUER)!,
     `${process.env.OIDC_CLIENT_ID}`!,
     clientConfig!,
-    openid.ClientSecretBasic(process.env.OIDC_CLIENT_SECRET)
+    openid.ClientSecretBasic(process.env.OIDC_CLIENT_SECRET),
   );
   console.log(
-    `SERVER_METADATA=${JSON.stringify(client.serverMetadata(), null, 2)}`
+    `SERVER_METADATA=${JSON.stringify(client.serverMetadata(), null, 2)}`,
   );
   console.log(
-    `CLIENT_METADATA=${JSON.stringify(client.clientMetadata(), null, 2)}`
+    `CLIENT_METADATA=${JSON.stringify(client.clientMetadata(), null, 2)}`,
   );
   return client;
 }

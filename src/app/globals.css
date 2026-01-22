@@ -147,3 +147,44 @@
 .slick-slide > div {
   margin: 0 2%;
 }
+
+/* Chinese locale font weight adjustments - increase by ~100 weight */
+:lang(zh) {
+  font-weight: 400;
+}
+
+:lang(zh) h1 {
+  font-weight: 400; /* from 300 (light) */
+}
+
+:lang(zh) h2 {
+  font-weight: 400; /* from 300 (light) */
+}
+
+:lang(zh) h3 {
+  font-weight: 500; /* from 400 (normal) */
+}
+
+:lang(zh) h4 {
+  font-weight: 600; /* from 500 (medium) */
+}
+
+:lang(zh) p {
+  font-weight: 400; /* from 300 (light) */
+}
+
+:lang(zh) .font-light {
+  font-weight: 400 !important;
+}
+
+:lang(zh) .font-normal {
+  font-weight: 500 !important;
+}
+
+:lang(zh) .font-medium {
+  font-weight: 600 !important;
+}
+
+:lang(zh) .font-semibold {
+  font-weight: 700 !important;
+}
