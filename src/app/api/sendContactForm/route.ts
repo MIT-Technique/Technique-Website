@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import sgMail from "@sendgrid/mail";
+import nodemailer from "nodemailer";
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "mittnq@gmail.com",
+    pass: process.env.GOOGLE_PASSWORD,
+  },
+});
+const RECIPIENT_EMAIL: string = "tnq-exec@mit.edu";
+const FROM_EMAIL: string = "mittnq@gmail.com";
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
-  const RECIPIENT_EMAIL: string = "tnq-exec@mit.edu";
-  const FROM_EMAIL: string = "mittnq@gmail.com";
-
   try {
     const { formType, data } = await request.json();
 
@@ -36,28 +41,22 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         <p>${data.message.replace(/\n/g, "<br>")}</p>
       `;
     } else {
-      return NextResponse.json(
-        { error: "Invalid form type" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid form type" }, { status: 400 });
     }
 
-    const msg = {
-      to: RECIPIENT_EMAIL,
+    await transporter.sendMail({
       from: FROM_EMAIL,
-      replyTo: data.email,
+      to: RECIPIENT_EMAIL,
       subject: subject,
       html: htmlContent,
-    };
-
-    await sgMail.send(msg);
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error:", error.response?.body || error);
     return NextResponse.json(
       { error: "Failed to send email" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

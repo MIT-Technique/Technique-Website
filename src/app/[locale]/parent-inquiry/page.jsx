@@ -35,7 +35,7 @@ export default function ParentInquiryPage() {
   const horizontal = "center";
 
   const categoryOptions = [
-    { value: "parentAd", label: t('fields.categoryOptions.parentAd') },
+    // { value: "parentAd", label: t('fields.categoryOptions.parentAd') },
     { value: "purchaseOldYearbook", label: t('fields.categoryOptions.purchaseOldYearbook') },
     { value: "yearbookNotDelivered", label: t('fields.categoryOptions.yearbookNotDelivered') },
     { value: "other", label: t('fields.categoryOptions.other') },
