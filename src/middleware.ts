@@ -38,6 +38,8 @@ export async function middleware(req: NextRequest) {
       }
       // Redirect to /login (no locale)
       return NextResponse.redirect(new URL("/login", req.url));
+    } else if (pathWithoutLocale.startsWith("/api")) {
+      return NextResponse.next();
     }
   }
 
