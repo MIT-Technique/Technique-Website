@@ -85,6 +85,13 @@ export async function PUT(request: NextRequest) {
 
     const supabase = createAdminClient();
 
+    // Get current user role to check if we need to create clubs entry
+    const { data: existingUser } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', userId)
+      .single();
+
     const updateData: Record<string, unknown> = {
       updated_at: new Date().toISOString(),
     };
@@ -105,6 +112,33 @@ export async function PUT(request: NextRequest) {
         { error: "Failed to update user" },
         { status: 500 }
       );
+    }
+
+    // If changing role to 'club' and user wasn't already a club, create clubs entry
+    if (role === 'club' && existingUser?.role !== 'club') {
+      // Check if clubs entry already exists
+      const { data: existingClub } = await supabase
+        .from('clubs')
+        .select('id')
+        .eq('user_id', userId)
+        .single();
+
+      if (!existingClub) {
+        const { error: clubError } = await supabase
+          .from('clubs')
+          .insert({
+            user_id: userId,
+            club_id: `CLUB-${Date.now()}`,
+            name: '',
+            has_leader: false,
+            approval_status: 'pending',
+          });
+
+        if (clubError) {
+          console.error("Error creating clubs entry:", clubError);
+          // Don't fail the whole request, just log the error
+        }
+      }
     }
 
     return NextResponse.json({ user: updatedUser });

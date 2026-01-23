@@ -9,11 +9,13 @@
   "nav": {
     "about": "ABOUT",
     "archive": "ARCHIVE",
+    "purchase": "PURCHASE",
     "yearbook": "YEARBOOK",
     "parents": "PARENTS",
     "alumni": "ALUMNI",
     "forms": "FORMS",
     "seniors": "SENIORS",
+    "resources": "RESOURCES",
     "getStarted": "GET STARTED",
     "dropdown": {
       "ourHistory": "OUR HISTORY",
@@ -29,7 +31,8 @@
       "clubs": "CLUBS",
       "studentWork": "STUDENT WORK",
       "hireUs": "HIRE US",
-      "joinUs": "JOIN US"
+      "joinUs": "JOIN US",
+      "faq": "FAQ"
     }
   },
 
@@ -195,13 +198,25 @@
         "sendLinkButton": "Send Login Link",
         "sending": "Sending...",
         "success": "Login link sent! Check your email.",
-        "error": "Failed to send login link. Please try again."
+        "error": "Failed to send login link. Please try again.",
+        "signIn": "Sign In",
+        "signUp": "Sign Up",
+        "signUpTitle": "Club Registration",
+        "signUpDescription": "Register your club to manage your yearbook profile.",
+        "clubNameLabel": "Club Name",
+        "clubNamePlaceholder": "e.g., MIT Robotics Club",
+        "signUpButton": "Register Club",
+        "signUpSuccess": "Registration link sent! Check your email.",
+        "signUpError": "Failed to register. Please try again.",
+        "noAccount": "Don't have an account?",
+        "haveAccount": "Already have an account?",
+        "personalEmailWarning": "This appears to be a personal MIT email. Please use your club's official email address if available."
       },
       "adminLinkPrefix": "Technique staff?",
       "adminLink": "Admin Login",
       "clubLinkPrefix": "Representing a club?",
       "clubLink": "Club Login",
-      "backToLogin": "← Back to login"
+      "backToLogin": "← Back to Student login"
     },
 
     "portfolio": {
@@ -263,7 +278,51 @@
         "profile": "Profile",
         "seniorBio": "Senior Bio",
         "clubInfo": "Club Info",
-        "scheduling": "Scheduling"
+        "scheduling": "Scheduling",
+        "myClubs": "My Clubs"
+      },
+      "myClubs": {
+        "title": "My Clubs",
+        "searchTitle": "Search Clubs",
+        "memberships": "Your Memberships",
+        "noMemberships": "You are not a member of any clubs yet.",
+        "pendingRequests": "Pending Requests",
+        "noPendingRequests": "No pending join requests.",
+        "cancelRequest": "Cancel",
+        "cancel": "Cancel",
+        "cancelling": "...",
+        "searchClubs": "Search Clubs",
+        "searchPlaceholder": "Search for a club to join...",
+        "searchHint": "Find and request to join MIT clubs",
+        "noResults": "No clubs found",
+        "joinClub": "Join",
+        "requestJoin": "Join",
+        "joining": "...",
+        "requesting": "...",
+        "requestSent": "Request sent!",
+        "requestedOn": "Requested on {date}",
+        "joinedOn": "Joined on {date}",
+        "alreadyMember": "Member",
+        "alreadyRequested": "Requested",
+        "leader": "Leader",
+        "member": "Member",
+        "role": {
+          "member": "Member",
+          "leader": "Leader"
+        },
+        "invitations": {
+          "title": "Club Invitations",
+          "noInvitations": "No pending club invitations",
+          "accept": "Accept",
+          "decline": "Decline",
+          "accepting": "Accepting...",
+          "declining": "Declining...",
+          "accepted": "Invitation accepted!",
+          "declined": "Invitation declined",
+          "invitedBy": "Invited by {name}",
+          "invitedOn": "{date}",
+          "error": "Failed to process invitation"
+        }
       },
       "profile": {
         "title": "Account Information",
@@ -644,7 +703,14 @@
       "notes": "Notes",
       "approve": "Approve",
       "deny": "Deny",
-      "denyReason": "Enter reason for denial (optional):"
+      "denyReason": "Enter reason for denial (optional):",
+      "leaderRequests": {
+        "title": "Leader Promotion Requests",
+        "leaderOf": "leader of",
+        "requestedBy": "Requested by",
+        "approve": "Approve",
+        "deny": "Deny"
+      }
     },
     "livingGroups": {
       "title": "Living Group Management",
@@ -743,6 +809,12 @@
     "clubId": "Club ID",
     "notes": "Admin Notes",
     "frozen": "This form is currently frozen. You cannot make changes at this time.",
+    "tabs": {
+      "profile": "Profile",
+      "members": "Members",
+      "requests": "Join Requests",
+      "management": "User Management"
+    },
     "form": {
       "name": "Club Name",
       "description": "Description",
@@ -752,6 +824,94 @@
       "images": "Candid Images",
       "imagesHint": "Upload up to 3 candid images of your club (coming soon)",
       "uploadNote": "Image upload functionality coming soon"
+    },
+    "members": {
+      "title": "Club Members",
+      "active": "Active Members",
+      "activeMembers": "Active Members",
+      "noActiveMembers": "No active members yet.",
+      "manual": "Manual Members",
+      "manualMembers": "Manual Members",
+      "noManualMembers": "No manual members added.",
+      "addManual": "Add Member",
+      "add": "Add",
+      "addManualPlaceholder": "Enter member name",
+      "addPlaceholder": "Enter member name",
+      "adding": "Adding...",
+      "remove": "Remove",
+      "removing": "Removing...",
+      "addSuccess": "Member added successfully",
+      "addError": "Failed to add member",
+      "removeSuccess": "Member removed successfully",
+      "removeError": "Failed to remove member",
+      "export": "Export for InDesign",
+      "exporting": "Exporting...",
+      "exportSuccess": "Copied {count} members to clipboard!",
+      "exportError": "Failed to export members",
+      "exportHint": "Copy all member names (sorted by last name)",
+      "copied": "Copied to clipboard!",
+      "leader": "Leader",
+      "member": "Member",
+      "promotionRequested": "Leader promotion request submitted",
+      "promotionError": "Failed to request promotion",
+      "requestCancelled": "Promotion request cancelled",
+      "cancelError": "Failed to cancel request",
+      "demoteSuccess": "Leader demoted to member",
+      "demoteError": "Failed to demote leader",
+      "role": {
+        "member": "Member",
+        "leader": "Leader"
+      }
+    },
+    "requests": {
+      "title": "Join Requests",
+      "pending": "Pending Requests",
+      "noPending": "No pending join requests.",
+      "noRequests": "No pending join requests.",
+      "approve": "Approve",
+      "deny": "Deny",
+      "processing": "..."
+    },
+    "management": {
+      "title": "User Management",
+      "description": "Manage club members and leaders. You can have up to 2 leaders per club.",
+      "noMembers": "No members to manage.",
+      "removeMember": "Remove",
+      "promoteToLeader": "Promote to Leader",
+      "demoteToMember": "Demote to Member",
+      "processing": "...",
+      "leaderLimit": "Maximum 2 leaders allowed",
+      "leaderInfo": "Current leaders: {count}/{max}",
+      "pendingPromotions": "Pending Leader Promotions",
+      "awaitingApproval": "Awaiting admin approval",
+      "cancelling": "Cancelling...",
+      "cancelRequest": "Cancel Request",
+      "promotionPending": "Promotion pending",
+      "requestLeader": "Request Leader Promotion",
+      "requestLeaderHint": "Admin approval required to promote members to leader",
+      "pendingLeaderRequest": "Promotion pending admin approval"
+    },
+    "onboarding": {
+      "addLeaderRequired": "Add a leader to continue",
+      "addLeaderDescription": "Your club needs at least one MIT student leader before you can manage members and be discoverable to students.",
+      "searchStudent": "Search MIT students...",
+      "addAsLeader": "Add as Leader",
+      "adding": "Adding...",
+      "leaderAdded": "Leader added successfully!",
+      "leaderError": "Failed to add leader"
+    },
+    "invitations": {
+      "title": "Invite Students",
+      "searchPlaceholder": "Search by name or email...",
+      "invite": "Invite",
+      "inviting": "Inviting...",
+      "inviteSent": "Invitation sent!",
+      "inviteError": "Failed to send invitation",
+      "pendingInvitations": "Pending Invitations",
+      "noPendingInvitations": "No pending invitations",
+      "invitedOn": "Invited on {date}",
+      "cancel": "Cancel",
+      "cancelling": "Cancelling..."
     },
     "success": "Your club profile has been updated",
     "error": "Failed to update club profile",
@@ -778,5 +938,49 @@
     "booking": "Booking...",
     "bookSuccess": "Time slot booked successfully",
     "bookError": "Failed to book time slot"
+  },
+
+  "resources": {
+    "title": "Resources & FAQ",
+    "metaTitle": "Resources & FAQ - MIT Technique",
+    "metaDescription": "Frequently asked questions about MIT Technique yearbook, accounts, and services.",
+    "description": "Find answers to common questions about yearbooks, accounts, and our services.",
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "accounts": {
+        "title": "Accounts & Login",
+        "q1": "How do I create an account?",
+        "a1": "MIT students can log in using MIT SSO (Touchstone). Clubs can register by clicking 'Club Login' and selecting 'Sign Up' to create a new club account with their official club email.",
+        "q2": "What's the difference between student and club accounts?",
+        "a2": "Student accounts are for MIT students to manage their senior bio and join clubs. Club accounts are for MIT organizations to manage their yearbook profile, member lists, and candid photos.",
+        "q3": "I'm a club - how do I get started after signing up?",
+        "a3": "After signing up, you'll need to add at least one MIT student as a leader before your club becomes discoverable. Search for the student by name or email in the onboarding section.",
+        "q4": "How do club invitations work?",
+        "a4": "Clubs can invite MIT students to join. Students will see pending invitations in their profile's 'My Clubs' tab and can accept or decline. Accepted invitations automatically add the student as a member."
+      },
+      "yearbook": {
+        "title": "Yearbook & Ordering",
+        "q1": "When can I order the yearbook?",
+        "a1": "Yearbooks are typically available for preorder in the spring semester. Check the Yearbook page for current availability and pricing.",
+        "q2": "How do I submit my senior bio?",
+        "a2": "Log in with your MIT account, then navigate to your profile. You can edit your quote, achievements, and other information that will appear in the yearbook.",
+        "q3": "Can parents or alumni order yearbooks?",
+        "a3": "Yes! Visit the Parents or Alumni pages for information on ordering yearbooks as a gift or for yourself."
+      },
+      "clubs": {
+        "title": "Clubs & Organizations",
+        "q1": "How do I add my club to the yearbook?",
+        "a1": "Register a club account, add a leader, then fill out your club profile with a description, member list, and candid photos. Your submission will be reviewed by the Technique staff.",
+        "q2": "What photos should clubs submit?",
+        "a2": "Submit high-quality candid photos that represent your club's activities. You can upload up to 3 photos. Avoid posed group shots - we want to capture your club in action!",
+        "q3": "Who can manage the club profile?",
+        "a3": "The club account owner and designated leaders can edit the club profile. Leaders must be MIT students and are added through the club dashboard."
+      },
+      "contact": {
+        "title": "Still have questions?",
+        "description": "We're here to help. Reach out to us directly.",
+        "button": "Contact Us"
+      }
+    }
   }
 }

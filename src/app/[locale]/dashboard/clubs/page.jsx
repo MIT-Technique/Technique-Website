@@ -1,17 +1,62 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 
 export default function ClubsPage() {
   const t = useTranslations('dashboard.clubs');
+  const locale = useLocale();
   const [clubs, setClubs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
 
+  // Leader requests state
+  const [leaderRequests, setLeaderRequests] = useState([]);
+  const [leaderRequestsLoading, setLeaderRequestsLoading] = useState(true);
+  const [processingRequestId, setProcessingRequestId] = useState(null);
+
   useEffect(() => {
     fetchClubs();
   }, [filter]);
+
+  useEffect(() => {
+    fetchLeaderRequests();
+  }, []);
+
+  async function fetchLeaderRequests() {
+    try {
+      setLeaderRequestsLoading(true);
+      const res = await fetch('/api/admin/club-leader-requests');
+      const data = await res.json();
+      setLeaderRequests(data.requests || []);
+    } catch (error) {
+      console.error('Error fetching leader requests:', error);
+    } finally {
+      setLeaderRequestsLoading(false);
+    }
+  }
+
+  async function handleLeaderAction(requestId, action) {
+    setProcessingRequestId(requestId);
+    try {
+      const res = await fetch('/api/admin/club-leader-requests', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ request_id: requestId, action }),
+      });
+
+      if (res.ok) {
+        fetchLeaderRequests();
+      } else {
+        const data = await res.json();
+        console.error('Error processing leader request:', data.error);
+      }
+    } catch (error) {
+      console.error('Error processing leader request:', error);
+    } finally {
+      setProcessingRequestId(null);
+    }
+  }
 
   async function fetchClubs() {
     try {
@@ -47,6 +92,51 @@ export default function ClubsPage() {
 
   return (
     <div>
+      {/* Leader Requests Section */}
+      {leaderRequests.length > 0 && (
+        <div className="mb-8">
+          <h2 className="text-lg font-medium mb-4">{t('leaderRequests.title')}</h2>
+          <div className="space-y-3">
+            {leaderRequests.map((request) => (
+              <div
+                key={request.id}
+                className="p-4 border border-yellow-200 bg-yellow-50 rounded-lg flex justify-between items-center"
+              >
+                <div>
+                  <p className="font-medium">
+                    {request.user?.first_name} {request.user?.last_name}
+                    <span className="text-text-muted font-normal"> → {t('leaderRequests.leaderOf')} </span>
+                    {request.club?.name || t('unnamed')}
+                  </p>
+                  <p className="text-text-secondary text-sm">{request.user?.email}</p>
+                  <p className="text-text-muted text-xs">
+                    {t('leaderRequests.requestedBy')}: {request.requester?.first_name} {request.requester?.last_name}
+                    {' • '}
+                    {new Date(request.created_at).toLocaleDateString(locale)}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleLeaderAction(request.id, 'approve')}
+                    disabled={processingRequestId === request.id}
+                    className="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700"
+                  >
+                    {processingRequestId === request.id ? '...' : t('leaderRequests.approve')}
+                  </button>
+                  <button
+                    onClick={() => handleLeaderAction(request.id, 'deny')}
+                    disabled={processingRequestId === request.id}
+                    className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700"
+                  >
+                    {processingRequestId === request.id ? '...' : t('leaderRequests.deny')}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <h2 className="text-lg font-medium mb-6">{t('title')}</h2>
 
       {/* Filters */}

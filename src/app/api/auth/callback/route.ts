@@ -88,25 +88,75 @@ export async function GET(request: NextRequest) {
       }
 
       if (type === 'club') {
-        // Club login - user should already exist with club role (validated by club-login API)
-        if (!existingUser || existingUser.role !== 'club') {
-          console.error("Club callback error: user not found or not a club account");
+        // Club signup or login
+        if (!existingUser) {
+          // NEW CLUB SIGNUP - create user and club entry
+          if (!clubName) {
+            console.error("Club signup error: no club name provided");
+            return NextResponse.redirect(
+              `${process.env.NEXT_PUBLIC_APP_URL}/en/login/club?error=missing_club_name`
+            );
+          }
+
+          // Create new user with club role
+          const { data: newUser, error: createError } = await supabase
+            .from('users')
+            .insert({
+              email,
+              role: 'club',
+              first_name: clubName,
+              last_name: '',
+              auth_provider: 'supabase_auth',
+              supabase_auth_id: supabaseAuthId,
+              is_active: true,
+            })
+            .select()
+            .single();
+
+          if (createError) {
+            console.error("Error creating club user:", createError);
+            return NextResponse.redirect(
+              `${process.env.NEXT_PUBLIC_APP_URL}/en/login/club?error=user_create_failed`
+            );
+          }
+
+          // Create clubs table entry
+          const { error: clubCreateError } = await supabase
+            .from('clubs')
+            .insert({
+              user_id: newUser.id,
+              club_id: `CLUB-${Date.now()}`,
+              name: clubName,
+              has_leader: false,
+              approval_status: 'pending',
+            });
+
+          if (clubCreateError) {
+            console.error("Error creating club entry:", clubCreateError);
+            // Don't fail - user is created, they can still access
+          }
+
+          user = newUser;
+        } else if (existingUser.role !== 'club') {
+          // User exists but isn't a club account
+          console.error("Club callback error: user exists but not a club account");
           return NextResponse.redirect(
             `${process.env.NEXT_PUBLIC_APP_URL}/en/login/club?error=not_club_account`
           );
-        }
+        } else {
+          // EXISTING CLUB LOGIN
+          user = existingUser;
 
-        user = existingUser;
-
-        // Update supabase_auth_id if not set
-        if (!user.supabase_auth_id) {
-          await supabase
-            .from('users')
-            .update({
-              supabase_auth_id: supabaseAuthId,
-              updated_at: new Date().toISOString(),
-            })
-            .eq('email', email);
+          // Update supabase_auth_id if not set
+          if (!user.supabase_auth_id) {
+            await supabase
+              .from('users')
+              .update({
+                supabase_auth_id: supabaseAuthId,
+                updated_at: new Date().toISOString(),
+              })
+              .eq('email', email);
+          }
         }
 
         // Get club name for session

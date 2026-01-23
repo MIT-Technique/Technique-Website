@@ -66,6 +66,19 @@ export default function ProfilePage() {
   const [bookingLocation, setBookingLocation] = useState('');
   const [schedulingMessage, setSchedulingMessage] = useState({ type: '', text: '' });
 
+  // My Clubs state
+  const [myMemberships, setMyMemberships] = useState([]);
+  const [myPendingRequests, setMyPendingRequests] = useState([]);
+  const [myInvitations, setMyInvitations] = useState([]);
+  const [clubSearch, setClubSearch] = useState('');
+  const [clubSearchResults, setClubSearchResults] = useState([]);
+  const [clubSearchLoading, setClubSearchLoading] = useState(false);
+  const [clubsLoading, setClubsLoading] = useState(true);
+  const [clubsMessage, setClubsMessage] = useState({ type: '', text: '' });
+  const [joiningClubId, setJoiningClubId] = useState(null);
+  const [cancellingRequestId, setCancellingRequestId] = useState(null);
+  const [processingInvitationId, setProcessingInvitationId] = useState(null);
+
   // Redirect admin to dashboard
   useEffect(() => {
     if (!userLoading && isLoggedIn && user?.role === 'admin') {
@@ -105,6 +118,13 @@ export default function ProfilePage() {
     }
   }, [isLoggedIn, user]);
 
+  // Fetch my clubs data for students and living group leaders
+  useEffect(() => {
+    if (isLoggedIn && (user?.role === 'student' || user?.role === 'living_group_leader')) {
+      fetchMyClubsData();
+    }
+  }, [isLoggedIn, user]);
+
   async function fetchBioData() {
     try {
       setBioLoading(true);
@@ -139,6 +159,130 @@ export default function ProfilePage() {
       setSchedulingLoading(false);
     }
   }
+
+  async function fetchMyClubsData() {
+    try {
+      setClubsLoading(true);
+      const [membershipsRes, requestsRes, invitationsRes] = await Promise.all([
+        fetch('/api/clubs/my-memberships'),
+        fetch('/api/clubs/my-requests'),
+        fetch('/api/clubs/my-invitations'),
+      ]);
+      const membershipsData = await membershipsRes.json();
+      const requestsData = await requestsRes.json();
+      const invitationsData = await invitationsRes.json();
+      setMyMemberships(membershipsData.memberships || []);
+      setMyPendingRequests(requestsData.requests || []);
+      setMyInvitations(invitationsData.invitations || []);
+    } catch (error) {
+      console.error('Error fetching clubs data:', error);
+    } finally {
+      setClubsLoading(false);
+    }
+  }
+
+  async function searchClubs(query) {
+    if (!query || query.length < 2) {
+      setClubSearchResults([]);
+      return;
+    }
+    try {
+      setClubSearchLoading(true);
+      const res = await fetch(`/api/clubs/search?q=${encodeURIComponent(query)}`);
+      const data = await res.json();
+      // Filter out clubs user is already a member of or has pending request
+      const memberClubIds = new Set(myMemberships.map(m => m.club_id));
+      const pendingClubIds = new Set(myPendingRequests.map(r => r.club_id));
+      const filteredClubs = (data.clubs || []).filter(
+        c => !memberClubIds.has(c.id) && !pendingClubIds.has(c.id)
+      );
+      setClubSearchResults(filteredClubs);
+    } catch (error) {
+      console.error('Error searching clubs:', error);
+    } finally {
+      setClubSearchLoading(false);
+    }
+  }
+
+  async function handleJoinClub(clubId) {
+    setJoiningClubId(clubId);
+    setClubsMessage({ type: '', text: '' });
+    try {
+      const res = await fetch('/api/clubs/join-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ club_id: clubId }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setClubsMessage({ type: 'success', text: t('myClubs.requestSent', { club: data.club_name }) });
+        setClubSearch('');
+        setClubSearchResults([]);
+        fetchMyClubsData();
+      } else {
+        setClubsMessage({ type: 'error', text: data.error || t('myClubs.requestError') });
+      }
+    } catch (error) {
+      setClubsMessage({ type: 'error', text: t('myClubs.requestError') });
+    } finally {
+      setJoiningClubId(null);
+    }
+  }
+
+  async function handleCancelRequest(requestId) {
+    setCancellingRequestId(requestId);
+    setClubsMessage({ type: '', text: '' });
+    try {
+      const res = await fetch(`/api/clubs/join-request?id=${requestId}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        setClubsMessage({ type: 'success', text: t('myClubs.requestCancelled') });
+        fetchMyClubsData();
+      } else {
+        const data = await res.json();
+        setClubsMessage({ type: 'error', text: data.error || t('myClubs.cancelError') });
+      }
+    } catch (error) {
+      setClubsMessage({ type: 'error', text: t('myClubs.cancelError') });
+    } finally {
+      setCancellingRequestId(null);
+    }
+  }
+
+  async function handleInvitationResponse(invitationId, action) {
+    setProcessingInvitationId(invitationId);
+    setClubsMessage({ type: '', text: '' });
+    try {
+      const res = await fetch('/api/clubs/my-invitations', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ invitation_id: invitationId, action }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setClubsMessage({
+          type: 'success',
+          text: action === 'accept' ? t('myClubs.invitations.accepted') : t('myClubs.invitations.declined'),
+        });
+        fetchMyClubsData();
+      } else {
+        setClubsMessage({ type: 'error', text: data.error || t('myClubs.invitations.error') });
+      }
+    } catch (error) {
+      setClubsMessage({ type: 'error', text: t('myClubs.invitations.error') });
+    } finally {
+      setProcessingInvitationId(null);
+    }
+  }
+
+  // Debounced search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      searchClubs(clubSearch);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [clubSearch, myMemberships, myPendingRequests]);
 
   async function handleBioSubmit(e) {
     e.preventDefault();
@@ -228,10 +372,12 @@ export default function ProfilePage() {
 
     if (user?.role === 'student') {
       tabs.push({ id: 'bio', label: t('tabs.seniorBio') });
+      tabs.push({ id: 'myClubs', label: t('tabs.myClubs') });
     } else if (user?.role === 'club') {
       tabs.push({ id: 'club', label: t('tabs.clubInfo') });
     } else if (user?.role === 'living_group_leader') {
       tabs.push({ id: 'scheduling', label: t('tabs.scheduling') });
+      tabs.push({ id: 'myClubs', label: t('tabs.myClubs') });
     }
 
     return tabs;
@@ -621,6 +767,184 @@ export default function ProfilePage() {
                   )}
                 </div>
               )}
+            </div>
+          )}
+
+          {/* My Clubs Tab (Students and Living Group Leaders) */}
+          {activeTab === 'myClubs' && (user?.role === 'student' || user?.role === 'living_group_leader') && (
+            <div>
+              {clubsMessage.text && (
+                <div className={`mb-6 p-4 rounded ${
+                  clubsMessage.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
+                }`}>
+                  {clubsMessage.text}
+                </div>
+              )}
+
+              {/* Search for clubs */}
+              <div className="mb-8">
+                <h2 className="text-lg font-medium mb-4">{t('myClubs.searchTitle')}</h2>
+                <TextField
+                  label={t('myClubs.searchPlaceholder')}
+                  variant="outlined"
+                  InputLabelProps={{ shrink: true }}
+                  value={clubSearch}
+                  onChange={(e) => setClubSearch(e.target.value)}
+                  sx={textFieldSx}
+                  fullWidth
+                  placeholder={t('myClubs.searchHint')}
+                />
+
+                {/* Search results */}
+                {clubSearchLoading ? (
+                  <p className="text-text-secondary mt-4">Loading...</p>
+                ) : clubSearchResults.length > 0 ? (
+                  <div className="mt-4 space-y-2">
+                    {clubSearchResults.map((club) => (
+                      <div
+                        key={club.id}
+                        className="p-4 border border-border rounded-lg flex justify-between items-center"
+                      >
+                        <div>
+                          <p className="font-medium">{club.name}</p>
+                          {club.description && (
+                            <p className="text-text-secondary text-sm line-clamp-1">{club.description}</p>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => handleJoinClub(club.id)}
+                          disabled={joiningClubId === club.id}
+                          className="btn-primary text-sm"
+                        >
+                          {joiningClubId === club.id ? t('myClubs.requesting') : t('myClubs.requestJoin')}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : clubSearch.length >= 2 ? (
+                  <p className="text-text-secondary mt-4">{t('myClubs.noResults')}</p>
+                ) : null}
+              </div>
+
+              {/* Club Invitations */}
+              {myInvitations.length > 0 && (
+                <div className="mb-8">
+                  <h2 className="text-lg font-medium mb-4">{t('myClubs.invitations.title')}</h2>
+                  <div className="space-y-2">
+                    {myInvitations.map((invitation) => (
+                      <div
+                        key={invitation.id}
+                        className="p-4 border border-blue-200 bg-blue-50 rounded-lg"
+                      >
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p className="font-medium">{invitation.club?.name || 'Unknown Club'}</p>
+                            {invitation.club?.description && (
+                              <p className="text-text-secondary text-sm line-clamp-1">{invitation.club.description}</p>
+                            )}
+                            <p className="text-text-muted text-xs mt-1">
+                              {t('myClubs.invitations.invitedBy', {
+                                name: `${invitation.inviter?.first_name || ''} ${invitation.inviter?.last_name || ''}`.trim() || 'Unknown',
+                              })}
+                              {' • '}
+                              {t('myClubs.invitations.invitedOn', {
+                                date: new Date(invitation.created_at).toLocaleDateString(locale),
+                              })}
+                            </p>
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleInvitationResponse(invitation.id, 'accept')}
+                              disabled={processingInvitationId === invitation.id}
+                              className="text-sm px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+                            >
+                              {processingInvitationId === invitation.id ? '...' : t('myClubs.invitations.accept')}
+                            </button>
+                            <button
+                              onClick={() => handleInvitationResponse(invitation.id, 'decline')}
+                              disabled={processingInvitationId === invitation.id}
+                              className="text-sm px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700"
+                            >
+                              {processingInvitationId === invitation.id ? '...' : t('myClubs.invitations.decline')}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Pending requests */}
+              {myPendingRequests.length > 0 && (
+                <div className="mb-8">
+                  <h2 className="text-lg font-medium mb-4">{t('myClubs.pendingRequests')}</h2>
+                  <div className="space-y-2">
+                    {myPendingRequests.map((request) => (
+                      <div
+                        key={request.id}
+                        className="p-4 border border-yellow-200 bg-yellow-50 rounded-lg flex justify-between items-center"
+                      >
+                        <div>
+                          <p className="font-medium">{request.club?.name || 'Unknown Club'}</p>
+                          <p className="text-text-secondary text-sm">
+                            {t('myClubs.requestedOn', {
+                              date: new Date(request.created_at).toLocaleDateString(locale),
+                            })}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => handleCancelRequest(request.id)}
+                          disabled={cancellingRequestId === request.id}
+                          className="text-sm text-red-600 hover:text-red-700"
+                        >
+                          {cancellingRequestId === request.id ? t('myClubs.cancelling') : t('myClubs.cancel')}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* My memberships */}
+              <div>
+                <h2 className="text-lg font-medium mb-4">{t('myClubs.memberships')}</h2>
+                {clubsLoading ? (
+                  <p className="text-text-secondary">Loading...</p>
+                ) : myMemberships.length === 0 ? (
+                  <p className="text-text-secondary">{t('myClubs.noMemberships')}</p>
+                ) : (
+                  <div className="space-y-2">
+                    {myMemberships.map((membership) => (
+                      <div
+                        key={membership.id}
+                        className="p-4 border border-green-200 bg-green-50 rounded-lg"
+                      >
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p className="font-medium">{membership.club?.name || 'Unknown Club'}</p>
+                            {membership.club?.description && (
+                              <p className="text-text-secondary text-sm line-clamp-2">{membership.club.description}</p>
+                            )}
+                          </div>
+                          <span className={`text-xs px-2 py-1 rounded ${
+                            membership.role === 'leader'
+                              ? 'bg-accent text-white'
+                              : 'bg-gray-200 text-gray-700'
+                          }`}>
+                            {membership.role === 'leader' ? t('myClubs.leader') : t('myClubs.member')}
+                          </span>
+                        </div>
+                        <p className="text-text-muted text-xs mt-2">
+                          {t('myClubs.joinedOn', {
+                            date: new Date(membership.joined_at).toLocaleDateString(locale),
+                          })}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </section>

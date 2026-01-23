@@ -21,6 +21,7 @@ function Sidebar({ pathname }) {
   const { isLoggedIn, user, loading, logout } = useUser();
   const [isOpen, setIsOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [purchaseOpen, setPurchaseOpen] = useState(false);
   const [formsOpen, setFormsOpen] = useState(false);
   const [getStartedOpen, setGetStartedOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
@@ -54,6 +55,7 @@ function Sidebar({ pathname }) {
   };
 
   const isAboutActive = [`/${locale}/about`, `/${locale}/archives`, `/${locale}/portfolio`, `/${locale}/contact`].some(isActive);
+  const isPurchaseActive = [`/${locale}/yearbook`, `/${locale}/seniors`, `/${locale}/parents`, `/${locale}/alumni`].some(isActive);
   const isFormsActive = [`/${locale}/login`, `/${locale}/invoice`, `/${locale}/parent-inquiry`, `/${locale}/alumni-inquiry`, `/${locale}/clubs`, `/${locale}/student-work-feature`].some(isActive);
   const isGetStartedActive = [`/${locale}/hire`, `/${locale}/join`].some(isActive);
 
@@ -184,97 +186,65 @@ function Sidebar({ pathname }) {
               </List>
             </Collapse>
 
-            {/* Yearbook */}
+            {/* Purchase Dropdown */}
             <ListItem disablePadding>
-              <Link
-                href={`/${locale}/yearbook`}
-                onClick={() => setIsOpen(false)}
-                className="w-full"
+              <ListItemButton
+                onClick={() => setPurchaseOpen(!purchaseOpen)}
+                sx={{ px: 3, py: 1.5 }}
               >
-                <ListItemButton sx={{ px: 3, py: 1.5 }}>
-                  <ListItemText
-                    primary={t('yearbook')}
-                    primaryTypographyProps={{
-                      sx: {
-                        fontSize: "0.75rem",
-                        fontWeight: 500,
-                        letterSpacing: "0.1em",
-                        color: isActive(`/${locale}/yearbook`) ? "#750014" : textColor,
-                      },
-                    }}
-                  />
-                </ListItemButton>
-              </Link>
+                <ListItemText
+                  primary={t('purchase')}
+                  primaryTypographyProps={{
+                    sx: {
+                      fontSize: "0.75rem",
+                      fontWeight: 500,
+                      letterSpacing: "0.1em",
+                      color: isPurchaseActive ? "#750014" : textColor,
+                    },
+                  }}
+                />
+                <VscChevronDown
+                  size={16}
+                  style={{
+                    color: isPurchaseActive ? "#750014" : textColor,
+                    transform: purchaseOpen ? "rotate(180deg)" : "rotate(0deg)",
+                    transition: "transform 0.2s",
+                  }}
+                />
+              </ListItemButton>
             </ListItem>
-
-            {/* Seniors */}
-            <ListItem disablePadding>
-              <Link
-                href={`/${locale}/seniors`}
-                onClick={() => setIsOpen(false)}
-                className="w-full"
-              >
-                <ListItemButton sx={{ px: 3, py: 1.5 }}>
-                  <ListItemText
-                    primary={t('seniors')}
-                    primaryTypographyProps={{
-                      sx: {
-                        fontSize: "0.75rem",
-                        fontWeight: 500,
-                        letterSpacing: "0.1em",
-                        color: isActive(`/${locale}/seniors`) ? "#750014" : textColor,
-                      },
-                    }}
-                  />
-                </ListItemButton>
-              </Link>
-            </ListItem>
-
-            {/* Parents */}
-            <ListItem disablePadding>
-              <Link
-                href={`/${locale}/parents`}
-                onClick={() => setIsOpen(false)}
-                className="w-full"
-              >
-                <ListItemButton sx={{ px: 3, py: 1.5 }}>
-                  <ListItemText
-                    primary={t('parents')}
-                    primaryTypographyProps={{
-                      sx: {
-                        fontSize: "0.75rem",
-                        fontWeight: 500,
-                        letterSpacing: "0.1em",
-                        color: isActive(`/${locale}/parents`) ? "#750014" : textColor,
-                      },
-                    }}
-                  />
-                </ListItemButton>
-              </Link>
-            </ListItem>
-
-            {/* Alumni */}
-            <ListItem disablePadding>
-              <Link
-                href={`/${locale}/alumni`}
-                onClick={() => setIsOpen(false)}
-                className="w-full"
-              >
-                <ListItemButton sx={{ px: 3, py: 1.5 }}>
-                  <ListItemText
-                    primary={t('alumni')}
-                    primaryTypographyProps={{
-                      sx: {
-                        fontSize: "0.75rem",
-                        fontWeight: 500,
-                        letterSpacing: "0.1em",
-                        color: isActive(`/${locale}/alumni`) ? "#750014" : textColor,
-                      },
-                    }}
-                  />
-                </ListItemButton>
-              </Link>
-            </ListItem>
+            <Collapse in={purchaseOpen} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                {[
+                  { href: `/${locale}/yearbook`, label: t('yearbook') },
+                  { href: `/${locale}/seniors`, label: t('seniors') },
+                  { href: `/${locale}/parents`, label: t('parents') },
+                  { href: `/${locale}/alumni`, label: t('alumni') },
+                ].map((item) => (
+                  <ListItem key={item.href} disablePadding>
+                    <Link
+                      href={item.href}
+                      onClick={() => setIsOpen(false)}
+                      className="w-full"
+                    >
+                      <ListItemButton sx={{ pl: 6, py: 1 }}>
+                        <ListItemText
+                          primary={item.label}
+                          primaryTypographyProps={{
+                            sx: {
+                              fontSize: "0.7rem",
+                              fontWeight: 400,
+                              letterSpacing: "0.05em",
+                              color: isActive(item.href) ? "#750014" : mutedColor,
+                            },
+                          }}
+                        />
+                      </ListItemButton>
+                    </Link>
+                  </ListItem>
+                ))}
+              </List>
+            </Collapse>
 
             {/* Forms Dropdown */}
             <ListItem disablePadding>
@@ -396,6 +366,29 @@ function Sidebar({ pathname }) {
                 ))}
               </List>
             </Collapse>
+
+            {/* Resources */}
+            <ListItem disablePadding>
+              <Link
+                href={`/${locale}/resources`}
+                onClick={() => setIsOpen(false)}
+                className="w-full"
+              >
+                <ListItemButton sx={{ px: 3, py: 1.5 }}>
+                  <ListItemText
+                    primary={t('resources')}
+                    primaryTypographyProps={{
+                      sx: {
+                        fontSize: "0.75rem",
+                        fontWeight: 500,
+                        letterSpacing: "0.1em",
+                        color: isActive(`/${locale}/resources`) ? "#750014" : textColor,
+                      },
+                    }}
+                  />
+                </ListItemButton>
+              </Link>
+            </ListItem>
 
             {/* Get Started Dropdown */}
             <ListItem disablePadding>

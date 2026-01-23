@@ -129,3 +129,64 @@ export interface PhotoshootTimeWithLivingGroup extends PhotoshootTime {
 export interface PromotionRequestWithUser extends PromotionRequest {
   user?: User;
 }
+
+// Club membership types
+export type ClubMemberRole = 'member' | 'leader';
+
+export interface ClubMembership {
+  id: string;
+  club_id: string;
+  user_id: string;
+  role: ClubMemberRole;
+  joined_at: string;
+}
+
+export interface ClubJoinRequest {
+  id: string;
+  club_id: string;
+  user_id: string;
+  status: RequestStatus;
+  created_at: string;
+  resolved_at: string | null;
+}
+
+export interface ClubLeaderRequest {
+  id: string;
+  club_id: string;
+  user_id: string;
+  requested_by: string;
+  status: RequestStatus;
+  created_at: string;
+  resolved_at: string | null;
+  resolved_by: string | null;
+}
+
+export interface ClubManualMember {
+  id: string;
+  club_id: string;
+  name: string;
+  added_at: string;
+}
+
+// Extended club membership types with relations
+export interface ClubMembershipWithUser extends ClubMembership {
+  user?: Pick<User, 'id' | 'email' | 'first_name' | 'last_name'>;
+}
+
+export interface ClubMembershipWithClub extends ClubMembership {
+  club?: Club;
+}
+
+export interface ClubJoinRequestWithUser extends ClubJoinRequest {
+  user?: Pick<User, 'id' | 'email' | 'first_name' | 'last_name'>;
+}
+
+export interface ClubJoinRequestWithClub extends ClubJoinRequest {
+  club?: Club;
+}
+
+export interface ClubLeaderRequestWithDetails extends ClubLeaderRequest {
+  user?: Pick<User, 'id' | 'email' | 'first_name' | 'last_name'>;
+  club?: Club;
+  requester?: Pick<User, 'id' | 'email' | 'first_name' | 'last_name'>;
+}

@@ -23,7 +23,9 @@ const textFieldSx = {
 export default function ClubLoginPage() {
   const locale = useLocale();
   const t = useTranslations('pages.login');
+  const [mode, setMode] = useState('signup'); // 'signin' or 'signup'
   const [email, setEmail] = useState('');
+  const [clubName, setClubName] = useState('');
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -37,48 +39,79 @@ export default function ClubLoginPage() {
     setSnackbarOpen(false);
   }
 
-  async function handleClubLogin(e) {
+  // Check if email looks like a personal MIT email (e.g., kerb@mit.edu)
+  function isPersonalMitEmail(email) {
+    const mitPattern = /^[a-z0-9]+@mit\.edu$/i;
+    return mitPattern.test(email);
+  }
+
+  async function handleSubmit(e) {
     e.preventDefault();
 
     setSending(true);
     setMessage({ type: '', text: '' });
 
     try {
-      const res = await fetch('/api/auth/club-login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
+      if (mode === 'signup') {
+        // Club signup - create new account
+        const res = await fetch('/api/auth/club-signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, clubName }),
+        });
 
-      const data = await res.json();
+        const data = await res.json();
 
-      if (res.ok) {
-        setMessage({ type: 'success', text: t('club.success') });
-        setSnackbarSeverity('success');
-        setSnackbarMessage(t('club.success'));
-        setSnackbarOpen(true);
+        if (res.ok) {
+          setMessage({ type: 'success', text: t('club.signUpSuccess') });
+          setSnackbarSeverity('success');
+          setSnackbarMessage(t('club.signUpSuccess'));
+          setSnackbarOpen(true);
+        } else {
+          setMessage({ type: 'error', text: data.error || t('club.signUpError') });
+        }
       } else {
-        setMessage({ type: 'error', text: data.error || t('club.error') });
+        // Club login - existing account
+        const res = await fetch('/api/auth/club-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          setMessage({ type: 'success', text: t('club.success') });
+          setSnackbarSeverity('success');
+          setSnackbarMessage(t('club.success'));
+          setSnackbarOpen(true);
+        } else {
+          setMessage({ type: 'error', text: data.error || t('club.error') });
+        }
       }
     } catch (error) {
-      setMessage({ type: 'error', text: t('club.error') });
+      setMessage({ type: 'error', text: mode === 'signup' ? t('club.signUpError') : t('club.error') });
     } finally {
       setSending(false);
     }
   }
+
+  const isSignup = mode === 'signup';
+  const showPersonalEmailWarning = isSignup && email && isPersonalMitEmail(email);
+  const isFormValid = isSignup ? (email && clubName) : email;
 
   return (
     <>
       <main className="min-h-screen pt-24 lg:pt-32">
         <section className="section container-narrow">
           <div className="text-center mb-8">
-            <h1 className="mb-2">{t('club.title')}</h1>
+            <h1 className="mb-2">{isSignup ? t('club.signUpTitle') : t('club.title')}</h1>
             <p className="text-text-secondary">
-              {t('club.description')}
+              {isSignup ? t('club.signUpDescription') : t('club.description')}
             </p>
           </div>
 
-          {/* Club Login Form */}
+          {/* Club Login/Signup Form */}
           <Box
             component="form"
             className="card-elevated"
@@ -88,7 +121,7 @@ export default function ClubLoginPage() {
               py: 4,
               px: 4,
             }}
-            onSubmit={handleClubLogin}
+            onSubmit={handleSubmit}
           >
             <TextField
               type="email"
@@ -101,6 +134,28 @@ export default function ClubLoginPage() {
               fullWidth
               InputLabelProps={{ shrink: true }}
             />
+
+            {/* Club Name field - only shown in signup mode */}
+            {isSignup && (
+              <TextField
+                type="text"
+                label={t('club.clubNameLabel')}
+                variant="outlined"
+                value={clubName}
+                onChange={(e) => setClubName(e.target.value)}
+                placeholder={t('club.clubNamePlaceholder')}
+                sx={{ ...textFieldSx, mb: 2 }}
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+              />
+            )}
+
+            {/* Personal email warning - only for signup */}
+            {showPersonalEmailWarning && (
+              <div className="mb-4 p-3 rounded text-sm bg-yellow-50 text-yellow-700 border border-yellow-200">
+                {t('club.personalEmailWarning')}
+              </div>
+            )}
 
             {message.text && (
               <div className={`mb-4 p-3 rounded text-sm ${
@@ -115,7 +170,7 @@ export default function ClubLoginPage() {
             <Button
               type="submit"
               variant="contained"
-              disabled={sending || !email}
+              disabled={sending || !isFormValid}
               sx={{
                 backgroundColor: "#750014",
                 "&:hover": {
@@ -131,8 +186,44 @@ export default function ClubLoginPage() {
                 boxShadow: "none",
               }}
             >
-              {sending ? t('club.sending') : t('club.sendLinkButton')}
+              {sending
+                ? t('club.sending')
+                : (isSignup ? t('club.signUpButton') : t('club.sendLinkButton'))
+              }
             </Button>
+
+            {/* Mode switch link */}
+            <div className="text-center mt-4 text-sm text-text-secondary">
+              {isSignup ? (
+                <>
+                  {t('club.haveAccount')}{' '}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMode('signin');
+                      setMessage({ type: '', text: '' });
+                    }}
+                    className="text-accent hover:underline"
+                  >
+                    {t('club.signIn')}
+                  </button>
+                </>
+              ) : (
+                <>
+                  {t('club.noAccount')}{' '}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMode('signup');
+                      setMessage({ type: '', text: '' });
+                    }}
+                    className="text-accent hover:underline"
+                  >
+                    {t('club.signUp')}
+                  </button>
+                </>
+              )}
+            </div>
           </Box>
 
           {/* Back to regular login */}

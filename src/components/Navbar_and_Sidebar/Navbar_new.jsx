@@ -47,10 +47,15 @@ function Navbar() {
         { href: `/${locale}/contact`, label: t('dropdown.contact') },
       ],
     },
-    { href: `/${locale}/yearbook`, label: t('yearbook') },
-    { href: `/${locale}/seniors`, label: t('seniors') },
-    { href: `/${locale}/parents`, label: t('parents') },
-    { href: `/${locale}/alumni`, label: t('alumni') },
+    {
+      label: t('purchase'),
+      dropdown: [
+        { href: `/${locale}/yearbook`, label: t('yearbook') },
+        { href: `/${locale}/seniors`, label: t('seniors') },
+        { href: `/${locale}/parents`, label: t('parents') },
+        { href: `/${locale}/alumni`, label: t('alumni') },
+      ],
+    },
     {
       label: t('forms'),
       dropdown: [
@@ -73,6 +78,7 @@ function Navbar() {
       ],
       grouped: true,
     },
+    { href: `/${locale}/resources`, label: t('resources') },
     {
       label: t('getStarted'),
       dropdown: [

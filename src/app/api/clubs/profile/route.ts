@@ -83,13 +83,6 @@ export async function PUT(request: NextRequest) {
       .eq('user_id', user.id)
       .single();
 
-    if (!existingClub) {
-      return NextResponse.json(
-        { error: "Club profile not found" },
-        { status: 404 }
-      );
-    }
-
     // Validate and sanitize fields
     const allowedFields = [
       'name',
@@ -104,19 +97,41 @@ export async function PUT(request: NextRequest) {
       }
     }
 
-    // Update club
-    const { data, error } = await supabase
-      .from('clubs')
-      .update({
-        ...updateData,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', existingClub.id)
-      .select()
-      .single();
+    let data;
+    let error;
+
+    if (existingClub) {
+      // Update existing club
+      const result = await supabase
+        .from('clubs')
+        .update({
+          ...updateData,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', existingClub.id)
+        .select()
+        .single();
+      data = result.data;
+      error = result.error;
+    } else {
+      // Create new club record for this user
+      const result = await supabase
+        .from('clubs')
+        .insert({
+          user_id: user.id,
+          club_id: `CLUB-${Date.now()}`,
+          ...updateData,
+          has_leader: false,
+          approval_status: 'pending',
+        })
+        .select()
+        .single();
+      data = result.data;
+      error = result.error;
+    }
 
     if (error) {
-      console.error("Update club error:", error);
+      console.error("Update/create club error:", error);
       return NextResponse.json(
         { error: "Failed to update club profile" },
         { status: 500 }

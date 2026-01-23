@@ -9,11 +9,13 @@
   "nav": {
     "about": "ACERCA DE",
     "archive": "ARCHIVO",
+    "purchase": "COMPRAR",
     "yearbook": "ANUARIO",
     "parents": "PADRES",
     "alumni": "EXALUMNOS",
     "forms": "FORMULARIOS",
     "seniors": "SENIORS",
+    "resources": "RECURSOS",
     "getStarted": "COMENZAR",
     "dropdown": {
       "ourHistory": "NUESTRA HISTORIA",
@@ -29,7 +31,8 @@
       "clubs": "CLUBES",
       "studentWork": "TRABAJO ESTUDIANTIL",
       "hireUs": "CONTRÁTANOS",
-      "joinUs": "ÚNETE"
+      "joinUs": "ÚNETE",
+      "faq": "PREGUNTAS FRECUENTES"
     }
   },
 
@@ -195,13 +198,25 @@
         "sendLinkButton": "Enviar Enlace de Acceso",
         "sending": "Enviando...",
         "success": "¡Enlace de acceso enviado! Revisa tu correo.",
-        "error": "Error al enviar el enlace. Por favor intenta de nuevo."
+        "error": "Error al enviar el enlace. Por favor intenta de nuevo.",
+        "signIn": "Iniciar Sesión",
+        "signUp": "Registrarse",
+        "signUpTitle": "Registro de Club",
+        "signUpDescription": "Registra tu club para gestionar tu perfil del anuario.",
+        "clubNameLabel": "Nombre del Club",
+        "clubNamePlaceholder": "ej., MIT Robotics Club",
+        "signUpButton": "Registrar Club",
+        "signUpSuccess": "¡Enlace de registro enviado! Revisa tu correo.",
+        "signUpError": "Error al registrar. Por favor intenta de nuevo.",
+        "noAccount": "¿No tienes una cuenta?",
+        "haveAccount": "¿Ya tienes una cuenta?",
+        "personalEmailWarning": "Este parece ser un email personal de MIT. Por favor usa el email oficial de tu club si está disponible."
       },
       "adminLinkPrefix": "¿Personal de Technique?",
       "adminLink": "Acceso de Administrador",
       "clubLinkPrefix": "¿Representas a un club?",
       "clubLink": "Acceso de Club",
-      "backToLogin": "← Volver al inicio de sesión"
+      "backToLogin": "← Volver al inicio de sesión de estudiante"
     },
 
     "portfolio": {
@@ -263,7 +278,51 @@
         "profile": "Perfil",
         "seniorBio": "Bio de Senior",
         "clubInfo": "Info del Club",
-        "scheduling": "Programación"
+        "scheduling": "Programación",
+        "myClubs": "Mis Clubes"
+      },
+      "myClubs": {
+        "title": "Mis Clubes",
+        "searchTitle": "Buscar Clubes",
+        "memberships": "Tus Membresías",
+        "noMemberships": "Aún no eres miembro de ningún club.",
+        "pendingRequests": "Solicitudes Pendientes",
+        "noPendingRequests": "No hay solicitudes de unión pendientes.",
+        "cancelRequest": "Cancelar",
+        "cancel": "Cancelar",
+        "cancelling": "...",
+        "searchClubs": "Buscar Clubes",
+        "searchPlaceholder": "Buscar un club para unirse...",
+        "searchHint": "Encuentra y solicita unirte a clubes de MIT",
+        "noResults": "No se encontraron clubes",
+        "joinClub": "Unirse",
+        "requestJoin": "Unirse",
+        "joining": "...",
+        "requesting": "...",
+        "requestSent": "¡Solicitud enviada!",
+        "requestedOn": "Solicitado el {date}",
+        "joinedOn": "Unido el {date}",
+        "alreadyMember": "Miembro",
+        "alreadyRequested": "Solicitado",
+        "leader": "Líder",
+        "member": "Miembro",
+        "role": {
+          "member": "Miembro",
+          "leader": "Líder"
+        },
+        "invitations": {
+          "title": "Invitaciones de Clubes",
+          "noInvitations": "No hay invitaciones pendientes",
+          "accept": "Aceptar",
+          "decline": "Rechazar",
+          "accepting": "Aceptando...",
+          "declining": "Rechazando...",
+          "accepted": "¡Invitación aceptada!",
+          "declined": "Invitación rechazada",
+          "invitedBy": "Invitado por {name}",
+          "invitedOn": "{date}",
+          "error": "Error al procesar invitación"
+        }
       },
       "profile": {
         "title": "Información de la Cuenta",
@@ -645,7 +704,14 @@
       "notes": "Notas",
       "approve": "Aprobar",
       "deny": "Rechazar",
-      "denyReason": "Ingrese razón de rechazo (opcional):"
+      "denyReason": "Ingrese razón de rechazo (opcional):",
+      "leaderRequests": {
+        "title": "Solicitudes de Promoción a Líder",
+        "leaderOf": "líder de",
+        "requestedBy": "Solicitado por",
+        "approve": "Aprobar",
+        "deny": "Rechazar"
+      }
     },
     "livingGroups": {
       "title": "Gestión de Grupos de Vivienda",
@@ -744,6 +810,12 @@
     "clubId": "ID del Club",
     "notes": "Notas del Admin",
     "frozen": "Este formulario está congelado. No puede hacer cambios en este momento.",
+    "tabs": {
+      "profile": "Perfil",
+      "members": "Miembros",
+      "requests": "Solicitudes",
+      "management": "Gestión"
+    },
     "form": {
       "name": "Nombre del Club",
       "description": "Descripción",
@@ -753,6 +825,94 @@
       "images": "Imágenes Candid",
       "imagesHint": "Suba hasta 3 imágenes candid de su club (próximamente)",
       "uploadNote": "Función de carga de imágenes próximamente"
+    },
+    "members": {
+      "title": "Miembros del Club",
+      "active": "Miembros Activos",
+      "activeMembers": "Miembros Activos",
+      "noActiveMembers": "Aún no hay miembros activos.",
+      "manual": "Miembros Manuales",
+      "manualMembers": "Miembros Manuales",
+      "noManualMembers": "No hay miembros manuales añadidos.",
+      "addManual": "Añadir Miembro",
+      "add": "Añadir",
+      "addManualPlaceholder": "Ingrese nombre del miembro",
+      "addPlaceholder": "Ingrese nombre del miembro",
+      "adding": "Añadiendo...",
+      "remove": "Eliminar",
+      "removing": "Eliminando...",
+      "addSuccess": "Miembro añadido exitosamente",
+      "addError": "Error al añadir miembro",
+      "removeSuccess": "Miembro eliminado exitosamente",
+      "removeError": "Error al eliminar miembro",
+      "export": "Exportar para InDesign",
+      "exporting": "Exportando...",
+      "exportSuccess": "¡{count} miembros copiados al portapapeles!",
+      "exportError": "Error al exportar miembros",
+      "exportHint": "Copiar todos los nombres (ordenados por apellido)",
+      "copied": "¡Copiado al portapapeles!",
+      "leader": "Líder",
+      "member": "Miembro",
+      "promotionRequested": "Solicitud de promoción a líder enviada",
+      "promotionError": "Error al solicitar promoción",
+      "requestCancelled": "Solicitud de promoción cancelada",
+      "cancelError": "Error al cancelar solicitud",
+      "demoteSuccess": "Líder degradado a miembro",
+      "demoteError": "Error al degradar líder",
+      "role": {
+        "member": "Miembro",
+        "leader": "Líder"
+      }
+    },
+    "requests": {
+      "title": "Solicitudes de Unión",
+      "pending": "Solicitudes Pendientes",
+      "noPending": "No hay solicitudes pendientes.",
+      "noRequests": "No hay solicitudes pendientes.",
+      "approve": "Aprobar",
+      "deny": "Rechazar",
+      "processing": "..."
+    },
+    "management": {
+      "title": "Gestión de Usuarios",
+      "description": "Gestiona los miembros y líderes del club. Puede tener hasta 2 líderes por club.",
+      "noMembers": "No hay miembros que gestionar.",
+      "removeMember": "Eliminar",
+      "promoteToLeader": "Promover a Líder",
+      "demoteToMember": "Degradar a Miembro",
+      "processing": "...",
+      "leaderLimit": "Máximo 2 líderes permitidos",
+      "leaderInfo": "Líderes actuales: {count}/{max}",
+      "pendingPromotions": "Promociones Pendientes",
+      "awaitingApproval": "Esperando aprobación del admin",
+      "cancelling": "Cancelando...",
+      "cancelRequest": "Cancelar Solicitud",
+      "promotionPending": "Promoción pendiente",
+      "requestLeader": "Solicitar Promoción a Líder",
+      "requestLeaderHint": "Se requiere aprobación del admin para promover a líder",
+      "pendingLeaderRequest": "Promoción pendiente de aprobación"
+    },
+    "onboarding": {
+      "addLeaderRequired": "Añadir un líder para continuar",
+      "addLeaderDescription": "Su club necesita al menos un estudiante líder de MIT antes de poder gestionar miembros y ser visible para los estudiantes.",
+      "searchStudent": "Buscar estudiantes de MIT...",
+      "addAsLeader": "Añadir como Líder",
+      "adding": "Añadiendo...",
+      "leaderAdded": "¡Líder añadido exitosamente!",
+      "leaderError": "Error al añadir líder"
+    },
+    "invitations": {
+      "title": "Invitar Estudiantes",
+      "searchPlaceholder": "Buscar por nombre o email...",
+      "invite": "Invitar",
+      "inviting": "Invitando...",
+      "inviteSent": "¡Invitación enviada!",
+      "inviteError": "Error al enviar invitación",
+      "pendingInvitations": "Invitaciones Pendientes",
+      "noPendingInvitations": "No hay invitaciones pendientes",
+      "invitedOn": "Invitado el {date}",
+      "cancel": "Cancelar",
+      "cancelling": "Cancelando..."
     },
     "success": "El perfil de su club ha sido actualizado",
     "error": "Error al actualizar el perfil del club",
@@ -779,5 +939,49 @@
     "booking": "Reservando...",
     "bookSuccess": "Horario reservado exitosamente",
     "bookError": "Error al reservar horario"
+  },
+
+  "resources": {
+    "title": "Recursos y Preguntas Frecuentes",
+    "metaTitle": "Recursos y FAQ - MIT Technique",
+    "metaDescription": "Preguntas frecuentes sobre el anuario de MIT Technique, cuentas y servicios.",
+    "description": "Encuentra respuestas a preguntas comunes sobre anuarios, cuentas y nuestros servicios.",
+    "faq": {
+      "title": "Preguntas Frecuentes",
+      "accounts": {
+        "title": "Cuentas e Inicio de Sesión",
+        "q1": "¿Cómo creo una cuenta?",
+        "a1": "Los estudiantes de MIT pueden iniciar sesión usando MIT SSO (Touchstone). Los clubes pueden registrarse haciendo clic en 'Acceso de Club' y seleccionando 'Registrarse' para crear una nueva cuenta de club con su correo oficial.",
+        "q2": "¿Cuál es la diferencia entre cuentas de estudiante y de club?",
+        "a2": "Las cuentas de estudiante son para que los estudiantes de MIT gestionen su biografía de senior y se unan a clubes. Las cuentas de club son para que las organizaciones de MIT gestionen su perfil de anuario, listas de miembros y fotos candidas.",
+        "q3": "Soy un club - ¿cómo empiezo después de registrarme?",
+        "a3": "Después de registrarte, necesitarás agregar al menos un estudiante de MIT como líder antes de que tu club sea visible. Busca al estudiante por nombre o correo en la sección de incorporación.",
+        "q4": "¿Cómo funcionan las invitaciones de club?",
+        "a4": "Los clubes pueden invitar a estudiantes de MIT a unirse. Los estudiantes verán las invitaciones pendientes en la pestaña 'Mis Clubes' de su perfil y pueden aceptar o rechazar. Las invitaciones aceptadas agregan automáticamente al estudiante como miembro."
+      },
+      "yearbook": {
+        "title": "Anuario y Pedidos",
+        "q1": "¿Cuándo puedo ordenar el anuario?",
+        "a1": "Los anuarios típicamente están disponibles para preorden en el semestre de primavera. Consulta la página de Anuario para disponibilidad y precios actuales.",
+        "q2": "¿Cómo envío mi biografía de senior?",
+        "a2": "Inicia sesión con tu cuenta de MIT, luego navega a tu perfil. Puedes editar tu cita, logros y otra información que aparecerá en el anuario.",
+        "q3": "¿Pueden los padres o exalumnos ordenar anuarios?",
+        "a3": "¡Sí! Visita las páginas de Padres o Exalumnos para información sobre cómo ordenar anuarios como regalo o para ti mismo."
+      },
+      "clubs": {
+        "title": "Clubes y Organizaciones",
+        "q1": "¿Cómo agrego mi club al anuario?",
+        "a1": "Registra una cuenta de club, agrega un líder, luego completa tu perfil de club con descripción, lista de miembros y fotos candidas. Tu envío será revisado por el personal de Technique.",
+        "q2": "¿Qué fotos deben enviar los clubes?",
+        "a2": "Envía fotos candidas de alta calidad que representen las actividades de tu club. Puedes subir hasta 3 fotos. Evita fotos grupales posadas - ¡queremos capturar a tu club en acción!",
+        "q3": "¿Quién puede gestionar el perfil del club?",
+        "a3": "El propietario de la cuenta del club y los líderes designados pueden editar el perfil del club. Los líderes deben ser estudiantes de MIT y se agregan a través del panel del club."
+      },
+      "contact": {
+        "title": "¿Todavía tienes preguntas?",
+        "description": "Estamos aquí para ayudar. Contáctanos directamente.",
+        "button": "Contáctanos"
+      }
+    }
   }
 }

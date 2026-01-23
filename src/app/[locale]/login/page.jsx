@@ -62,17 +62,8 @@ export default function LoginPage() {
             </Button>
           </Box>
 
-          {/* Admin & Club Login Links */}
+          {/* Club & Admin Login Links */}
           <div className="text-center mt-6 space-y-2">
-            <div>
-              <span className="text-sm text-text-muted">{t('adminLinkPrefix')} </span>
-              <Link
-                href={`/${locale}/login/admin`}
-                className="text-sm text-accent hover:underline"
-              >
-                {t('adminLink')}
-              </Link>
-            </div>
             <div>
               <span className="text-sm text-text-muted">{t('clubLinkPrefix')} </span>
               <Link
@@ -80,6 +71,15 @@ export default function LoginPage() {
                 className="text-sm text-accent hover:underline"
               >
                 {t('clubLink')}
+              </Link>
+            </div>
+            <div>
+              <span className="text-sm text-text-muted">{t('adminLinkPrefix')} </span>
+              <Link
+                href={`/${locale}/login/admin`}
+                className="text-sm text-accent hover:underline"
+              >
+                {t('adminLink')}
               </Link>
             </div>
           </div>

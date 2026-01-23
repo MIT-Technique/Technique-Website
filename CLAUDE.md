@@ -646,25 +646,170 @@ export function generateStaticParams() {
 -- WARNING: This schema is for context only and is not meant to be run.
 -- Table order and constraints may not be valid for execution.
 
-CREATE TABLE public.bios (
+CREATE TABLE public.club_join_requests (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
-email text NOT NULL UNIQUE,
-first_name text NOT NULL DEFAULT ''::text,
-last_name text NOT NULL DEFAULT ''::text,
-major text NOT NULL DEFAULT ''::text,
-quote text CHECK (char_length(quote) <= 300),
+club_id uuid NOT NULL,
+user_id uuid NOT NULL,
+status text NOT NULL DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'approved'::text, 'denied'::text])),
+created_at timestamp with time zone DEFAULT now(),
+resolved_at timestamp with time zone,
+CONSTRAINT club_join_requests_pkey PRIMARY KEY (id),
+CONSTRAINT club_join_requests_club_id_fkey FOREIGN KEY (club_id) REFERENCES public.clubs(id),
+CONSTRAINT club_join_requests_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
+CREATE TABLE public.club_leader_requests (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+club_id uuid NOT NULL,
+user_id uuid NOT NULL,
+requested_by uuid NOT NULL,
+status text NOT NULL DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'approved'::text, 'denied'::text])),
+created_at timestamp with time zone DEFAULT now(),
+resolved_at timestamp with time zone,
+resolved_by uuid,
+CONSTRAINT club_leader_requests_pkey PRIMARY KEY (id),
+CONSTRAINT club_leader_requests_club_id_fkey FOREIGN KEY (club_id) REFERENCES public.clubs(id),
+CONSTRAINT club_leader_requests_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
+CONSTRAINT club_leader_requests_requested_by_fkey FOREIGN KEY (requested_by) REFERENCES public.users(id),
+CONSTRAINT club_leader_requests_resolved_by_fkey FOREIGN KEY (resolved_by) REFERENCES public.users(id)
+);
+CREATE TABLE public.club_manual_members (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+club_id uuid NOT NULL,
+name text NOT NULL,
+added_at timestamp with time zone DEFAULT now(),
+CONSTRAINT club_manual_members_pkey PRIMARY KEY (id),
+CONSTRAINT club_manual_members_club_id_fkey FOREIGN KEY (club_id) REFERENCES public.clubs(id)
+);
+CREATE TABLE public.club_memberships (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+club_id uuid NOT NULL,
+user_id uuid NOT NULL,
+role text NOT NULL DEFAULT 'member'::text CHECK (role = ANY (ARRAY['member'::text, 'leader'::text])),
+joined_at timestamp with time zone DEFAULT now(),
+CONSTRAINT club_memberships_pkey PRIMARY KEY (id),
+CONSTRAINT club_memberships_club_id_fkey FOREIGN KEY (club_id) REFERENCES public.clubs(id),
+CONSTRAINT club_memberships_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
+CREATE TABLE public.clubs (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+user_id uuid NOT NULL,
+club_id character NOT NULL UNIQUE,
+name character varying NOT NULL,
+description text,
+member_list text,
+candid_image_1 text,
+candid_image_2 text,
+candid_image_3 text,
+approval_status character varying DEFAULT 'pending'::character varying CHECK (approval_status::text = ANY (ARRAY['pending'::character varying, 'approved'::character varying, 'denied'::character varying]::text[])),
+approval_notes text,
+approved_by uuid,
+approved_at timestamp with time zone,
 created_at timestamp with time zone DEFAULT now(),
 updated_at timestamp with time zone DEFAULT now(),
-CONSTRAINT bios_pkey PRIMARY KEY (id)
+CONSTRAINT clubs_pkey PRIMARY KEY (id),
+CONSTRAINT clubs_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
+CONSTRAINT clubs_approved_by_fkey FOREIGN KEY (approved_by) REFERENCES public.users(id)
+);
+CREATE TABLE public.form_settings (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+form_name character varying NOT NULL UNIQUE,
+is_frozen boolean DEFAULT false,
+frozen_by uuid,
+frozen_at timestamp with time zone,
+unfrozen_by uuid,
+unfrozen_at timestamp with time zone,
+created_at timestamp with time zone DEFAULT now(),
+updated_at timestamp with time zone DEFAULT now(),
+CONSTRAINT form_settings_pkey PRIMARY KEY (id),
+CONSTRAINT form_settings_frozen_by_fkey FOREIGN KEY (frozen_by) REFERENCES public.users(id),
+CONSTRAINT form_settings_unfrozen_by_fkey FOREIGN KEY (unfrozen_by) REFERENCES public.users(id)
+);
+CREATE TABLE public.living_groups (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+user_id uuid NOT NULL,
+name character varying NOT NULL,
+status character varying DEFAULT 'pending'::character varying CHECK (status::text = ANY (ARRAY['active'::character varying, 'disabled'::character varying, 'pending'::character varying]::text[])),
+promoted_by uuid,
+promoted_at timestamp with time zone,
+disabled_by uuid,
+disabled_at timestamp with time zone,
+created_at timestamp with time zone DEFAULT now(),
+updated_at timestamp with time zone DEFAULT now(),
+CONSTRAINT living_groups_pkey PRIMARY KEY (id),
+CONSTRAINT living_groups_disabled_by_fkey FOREIGN KEY (disabled_by) REFERENCES public.users(id),
+CONSTRAINT living_groups_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
+CONSTRAINT living_groups_promoted_by_fkey FOREIGN KEY (promoted_by) REFERENCES public.users(id)
+);
+CREATE TABLE public.photoshoot_times (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+date date NOT NULL,
+start_time time without time zone NOT NULL,
+end_time time without time zone NOT NULL,
+living_group_id uuid,
+booked_at timestamp with time zone,
+booked_by uuid,
+cancellation_requested boolean DEFAULT false,
+cancellation_request_reason text,
+cancellation_approved boolean,
+cancelled_at timestamp with time zone,
+cancelled_by uuid,
+created_by uuid NOT NULL,
+notes text,
+created_at timestamp with time zone DEFAULT now(),
+updated_at timestamp with time zone DEFAULT now(),
+location text,
+CONSTRAINT photoshoot_times_pkey PRIMARY KEY (id),
+CONSTRAINT photoshoot_times_living_group_id_fkey FOREIGN KEY (living_group_id) REFERENCES public.living_groups(id),
+CONSTRAINT photoshoot_times_booked_by_fkey FOREIGN KEY (booked_by) REFERENCES public.users(id),
+CONSTRAINT photoshoot_times_cancelled_by_fkey FOREIGN KEY (cancelled_by) REFERENCES public.users(id),
+CONSTRAINT photoshoot_times_created_by_fkey FOREIGN KEY (created_by) REFERENCES public.users(id)
+);
+CREATE TABLE public.promotion_requests (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+user_id uuid NOT NULL,
+request_type character varying NOT NULL CHECK (request_type::text = ANY (ARRAY['club_promotion'::character varying, 'living_group_leader'::character varying]::text[])),
+status character varying DEFAULT 'pending'::character varying CHECK (status::text = ANY (ARRAY['pending'::character varying, 'approved'::character varying, 'denied'::character varying]::text[])),
+request_reason text,
+living_group_name character varying,
+reviewed_by uuid,
+reviewed_at timestamp with time zone,
+review_notes text,
+created_at timestamp with time zone DEFAULT now(),
+updated_at timestamp with time zone DEFAULT now(),
+CONSTRAINT promotion_requests_pkey PRIMARY KEY (id),
+CONSTRAINT promotion_requests_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
+CONSTRAINT promotion_requests_reviewed_by_fkey FOREIGN KEY (reviewed_by) REFERENCES public.users(id)
+);
+CREATE TABLE public.sessions (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+user_id uuid NOT NULL,
+access_token text,
+expires_at timestamp with time zone NOT NULL,
+code_verifier text,
+state text,
+created_at timestamp with time zone DEFAULT now(),
+updated_at timestamp with time zone DEFAULT now(),
+CONSTRAINT sessions_pkey PRIMARY KEY (id),
+CONSTRAINT sessions_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
 );
 CREATE TABLE public.users (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
-email text NOT NULL UNIQUE,
-name text NOT NULL DEFAULT ''::text,
-mit_sub text UNIQUE,
+email character varying NOT NULL UNIQUE,
+role character varying NOT NULL DEFAULT 'student'::character varying CHECK (role::text = ANY (ARRAY['admin'::character varying, 'club'::character varying, 'living_group_leader'::character varying, 'student'::character varying]::text[])),
+first_name character varying,
+last_name character varying,
+major character varying,
+second_major character varying,
+quote text,
+achievements text,
+school_year integer,
+auth_provider character varying NOT NULL DEFAULT 'mit_sso'::character varying CHECK (auth_provider::text = ANY (ARRAY['mit_sso'::character varying, 'supabase_auth'::character varying]::text[])),
+supabase_auth_id uuid,
+is_active boolean DEFAULT true,
 created_at timestamp with time zone DEFAULT now(),
 updated_at timestamp with time zone DEFAULT now(),
-CONSTRAINT users_pkey PRIMARY KEY (id)
+CONSTRAINT users_pkey PRIMARY KEY (id),
+CONSTRAINT users_supabase_auth_id_fkey FOREIGN KEY (supabase_auth_id) REFERENCES auth.users(id)
 );
 
 ## CRITICAL: Authentication System Rules
@@ -675,14 +820,15 @@ This project uses a **dual session system** with two separate iron-session cooki
 
 ### Dual Session Architecture
 
-| Session | Cookie Name | Source File | Purpose |
-|---------|-------------|-------------|---------|
-| `next_js_session` | `next_js_session` | `src/lib/lib.ts` | MIT SSO OAuth (stores `state`, `code_verifier`) |
+| Session             | Cookie Name         | Source File               | Purpose                                         |
+| ------------------- | ------------------- | ------------------------- | ----------------------------------------------- |
+| `next_js_session`   | `next_js_session`   | `src/lib/lib.ts`          | MIT SSO OAuth (stores `state`, `code_verifier`) |
 | `technique_session` | `technique_session` | `src/lib/auth/session.ts` | Admin magic links, club signup, role-based auth |
 
 ### Critical Import Rules
 
 **For MIT SSO OAuth callback (`/api/userSignIn`):**
+
 ```typescript
 // ✅ CORRECT - MIT SSO uses next_js_session
 import { getClientConfig, getSession } from "../../../lib/lib";
@@ -692,6 +838,7 @@ import { getSession } from "../../../lib/auth/session";
 ```
 
 **For admin/role-based auth (`/api/auth/*`):**
+
 ```typescript
 // ✅ CORRECT - Admin magic links use technique_session
 import { getSession } from "../../../lib/auth/session";
@@ -706,11 +853,11 @@ import { getSession } from "../../../lib/auth/session";
 
 ### Login Page Structure
 
-| Route | Purpose | Auth Method |
-|-------|---------|-------------|
-| `/login` | Main login page | MIT SSO button + "Admin Login" link |
-| `/login/student` | Student-only login (bio form redirect) | MIT SSO only |
-| `/login/admin` | Admin-only login | Magic link form (technique@mit.edu) |
+| Route            | Purpose                                | Auth Method                         |
+| ---------------- | -------------------------------------- | ----------------------------------- |
+| `/login`         | Main login page                        | MIT SSO button + "Admin Login" link |
+| `/login/student` | Student-only login (bio form redirect) | MIT SSO only                        |
+| `/login/admin`   | Admin-only login                       | Magic link form (technique@mit.edu) |
 
 ### User Roles
 
