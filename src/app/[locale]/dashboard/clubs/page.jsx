@@ -101,9 +101,6 @@ export default function ClubsPage() {
                       {t(`status.${club.approval_status}`)}
                     </span>
                   </div>
-                  <p className="text-sm text-text-secondary mb-2">
-                    {t('contactEmail')}: {club.user?.email}
-                  </p>
                   {club.description && (
                     <p className="text-sm text-text-secondary mb-2">{club.description}</p>
                   )}

@@ -22,10 +22,7 @@ export async function GET(request: NextRequest) {
 
     let query = supabase
       .from('clubs')
-      .select(`
-        *,
-        user:users(id, email, first_name, last_name)
-      `)
+      .select('*')
       .order('created_at', { ascending: false });
 
     if (status) {

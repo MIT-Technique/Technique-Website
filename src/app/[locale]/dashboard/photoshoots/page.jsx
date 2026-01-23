@@ -3,6 +3,16 @@
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
+// Format 24-hour time to 12-hour AM/PM format
+function formatTime(time24) {
+  if (!time24) return '';
+  const [hours, minutes] = time24.split(':');
+  const hour = parseInt(hours, 10);
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  const hour12 = hour % 12 || 12;
+  return `${hour12}:${minutes} ${ampm}`;
+}
+
 export default function PhotoshootsPage() {
   const t = useTranslations('dashboard.photoshoots');
   const [times, setTimes] = useState([]);
@@ -187,11 +197,11 @@ export default function PhotoshootsPage() {
               <div className="flex justify-between items-start">
                 <div>
                   <p className="font-medium">
-                    {new Date(time.date).toLocaleDateString()} &middot; {time.start_time} - {time.end_time}
+                    {new Date(time.date).toLocaleDateString()} &middot; {formatTime(time.start_time)} - {formatTime(time.end_time)} EST
                   </p>
                   {time.living_group && (
                     <p className="text-sm text-text-secondary mt-1">
-                      {t('bookedBy')}: {time.living_group.name} ({time.living_group.user?.email})
+                      {t('bookedBy')}: {time.living_group.name}
                     </p>
                   )}
                   {time.location && (

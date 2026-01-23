@@ -25,12 +25,7 @@ export async function GET(request: NextRequest) {
       .from('photoshoot_times')
       .select(`
         *,
-        living_group:living_groups(
-          id,
-          name,
-          user:users(id, email, first_name, last_name)
-        ),
-        booked_by_user:users!photoshoot_times_booked_by_fkey(id, email, first_name, last_name)
+        living_group:living_groups(id, name, user_id)
       `)
       .is('cancelled_at', null)
       .order('date', { ascending: true })

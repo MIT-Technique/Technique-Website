@@ -1,17 +1,17 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useUser } from '../../../hooks/useUser';
 
 export default function DashboardLayout({ children }) {
   const router = useRouter();
+  const pathname = usePathname();
   const locale = useLocale();
   const t = useTranslations('dashboard');
   const { isLoggedIn, user, loading } = useUser();
-  const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
     if (!loading && (!isLoggedIn || user?.role !== 'admin')) {
@@ -61,7 +61,7 @@ export default function DashboardLayout({ children }) {
                 key={tab.id}
                 href={tab.href}
                 className={`pb-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                  typeof window !== 'undefined' && window.location.pathname === tab.href
+                  pathname === tab.href
                     ? 'border-accent text-accent'
                     : 'border-transparent text-text-secondary hover:text-text-primary'
                 }`}
