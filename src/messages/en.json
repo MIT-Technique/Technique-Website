@@ -333,7 +333,10 @@
       "promotion": {
         "title": "Need different access?",
         "description": "Request a role change if you represent a club or living group.",
-        "requestButton": "Request Role Change"
+        "requestButton": "Request Role Change",
+        "staphTitle": "Need TNQ staph access?",
+        "staphRequestButton": "Request Staph Access",
+        "requestPending": "Request Pending"
       },
       "bio": {
         "firstName": "First Name",
@@ -685,6 +688,7 @@
     },
     "clubs": {
       "title": "Club Management",
+      "searchPlaceholder": "Search clubs...",
       "filters": {
         "all": "All",
         "pending": "Pending",
@@ -704,6 +708,10 @@
       "approve": "Approve",
       "deny": "Deny",
       "denyReason": "Enter reason for denial (optional):",
+      "activeMembers": "Active: {count}",
+      "manualMembers": "Manual: {count}",
+      "viewLeaders": "View Leaders ({count})",
+      "noLeaders": "No leaders assigned",
       "leaderRequests": {
         "title": "Leader Promotion Requests",
         "leaderOf": "leader of",
@@ -749,6 +757,7 @@
       "filters": {
         "allRoles": "All Roles",
         "student": "Student",
+        "staph": "Staph",
         "club": "Club",
         "lgl": "Living Group Leader",
         "admin": "Admin"
@@ -765,6 +774,7 @@
       "active": "Active",
       "inactive": "Inactive",
       "requestType": "Request Type",
+      "staphRequest": "Staph Request",
       "clubPromotion": "Club Promotion",
       "lglPromotion": "Living Group Leader",
       "livingGroupName": "Living Group",
@@ -772,7 +782,11 @@
       "submitted": "Submitted",
       "approve": "Approve",
       "deny": "Deny",
-      "denyReason": "Enter reason for denial (optional):"
+      "denyReason": "Enter reason for denial (optional):",
+      "designateAdmin": "Designate Admin",
+      "designateConfirm": "Designate this staph member as admin?",
+      "maxAdmins": "Max admins reached ({count}/{max})",
+      "designatedAdmins": "Designated Admins: {count}/{max}"
     },
     "settings": {
       "title": "Settings",

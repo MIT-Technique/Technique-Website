@@ -79,6 +79,10 @@ export default function ProfilePage() {
   const [cancellingRequestId, setCancellingRequestId] = useState(null);
   const [processingInvitationId, setProcessingInvitationId] = useState(null);
 
+  // Staph request state
+  const [staphRequestPending, setStaphRequestPending] = useState(false);
+  const [staphRequestSubmitting, setStaphRequestSubmitting] = useState(false);
+
   // Redirect admin to dashboard
   useEffect(() => {
     if (!userLoading && isLoggedIn && user?.role === 'admin') {
@@ -124,6 +128,47 @@ export default function ProfilePage() {
       fetchMyClubsData();
     }
   }, [isLoggedIn, user]);
+
+  // Check for pending staph request for students
+  useEffect(() => {
+    if (isLoggedIn && user?.role === 'student') {
+      checkStaphRequest();
+    }
+  }, [isLoggedIn, user]);
+
+  async function checkStaphRequest() {
+    try {
+      const res = await fetch('/api/user/request-promotion');
+      const data = await res.json();
+      const pendingStaphRequest = (data.requests || []).find(
+        r => r.request_type === 'staph_request' && r.status === 'pending'
+      );
+      setStaphRequestPending(!!pendingStaphRequest);
+    } catch (error) {
+      console.error('Error checking staph request:', error);
+    }
+  }
+
+  async function handleStaphRequest() {
+    setStaphRequestSubmitting(true);
+    try {
+      const res = await fetch('/api/user/request-promotion', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ request_type: 'staph_request' }),
+      });
+      if (res.ok) {
+        setStaphRequestPending(true);
+      } else {
+        const data = await res.json();
+        console.error('Error submitting staph request:', data.error);
+      }
+    } catch (error) {
+      console.error('Error submitting staph request:', error);
+    } finally {
+      setStaphRequestSubmitting(false);
+    }
+  }
 
   async function fetchBioData() {
     try {
@@ -460,17 +505,22 @@ export default function ProfilePage() {
                 )}
               </div>
 
-              {/* Request promotion for students - small and unobtrusive */}
+              {/* Staph request for students - small and unobtrusive */}
               {user?.role === 'student' && (
                 <div className="mt-6 pt-4 border-t border-border/50">
                   <p className="text-xs text-text-muted">
-                    {t('promotion.title')}{' '}
-                    <button
-                      onClick={() => router.push(`/${locale}/request-promotion`)}
-                      className="text-accent hover:underline"
-                    >
-                      {t('promotion.requestButton')}
-                    </button>
+                    {t('promotion.staphTitle')}{' '}
+                    {staphRequestPending ? (
+                      <span className="text-yellow-600">{t('promotion.requestPending')}</span>
+                    ) : (
+                      <button
+                        onClick={handleStaphRequest}
+                        disabled={staphRequestSubmitting}
+                        className="text-accent hover:underline disabled:opacity-50"
+                      >
+                        {staphRequestSubmitting ? '...' : t('promotion.staphRequestButton')}
+                      </button>
+                    )}
                   </p>
                 </div>
               )}

@@ -75,7 +75,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const validRoles: UserRole[] = ['admin', 'club', 'living_group_leader', 'student'];
+    const validRoles: UserRole[] = ['admin', 'staph', 'club', 'living_group_leader', 'student'];
     if (role && !validRoles.includes(role)) {
       return NextResponse.json(
         { error: "Invalid role" },

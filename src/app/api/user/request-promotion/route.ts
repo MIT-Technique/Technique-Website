@@ -14,20 +14,12 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { request_type, request_reason, living_group_name } = body;
+    const { request_type, request_reason } = body;
 
-    // Validate request type
-    if (!['club_promotion', 'living_group_leader'].includes(request_type)) {
+    // Only staph_request is allowed
+    if (request_type !== 'staph_request') {
       return NextResponse.json(
         { error: "Invalid request type" },
-        { status: 400 }
-      );
-    }
-
-    // Living group leader requests need a living group name
-    if (request_type === 'living_group_leader' && !living_group_name) {
-      return NextResponse.json(
-        { error: "Living group name is required" },
         { status: 400 }
       );
     }
@@ -58,7 +50,6 @@ export async function POST(request: NextRequest) {
         request_type,
         status: 'pending',
         request_reason: request_reason || null,
-        living_group_name: living_group_name || null,
       })
       .select()
       .single();

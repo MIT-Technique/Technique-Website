@@ -333,7 +333,10 @@
       "promotion": {
         "title": "需要其他权限？",
         "description": "如果您代表社团或宿舍，可以申请角色变更。",
-        "requestButton": "申请角色变更"
+        "requestButton": "申请角色变更",
+        "staphTitle": "需要TNQ工作人员权限？",
+        "staphRequestButton": "申请工作人员权限",
+        "requestPending": "申请待处理"
       },
       "bio": {
         "firstName": "名字",
@@ -686,6 +689,7 @@
     },
     "clubs": {
       "title": "社团管理",
+      "searchPlaceholder": "搜索社团...",
       "filters": {
         "all": "全部",
         "pending": "待审核",
@@ -705,6 +709,10 @@
       "approve": "批准",
       "deny": "拒绝",
       "denyReason": "请输入拒绝原因（可选）：",
+      "activeMembers": "活跃成员: {count}",
+      "manualMembers": "手动添加: {count}",
+      "viewLeaders": "查看负责人 ({count})",
+      "noLeaders": "未分配负责人",
       "leaderRequests": {
         "title": "负责人提升请求",
         "leaderOf": "负责人 →",
@@ -750,6 +758,7 @@
       "filters": {
         "allRoles": "所有角色",
         "student": "学生",
+        "staph": "工作人员",
         "club": "社团",
         "lgl": "宿舍负责人",
         "admin": "管理员"
@@ -766,6 +775,7 @@
       "active": "活跃",
       "inactive": "未激活",
       "requestType": "请求类型",
+      "staphRequest": "工作人员申请",
       "clubPromotion": "社团提升",
       "lglPromotion": "宿舍负责人",
       "livingGroupName": "宿舍",
@@ -773,7 +783,11 @@
       "submitted": "提交时间",
       "approve": "批准",
       "deny": "拒绝",
-      "denyReason": "请输入拒绝原因（可选）："
+      "denyReason": "请输入拒绝原因（可选）：",
+      "designateAdmin": "指定管理员",
+      "designateConfirm": "将此工作人员指定为管理员？",
+      "maxAdmins": "已达管理员上限 ({count}/{max})",
+      "designatedAdmins": "已指定管理员: {count}/{max}"
     },
     "settings": {
       "title": "设置",

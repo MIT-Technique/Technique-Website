@@ -130,17 +130,17 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // If approved, update user role and create corresponding entry
+    // If approved, update user role to staph
     if (action === 'approved') {
       const targetUserId = promotionRequest.user_id;
       const requestType = promotionRequest.request_type;
 
-      if (requestType === 'club_promotion') {
-        // Update user role to club
+      if (requestType === 'staph_request') {
+        // Update user role to staph
         const { error: roleError } = await supabase
           .from('users')
           .update({
-            role: 'club',
+            role: 'staph',
             updated_at: new Date().toISOString(),
           })
           .eq('id', targetUserId);
@@ -151,57 +151,6 @@ export async function PUT(request: NextRequest) {
             { error: "Failed to update user role" },
             { status: 500 }
           );
-        }
-
-        // Generate 4-digit club ID
-        const clubId = String(Math.floor(1000 + Math.random() * 9000));
-
-        // Create club entry
-        const { error: clubError } = await supabase
-          .from('clubs')
-          .insert({
-            user_id: targetUserId,
-            club_id: clubId,
-            name: '',
-            approval_status: 'pending',
-          });
-
-        if (clubError) {
-          console.error("Error creating club:", clubError);
-          // Don't fail the whole request, the user role is already updated
-        }
-      } else if (requestType === 'living_group_leader') {
-        // Update user role to living_group_leader
-        const { error: roleError } = await supabase
-          .from('users')
-          .update({
-            role: 'living_group_leader',
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', targetUserId);
-
-        if (roleError) {
-          console.error("Error updating user role:", roleError);
-          return NextResponse.json(
-            { error: "Failed to update user role" },
-            { status: 500 }
-          );
-        }
-
-        // Create living group entry
-        const { error: lgError } = await supabase
-          .from('living_groups')
-          .insert({
-            user_id: targetUserId,
-            name: promotionRequest.living_group_name || '',
-            status: 'active',
-            promoted_by: user.id,
-            promoted_at: new Date().toISOString(),
-          });
-
-        if (lgError) {
-          console.error("Error creating living group:", lgError);
-          // Don't fail the whole request, the user role is already updated
         }
       }
     }

@@ -333,7 +333,10 @@
       "promotion": {
         "title": "¿Necesitas otro acceso?",
         "description": "Solicita un cambio de rol si representas un club o grupo de vivienda.",
-        "requestButton": "Solicitar Cambio de Rol"
+        "requestButton": "Solicitar Cambio de Rol",
+        "staphTitle": "¿Necesitas acceso de staph TNQ?",
+        "staphRequestButton": "Solicitar Acceso Staph",
+        "requestPending": "Solicitud Pendiente"
       },
       "bio": {
         "firstName": "Nombre",
@@ -686,6 +689,7 @@
     },
     "clubs": {
       "title": "Gestión de Clubes",
+      "searchPlaceholder": "Buscar clubes...",
       "filters": {
         "all": "Todos",
         "pending": "Pendientes",
@@ -705,6 +709,10 @@
       "approve": "Aprobar",
       "deny": "Rechazar",
       "denyReason": "Ingrese razón de rechazo (opcional):",
+      "activeMembers": "Activos: {count}",
+      "manualMembers": "Manuales: {count}",
+      "viewLeaders": "Ver Líderes ({count})",
+      "noLeaders": "Sin líderes asignados",
       "leaderRequests": {
         "title": "Solicitudes de Promoción a Líder",
         "leaderOf": "líder de",
@@ -750,6 +758,7 @@
       "filters": {
         "allRoles": "Todos los Roles",
         "student": "Estudiante",
+        "staph": "Staph",
         "club": "Club",
         "lgl": "Líder de Grupo",
         "admin": "Administrador"
@@ -766,6 +775,7 @@
       "active": "Activo",
       "inactive": "Inactivo",
       "requestType": "Tipo de Solicitud",
+      "staphRequest": "Solicitud de Staph",
       "clubPromotion": "Promoción a Club",
       "lglPromotion": "Líder de Grupo",
       "livingGroupName": "Grupo de Vivienda",
@@ -773,7 +783,11 @@
       "submitted": "Enviado",
       "approve": "Aprobar",
       "deny": "Rechazar",
-      "denyReason": "Ingrese razón de rechazo (opcional):"
+      "denyReason": "Ingrese razón de rechazo (opcional):",
+      "designateAdmin": "Designar Admin",
+      "designateConfirm": "¿Designar a este staph como admin?",
+      "maxAdmins": "Máximo de admins alcanzado ({count}/{max})",
+      "designatedAdmins": "Admins Designados: {count}/{max}"
     },
     "settings": {
       "title": "Configuración",

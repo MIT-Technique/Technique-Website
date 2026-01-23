@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "../../../../lib/auth/session";
 import { createAdminClient } from "../../../../lib/supabase/admin";
-import { ApprovalStatus } from "../../../../lib/supabase/types";
 
-// GET - List all clubs
+// GET - List all clubs with member counts and leader emails
 export async function GET(request: NextRequest) {
   try {
     const user = await getCurrentUser();
@@ -17,17 +16,12 @@ export async function GET(request: NextRequest) {
 
     const supabase = createAdminClient();
     const searchParams = request.nextUrl.searchParams;
-    const status = searchParams.get('status');
     const search = searchParams.get('search');
 
     let query = supabase
       .from('clubs')
       .select('*')
       .order('created_at', { ascending: false });
-
-    if (status) {
-      query = query.eq('approval_status', status);
-    }
 
     if (search) {
       query = query.or(`name.ilike.%${search}%,club_id.ilike.%${search}%`);
@@ -43,79 +37,55 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ clubs });
+    // Enrich clubs with member counts and leader emails
+    const enrichedClubs = await Promise.all(
+      (clubs || []).map(async (club) => {
+        // Get active member count
+        const { count: activeMemberCount } = await supabase
+          .from('club_memberships')
+          .select('*', { count: 'exact', head: true })
+          .eq('club_id', club.id);
+
+        // Get manual member count
+        const { count: manualMemberCount } = await supabase
+          .from('club_manual_members')
+          .select('*', { count: 'exact', head: true })
+          .eq('club_id', club.id);
+
+        // Get up to 2 leaders with their user info
+        const { data: leaderMemberships } = await supabase
+          .from('club_memberships')
+          .select('user_id')
+          .eq('club_id', club.id)
+          .eq('role', 'leader')
+          .limit(2);
+
+        let leaders: Array<{ email: string; first_name: string | null; last_name: string | null }> = [];
+
+        if (leaderMemberships && leaderMemberships.length > 0) {
+          const leaderUserIds = leaderMemberships.map(m => m.user_id);
+          const { data: leaderUsers } = await supabase
+            .from('users')
+            .select('email, first_name, last_name')
+            .in('id', leaderUserIds);
+
+          leaders = leaderUsers || [];
+        }
+
+        return {
+          ...club,
+          active_member_count: activeMemberCount || 0,
+          manual_member_count: manualMemberCount || 0,
+          leaders,
+        };
+      })
+    );
+
+    return NextResponse.json({ clubs: enrichedClubs });
   } catch (error) {
     console.error("Error fetching clubs:", error);
     return NextResponse.json(
       { error: "Failed to fetch clubs" },
-      { status: 500 }
-    );
-  }
-}
-
-// PUT - Approve or deny a club
-export async function PUT(request: NextRequest) {
-  try {
-    const user = await getCurrentUser();
-
-    if (!user || user.role !== 'admin') {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
-    }
-
-    const body = await request.json();
-    const { clubId, action, notes } = body;
-
-    if (!clubId) {
-      return NextResponse.json(
-        { error: "Club ID is required" },
-        { status: 400 }
-      );
-    }
-
-    const validActions: ApprovalStatus[] = ['approved', 'denied', 'pending'];
-    if (!validActions.includes(action)) {
-      return NextResponse.json(
-        { error: "Invalid action. Must be 'approved', 'denied', or 'pending'" },
-        { status: 400 }
-      );
-    }
-
-    const supabase = createAdminClient();
-
-    const updateData: Record<string, unknown> = {
-      approval_status: action,
-      approval_notes: notes || null,
-      updated_at: new Date().toISOString(),
-    };
-
-    if (action === 'approved' || action === 'denied') {
-      updateData.approved_by = user.id;
-      updateData.approved_at = new Date().toISOString();
-    }
-
-    const { data: updatedClub, error } = await supabase
-      .from('clubs')
-      .update(updateData)
-      .eq('id', clubId)
-      .select()
-      .single();
-
-    if (error) {
-      console.error("Error updating club:", error);
-      return NextResponse.json(
-        { error: "Failed to update club" },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({ club: updatedClub });
-  } catch (error) {
-    console.error("Error updating club:", error);
-    return NextResponse.json(
-      { error: "Failed to update club" },
       { status: 500 }
     );
   }

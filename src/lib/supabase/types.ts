@@ -1,8 +1,8 @@
-export type UserRole = 'admin' | 'club' | 'living_group_leader' | 'student';
+export type UserRole = 'admin' | 'staph' | 'club' | 'living_group_leader' | 'student';
 export type AuthProvider = 'mit_sso' | 'supabase_auth';
 export type ApprovalStatus = 'pending' | 'approved' | 'denied';
 export type LivingGroupStatus = 'active' | 'disabled' | 'pending';
-export type PromotionRequestType = 'club_promotion' | 'living_group_leader';
+export type PromotionRequestType = 'staph_request';
 export type RequestStatus = 'pending' | 'approved' | 'denied';
 
 export interface User {
