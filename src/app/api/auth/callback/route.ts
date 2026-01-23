@@ -88,39 +88,33 @@ export async function GET(request: NextRequest) {
       }
 
       if (type === 'club') {
-        // Club signup - create user and club record
-        if (!existingUser) {
-          const { data: newUser, error: createError } = await supabase
-            .from('users')
-            .insert({
-              email,
-              role: 'student', // Start as student, needs promotion
-              auth_provider: 'supabase_auth',
-              supabase_auth_id: supabaseAuthId,
-              is_active: true,
-            })
-            .select()
-            .single();
-
-          if (createError) {
-            console.error("Error creating club user:", createError);
-            return NextResponse.redirect(
-              `${process.env.NEXT_PUBLIC_APP_URL}/en/login?error=user_create_failed`
-            );
-          }
-          user = newUser;
-
-          // Create pending club record
-          if (clubName) {
-            await supabase
-              .from('clubs')
-              .insert({
-                user_id: user.id,
-                name: clubName,
-                approval_status: 'pending',
-              });
-          }
+        // Club login - user should already exist with club role (validated by club-login API)
+        if (!existingUser || existingUser.role !== 'club') {
+          console.error("Club callback error: user not found or not a club account");
+          return NextResponse.redirect(
+            `${process.env.NEXT_PUBLIC_APP_URL}/en/login/club?error=not_club_account`
+          );
         }
+
+        user = existingUser;
+
+        // Update supabase_auth_id if not set
+        if (!user.supabase_auth_id) {
+          await supabase
+            .from('users')
+            .update({
+              supabase_auth_id: supabaseAuthId,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('email', email);
+        }
+
+        // Get club name for session
+        const { data: clubData } = await supabase
+          .from('clubs')
+          .select('name')
+          .eq('user_id', user.id)
+          .single();
 
         // Create session
         const session = await getSession();
@@ -128,14 +122,14 @@ export async function GET(request: NextRequest) {
         session.userId = user?.id;
         session.userInfo = {
           sub: email,
-          name: clubName || 'Club User',
+          name: clubData?.name || 'Club User',
           email,
           email_verified: true,
         };
         await session.save();
 
         return NextResponse.redirect(
-          `${process.env.NEXT_PUBLIC_APP_URL}/en/account`
+          `${process.env.NEXT_PUBLIC_APP_URL}/en/club`
         );
       }
     }

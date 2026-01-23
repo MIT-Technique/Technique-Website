@@ -187,8 +187,20 @@
       "sso": {
         "title": "Student & Organization Login"
       },
+      "club": {
+        "title": "Club Login",
+        "description": "Sign in with your club's registered email to manage your club profile.",
+        "emailLabel": "Club Email",
+        "emailPlaceholder": "your-club@mit.edu",
+        "sendLinkButton": "Send Login Link",
+        "sending": "Sending...",
+        "success": "Login link sent! Check your email.",
+        "error": "Failed to send login link. Please try again."
+      },
       "adminLinkPrefix": "Technique staff?",
       "adminLink": "Admin Login",
+      "clubLinkPrefix": "Representing a club?",
+      "clubLink": "Club Login",
       "backToLogin": "← Back to login"
     },
 

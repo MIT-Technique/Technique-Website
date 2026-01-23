@@ -187,8 +187,20 @@
       "sso": {
         "title": "学生和组织登录"
       },
+      "club": {
+        "title": "社团登录",
+        "description": "使用您社团的注册邮箱登录以管理社团资料。",
+        "emailLabel": "社团邮箱",
+        "emailPlaceholder": "your-club@mit.edu",
+        "sendLinkButton": "发送登录链接",
+        "sending": "发送中...",
+        "success": "登录链接已发送！请查看您的邮箱。",
+        "error": "发送登录链接失败。请重试。"
+      },
       "adminLinkPrefix": "Technique工作人员？",
       "adminLink": "管理员登录",
+      "clubLinkPrefix": "代表社团？",
+      "clubLink": "社团登录",
       "backToLogin": "← 返回登录"
     },
 

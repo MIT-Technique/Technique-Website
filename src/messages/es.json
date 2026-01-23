@@ -187,8 +187,20 @@
       "sso": {
         "title": "Acceso para Estudiantes y Organizaciones"
       },
+      "club": {
+        "title": "Acceso de Club",
+        "description": "Inicia sesión con el email registrado de tu club para gestionar el perfil.",
+        "emailLabel": "Email del Club",
+        "emailPlaceholder": "tu-club@mit.edu",
+        "sendLinkButton": "Enviar Enlace de Acceso",
+        "sending": "Enviando...",
+        "success": "¡Enlace de acceso enviado! Revisa tu correo.",
+        "error": "Error al enviar el enlace. Por favor intenta de nuevo."
+      },
       "adminLinkPrefix": "¿Personal de Technique?",
       "adminLink": "Acceso de Administrador",
+      "clubLinkPrefix": "¿Representas a un club?",
+      "clubLink": "Acceso de Club",
       "backToLogin": "← Volver al inicio de sesión"
     },
 
