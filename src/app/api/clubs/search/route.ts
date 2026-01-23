@@ -23,7 +23,6 @@ export async function GET(request: NextRequest) {
     let queryBuilder = supabase
       .from('clubs')
       .select('id, name, description')
-      .eq('approval_status', 'approved')
       .eq('has_leader', true)
       .order('name');
 

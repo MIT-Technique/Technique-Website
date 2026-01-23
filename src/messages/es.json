@@ -294,7 +294,7 @@
         "searchClubs": "Buscar Clubes",
         "searchPlaceholder": "Buscar un club para unirse...",
         "searchHint": "Encuentra y solicita unirte a clubes de MIT",
-        "noResults": "No se encontraron clubes",
+        "noResults": "No se encontraron clubes verificados",
         "joinClub": "Unirse",
         "requestJoin": "Unirse",
         "joining": "...",

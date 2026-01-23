@@ -294,7 +294,7 @@
         "searchClubs": "搜索社团",
         "searchPlaceholder": "搜索要加入的社团...",
         "searchHint": "查找并申请加入MIT社团",
-        "noResults": "未找到社团",
+        "noResults": "未找到已验证的社团",
         "joinClub": "加入",
         "requestJoin": "加入",
         "joining": "...",
