@@ -44,6 +44,13 @@
     "selectLanguage": "Select language"
   },
 
+  "account": {
+    "login": "SIGN IN",
+    "dashboard": "DASHBOARD",
+    "profile": "PROFILE",
+    "signOut": "SIGN OUT"
+  },
+
   "carousel": {
     "photoCredit": "Photo Credits: {photographer}"
   },
@@ -159,13 +166,30 @@
     },
 
     "login": {
-      "title": "Senior Bio",
+      "title": "Sign In",
       "metaTitle": "Login - MIT Technique",
-      "metaDescription": "Sign in to update your senior bio information.",
-      "description": "Sign in to update your senior bio information.",
+      "metaDescription": "Sign in to access your account.",
+      "description": "Sign in to access your account and manage your information.",
       "instructionText": "Click below to sign in with your MIT credentials.",
-      "signInButton": "Sign In",
-      "success": "Signed in successfully"
+      "signInButton": "Sign In with MIT",
+      "dividerText": "or",
+      "success": "Signed in successfully",
+      "admin": {
+        "title": "Admin Login",
+        "description": "For Technique administrators only.",
+        "emailLabel": "Admin Email",
+        "sendLinkButton": "Send Login Link",
+        "sending": "Sending...",
+        "success": "Login link sent! Check your email.",
+        "error": "Failed to send login link. Please try again.",
+        "invalidEmail": "Please enter technique@mit.edu"
+      },
+      "sso": {
+        "title": "Student & Organization Login"
+      },
+      "adminLinkPrefix": "Technique staff?",
+      "adminLink": "Admin Login",
+      "backToLogin": "← Back to login"
     },
 
     "portfolio": {
@@ -216,6 +240,81 @@
       "submitButton": "Update Bio",
       "success": "Your bio was updated successfully",
       "error": "There was an error updating your bio"
+    },
+
+    "profile": {
+      "title": "My Profile",
+      "welcome": "Logged in as {email}",
+      "metaTitle": "Profile - MIT Technique",
+      "metaDescription": "Manage your profile and account settings.",
+      "tabs": {
+        "profile": "Profile",
+        "seniorBio": "Senior Bio",
+        "clubInfo": "Club Info",
+        "scheduling": "Scheduling"
+      },
+      "profile": {
+        "title": "Account Information",
+        "email": "Email",
+        "role": "Role",
+        "name": "Name"
+      },
+      "promotion": {
+        "title": "Need different access?",
+        "description": "Request a role change if you represent a club or living group.",
+        "requestButton": "Request Role Change"
+      },
+      "bio": {
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "major": "Major",
+        "quote": "Quote",
+        "quotePlaceholder": "Enter a quote for your yearbook entry (optional)",
+        "success": "Your bio was updated successfully",
+        "error": "There was an error updating your bio",
+        "saving": "Saving...",
+        "save": "Save Bio"
+      },
+      "club": {
+        "status": "Status",
+        "statusValues": {
+          "pending": "Pending Review",
+          "approved": "Approved",
+          "denied": "Denied"
+        },
+        "clubId": "Club ID",
+        "name": "Club Name",
+        "description": "Description",
+        "memberList": "Member List",
+        "memberListPlaceholder": "Enter member names, one per line",
+        "success": "Club profile updated successfully",
+        "error": "Failed to update club profile",
+        "saving": "Saving...",
+        "save": "Save Changes"
+      },
+      "scheduling": {
+        "title": "Living Group Photoshoot Scheduling",
+        "status": "Status",
+        "currentBooking": "Your Booked Time",
+        "noBooking": "No time slot booked yet",
+        "cancellationPending": "Cancellation request pending review",
+        "requestCancel": "Request Cancellation",
+        "requesting": "Requesting...",
+        "cancelReason": "Please provide a reason for cancellation (optional):",
+        "cancelSuccess": "Cancellation request submitted",
+        "cancelError": "Failed to submit cancellation request",
+        "availableTimes": "Available Time Slots",
+        "noTimes": "No available time slots",
+        "book": "Book",
+        "booking": "Booking...",
+        "bookSuccess": "Time slot booked successfully",
+        "bookError": "Failed to book time slot",
+        "location": "Location",
+        "locationPlaceholder": "e.g., Baker House Main Lounge",
+        "locationHint": "Enter where the photoshoot will take place"
+      },
+      "disabled": "Your account has been disabled. Please contact an administrator.",
+      "frozen": "This form is currently frozen. You cannot make changes at this time."
     },
 
     "archives": {
@@ -454,5 +553,218 @@
         "address": "Mailing Address:"
       }
     }
+  },
+
+  "dashboard": {
+    "title": "Admin Dashboard",
+    "welcome": "Welcome, {name}",
+    "tabs": {
+      "overview": "Overview",
+      "photoshoots": "Photoshoots",
+      "clubs": "Clubs",
+      "livingGroups": "Living Groups",
+      "users": "Users",
+      "settings": "Settings"
+    },
+    "stats": {
+      "pendingClubs": "Pending Clubs",
+      "pendingRequests": "Pending Requests",
+      "upcomingPhotoshoots": "Booked Photoshoots",
+      "cancellationRequests": "Cancellation Requests"
+    },
+    "overview": {
+      "title": "Overview",
+      "quickActions": "Quick Actions"
+    },
+    "actions": {
+      "managePhotoshoots": "Manage Photoshoots",
+      "managePhotoshootsDesc": "Add, edit, or remove photoshoot time slots",
+      "reviewClubs": "Review Clubs",
+      "reviewClubsDesc": "Approve or deny pending club submissions",
+      "formSettings": "Form Settings",
+      "formSettingsDesc": "Freeze or unfreeze forms"
+    },
+    "photoshoots": {
+      "title": "Photoshoot Times",
+      "addTime": "Add Time Slot",
+      "cancel": "Cancel",
+      "form": {
+        "date": "Date",
+        "startTime": "Start Time",
+        "endTime": "End Time",
+        "notes": "Notes",
+        "notesPlaceholder": "Optional notes",
+        "submit": "Add Time"
+      },
+      "filters": {
+        "all": "All",
+        "available": "Available",
+        "booked": "Booked",
+        "cancellation": "Cancellation Requests"
+      },
+      "noTimes": "No photoshoot times found",
+      "bookedBy": "Booked by",
+      "location": "Location",
+      "cancellationRequested": "Cancellation requested",
+      "noReason": "No reason provided",
+      "approve": "Approve",
+      "deny": "Deny",
+      "delete": "Delete",
+      "confirmDelete": "Are you sure you want to delete this time slot?"
+    },
+    "clubs": {
+      "title": "Club Management",
+      "filters": {
+        "all": "All",
+        "pending": "Pending",
+        "approved": "Approved",
+        "denied": "Denied"
+      },
+      "noClubs": "No clubs found",
+      "unnamed": "Unnamed Club",
+      "status": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "denied": "Denied"
+      },
+      "contactEmail": "Contact",
+      "members": "Members",
+      "notes": "Notes",
+      "approve": "Approve",
+      "deny": "Deny",
+      "denyReason": "Enter reason for denial (optional):"
+    },
+    "livingGroups": {
+      "title": "Living Group Management",
+      "promoteUser": "Promote User",
+      "cancel": "Cancel",
+      "promoteTitle": "Promote User to Living Group Leader",
+      "form": {
+        "searchUser": "Search User",
+        "searchPlaceholder": "Enter email to search",
+        "livingGroupName": "Living Group Name",
+        "namePlaceholder": "e.g., Baker House",
+        "instructions": "Search for a student user and click to promote them. Make sure to enter the living group name first."
+      },
+      "enterLivingGroupName": "Please enter a living group name",
+      "promoteError": "Failed to promote user",
+      "filters": {
+        "all": "All",
+        "active": "Active",
+        "disabled": "Disabled"
+      },
+      "noLivingGroups": "No living groups found",
+      "status": {
+        "active": "Active",
+        "disabled": "Disabled"
+      },
+      "leader": "Leader",
+      "bookedTime": "Booked Time",
+      "disable": "Disable",
+      "enable": "Enable"
+    },
+    "users": {
+      "title": "User Management",
+      "allUsers": "All Users",
+      "promotionRequests": "Promotion Requests",
+      "searchPlaceholder": "Search by email or name",
+      "filters": {
+        "allRoles": "All Roles",
+        "student": "Student",
+        "club": "Club",
+        "lgl": "Living Group Leader",
+        "admin": "Admin"
+      },
+      "noUsers": "No users found",
+      "noRequests": "No pending requests",
+      "table": {
+        "email": "Email",
+        "name": "Name",
+        "role": "Role",
+        "status": "Status",
+        "actions": "Joined"
+      },
+      "active": "Active",
+      "inactive": "Inactive",
+      "requestType": "Request Type",
+      "clubPromotion": "Club Promotion",
+      "lglPromotion": "Living Group Leader",
+      "livingGroupName": "Living Group",
+      "reason": "Reason",
+      "submitted": "Submitted",
+      "approve": "Approve",
+      "deny": "Deny",
+      "denyReason": "Enter reason for denial (optional):"
+    },
+    "settings": {
+      "title": "Settings",
+      "formFreeze": {
+        "title": "Form Freeze",
+        "description": "Freeze forms to prevent users from making changes. Frozen forms will show an overlay and disable all inputs.",
+        "frozen": "Frozen - Users cannot make changes",
+        "active": "Active - Users can make changes",
+        "freeze": "Freeze",
+        "unfreeze": "Unfreeze"
+      },
+      "forms": {
+        "seniorBio": "Senior Bio Form",
+        "clubForm": "Club Form",
+        "livingGroupBooking": "Living Group Booking"
+      },
+      "info": {
+        "title": "System Information",
+        "adminEmail": "Admin Email",
+        "graduatingYear": "Graduating Year"
+      }
+    }
+  },
+
+  "clubPage": {
+    "title": "Club Profile",
+    "welcome": "Logged in as {email}",
+    "status": "Status",
+    "statusValues": {
+      "pending": "Pending Review",
+      "approved": "Approved",
+      "denied": "Denied"
+    },
+    "clubId": "Club ID",
+    "notes": "Admin Notes",
+    "frozen": "This form is currently frozen. You cannot make changes at this time.",
+    "form": {
+      "name": "Club Name",
+      "description": "Description",
+      "memberList": "Member List",
+      "memberListPlaceholder": "Enter member names, one per line or separated by commas",
+      "memberListHint": "List the names of members who should appear in the yearbook",
+      "images": "Candid Images",
+      "imagesHint": "Upload up to 3 candid images of your club (coming soon)",
+      "uploadNote": "Image upload functionality coming soon"
+    },
+    "success": "Your club profile has been updated",
+    "error": "Failed to update club profile",
+    "saving": "Saving...",
+    "save": "Save Changes"
+  },
+
+  "livingGroupPage": {
+    "title": "Living Group Photoshoot",
+    "welcome": "Welcome, {name}",
+    "disabled": "Your account has been disabled",
+    "disabledHint": "Please contact an administrator for assistance",
+    "frozen": "Booking is currently frozen. You cannot make changes at this time.",
+    "currentBooking": "Your Booked Time",
+    "cancellationPending": "Cancellation request pending review",
+    "requestCancel": "Request Cancellation",
+    "requesting": "Requesting...",
+    "cancelReason": "Please provide a reason for cancellation (optional):",
+    "cancelRequestSuccess": "Cancellation request submitted",
+    "cancelRequestError": "Failed to submit cancellation request",
+    "availableTimes": "Available Time Slots",
+    "noTimes": "No available time slots",
+    "book": "Book This Time",
+    "booking": "Booking...",
+    "bookSuccess": "Time slot booked successfully",
+    "bookError": "Failed to book time slot"
   }
 }

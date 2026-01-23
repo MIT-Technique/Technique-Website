@@ -1,0 +1,131 @@
+export type UserRole = 'admin' | 'club' | 'living_group_leader' | 'student';
+export type AuthProvider = 'mit_sso' | 'supabase_auth';
+export type ApprovalStatus = 'pending' | 'approved' | 'denied';
+export type LivingGroupStatus = 'active' | 'disabled' | 'pending';
+export type PromotionRequestType = 'club_promotion' | 'living_group_leader';
+export type RequestStatus = 'pending' | 'approved' | 'denied';
+
+export interface User {
+  id: string;
+  email: string;
+  role: UserRole;
+  first_name: string | null;
+  last_name: string | null;
+  major: string | null;
+  second_major: string | null;
+  quote: string | null;
+  achievements: string | null;
+  school_year: number | null;
+  auth_provider: AuthProvider;
+  supabase_auth_id: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Club {
+  id: string;
+  user_id: string;
+  club_id: string;
+  name: string;
+  description: string | null;
+  member_list: string | null;
+  candid_image_1: string | null;
+  candid_image_2: string | null;
+  candid_image_3: string | null;
+  approval_status: ApprovalStatus;
+  approval_notes: string | null;
+  approved_by: string | null;
+  approved_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface LivingGroup {
+  id: string;
+  user_id: string;
+  name: string;
+  status: LivingGroupStatus;
+  promoted_by: string | null;
+  promoted_at: string | null;
+  disabled_by: string | null;
+  disabled_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PhotoshootTime {
+  id: string;
+  date: string;
+  start_time: string;
+  end_time: string;
+  living_group_id: string | null;
+  booked_at: string | null;
+  booked_by: string | null;
+  location: string | null;
+  cancellation_requested: boolean;
+  cancellation_request_reason: string | null;
+  cancellation_approved: boolean | null;
+  cancelled_at: string | null;
+  cancelled_by: string | null;
+  created_by: string;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PromotionRequest {
+  id: string;
+  user_id: string;
+  request_type: PromotionRequestType;
+  status: RequestStatus;
+  request_reason: string | null;
+  living_group_name: string | null;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  review_notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface FormSetting {
+  id: string;
+  form_name: string;
+  is_frozen: boolean;
+  frozen_by: string | null;
+  frozen_at: string | null;
+  unfrozen_by: string | null;
+  unfrozen_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Session {
+  id: string;
+  user_id: string;
+  access_token: string | null;
+  expires_at: string;
+  code_verifier: string | null;
+  state: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// Extended types with relations
+export interface UserWithClub extends User {
+  club?: Club;
+}
+
+export interface UserWithLivingGroup extends User {
+  living_group?: LivingGroup;
+}
+
+export interface PhotoshootTimeWithLivingGroup extends PhotoshootTime {
+  living_group?: LivingGroup & {
+    user?: User;
+  };
+}
+
+export interface PromotionRequestWithUser extends PromotionRequest {
+  user?: User;
+}

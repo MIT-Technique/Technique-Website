@@ -1,4 +1,4 @@
-import { getClientConfig, getSession, clientConfig } from "../../../lib/lib";
+import { getClientConfig, clientConfig, getSession } from "../../../lib/lib";
 import * as client from "openid-client";
 
 export async function GET(request: Request, response: Response) {

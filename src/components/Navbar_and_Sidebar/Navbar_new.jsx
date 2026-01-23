@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations, useLocale } from 'next-intl';
 import LanguageSwitcher from "../LanguageSwitcher/LanguageSwitcher";
+import AccountButton from "../AccountButton/AccountButton";
 import "./Navbar.css";
 
 function Navbar() {
@@ -236,6 +237,8 @@ function Navbar() {
                 </Link>
               )
             ))}
+            {/* Account Button */}
+            <AccountButton isHomePage={isHomePage} />
           </div>
         </nav>
       </div>

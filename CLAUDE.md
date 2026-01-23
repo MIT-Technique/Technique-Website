@@ -1,6 +1,6 @@
 # MIT Technique Website - Project Documentation
 
-**Last Updated:** January 17, 2026
+**Last Updated:** January 22, 2026
 **Tech Stack:** Next.js 14.2.3 (App Router) + next-intl 4.7.0
 **Internationalization:** 3 languages supported
 
@@ -105,15 +105,17 @@ Technique-Website/
 ### Configuration Files
 
 #### `/src/i18n/config.js`
+
 Centralized i18n configuration:
+
 ```javascript
-export const locales = ['en', 'es', 'zh'];
-export const defaultLocale = 'en';
+export const locales = ["en", "es", "zh"];
+export const defaultLocale = "en";
 
 export const localeNames = {
-  en: 'English',
-  es: 'Español',
-  zh: '中文'
+  en: "English",
+  es: "Español",
+  zh: "中文",
 };
 
 export const localeDirection = {
@@ -122,14 +124,18 @@ export const localeDirection = {
 ```
 
 #### `/middleware.js`
+
 Handles locale detection and routing:
+
 - Detects locale from URL, cookie, or browser Accept-Language header
 - Redirects `/about` → `/en/about` (or user's preferred locale)
 - Stores locale preference in cookie
 - Excludes API routes and static files
 
 #### `/src/i18n/request.js`
+
 Server-side locale handler for next-intl:
+
 - Validates incoming locale parameter
 - Loads appropriate translation file
 - Provides fallback to English if invalid locale
@@ -149,11 +155,11 @@ All translation files are located in `/src/messages/` and follow the same JSON s
 
 ### File List
 
-| File | Language | Direction | Size | Characters |
-|------|----------|-----------|------|------------|
-| `en.json` | English | LTR | ~19 KB | ~1,200 words |
-| `es.json` | Spanish | LTR | ~21 KB | ~1,200 words |
-| `zh.json` | Chinese (Simplified) | LTR | ~18 KB | ~1,200 words |
+| File      | Language             | Direction | Size   | Characters   |
+| --------- | -------------------- | --------- | ------ | ------------ |
+| `en.json` | English              | LTR       | ~19 KB | ~1,200 words |
+| `es.json` | Spanish              | LTR       | ~21 KB | ~1,200 words |
+| `zh.json` | Chinese (Simplified) | LTR       | ~18 KB | ~1,200 words |
 
 ### Translation File Structure
 
@@ -194,17 +200,39 @@ Each JSON file follows this hierarchical structure:
   },
 
   "pages": {
-    "home": { /* homepage translations */ },
-    "about": { /* about page translations */ },
-    "yearbook": { /* yearbook page translations */ },
-    "contact": { /* contact page translations */ },
-    "hire": { /* hire page translations */ },
-    "invoice": { /* invoice page translations */ },
-    "login": { /* login page translations */ },
-    "portfolio": { /* portfolio page translations */ },
-    "seniors": { /* seniors page translations */ },
-    "bio": { /* bio page translations */ },
-    "archives": { /* archives page translations */ }
+    "home": {
+      /* homepage translations */
+    },
+    "about": {
+      /* about page translations */
+    },
+    "yearbook": {
+      /* yearbook page translations */
+    },
+    "contact": {
+      /* contact page translations */
+    },
+    "hire": {
+      /* hire page translations */
+    },
+    "invoice": {
+      /* invoice page translations */
+    },
+    "login": {
+      /* login page translations */
+    },
+    "portfolio": {
+      /* portfolio page translations */
+    },
+    "seniors": {
+      /* seniors page translations */
+    },
+    "bio": {
+      /* bio page translations */
+    },
+    "archives": {
+      /* archives page translations */
+    }
   }
 }
 ```
@@ -212,15 +240,19 @@ Each JSON file follows this hierarchical structure:
 ### Translation Keys by Namespace
 
 #### Common Keys (8 keys)
+
 - Site metadata, branding, taglines
 
 #### Navigation Keys (12 keys)
+
 - Main nav items, dropdown menus
 
 #### Footer Keys (3 keys)
+
 - Copyright, social media labels
 
 #### Page-Specific Keys (varies by page)
+
 - **Home:** 4 keys (hero, subtitle, tagline, photo credit)
 - **About:** ~350 words (hero, sections, cards)
 - **Archives:** 3 keys (uses template for 130+ yearbooks)
@@ -236,6 +268,7 @@ Each JSON file follows this hierarchical structure:
 ### Translation Interpolation
 
 Dynamic values use curly brace syntax:
+
 ```json
 {
   "photoCredit": "Photo: {photographer}",
@@ -244,8 +277,9 @@ Dynamic values use curly brace syntax:
 ```
 
 Usage in components:
+
 ```javascript
-t('photoCredit', { photographer: 'Michelle Xiang' })
+t("photoCredit", { photographer: "Michelle Xiang" });
 ```
 
 ---
@@ -256,23 +290,24 @@ All pages are located in `/src/app/[locale]/` and support 9 languages.
 
 ### Primary Pages (11 total)
 
-| Route | File | Description | Key Features |
-|-------|------|-------------|--------------|
-| `/` | `page.js` | Homepage | Hero image, tagline, photo carousel |
-| `/about` | `about/page.jsx` | About Us | Organization history, H.R.H. Grogo, weekly meetings |
-| `/archives` | `archives/page.jsx` | Yearbook Archive | 130+ yearbook covers (1885-present) |
-| `/yearbook` | `yearbook/page.jsx` | Yearbook Info | Ordering, preorder, senior info |
-| `/seniors` | `seniors/page.jsx` | Senior Portraits | Portrait sessions, dress code, discount |
-| `/bio` | `bio/page.jsx` | Senior Bio Form | Form to update yearbook bio (requires login) |
-| `/login` | `login/page.jsx` | MIT SSO Login | Authentication for senior bio access |
-| `/portfolio` | `portfolio/page.jsx` | Photography Portfolio | Showcase of photographer work |
-| `/contact` | `contact/page.jsx` | Contact Info | Office address, mailing address, email |
-| `/hire` | `hire/page.jsx` | Event Photography | Services for MIT organizations |
-| `/invoice` | `invoice/page.jsx` | Invoice Submission | Form for photographer payment |
+| Route        | File                 | Description           | Key Features                                        |
+| ------------ | -------------------- | --------------------- | --------------------------------------------------- |
+| `/`          | `page.js`            | Homepage              | Hero image, tagline, photo carousel                 |
+| `/about`     | `about/page.jsx`     | About Us              | Organization history, H.R.H. Grogo, weekly meetings |
+| `/archives`  | `archives/page.jsx`  | Yearbook Archive      | 130+ yearbook covers (1885-present)                 |
+| `/yearbook`  | `yearbook/page.jsx`  | Yearbook Info         | Ordering, preorder, senior info                     |
+| `/seniors`   | `seniors/page.jsx`   | Senior Portraits      | Portrait sessions, dress code, discount             |
+| `/bio`       | `bio/page.jsx`       | Senior Bio Form       | Form to update yearbook bio (requires login)        |
+| `/login`     | `login/page.jsx`     | MIT SSO Login         | Authentication for senior bio access                |
+| `/portfolio` | `portfolio/page.jsx` | Photography Portfolio | Showcase of photographer work                       |
+| `/contact`   | `contact/page.jsx`   | Contact Info          | Office address, mailing address, email              |
+| `/hire`      | `hire/page.jsx`      | Event Photography     | Services for MIT organizations                      |
+| `/invoice`   | `invoice/page.jsx`   | Invoice Submission    | Form for photographer payment                       |
 
 ### Generated Routes (33 total)
 
 Each of the 11 pages × 3 languages = 33 pre-rendered static pages:
+
 - `/en/about`, `/es/about`, `/zh/about`
 
 ---
@@ -282,6 +317,7 @@ Each of the 11 pages × 3 languages = 33 pre-rendered static pages:
 ### Core Components
 
 #### `/src/components/LanguageSwitcher/LanguageSwitcher.jsx`
+
 - **Purpose:** Dropdown language selector
 - **Features:**
   - Displays current locale (e.g., "EN")
@@ -291,6 +327,7 @@ Each of the 11 pages × 3 languages = 33 pre-rendered static pages:
 - **Usage:** Rendered in Navbar and mobile Sidebar
 
 #### `/src/components/Navbar_and_Sidebar/Navbar_new.jsx`
+
 - **Purpose:** Desktop navigation bar
 - **Features:**
   - Logo/site name (links to homepage)
@@ -302,6 +339,7 @@ Each of the 11 pages × 3 languages = 33 pre-rendered static pages:
 - **Translation Keys:** Uses `nav` namespace
 
 #### `/src/components/Navbar_and_Sidebar/Sidebar.jsx`
+
 - **Purpose:** Mobile navigation drawer
 - **Features:**
   - Hamburger menu icon (uses react-icons/vsc)
@@ -313,6 +351,7 @@ Each of the 11 pages × 3 languages = 33 pre-rendered static pages:
 - **Translation Keys:** Uses `nav` namespace
 
 #### `/src/components/Footer/Footer.jsx`
+
 - **Purpose:** Site footer
 - **Features:**
   - Copyright notice (translated)
@@ -321,6 +360,7 @@ Each of the 11 pages × 3 languages = 33 pre-rendered static pages:
 - **Translation Keys:** Uses `footer` namespace
 
 #### `/src/components/SimpleCarousel/SimpleCarousel.jsx`
+
 - **Purpose:** Image carousel for portfolio/galleries
 - **Features:**
   - Photo credit display (translated)
@@ -328,6 +368,7 @@ Each of the 11 pages × 3 languages = 33 pre-rendered static pages:
 - **Translation Keys:** Uses `carousel.photoCredit`
 
 #### `/src/components/CoverCard/CoverCard.jsx`
+
 - **Purpose:** Yearbook cover display cards
 - **Features:**
   - Image display
@@ -343,24 +384,25 @@ Located in `/src/app/api/` - **NOT localized** (language-agnostic).
 
 ### Authentication & Session
 
-| Route | Method | Purpose |
-|-------|--------|---------|
-| `/api/login` | GET | Initiates MIT SSO login flow |
-| `/api/logout` | GET | Destroys session and redirects |
-| `/api/session` | GET | Checks current session status |
-| `/api/userSignIn` | GET | Handles SSO callback, creates session |
+| Route             | Method | Purpose                               |
+| ----------------- | ------ | ------------------------------------- |
+| `/api/login`      | GET    | Initiates MIT SSO login flow          |
+| `/api/logout`     | GET    | Destroys session and redirects        |
+| `/api/session`    | GET    | Checks current session status         |
+| `/api/userSignIn` | GET    | Handles SSO callback, creates session |
 
 ### Data Operations
 
-| Route | Method | Purpose |
-|-------|--------|---------|
-| `/api/getUserData` | GET | Fetches user data from MongoDB (requires auth) |
-| `/api/updateBio` | POST | Updates senior bio in database (requires auth) |
-| `/api/sendInvoice` | POST | Sends photographer invoice email |
+| Route              | Method | Purpose                                        |
+| ------------------ | ------ | ---------------------------------------------- |
+| `/api/getUserData` | GET    | Fetches user data from MongoDB (requires auth) |
+| `/api/updateBio`   | POST   | Updates senior bio in database (requires auth) |
+| `/api/sendInvoice` | POST   | Sends photographer invoice email               |
 
 ### Database Schema (MongoDB)
 
 **Collection:** `users`
+
 ```javascript
 {
   email: String,
@@ -377,10 +419,11 @@ Located in `/src/app/api/` - **NOT localized** (language-agnostic).
 ## Configuration Files
 
 ### `/next.config.mjs`
-```javascript
-import createNextIntlPlugin from 'next-intl/plugin';
 
-const withNextIntl = createNextIntlPlugin('./src/i18n/request.js');
+```javascript
+import createNextIntlPlugin from "next-intl/plugin";
+
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.js");
 
 const nextConfig = {
   eslint: {
@@ -406,24 +449,26 @@ export default withNextIntl(nextConfig);
 ```
 
 ### `/middleware.js`
+
 ```javascript
-import createMiddleware from 'next-intl/middleware';
-import { locales, defaultLocale } from './src/i18n/config';
+import createMiddleware from "next-intl/middleware";
+import { locales, defaultLocale } from "./src/i18n/config";
 
 export default createMiddleware({
   locales,
   defaultLocale,
-  localePrefix: 'always'
+  localePrefix: "always",
 });
 
 export const config = {
   matcher: [
-    '/((?!api|_next|_vercel|.*\\..*).*)' // Exclude API, Next.js internals, static files
-  ]
+    "/((?!api|_next|_vercel|.*\\..*).*)", // Exclude API, Next.js internals, static files
+  ],
 };
 ```
 
 ### `/package.json` (Key Dependencies)
+
 ```json
 {
   "dependencies": {
@@ -463,6 +508,7 @@ npm start
 ### Adding a New Translation
 
 1. **Add text to English file** (`/src/messages/en.json`):
+
    ```json
    {
      "pages": {
@@ -477,18 +523,20 @@ npm start
 2. **Translate to other 2 languages** (es, zh)
 
 3. **Use in component**:
+
    ```javascript
-   import { useTranslations } from 'next-intl';
+   import { useTranslations } from "next-intl";
 
    export default function NewPage() {
-     const t = useTranslations('pages.newPage');
-     return <h1>{t('title')}</h1>;
+     const t = useTranslations("pages.newPage");
+     return <h1>{t("title")}</h1>;
    }
    ```
 
 ### Adding a New Page
 
 1. **Create page in locale directory**:
+
    ```bash
    mkdir -p src/app/[locale]/new-page
    touch src/app/[locale]/new-page/page.jsx
@@ -510,6 +558,7 @@ npm start
 If you encounter build errors:
 
 1. **Clean build cache**:
+
    ```bash
    rm -rf .next node_modules package-lock.json
    npm cache clean --force
@@ -546,14 +595,16 @@ done
 ### Locale-Aware Routing
 
 All navigation uses locale-aware paths:
+
 ```javascript
 const locale = useLocale();
-<Link href={`/${locale}/about`}>About</Link>
+<Link href={`/${locale}/about`}>About</Link>;
 ```
 
 ### Locale Direction
 
 All languages use left-to-right layout:
+
 ```javascript
 const direction = localeDirection[locale] || 'ltr';
 <html lang={locale} dir={direction}>
@@ -572,6 +623,7 @@ t('photoCredit', { photographer: 'Michelle Xiang' })
 ### Static Generation
 
 All pages use `generateStaticParams` to pre-render all locales:
+
 ```javascript
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -589,6 +641,86 @@ export function generateStaticParams() {
 
 ---
 
+## Supabase Schema
+
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
+
+CREATE TABLE public.bios (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+email text NOT NULL UNIQUE,
+first_name text NOT NULL DEFAULT ''::text,
+last_name text NOT NULL DEFAULT ''::text,
+major text NOT NULL DEFAULT ''::text,
+quote text CHECK (char_length(quote) <= 300),
+created_at timestamp with time zone DEFAULT now(),
+updated_at timestamp with time zone DEFAULT now(),
+CONSTRAINT bios_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.users (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+email text NOT NULL UNIQUE,
+name text NOT NULL DEFAULT ''::text,
+mit_sub text UNIQUE,
+created_at timestamp with time zone DEFAULT now(),
+updated_at timestamp with time zone DEFAULT now(),
+CONSTRAINT users_pkey PRIMARY KEY (id)
+);
+
+## CRITICAL: Authentication System Rules
+
+⚠️ **DO NOT MODIFY WITHOUT EXTREME CARE** ⚠️
+
+This project uses a **dual session system** with two separate iron-session cookies. Mixing them up will break authentication.
+
+### Dual Session Architecture
+
+| Session | Cookie Name | Source File | Purpose |
+|---------|-------------|-------------|---------|
+| `next_js_session` | `next_js_session` | `src/lib/lib.ts` | MIT SSO OAuth (stores `state`, `code_verifier`) |
+| `technique_session` | `technique_session` | `src/lib/auth/session.ts` | Admin magic links, club signup, role-based auth |
+
+### Critical Import Rules
+
+**For MIT SSO OAuth callback (`/api/userSignIn`):**
+```typescript
+// ✅ CORRECT - MIT SSO uses next_js_session
+import { getClientConfig, getSession } from "../../../lib/lib";
+
+// ❌ WRONG - This will cause OAuth state mismatch errors
+import { getSession } from "../../../lib/auth/session";
+```
+
+**For admin/role-based auth (`/api/auth/*`):**
+```typescript
+// ✅ CORRECT - Admin magic links use technique_session
+import { getSession } from "../../../lib/auth/session";
+```
+
+### MIT SSO OAuth Flow
+
+1. `/api/login` stores `state` and `code_verifier` in `next_js_session` (via `lib/lib.ts`)
+2. User authenticates with MIT SSO
+3. `/api/userSignIn` reads `state` and `code_verifier` from `next_js_session` to validate OAuth response
+4. If step 3 uses wrong `getSession`, you get: `OperationProcessingError: unexpected "state" response parameter`
+
+### Login Page Structure
+
+| Route | Purpose | Auth Method |
+|-------|---------|-------------|
+| `/login` | Main login page | MIT SSO button + "Admin Login" link |
+| `/login/student` | Student-only login (bio form redirect) | MIT SSO only |
+| `/login/admin` | Admin-only login | Magic link form (technique@mit.edu) |
+
+### User Roles
+
+- `admin` - Full dashboard access
+- `club` - Club management
+- `living_group_leader` - Living group management
+- `student` - Default role, profile/bio access
+
+---
+
 ## Notes for AI Assistants
 
 When working on this project:
@@ -600,6 +732,8 @@ When working on this project:
 5. **Keep API routes separate** - they are NOT localized
 6. **Follow existing patterns** - use `useTranslations` hook consistently
 7. **Clean build cache** if encountering module errors
+8. **NEVER change `getSession` imports in `/api/userSignIn`** - must use `lib/lib.ts`
+9. **Understand the dual session system** - see "CRITICAL: Authentication System Rules" above
 
 ### Common Issues
 
@@ -610,6 +744,6 @@ When working on this project:
 
 ---
 
-**Generated:** January 17, 2026
-**Version:** 1.1
+**Generated:** January 22, 2026
+**Version:** 1.2
 **Last Build:** 33 static pages successfully generated

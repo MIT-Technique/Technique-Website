@@ -44,6 +44,13 @@
     "selectLanguage": "选择语言"
   },
 
+  "account": {
+    "login": "登录",
+    "dashboard": "控制台",
+    "profile": "个人资料",
+    "signOut": "退出登录"
+  },
+
   "carousel": {
     "photoCredit": "照片提供：{photographer}"
   },
@@ -159,13 +166,30 @@
     },
 
     "login": {
-      "title": "毕业生简介",
+      "title": "登录",
       "metaTitle": "登录 - MIT Technique",
-      "metaDescription": "登录以更新您的毕业生简介信息。",
-      "description": "登录以更新您的毕业生简介信息。",
+      "metaDescription": "登录以访问您的账户。",
+      "description": "登录以访问您的账户并管理您的信息。",
       "instructionText": "点击下方使用您的MIT凭据登录。",
-      "signInButton": "登录",
-      "success": "成功登录"
+      "signInButton": "使用MIT登录",
+      "dividerText": "或",
+      "success": "成功登录",
+      "admin": {
+        "title": "管理员登录",
+        "description": "仅限Technique管理员。",
+        "emailLabel": "管理员邮箱",
+        "sendLinkButton": "发送登录链接",
+        "sending": "发送中...",
+        "success": "登录链接已发送！请查看您的邮箱。",
+        "error": "发送登录链接失败。请重试。",
+        "invalidEmail": "请输入technique@mit.edu"
+      },
+      "sso": {
+        "title": "学生和组织登录"
+      },
+      "adminLinkPrefix": "Technique工作人员？",
+      "adminLink": "管理员登录",
+      "backToLogin": "← 返回登录"
     },
 
     "portfolio": {
@@ -216,6 +240,81 @@
       "submitButton": "更新简介",
       "success": "您的简介已成功更新",
       "error": "更新您的简介时出错"
+    },
+
+    "profile": {
+      "title": "我的资料",
+      "welcome": "当前登录：{email}",
+      "metaTitle": "个人资料 - MIT Technique",
+      "metaDescription": "管理您的个人资料和账户设置。",
+      "tabs": {
+        "profile": "个人资料",
+        "seniorBio": "毕业生简介",
+        "clubInfo": "社团信息",
+        "scheduling": "预约管理"
+      },
+      "profile": {
+        "title": "账户信息",
+        "email": "邮箱",
+        "role": "角色",
+        "name": "姓名"
+      },
+      "promotion": {
+        "title": "需要其他权限？",
+        "description": "如果您代表社团或宿舍，可以申请角色变更。",
+        "requestButton": "申请角色变更"
+      },
+      "bio": {
+        "firstName": "名字",
+        "lastName": "姓氏",
+        "major": "专业",
+        "quote": "引言",
+        "quotePlaceholder": "输入您年鉴条目的引言（可选）",
+        "success": "您的简介已成功更新",
+        "error": "更新简介时出错",
+        "saving": "保存中...",
+        "save": "保存简介"
+      },
+      "club": {
+        "status": "状态",
+        "statusValues": {
+          "pending": "审核中",
+          "approved": "已批准",
+          "denied": "已拒绝"
+        },
+        "clubId": "社团ID",
+        "name": "社团名称",
+        "description": "描述",
+        "memberList": "成员名单",
+        "memberListPlaceholder": "输入成员姓名，每行一个",
+        "success": "社团资料更新成功",
+        "error": "更新社团资料失败",
+        "saving": "保存中...",
+        "save": "保存更改"
+      },
+      "scheduling": {
+        "title": "宿舍拍摄预约管理",
+        "status": "状态",
+        "currentBooking": "您预约的时间",
+        "noBooking": "尚未预约时间段",
+        "cancellationPending": "取消请求待审核",
+        "requestCancel": "申请取消",
+        "requesting": "申请中...",
+        "cancelReason": "请提供取消原因（可选）：",
+        "cancelSuccess": "取消请求已提交",
+        "cancelError": "提交取消请求失败",
+        "availableTimes": "可用时间段",
+        "noTimes": "暂无可用时间段",
+        "book": "预约",
+        "booking": "预约中...",
+        "bookSuccess": "预约成功",
+        "bookError": "预约失败",
+        "location": "地点",
+        "locationPlaceholder": "例如：Baker House主休息室",
+        "locationHint": "输入拍摄地点"
+      },
+      "disabled": "您的账户已被禁用。请联系管理员。",
+      "frozen": "此表单目前已冻结。您暂时无法进行更改。"
     },
 
     "archives": {
@@ -455,5 +554,218 @@
         "address": "邮寄地址："
       }
     }
+  },
+
+  "dashboard": {
+    "title": "管理控制台",
+    "welcome": "欢迎，{name}",
+    "tabs": {
+      "overview": "概览",
+      "photoshoots": "拍摄时间",
+      "clubs": "社团",
+      "livingGroups": "宿舍",
+      "users": "用户",
+      "settings": "设置"
+    },
+    "stats": {
+      "pendingClubs": "待审核社团",
+      "pendingRequests": "待处理请求",
+      "upcomingPhotoshoots": "已预约拍摄",
+      "cancellationRequests": "取消请求"
+    },
+    "overview": {
+      "title": "概览",
+      "quickActions": "快捷操作"
+    },
+    "actions": {
+      "managePhotoshoots": "管理拍摄时间",
+      "managePhotoshootsDesc": "添加、编辑或删除拍摄时间段",
+      "reviewClubs": "审核社团",
+      "reviewClubsDesc": "批准或拒绝社团申请",
+      "formSettings": "表单设置",
+      "formSettingsDesc": "冻结或解冻表单"
+    },
+    "photoshoots": {
+      "title": "拍摄时间管理",
+      "addTime": "添加时间段",
+      "cancel": "取消",
+      "form": {
+        "date": "日期",
+        "startTime": "开始时间",
+        "endTime": "结束时间",
+        "notes": "备注",
+        "notesPlaceholder": "可选备注",
+        "submit": "添加时间"
+      },
+      "filters": {
+        "all": "全部",
+        "available": "可用",
+        "booked": "已预约",
+        "cancellation": "取消请求"
+      },
+      "noTimes": "未找到拍摄时间",
+      "bookedBy": "预约者",
+      "location": "地点",
+      "cancellationRequested": "已申请取消",
+      "noReason": "未提供原因",
+      "approve": "批准",
+      "deny": "拒绝",
+      "delete": "删除",
+      "confirmDelete": "确定要删除此时间段吗？"
+    },
+    "clubs": {
+      "title": "社团管理",
+      "filters": {
+        "all": "全部",
+        "pending": "待审核",
+        "approved": "已批准",
+        "denied": "已拒绝"
+      },
+      "noClubs": "未找到社团",
+      "unnamed": "未命名社团",
+      "status": {
+        "pending": "待审核",
+        "approved": "已批准",
+        "denied": "已拒绝"
+      },
+      "contactEmail": "联系人",
+      "members": "成员",
+      "notes": "备注",
+      "approve": "批准",
+      "deny": "拒绝",
+      "denyReason": "请输入拒绝原因（可选）："
+    },
+    "livingGroups": {
+      "title": "宿舍管理",
+      "promoteUser": "提升用户",
+      "cancel": "取消",
+      "promoteTitle": "将用户提升为宿舍负责人",
+      "form": {
+        "searchUser": "搜索用户",
+        "searchPlaceholder": "输入邮箱搜索",
+        "livingGroupName": "宿舍名称",
+        "namePlaceholder": "例如：Baker House",
+        "instructions": "搜索学生用户并点击提升。请先输入宿舍名称。"
+      },
+      "enterLivingGroupName": "请输入宿舍名称",
+      "promoteError": "提升用户失败",
+      "filters": {
+        "all": "全部",
+        "active": "活跃",
+        "disabled": "已禁用"
+      },
+      "noLivingGroups": "未找到宿舍",
+      "status": {
+        "active": "活跃",
+        "disabled": "已禁用"
+      },
+      "leader": "负责人",
+      "bookedTime": "预约时间",
+      "disable": "禁用",
+      "enable": "启用"
+    },
+    "users": {
+      "title": "用户管理",
+      "allUsers": "所有用户",
+      "promotionRequests": "提升请求",
+      "searchPlaceholder": "按邮箱或姓名搜索",
+      "filters": {
+        "allRoles": "所有角色",
+        "student": "学生",
+        "club": "社团",
+        "lgl": "宿舍负责人",
+        "admin": "管理员"
+      },
+      "noUsers": "未找到用户",
+      "noRequests": "无待处理请求",
+      "table": {
+        "email": "邮箱",
+        "name": "姓名",
+        "role": "角色",
+        "status": "状态",
+        "actions": "注册时间"
+      },
+      "active": "活跃",
+      "inactive": "未激活",
+      "requestType": "请求类型",
+      "clubPromotion": "社团提升",
+      "lglPromotion": "宿舍负责人",
+      "livingGroupName": "宿舍",
+      "reason": "原因",
+      "submitted": "提交时间",
+      "approve": "批准",
+      "deny": "拒绝",
+      "denyReason": "请输入拒绝原因（可选）："
+    },
+    "settings": {
+      "title": "设置",
+      "formFreeze": {
+        "title": "表单冻结",
+        "description": "冻结表单以防止用户进行更改。冻结的表单将显示遮罩并禁用所有输入。",
+        "frozen": "已冻结 - 用户无法进行更改",
+        "active": "活跃 - 用户可以进行更改",
+        "freeze": "冻结",
+        "unfreeze": "解冻"
+      },
+      "forms": {
+        "seniorBio": "毕业生简介表单",
+        "clubForm": "社团表单",
+        "livingGroupBooking": "宿舍拍摄预约"
+      },
+      "info": {
+        "title": "系统信息",
+        "adminEmail": "管理员邮箱",
+        "graduatingYear": "毕业年份"
+      }
+    }
+  },
+
+  "clubPage": {
+    "title": "社团资料",
+    "welcome": "当前登录：{email}",
+    "status": "状态",
+    "statusValues": {
+      "pending": "审核中",
+      "approved": "已批准",
+      "denied": "已拒绝"
+    },
+    "clubId": "社团ID",
+    "notes": "管理员备注",
+    "frozen": "此表单目前已冻结。您暂时无法进行更改。",
+    "form": {
+      "name": "社团名称",
+      "description": "描述",
+      "memberList": "成员名单",
+      "memberListPlaceholder": "输入成员姓名，每行一个或用逗号分隔",
+      "memberListHint": "列出应出现在年鉴中的成员姓名",
+      "images": "活动照片",
+      "imagesHint": "上传最多3张社团活动照片（即将推出）",
+      "uploadNote": "图片上传功能即将推出"
+    },
+    "success": "社团资料已更新",
+    "error": "更新社团资料失败",
+    "saving": "保存中...",
+    "save": "保存更改"
+  },
+
+  "livingGroupPage": {
+    "title": "宿舍拍摄预约",
+    "welcome": "欢迎，{name}",
+    "disabled": "您的账户已被禁用",
+    "disabledHint": "请联系管理员获取帮助",
+    "frozen": "预约功能目前已冻结。您暂时无法进行更改。",
+    "currentBooking": "您预约的时间",
+    "cancellationPending": "取消请求待审核",
+    "requestCancel": "申请取消",
+    "requesting": "申请中...",
+    "cancelReason": "请提供取消原因（可选）：",
+    "cancelRequestSuccess": "取消请求已提交",
+    "cancelRequestError": "提交取消请求失败",
+    "availableTimes": "可用时间段",
+    "noTimes": "暂无可用时间段",
+    "book": "预约此时间",
+    "booking": "预约中...",
+    "bookSuccess": "预约成功",
+    "bookError": "预约失败"
   }
 }

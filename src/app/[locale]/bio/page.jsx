@@ -2,6 +2,8 @@
 import Footer from "../../../components/Footer/Footer";
 import { useState, useEffect } from "react";
 import * as React from "react";
+import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from 'next-intl';
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import InputLabel from "@mui/material/InputLabel";
@@ -13,7 +15,7 @@ import Snackbar from "@mui/material/Snackbar";
 import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import Alert from "@mui/material/Alert";
-import { useTranslations } from 'next-intl';
+import { useUser } from "../../../hooks/useUser";
 
 // Shared MUI text field styling
 const textFieldSx = {
@@ -32,7 +34,11 @@ const selectSx = {
 };
 
 export default function BioPage() {
+  const router = useRouter();
+  const locale = useLocale();
   const t = useTranslations('pages.bio');
+  const { isLoggedIn, loading: userLoading } = useUser();
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [major, setMajor] = useState("");
@@ -46,10 +52,19 @@ export default function BioPage() {
   const vertical = "top";
   const horizontal = "center";
 
+  // Redirect to student login if not logged in
   useEffect(() => {
+    if (!userLoading && !isLoggedIn) {
+      router.push(`/${locale}/login/student`);
+    }
+  }, [userLoading, isLoggedIn, router, locale]);
+
+  useEffect(() => {
+    if (!isLoggedIn) return;
+
     const fetchUser = async () => {
       try {
-        const res = await fetch("/api/getUserData", {
+        const res = await fetch("/api/bio", {
           method: "GET",
         });
 
@@ -76,7 +91,7 @@ export default function BioPage() {
     };
 
     fetchUser();
-  }, []);
+  }, [isLoggedIn]);
 
   function handleClose() {
     setOpen(false);
@@ -85,7 +100,7 @@ export default function BioPage() {
 
   async function updateBio() {
     try {
-      const response = await fetch("/api/updateBio", {
+      const response = await fetch("/api/bio", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -240,6 +255,22 @@ export default function BioPage() {
     "24-2",
     "STS",
   ];
+
+  // Show loading while checking auth
+  if (userLoading || !isLoggedIn) {
+    return (
+      <>
+        <main className="min-h-screen pt-24 lg:pt-32">
+          <section className="section-tight container-narrow">
+            <div className="text-center">
+              <p className="text-text-secondary">Loading...</p>
+            </div>
+          </section>
+        </main>
+        <Footer />
+      </>
+    );
+  }
 
   return (
     <>

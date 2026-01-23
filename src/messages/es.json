@@ -44,6 +44,13 @@
     "selectLanguage": "Seleccionar idioma"
   },
 
+  "account": {
+    "login": "INICIAR SESIÓN",
+    "dashboard": "PANEL",
+    "profile": "PERFIL",
+    "signOut": "CERRAR SESIÓN"
+  },
+
   "carousel": {
     "photoCredit": "Créditos de la foto: {photographer}"
   },
@@ -159,13 +166,30 @@
     },
 
     "login": {
-      "title": "Bio de Senior",
+      "title": "Iniciar Sesión",
       "metaTitle": "Iniciar Sesión - MIT Technique",
-      "metaDescription": "Inicia sesión para actualizar tu información de bio de senior.",
-      "description": "Inicia sesión para actualizar tu información de bio de senior.",
+      "metaDescription": "Inicia sesión para acceder a tu cuenta.",
+      "description": "Inicia sesión para acceder a tu cuenta y gestionar tu información.",
       "instructionText": "Haz clic abajo para iniciar sesión con tus credenciales de MIT.",
-      "signInButton": "Iniciar Sesión",
-      "success": "Sesión iniciada exitosamente"
+      "signInButton": "Iniciar Sesión con MIT",
+      "dividerText": "o",
+      "success": "Sesión iniciada exitosamente",
+      "admin": {
+        "title": "Acceso de Administrador",
+        "description": "Solo para administradores de Technique.",
+        "emailLabel": "Email de Administrador",
+        "sendLinkButton": "Enviar Enlace de Acceso",
+        "sending": "Enviando...",
+        "success": "¡Enlace de acceso enviado! Revisa tu correo.",
+        "error": "Error al enviar el enlace. Por favor intenta de nuevo.",
+        "invalidEmail": "Por favor ingresa technique@mit.edu"
+      },
+      "sso": {
+        "title": "Acceso para Estudiantes y Organizaciones"
+      },
+      "adminLinkPrefix": "¿Personal de Technique?",
+      "adminLink": "Acceso de Administrador",
+      "backToLogin": "← Volver al inicio de sesión"
     },
 
     "portfolio": {
@@ -216,6 +240,81 @@
       "submitButton": "Actualizar Bio",
       "success": "Tu bio fue actualizada exitosamente",
       "error": "Hubo un error al actualizar tu bio"
+    },
+
+    "profile": {
+      "title": "Mi Perfil",
+      "welcome": "Conectado como {email}",
+      "metaTitle": "Perfil - MIT Technique",
+      "metaDescription": "Gestiona tu perfil y configuración de cuenta.",
+      "tabs": {
+        "profile": "Perfil",
+        "seniorBio": "Bio de Senior",
+        "clubInfo": "Info del Club",
+        "scheduling": "Programación"
+      },
+      "profile": {
+        "title": "Información de la Cuenta",
+        "email": "Email",
+        "role": "Rol",
+        "name": "Nombre"
+      },
+      "promotion": {
+        "title": "¿Necesitas otro acceso?",
+        "description": "Solicita un cambio de rol si representas un club o grupo de vivienda.",
+        "requestButton": "Solicitar Cambio de Rol"
+      },
+      "bio": {
+        "firstName": "Nombre",
+        "lastName": "Apellido",
+        "major": "Carrera",
+        "quote": "Cita",
+        "quotePlaceholder": "Ingresa una cita para tu entrada del anuario (opcional)",
+        "success": "Tu bio fue actualizada exitosamente",
+        "error": "Hubo un error al actualizar tu bio",
+        "saving": "Guardando...",
+        "save": "Guardar Bio"
+      },
+      "club": {
+        "status": "Estado",
+        "statusValues": {
+          "pending": "En Revisión",
+          "approved": "Aprobado",
+          "denied": "Rechazado"
+        },
+        "clubId": "ID del Club",
+        "name": "Nombre del Club",
+        "description": "Descripción",
+        "memberList": "Lista de Miembros",
+        "memberListPlaceholder": "Ingresa nombres de miembros, uno por línea",
+        "success": "Perfil del club actualizado exitosamente",
+        "error": "Error al actualizar perfil del club",
+        "saving": "Guardando...",
+        "save": "Guardar Cambios"
+      },
+      "scheduling": {
+        "title": "Programación de Sesión de Fotos",
+        "status": "Estado",
+        "currentBooking": "Tu Horario Reservado",
+        "noBooking": "Aún no hay horario reservado",
+        "cancellationPending": "Solicitud de cancelación pendiente de revisión",
+        "requestCancel": "Solicitar Cancelación",
+        "requesting": "Solicitando...",
+        "cancelReason": "Por favor proporciona una razón para la cancelación (opcional):",
+        "cancelSuccess": "Solicitud de cancelación enviada",
+        "cancelError": "Error al enviar solicitud de cancelación",
+        "availableTimes": "Horarios Disponibles",
+        "noTimes": "No hay horarios disponibles",
+        "book": "Reservar",
+        "booking": "Reservando...",
+        "bookSuccess": "Horario reservado exitosamente",
+        "bookError": "Error al reservar horario",
+        "location": "Ubicación",
+        "locationPlaceholder": "ej., Salón Principal de Baker House",
+        "locationHint": "Ingresa dónde se realizará la sesión de fotos"
+      },
+      "disabled": "Tu cuenta ha sido deshabilitada. Por favor contacta a un administrador.",
+      "frozen": "Este formulario está congelado. No puedes hacer cambios en este momento."
     },
 
     "archives": {
@@ -455,5 +554,218 @@
         "address": "Dirección Postal:"
       }
     }
+  },
+
+  "dashboard": {
+    "title": "Panel de Administración",
+    "welcome": "Bienvenido, {name}",
+    "tabs": {
+      "overview": "Resumen",
+      "photoshoots": "Sesiones de Fotos",
+      "clubs": "Clubes",
+      "livingGroups": "Grupos de Vivienda",
+      "users": "Usuarios",
+      "settings": "Configuración"
+    },
+    "stats": {
+      "pendingClubs": "Clubes Pendientes",
+      "pendingRequests": "Solicitudes Pendientes",
+      "upcomingPhotoshoots": "Sesiones Reservadas",
+      "cancellationRequests": "Solicitudes de Cancelación"
+    },
+    "overview": {
+      "title": "Resumen",
+      "quickActions": "Acciones Rápidas"
+    },
+    "actions": {
+      "managePhotoshoots": "Gestionar Sesiones",
+      "managePhotoshootsDesc": "Agregar, editar o eliminar horarios de sesiones",
+      "reviewClubs": "Revisar Clubes",
+      "reviewClubsDesc": "Aprobar o rechazar solicitudes de clubes",
+      "formSettings": "Configuración de Formularios",
+      "formSettingsDesc": "Congelar o descongelar formularios"
+    },
+    "photoshoots": {
+      "title": "Horarios de Sesiones",
+      "addTime": "Agregar Horario",
+      "cancel": "Cancelar",
+      "form": {
+        "date": "Fecha",
+        "startTime": "Hora de Inicio",
+        "endTime": "Hora de Fin",
+        "notes": "Notas",
+        "notesPlaceholder": "Notas opcionales",
+        "submit": "Agregar Horario"
+      },
+      "filters": {
+        "all": "Todos",
+        "available": "Disponibles",
+        "booked": "Reservados",
+        "cancellation": "Solicitudes de Cancelación"
+      },
+      "noTimes": "No se encontraron horarios",
+      "bookedBy": "Reservado por",
+      "location": "Ubicación",
+      "cancellationRequested": "Cancelación solicitada",
+      "noReason": "Sin razón proporcionada",
+      "approve": "Aprobar",
+      "deny": "Rechazar",
+      "delete": "Eliminar",
+      "confirmDelete": "¿Está seguro de que desea eliminar este horario?"
+    },
+    "clubs": {
+      "title": "Gestión de Clubes",
+      "filters": {
+        "all": "Todos",
+        "pending": "Pendientes",
+        "approved": "Aprobados",
+        "denied": "Rechazados"
+      },
+      "noClubs": "No se encontraron clubes",
+      "unnamed": "Club Sin Nombre",
+      "status": {
+        "pending": "Pendiente",
+        "approved": "Aprobado",
+        "denied": "Rechazado"
+      },
+      "contactEmail": "Contacto",
+      "members": "Miembros",
+      "notes": "Notas",
+      "approve": "Aprobar",
+      "deny": "Rechazar",
+      "denyReason": "Ingrese razón de rechazo (opcional):"
+    },
+    "livingGroups": {
+      "title": "Gestión de Grupos de Vivienda",
+      "promoteUser": "Promover Usuario",
+      "cancel": "Cancelar",
+      "promoteTitle": "Promover Usuario a Líder de Grupo",
+      "form": {
+        "searchUser": "Buscar Usuario",
+        "searchPlaceholder": "Ingrese email para buscar",
+        "livingGroupName": "Nombre del Grupo",
+        "namePlaceholder": "ej., Baker House",
+        "instructions": "Busque un estudiante y haga clic para promoverlo. Asegúrese de ingresar el nombre del grupo primero."
+      },
+      "enterLivingGroupName": "Por favor ingrese el nombre del grupo",
+      "promoteError": "Error al promover usuario",
+      "filters": {
+        "all": "Todos",
+        "active": "Activos",
+        "disabled": "Deshabilitados"
+      },
+      "noLivingGroups": "No se encontraron grupos",
+      "status": {
+        "active": "Activo",
+        "disabled": "Deshabilitado"
+      },
+      "leader": "Líder",
+      "bookedTime": "Horario Reservado",
+      "disable": "Deshabilitar",
+      "enable": "Habilitar"
+    },
+    "users": {
+      "title": "Gestión de Usuarios",
+      "allUsers": "Todos los Usuarios",
+      "promotionRequests": "Solicitudes de Promoción",
+      "searchPlaceholder": "Buscar por email o nombre",
+      "filters": {
+        "allRoles": "Todos los Roles",
+        "student": "Estudiante",
+        "club": "Club",
+        "lgl": "Líder de Grupo",
+        "admin": "Administrador"
+      },
+      "noUsers": "No se encontraron usuarios",
+      "noRequests": "No hay solicitudes pendientes",
+      "table": {
+        "email": "Email",
+        "name": "Nombre",
+        "role": "Rol",
+        "status": "Estado",
+        "actions": "Registrado"
+      },
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "requestType": "Tipo de Solicitud",
+      "clubPromotion": "Promoción a Club",
+      "lglPromotion": "Líder de Grupo",
+      "livingGroupName": "Grupo de Vivienda",
+      "reason": "Razón",
+      "submitted": "Enviado",
+      "approve": "Aprobar",
+      "deny": "Rechazar",
+      "denyReason": "Ingrese razón de rechazo (opcional):"
+    },
+    "settings": {
+      "title": "Configuración",
+      "formFreeze": {
+        "title": "Congelar Formularios",
+        "description": "Congele formularios para evitar que los usuarios hagan cambios. Los formularios congelados mostrarán una superposición y deshabilitarán todas las entradas.",
+        "frozen": "Congelado - Los usuarios no pueden hacer cambios",
+        "active": "Activo - Los usuarios pueden hacer cambios",
+        "freeze": "Congelar",
+        "unfreeze": "Descongelar"
+      },
+      "forms": {
+        "seniorBio": "Formulario de Bio de Senior",
+        "clubForm": "Formulario de Club",
+        "livingGroupBooking": "Reserva de Grupo de Vivienda"
+      },
+      "info": {
+        "title": "Información del Sistema",
+        "adminEmail": "Email de Admin",
+        "graduatingYear": "Año de Graduación"
+      }
+    }
+  },
+
+  "clubPage": {
+    "title": "Perfil del Club",
+    "welcome": "Conectado como {email}",
+    "status": "Estado",
+    "statusValues": {
+      "pending": "En Revisión",
+      "approved": "Aprobado",
+      "denied": "Rechazado"
+    },
+    "clubId": "ID del Club",
+    "notes": "Notas del Admin",
+    "frozen": "Este formulario está congelado. No puede hacer cambios en este momento.",
+    "form": {
+      "name": "Nombre del Club",
+      "description": "Descripción",
+      "memberList": "Lista de Miembros",
+      "memberListPlaceholder": "Ingrese nombres de miembros, uno por línea o separados por comas",
+      "memberListHint": "Liste los nombres de los miembros que deben aparecer en el anuario",
+      "images": "Imágenes Candid",
+      "imagesHint": "Suba hasta 3 imágenes candid de su club (próximamente)",
+      "uploadNote": "Función de carga de imágenes próximamente"
+    },
+    "success": "El perfil de su club ha sido actualizado",
+    "error": "Error al actualizar el perfil del club",
+    "saving": "Guardando...",
+    "save": "Guardar Cambios"
+  },
+
+  "livingGroupPage": {
+    "title": "Sesión de Fotos del Grupo",
+    "welcome": "Bienvenido, {name}",
+    "disabled": "Su cuenta ha sido deshabilitada",
+    "disabledHint": "Por favor contacte a un administrador para asistencia",
+    "frozen": "Las reservas están congeladas. No puede hacer cambios en este momento.",
+    "currentBooking": "Su Horario Reservado",
+    "cancellationPending": "Solicitud de cancelación pendiente de revisión",
+    "requestCancel": "Solicitar Cancelación",
+    "requesting": "Solicitando...",
+    "cancelReason": "Por favor proporcione una razón para la cancelación (opcional):",
+    "cancelRequestSuccess": "Solicitud de cancelación enviada",
+    "cancelRequestError": "Error al enviar solicitud de cancelación",
+    "availableTimes": "Horarios Disponibles",
+    "noTimes": "No hay horarios disponibles",
+    "book": "Reservar Este Horario",
+    "booking": "Reservando...",
+    "bookSuccess": "Horario reservado exitosamente",
+    "bookError": "Error al reservar horario"
   }
 }

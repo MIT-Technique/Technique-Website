@@ -11,16 +11,33 @@ import Collapse from "@mui/material/Collapse";
 import { VscThreeBars, VscClose, VscChevronDown } from "react-icons/vsc";
 import { useTranslations, useLocale } from 'next-intl';
 import LanguageSwitcher from "../LanguageSwitcher/LanguageSwitcher";
-import { LineWeight } from "@mui/icons-material";
+import { useUser } from "../../hooks/useUser";
 
 function Sidebar({ pathname }) {
   const locale = useLocale();
   const t = useTranslations('nav');
   const tCommon = useTranslations('common');
+  const tAccount = useTranslations('account');
+  const { isLoggedIn, user, loading, logout } = useUser();
   const [isOpen, setIsOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [formsOpen, setFormsOpen] = useState(false);
   const [getStartedOpen, setGetStartedOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+
+  // Get dashboard link based on role
+  const getDashboardLink = () => {
+    switch (user?.role) {
+      case 'admin':
+        return `/${locale}/dashboard`;
+      case 'club':
+        return `/${locale}/club`;
+      case 'living_group_leader':
+        return `/${locale}/living-group`;
+      default:
+        return `/${locale}/bio`;
+    }
+  };
 
   const isHomePage = pathname === `/${locale}`;
   const textColor = isHomePage ? "#FFFFFF" : "#1A1A1A";
@@ -439,35 +456,108 @@ function Sidebar({ pathname }) {
             <ListItem disablePadding sx={{ mt: 2, px: 3 }}>
               <LanguageSwitcher />
             </ListItem>
-            <Collapse in={getStartedOpen} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-                {[
-                  { href: `/${locale}/join`, label: t('dropdown.joinUs') },
-                ].map((item) => (
-                  <ListItem key={item.href} disablePadding>
-                    <Link
-                      href={item.href}
-                      onClick={() => setIsOpen(false)}
-                      className="w-full"
+
+            {/* Account Section */}
+            {!loading && (
+              isLoggedIn ? (
+                <>
+                  <ListItem disablePadding sx={{ mt: 1 }}>
+                    <ListItemButton
+                      onClick={() => setAccountOpen(!accountOpen)}
+                      sx={{ px: 3, py: 1.5 }}
                     >
-                      <ListItemButton sx={{ pl: 6, py: 1 }}>
-                        <ListItemText
-                          primary={item.label}
-                          primaryTypographyProps={{
-                            sx: {
-                              fontSize: "0.7rem",
-                              fontWeight: 400,
-                              letterSpacing: "0.05em",
-                              color: isActive(item.href) ? "#750014" : mutedColor,
-                            },
-                          }}
-                        />
-                      </ListItemButton>
-                    </Link>
+                      <ListItemText
+                        primary={user?.first_name || user?.email?.split('@')[0] || tAccount('login')}
+                        primaryTypographyProps={{
+                          sx: {
+                            fontSize: "0.75rem",
+                            fontWeight: 500,
+                            letterSpacing: "0.1em",
+                            color: textColor,
+                          },
+                        }}
+                      />
+                      <VscChevronDown
+                        size={16}
+                        style={{
+                          color: textColor,
+                          transform: accountOpen ? "rotate(180deg)" : "rotate(0deg)",
+                          transition: "transform 0.2s",
+                        }}
+                      />
+                    </ListItemButton>
                   </ListItem>
-                ))}
-              </List>
-            </Collapse>
+                  <Collapse in={accountOpen} timeout="auto" unmountOnExit>
+                    <List component="div" disablePadding>
+                      <ListItem disablePadding>
+                        <Link
+                          href={getDashboardLink()}
+                          onClick={() => setIsOpen(false)}
+                          className="w-full"
+                        >
+                          <ListItemButton sx={{ pl: 6, py: 1 }}>
+                            <ListItemText
+                              primary={tAccount('dashboard')}
+                              primaryTypographyProps={{
+                                sx: {
+                                  fontSize: "0.7rem",
+                                  fontWeight: 400,
+                                  letterSpacing: "0.05em",
+                                  color: mutedColor,
+                                },
+                              }}
+                            />
+                          </ListItemButton>
+                        </Link>
+                      </ListItem>
+                      <ListItem disablePadding>
+                        <ListItemButton
+                          onClick={() => {
+                            setIsOpen(false);
+                            logout();
+                          }}
+                          sx={{ pl: 6, py: 1 }}
+                        >
+                          <ListItemText
+                            primary={tAccount('signOut')}
+                            primaryTypographyProps={{
+                              sx: {
+                                fontSize: "0.7rem",
+                                fontWeight: 400,
+                                letterSpacing: "0.05em",
+                                color: mutedColor,
+                              },
+                            }}
+                          />
+                        </ListItemButton>
+                      </ListItem>
+                    </List>
+                  </Collapse>
+                </>
+              ) : (
+                <ListItem disablePadding sx={{ mt: 1 }}>
+                  <Link
+                    href={`/${locale}/login`}
+                    onClick={() => setIsOpen(false)}
+                    className="w-full"
+                  >
+                    <ListItemButton sx={{ px: 3, py: 1.5 }}>
+                      <ListItemText
+                        primary={tAccount('login')}
+                        primaryTypographyProps={{
+                          sx: {
+                            fontSize: "0.75rem",
+                            fontWeight: 500,
+                            letterSpacing: "0.1em",
+                            color: textColor,
+                          },
+                        }}
+                      />
+                    </ListItemButton>
+                  </Link>
+                </ListItem>
+              )
+            )}
           </List>
         </Box>
       </Drawer>
