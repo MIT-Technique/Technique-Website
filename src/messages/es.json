@@ -349,6 +349,25 @@
         "saving": "Guardando...",
         "save": "Guardar Bio"
       },
+      "studentInfo": {
+        "title": "Información del Estudiante",
+        "description": "Mantén tu información actualizada. Estos datos se pueden usar para autocompletar tu Bio de Senior cuando seas senior.",
+        "firstName": "Nombre",
+        "lastName": "Apellido",
+        "major": "Carrera",
+        "secondMajor": "Segunda Carrera",
+        "none": "Ninguna",
+        "graduationYear": "Año de Graduación",
+        "success": "Tu información fue actualizada exitosamente",
+        "error": "Hubo un error al actualizar tu información",
+        "saving": "Guardando...",
+        "save": "Guardar Información",
+        "seniorBioTitle": "Bio de Senior",
+        "seniorBioDescription": "Los seniors que se gradúan pueden completar su bio del anuario con detalles adicionales como una cita.",
+        "completeSeniorBio": "Completar Bio de Senior",
+        "notSenior": "La Bio de Senior solo está disponible para seniors que se gradúan. Por favor actualiza tu año de graduación en tu perfil si crees que esto es incorrecto.",
+        "notSeniorShort": "solo seniors"
+      },
       "club": {
         "status": "Estado",
         "statusValues": {

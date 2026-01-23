@@ -43,7 +43,6 @@ export default function ProfilePage() {
     lastName: '',
     major: '',
     secondMajor: 'None',
-    quote: '',
   });
   const [bioLoading, setBioLoading] = useState(true);
   const [bioSaving, setBioSaving] = useState(false);
@@ -181,7 +180,6 @@ export default function ProfilePage() {
           lastName: data.data.lastName || '',
           major: data.data.major || '',
           secondMajor: data.data.second_major || 'None',
-          quote: data.data.quote || '',
         });
       }
     } catch (error) {
@@ -343,17 +341,17 @@ export default function ProfilePage() {
           lastName: bioData.lastName,
           major: bioData.major,
           second_major: bioData.secondMajor === 'None' ? '' : bioData.secondMajor,
-          quote: bioData.quote,
         }),
       });
 
       if (res.ok) {
-        setBioMessage({ type: 'success', text: t('bio.success') });
+        setBioMessage({ type: 'success', text: t('studentInfo.success') });
+        refetch();
       } else {
-        setBioMessage({ type: 'error', text: t('bio.error') });
+        setBioMessage({ type: 'error', text: t('studentInfo.error') });
       }
     } catch (error) {
-      setBioMessage({ type: 'error', text: t('bio.error') });
+      setBioMessage({ type: 'error', text: t('studentInfo.error') });
     } finally {
       setBioSaving(false);
     }
@@ -416,7 +414,6 @@ export default function ProfilePage() {
     const tabs = [{ id: 'profile', label: t('tabs.profile') }];
 
     if (user?.role === 'student') {
-      tabs.push({ id: 'bio', label: t('tabs.seniorBio') });
       tabs.push({ id: 'myClubs', label: t('tabs.myClubs') });
     } else if (user?.role === 'club') {
       tabs.push({ id: 'club', label: t('tabs.clubInfo') });
@@ -486,135 +483,152 @@ export default function ProfilePage() {
 
           {/* Profile Tab */}
           {activeTab === 'profile' && (
-            <div className="card-elevated p-6">
-              <h2 className="text-lg font-medium mb-4">{t('profile.title')}</h2>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-text-secondary">{t('profile.email')}</span>
-                  <span>{user?.email}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-text-secondary">{t('profile.role')}</span>
-                  <span className="capitalize">{user?.role?.replace('_', ' ')}</span>
-                </div>
-                {user?.first_name && (
+            <div className="space-y-6">
+              {/* Account Information */}
+              <div className="card-elevated p-6">
+                <h2 className="text-lg font-medium mb-4">{t('profile.title')}</h2>
+                <div className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="text-text-secondary">{t('profile.name')}</span>
-                    <span>{user.first_name} {user.last_name}</span>
+                    <span className="text-text-secondary">{t('profile.email')}</span>
+                    <span>{user?.email}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-text-secondary">{t('profile.role')}</span>
+                    <span className="capitalize">{user?.role?.replace('_', ' ')}</span>
+                  </div>
+                </div>
+
+                {/* Staph request for students - small and unobtrusive */}
+                {user?.role === 'student' && (
+                  <div className="mt-6 pt-4 border-t border-border/50">
+                    <p className="text-xs text-text-muted">
+                      {t('promotion.staphTitle')}{' '}
+                      {staphRequestPending ? (
+                        <span className="text-yellow-600">{t('promotion.requestPending')}</span>
+                      ) : (
+                        <button
+                          onClick={handleStaphRequest}
+                          disabled={staphRequestSubmitting}
+                          className="text-accent hover:underline disabled:opacity-50"
+                        >
+                          {staphRequestSubmitting ? '...' : t('promotion.staphRequestButton')}
+                        </button>
+                      )}
+                    </p>
                   </div>
                 )}
               </div>
 
-              {/* Staph request for students - small and unobtrusive */}
+              {/* Student Information Section */}
               {user?.role === 'student' && (
-                <div className="mt-6 pt-4 border-t border-border/50">
-                  <p className="text-xs text-text-muted">
-                    {t('promotion.staphTitle')}{' '}
-                    {staphRequestPending ? (
-                      <span className="text-yellow-600">{t('promotion.requestPending')}</span>
-                    ) : (
-                      <button
-                        onClick={handleStaphRequest}
-                        disabled={staphRequestSubmitting}
-                        className="text-accent hover:underline disabled:opacity-50"
+                <div className="card-elevated p-6">
+                  <h2 className="text-lg font-medium mb-4">{t('studentInfo.title')}</h2>
+                  <p className="text-sm text-text-secondary mb-4">{t('studentInfo.description')}</p>
+
+                  {bioLoading ? (
+                    <p className="text-text-secondary">Loading...</p>
+                  ) : (
+                    <form onSubmit={handleBioSubmit} className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <TextField
+                          required
+                          label={t('studentInfo.firstName')}
+                          variant="outlined"
+                          InputLabelProps={{ shrink: true }}
+                          value={bioData.firstName}
+                          onChange={(e) => setBioData({ ...bioData, firstName: e.target.value })}
+                          sx={textFieldSx}
+                        />
+                        <TextField
+                          required
+                          label={t('studentInfo.lastName')}
+                          variant="outlined"
+                          InputLabelProps={{ shrink: true }}
+                          value={bioData.lastName}
+                          onChange={(e) => setBioData({ ...bioData, lastName: e.target.value })}
+                          sx={textFieldSx}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormControl fullWidth>
+                          <InputLabel shrink sx={{ "&.Mui-focused": { color: "#750014" } }}>
+                            {t('studentInfo.major')} *
+                          </InputLabel>
+                          <Select
+                            value={bioData.major}
+                            label={`${t('studentInfo.major')} *`}
+                            notched
+                            required
+                            onChange={(e) => setBioData({ ...bioData, major: e.target.value })}
+                            sx={selectSx}
+                          >
+                            {majors.map((m) => (
+                              <MenuItem key={m} value={m}>{m}</MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+
+                        <FormControl fullWidth>
+                          <InputLabel shrink sx={{ "&.Mui-focused": { color: "#750014" } }}>
+                            {t('studentInfo.secondMajor')}
+                          </InputLabel>
+                          <Select
+                            value={bioData.secondMajor}
+                            label={t('studentInfo.secondMajor')}
+                            notched
+                            onChange={(e) => setBioData({ ...bioData, secondMajor: e.target.value })}
+                            sx={selectSx}
+                          >
+                            <MenuItem value="None">{t('studentInfo.none')}</MenuItem>
+                            {majors.map((m) => (
+                              <MenuItem key={m} value={m}>{m}</MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </div>
+
+                      {bioMessage.text && (
+                        <div className={`p-4 rounded ${
+                          bioMessage.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
+                        }`}>
+                          {bioMessage.text}
+                        </div>
+                      )}
+
+                      <Button
+                        type="submit"
+                        variant="contained"
+                        disabled={bioSaving}
+                        fullWidth
+                        sx={{
+                          backgroundColor: "#750014",
+                          "&:hover": { backgroundColor: "#5C0010" },
+                          textTransform: "uppercase",
+                          letterSpacing: "0.05em",
+                          fontWeight: 500,
+                          py: 1.5,
+                          boxShadow: "none",
+                        }}
                       >
-                        {staphRequestSubmitting ? '...' : t('promotion.staphRequestButton')}
-                      </button>
-                    )}
-                  </p>
+                        {bioSaving ? t('studentInfo.saving') : t('studentInfo.save')}
+                      </Button>
+                    </form>
+                  )}
                 </div>
               )}
-            </div>
-          )}
 
-          {/* Senior Bio Tab (Students) */}
-          {activeTab === 'bio' && user?.role === 'student' && (
-            <div>
-              {bioLoading ? (
-                <p className="text-text-secondary">Loading...</p>
-              ) : (
-                <form onSubmit={handleBioSubmit} className="card-elevated p-6 space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <TextField
-                      required
-                      label={t('bio.firstName')}
-                      variant="outlined"
-                      InputLabelProps={{ shrink: true }}
-                      value={bioData.firstName}
-                      onChange={(e) => setBioData({ ...bioData, firstName: e.target.value })}
-                      sx={textFieldSx}
-                    />
-                    <TextField
-                      required
-                      label={t('bio.lastName')}
-                      variant="outlined"
-                      InputLabelProps={{ shrink: true }}
-                      value={bioData.lastName}
-                      onChange={(e) => setBioData({ ...bioData, lastName: e.target.value })}
-                      sx={textFieldSx}
-                    />
-                  </div>
-
-                  <FormControl fullWidth>
-                    <InputLabel shrink sx={{ "&.Mui-focused": { color: "#750014" } }}>
-                      {t('bio.major')} *
-                    </InputLabel>
-                    <Select
-                      value={bioData.major}
-                      label={`${t('bio.major')} *`}
-                      notched
-                      required
-                      onChange={(e) => setBioData({ ...bioData, major: e.target.value })}
-                      sx={selectSx}
-                    >
-                      {majors.map((m) => (
-                        <MenuItem key={m} value={m}>{m}</MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-
-                  <TextField
-                    label={t('bio.quote')}
-                    variant="outlined"
-                    InputLabelProps={{ shrink: true }}
-                    value={bioData.quote}
-                    onChange={(e) => setBioData({ ...bioData, quote: e.target.value })}
-                    multiline
-                    minRows={3}
-                    maxRows={8}
-                    sx={textFieldSx}
-                    fullWidth
-                    placeholder={t('bio.quotePlaceholder')}
-                    inputProps={{ maxLength: 300 }}
-                    helperText={`${bioData.quote.length}/300`}
-                  />
-
-                  {bioMessage.text && (
-                    <div className={`p-4 rounded ${
-                      bioMessage.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
-                    }`}>
-                      {bioMessage.text}
-                    </div>
-                  )}
-
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    disabled={bioSaving}
-                    fullWidth
-                    sx={{
-                      backgroundColor: "#750014",
-                      "&:hover": { backgroundColor: "#5C0010" },
-                      textTransform: "uppercase",
-                      letterSpacing: "0.05em",
-                      fontWeight: 500,
-                      py: 1.5,
-                      boxShadow: "none",
-                    }}
+              {/* Senior Bio CTA - compact, lower priority */}
+              {user?.role === 'student' && (
+                <div className="flex items-center justify-between px-4 py-3 bg-bg-secondary/50 rounded-lg">
+                  <span className="text-sm text-text-secondary">{t('studentInfo.seniorBioTitle')}</span>
+                  <button
+                    onClick={() => router.push(`/${locale}/bio`)}
+                    className="text-sm text-accent hover:underline"
                   >
-                    {bioSaving ? t('bio.saving') : t('bio.save')}
-                  </Button>
-                </form>
+                    {t('studentInfo.completeSeniorBio')} →
+                  </button>
+                </div>
               )}
             </div>
           )}

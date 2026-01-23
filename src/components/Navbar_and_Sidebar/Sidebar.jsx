@@ -293,7 +293,7 @@ function Sidebar({ pathname }) {
                   </ListItemButton>
                 </ListItem>
                 {[
-                  { href: `/${locale}/login`, label: t('dropdown.seniorBio') },
+                  { href: `/${locale}/bio`, label: t('dropdown.seniorBio') },
                   { href: `/${locale}/clubs`, label: t('dropdown.clubs') },
                   { href: `/${locale}/student-work-feature`, label: t('dropdown.studentWork') },
                 ].map((item) => (

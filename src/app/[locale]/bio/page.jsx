@@ -2,7 +2,6 @@
 import Footer from "../../../components/Footer/Footer";
 import { useState, useEffect } from "react";
 import * as React from "react";
-import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from 'next-intl';
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
@@ -34,7 +33,6 @@ const selectSx = {
 };
 
 export default function BioPage() {
-  const router = useRouter();
   const locale = useLocale();
   const t = useTranslations('pages.bio');
   const { isLoggedIn, loading: userLoading } = useUser();
@@ -48,16 +46,20 @@ export default function BioPage() {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   const vertical = "top";
   const horizontal = "center";
 
   // Redirect to student login if not logged in
   useEffect(() => {
-    if (!userLoading && !isLoggedIn) {
-      router.push(`/${locale}/login/student`);
+    // Ensure locale is valid before redirecting
+    if (!userLoading && !isLoggedIn && !isRedirecting && locale) {
+      setIsRedirecting(true);
+      // Use window.location for full page redirect to avoid MUI portal DOM conflicts
+      window.location.href = `/${locale}/login/student?returnUrl=${encodeURIComponent(`/${locale}/bio`)}`;
     }
-  }, [userLoading, isLoggedIn, router, locale]);
+  }, [userLoading, isLoggedIn, locale, isRedirecting]);
 
   useEffect(() => {
     if (!isLoggedIn) return;
@@ -255,6 +257,11 @@ export default function BioPage() {
     "24-2",
     "STS",
   ];
+
+  // Return null while redirecting to prevent DOM manipulation errors
+  if (isRedirecting) {
+    return null;
+  }
 
   // Show loading while checking auth
   if (userLoading || !isLoggedIn) {

@@ -1,24 +1,21 @@
 "use client";
 import Footer from "../../../../components/Footer/Footer";
 import * as React from "react";
+import { Suspense } from "react";
 import Box from "@mui/material/Box";
 import { Button } from "@mui/material";
 import { useTranslations } from 'next-intl';
+import { useSearchParams } from "next/navigation";
 
-export default function StudentLoginPage() {
+function LoginForm() {
   const t = useTranslations('pages.login');
+  const searchParams = useSearchParams();
+  const returnUrl = searchParams.get('returnUrl');
 
   return (
     <>
       <main className="min-h-screen pt-24 lg:pt-32">
         <section className="section container-narrow">
-          <div className="text-center mb-8">
-            <h1 className="mb-2">{t('title')}</h1>
-            <p className="text-text-secondary">
-              {t('description')}
-            </p>
-          </div>
-
           {/* MIT SSO Login Section Only */}
           <Box
             component="form"
@@ -30,10 +27,10 @@ export default function StudentLoginPage() {
               py: 6,
             }}
             method="GET"
-            action="/api/login"
+            action={returnUrl ? `/api/login?returnUrl=${encodeURIComponent(returnUrl)}` : "/api/login"}
           >
             <p className="text-sm text-text-secondary text-center mb-6 pb-0">
-              {t('instructionText')}
+              Sign in to access the senior bio form
             </p>
             <Button
               type="submit"
@@ -63,5 +60,21 @@ export default function StudentLoginPage() {
       </main>
       <Footer />
     </>
+  );
+}
+
+export default function StudentLoginPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen pt-24 lg:pt-32">
+        <section className="section container-narrow">
+          <div className="text-center">
+            <p className="text-text-secondary">Loading...</p>
+          </div>
+        </section>
+      </main>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }

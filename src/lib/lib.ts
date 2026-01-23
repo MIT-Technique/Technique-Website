@@ -24,6 +24,7 @@ export interface SessionData {
   access_token?: string;
   code_verifier?: string;
   state?: string;
+  returnUrl?: string;
   userInfo?: {
     sub: string;
     name: string;

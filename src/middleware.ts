@@ -24,7 +24,7 @@ export async function middleware(req: NextRequest) {
   }
 
   // Check if it's a protected route (with locale prefix removed)
-  const pathWithoutLocale = pathname.replace(/^\/(en|es)/, "");
+  const pathWithoutLocale = pathname.replace(/^\/(en|es|zh)/, "");
   const isProtected = protectedRoutes.includes(pathWithoutLocale);
 
   if (isProtected) {
@@ -36,8 +36,10 @@ export async function middleware(req: NextRequest) {
           { status: 401 }
         );
       }
-      // Redirect to /login (no locale)
-      return NextResponse.redirect(new URL("/login", req.url));
+      // Redirect to locale-aware login page with returnUrl
+      const locale = req.cookies.get("NEXT_LOCALE")?.value || pathname.match(/^\/(en|es|zh)/)?.[1] || "en";
+      const returnUrl = encodeURIComponent(pathname);
+      return NextResponse.redirect(new URL(`/${locale}/login/student?returnUrl=${returnUrl}`, req.url));
     }
   }
 

@@ -349,6 +349,25 @@
         "saving": "Saving...",
         "save": "Save Bio"
       },
+      "studentInfo": {
+        "title": "Student Information",
+        "description": "Keep your information up to date. This data can be used to autofill your Senior Bio when you become a senior.",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "major": "Major",
+        "secondMajor": "Second Major",
+        "none": "None",
+        "graduationYear": "Graduation Year",
+        "success": "Your information was updated successfully",
+        "error": "There was an error updating your information",
+        "saving": "Saving...",
+        "save": "Save Information",
+        "seniorBioTitle": "Senior Bio",
+        "seniorBioDescription": "Graduating seniors can complete their yearbook bio with additional details like a quote.",
+        "completeSeniorBio": "Complete Senior Bio",
+        "notSenior": "Senior Bio is only available for graduating seniors. Please update your graduation year in your profile if you believe this is incorrect.",
+        "notSeniorShort": "seniors only"
+      },
       "club": {
         "status": "Status",
         "statusValues": {

@@ -1,6 +1,6 @@
 import { getClientConfig, getSession } from "../../../lib/lib";
 import { upsertMitSsoUser } from "../../../lib/auth/session";
-import { headers } from "next/headers";
+import { headers, cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import * as client from "openid-client";
 
@@ -46,15 +46,29 @@ export async function GET(request: NextRequest, response: NextResponse) {
 
   // Redirect based on role
   if (user?.role === 'admin') {
-    return Response.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/en/dashboard`);
+    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/en/dashboard`);
   }
   if (user?.role === 'club') {
-    return Response.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/en/club`);
+    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/en/club`);
   }
   if (user?.role === 'living_group_leader') {
-    return Response.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/en/living-group`);
+    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/en/living-group`);
+  }
+
+  // For students, check for returnUrl from cookie (set by /api/login before OAuth redirect)
+  const cookieStore = cookies();
+  const returnUrlCookie = cookieStore.get('auth_return_url');
+  console.log('[/api/userSignIn] auth_return_url cookie:', returnUrlCookie?.value);
+
+  if (returnUrlCookie?.value && returnUrlCookie.value.startsWith('/')) {
+    console.log('[/api/userSignIn] Redirecting to cookie returnUrl:', returnUrlCookie.value);
+    const response = NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}${returnUrlCookie.value}`);
+    // Clear the cookie after use
+    response.cookies.delete('auth_return_url');
+    return response;
   }
 
   // Default to profile page for students
-  return Response.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/en/profile`);
+  console.log('[/api/userSignIn] No returnUrl cookie, redirecting to default /en/profile');
+  return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/en/profile`);
 }

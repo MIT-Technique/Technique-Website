@@ -349,6 +349,25 @@
         "saving": "保存中...",
         "save": "保存简介"
       },
+      "studentInfo": {
+        "title": "学生信息",
+        "description": "请保持您的信息更新。这些数据可用于在您成为高年级生时自动填写您的高年级简介。",
+        "firstName": "名字",
+        "lastName": "姓氏",
+        "major": "专业",
+        "secondMajor": "第二专业",
+        "none": "无",
+        "graduationYear": "毕业年份",
+        "success": "您的信息已成功更新",
+        "error": "更新信息时出错",
+        "saving": "保存中...",
+        "save": "保存信息",
+        "seniorBioTitle": "高年级简介",
+        "seniorBioDescription": "即将毕业的高年级生可以在年鉴简介中添加更多详细信息，如引言。",
+        "completeSeniorBio": "完成高年级简介",
+        "notSenior": "高年级简介仅对即将毕业的高年级生开放。如果您认为这不正确，请在个人资料中更新您的毕业年份。",
+        "notSeniorShort": "仅限高年级生"
+      },
       "club": {
         "status": "状态",
         "statusValues": {
