@@ -46,7 +46,10 @@ function Sidebar({ pathname }) {
   const borderColor = isHomePage ? "rgba(255,255,255,0.1)" : "#E5E5E5";
 
   const isActive = (href) => {
+    // Senior Bio link (/login) should only be active on exactly /login or /bio, not on /login/admin, /login/club, etc.
     if (href === `/${locale}/login`) return pathname === `/${locale}/login` || pathname === `/${locale}/bio`;
+    // For other paths, check exact match or subpath, but exclude login subpages from general matching
+    if (pathname.startsWith(`/${locale}/login/`)) return pathname === href;
     return pathname === href || pathname.startsWith(href + "/");
   };
 

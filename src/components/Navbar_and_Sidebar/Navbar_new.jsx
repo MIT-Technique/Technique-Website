@@ -19,14 +19,20 @@ function Navbar() {
   // Check if any item in a dropdown is active
   const isDropdownActive = (items) => {
     return items.some(item => {
+      // Senior Bio link should only be active on exactly /login or /bio, not login subpages
       if (item.href === `/${locale}/login`) return pathname === `/${locale}/login` || pathname === `/${locale}/bio`;
+      // When on login subpages, only match exact paths
+      if (pathname.startsWith(`/${locale}/login/`)) return pathname === item.href;
       return pathname === item.href || pathname.startsWith(item.href + "/");
     });
   };
 
   const isActive = (href) => {
     if (href === `/${locale}`) return pathname === `/${locale}`;
+    // Senior Bio link should only be active on exactly /login or /bio, not login subpages like /login/admin
     if (href === `/${locale}/login`) return pathname === `/${locale}/login` || pathname === `/${locale}/bio`;
+    // When on login subpages (/login/admin, /login/club, etc.), only match exact paths
+    if (pathname.startsWith(`/${locale}/login/`)) return pathname === href;
     return pathname === href || pathname.startsWith(href + "/");
   };
 
