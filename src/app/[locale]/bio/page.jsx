@@ -13,7 +13,7 @@ import Snackbar from "@mui/material/Snackbar";
 import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import Alert from "@mui/material/Alert";
-import { useTranslations } from 'next-intl';
+import { useTranslations } from "next-intl";
 
 // Shared MUI text field styling
 const textFieldSx = {
@@ -32,7 +32,7 @@ const selectSx = {
 };
 
 export default function BioPage() {
-  const t = useTranslations('pages.bio');
+  const t = useTranslations("pages.bio");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [major, setMajor] = useState("");
@@ -246,10 +246,8 @@ export default function BioPage() {
       <main className="min-h-screen pt-24 lg:pt-32">
         <section className="section-tight container-narrow">
           <div className="text-center mb-8">
-            <h1 className="mb-2">{t('title')}</h1>
-            <p className="text-text-secondary">
-              {t('description')}
-            </p>
+            <h1 className="mb-2">{t("title")}</h1>
+            <p className="text-text-secondary">{t("description")}</p>
           </div>
 
           <Box
@@ -268,7 +266,7 @@ export default function BioPage() {
             <div className="grid grid-cols-2 gap-4">
               <TextField
                 required
-                label={t('fields.firstName')}
+                label={t("fields.firstName")}
                 variant="outlined"
                 InputLabelProps={{ shrink: true }}
                 value={firstName}
@@ -278,7 +276,7 @@ export default function BioPage() {
               />
               <TextField
                 required
-                label={t('fields.lastName')}
+                label={t("fields.lastName")}
                 variant="outlined"
                 InputLabelProps={{ shrink: true }}
                 value={lastName}
@@ -296,13 +294,13 @@ export default function BioPage() {
                   "&.Mui-focused": { color: "#750014" },
                 }}
               >
-                {t('fields.major')} *
+                {t("fields.major")} *
               </InputLabel>
               <Select
                 labelId="major-label"
                 id="major-select"
                 value={major}
-                label={`${t('fields.major')} *`}
+                label={`${t("fields.major")} *`}
                 notched
                 required
                 onChange={(event) => setMajor(event.target.value)}
@@ -315,9 +313,35 @@ export default function BioPage() {
                 ))}
               </Select>
             </FormControl>
-
+            <FormControl fullWidth>
+              <InputLabel
+                id="second-major-label"
+                shrink
+                sx={{
+                  "&.Mui-focused": { color: "#750014" },
+                }}
+              >
+                Second Major *
+              </InputLabel>
+              <Select
+                labelId="second-major-label"
+                id="second-major-select"
+                value={secondMajor}
+                label="Second Major"
+                notched
+                required
+                onChange={(event) => setSecondMajor(event.target.value)}
+                sx={selectSx}
+              >
+                {second_majors.map((m) => (
+                  <MenuItem key={m} value={m}>
+                    {m}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
             <TextField
-              label={t('fields.quote')}
+              label={t("fields.quote")}
               variant="outlined"
               InputLabelProps={{ shrink: true }}
               value={quote}
@@ -328,9 +352,22 @@ export default function BioPage() {
               maxRows={8}
               sx={textFieldSx}
               fullWidth
-              placeholder={t('fields.quotePlaceholder')}
+              placeholder={t("fields.quotePlaceholder")}
             />
-
+            <TextField
+              label="Extracurriculars"
+              variant="outlined"
+              InputLabelProps={{ shrink: true }}
+              value={extracurriculars}
+              onChange={(event) => setExtracurriculars(event.target.value)}
+              name="extracurriculars"
+              multiline
+              minRows={3}
+              maxRows={8}
+              sx={textFieldSx}
+              fullWidth
+              placeholder="Enter the clubs/extracurriculars/societies that you have been part of as a student"
+            />
             <Button
               type="submit"
               variant="contained"
@@ -353,7 +390,7 @@ export default function BioPage() {
               }}
               fullWidth
             >
-              {t('submitButton')}
+              {t("submitButton")}
             </Button>
           </Box>
         </section>
@@ -381,7 +418,7 @@ export default function BioPage() {
           variant="filled"
           sx={{ width: "100%" }}
         >
-          {error ? t('error') : t('success')}
+          {error ? t("error") : t("success")}
         </Alert>
       </Snackbar>
       <Footer />
