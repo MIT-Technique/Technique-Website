@@ -33,7 +33,7 @@ export async function middleware(req: NextRequest) {
       if (pathWithoutLocale.startsWith("/api/")) {
         return NextResponse.json(
           { success: false, message: "Authentication required" },
-          { status: 401 }
+          { status: 401 },
         );
       }
       // Redirect to /login (no locale)
@@ -48,11 +48,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/((?!api|_next|_vercel|.*\\..*).*)",
-    "/login",
-    "/api/login", 
-    "/api/updateBio", 
-    "/api/getUserData", 
-  ],
+  matcher: ["/((?!api|_next|_vercel|.*\\..*).*)", "/login", "/api/login"],
 };

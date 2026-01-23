@@ -14,6 +14,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import Alert from "@mui/material/Alert";
 import { useTranslations } from "next-intl";
+import CircularProgress from "@mui/material/CircularProgress";
 
 // Shared MUI text field styling
 const textFieldSx = {
@@ -244,156 +245,168 @@ export default function BioPage() {
   return (
     <>
       <main className="min-h-screen pt-24 lg:pt-32">
-        <section className="section-tight container-narrow">
-          <div className="text-center mb-8">
-            <h1 className="mb-2">{t("title")}</h1>
-            <p className="text-text-secondary">{t("description")}</p>
-          </div>
-
+        {loading ? (
           <Box
-            component="form"
-            className="card-elevated"
             sx={{
               display: "flex",
-              flexDirection: "column",
-              gap: 2,
-            }}
-            onSubmit={async (event) => {
-              event.preventDefault();
-              await updateBio();
+              justifyContent: "center",
+              alignItems: "center",
             }}
           >
-            <div className="grid grid-cols-2 gap-4">
-              <TextField
-                required
-                label={t("fields.firstName")}
-                variant="outlined"
-                InputLabelProps={{ shrink: true }}
-                value={firstName}
-                onChange={(event) => setFirstName(event.target.value)}
-                name="firstName"
-                sx={textFieldSx}
-              />
-              <TextField
-                required
-                label={t("fields.lastName")}
-                variant="outlined"
-                InputLabelProps={{ shrink: true }}
-                value={lastName}
-                onChange={(event) => setLastName(event.target.value)}
-                name="lastName"
-                sx={textFieldSx}
-              />
+            <CircularProgress sx={{ color: "#790606" }} />
+          </Box>
+        ) : (
+          <section className="section-tight container-narrow">
+            <div className="text-center mb-8">
+              <h1 className="mb-2">{t("title")}</h1>
+              <p className="text-text-secondary">{t("description")}</p>
             </div>
 
-            <FormControl fullWidth>
-              <InputLabel
-                id="major-label"
-                shrink
-                sx={{
-                  "&.Mui-focused": { color: "#750014" },
-                }}
-              >
-                {t("fields.major")} *
-              </InputLabel>
-              <Select
-                labelId="major-label"
-                id="major-select"
-                value={major}
-                label={`${t("fields.major")} *`}
-                notched
-                required
-                onChange={(event) => setMajor(event.target.value)}
-                sx={selectSx}
-              >
-                {majors.map((m) => (
-                  <MenuItem key={m} value={m}>
-                    {m}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <FormControl fullWidth>
-              <InputLabel
-                id="second-major-label"
-                shrink
-                sx={{
-                  "&.Mui-focused": { color: "#750014" },
-                }}
-              >
-                Second Major *
-              </InputLabel>
-              <Select
-                labelId="second-major-label"
-                id="second-major-select"
-                value={secondMajor}
-                label="Second Major"
-                notched
-                required
-                onChange={(event) => setSecondMajor(event.target.value)}
-                sx={selectSx}
-              >
-                {second_majors.map((m) => (
-                  <MenuItem key={m} value={m}>
-                    {m}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <TextField
-              label={t("fields.quote")}
-              variant="outlined"
-              InputLabelProps={{ shrink: true }}
-              value={quote}
-              onChange={(event) => setQuote(event.target.value)}
-              name="quote"
-              multiline
-              minRows={3}
-              maxRows={8}
-              sx={textFieldSx}
-              fullWidth
-              placeholder={t("fields.quotePlaceholder")}
-            />
-            <TextField
-              label="Extracurriculars"
-              variant="outlined"
-              InputLabelProps={{ shrink: true }}
-              value={extracurriculars}
-              onChange={(event) => setExtracurriculars(event.target.value)}
-              name="extracurriculars"
-              multiline
-              minRows={3}
-              maxRows={8}
-              sx={textFieldSx}
-              fullWidth
-              placeholder="Enter the clubs/extracurriculars/societies that you have been part of as a student"
-            />
-            <Button
-              type="submit"
-              variant="contained"
+            <Box
+              component="form"
+              className="card-elevated"
               sx={{
-                mt: 2,
-                backgroundColor: "#750014",
-                "&:hover": {
-                  backgroundColor: "#5C0010",
-                },
-                "&:active": {
-                  backgroundColor: "#5C0010",
-                  transform: "translateY(1px)",
-                },
-                transition: "all 0.2s ease",
-                textTransform: "uppercase",
-                letterSpacing: "0.05em",
-                fontWeight: 500,
-                py: 1.5,
-                boxShadow: "none",
+                display: "flex",
+                flexDirection: "column",
+                gap: 2,
               }}
-              fullWidth
+              onSubmit={async (event) => {
+                event.preventDefault();
+                await updateBio();
+              }}
             >
-              {t("submitButton")}
-            </Button>
-          </Box>
-        </section>
+              <div className="grid grid-cols-2 gap-4">
+                <TextField
+                  required
+                  label={t("fields.firstName")}
+                  variant="outlined"
+                  InputLabelProps={{ shrink: true }}
+                  value={firstName}
+                  onChange={(event) => setFirstName(event.target.value)}
+                  name="firstName"
+                  sx={textFieldSx}
+                />
+                <TextField
+                  required
+                  label={t("fields.lastName")}
+                  variant="outlined"
+                  InputLabelProps={{ shrink: true }}
+                  value={lastName}
+                  onChange={(event) => setLastName(event.target.value)}
+                  name="lastName"
+                  sx={textFieldSx}
+                />
+              </div>
+
+              <FormControl fullWidth>
+                <InputLabel
+                  id="major-label"
+                  shrink
+                  sx={{
+                    "&.Mui-focused": { color: "#750014" },
+                  }}
+                >
+                  {t("fields.major")} *
+                </InputLabel>
+                <Select
+                  labelId="major-label"
+                  id="major-select"
+                  value={major}
+                  label={`${t("fields.major")} *`}
+                  notched
+                  required
+                  onChange={(event) => setMajor(event.target.value)}
+                  sx={selectSx}
+                >
+                  {majors.map((m) => (
+                    <MenuItem key={m} value={m}>
+                      {m}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <FormControl fullWidth>
+                <InputLabel
+                  id="second-major-label"
+                  shrink
+                  sx={{
+                    "&.Mui-focused": { color: "#750014" },
+                  }}
+                >
+                  Second Major *
+                </InputLabel>
+                <Select
+                  labelId="second-major-label"
+                  id="second-major-select"
+                  value={secondMajor}
+                  label="Second Major"
+                  notched
+                  required
+                  onChange={(event) => setSecondMajor(event.target.value)}
+                  sx={selectSx}
+                >
+                  {second_majors.map((m) => (
+                    <MenuItem key={m} value={m}>
+                      {m}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <TextField
+                label={t("fields.quote")}
+                variant="outlined"
+                InputLabelProps={{ shrink: true }}
+                value={quote}
+                onChange={(event) => setQuote(event.target.value)}
+                name="quote"
+                multiline
+                minRows={3}
+                maxRows={8}
+                sx={textFieldSx}
+                fullWidth
+                placeholder={t("fields.quotePlaceholder")}
+              />
+              <TextField
+                label="Extracurriculars"
+                variant="outlined"
+                InputLabelProps={{ shrink: true }}
+                value={extracurriculars}
+                onChange={(event) => setExtracurriculars(event.target.value)}
+                name="extracurriculars"
+                multiline
+                minRows={3}
+                maxRows={8}
+                sx={textFieldSx}
+                fullWidth
+                placeholder="Enter the clubs/extracurriculars/societies that you have been part of as a student"
+              />
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{
+                  mt: 2,
+                  backgroundColor: "#750014",
+                  "&:hover": {
+                    backgroundColor: "#5C0010",
+                  },
+                  "&:active": {
+                    backgroundColor: "#5C0010",
+                    transform: "translateY(1px)",
+                  },
+                  transition: "all 0.2s ease",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                  fontWeight: 500,
+                  py: 1.5,
+                  boxShadow: "none",
+                }}
+                fullWidth
+              >
+                {t("submitButton")}
+              </Button>
+            </Box>
+          </section>
+        )}
       </main>
 
       <Snackbar
