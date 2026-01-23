@@ -25,6 +25,16 @@ const nextConfig = {
         destination: "https://engage.mit.edu/technique/rsvp_boot?id=916938",
         permanent: false,
       },
+      {
+        source: "/purchase",
+        destination: "https://engage.mit.edu/technique/rsvp_boot?id=916938",
+        permanent: false,
+      },
+      {
+        source: "/bio",
+        destination: "/en/bio",
+        permanent: false,
+      },
     ];
   },
 };
