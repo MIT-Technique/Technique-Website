@@ -173,10 +173,59 @@
       "metaTitle": "Login - MIT Technique",
       "metaDescription": "Sign in to access your account.",
       "description": "Sign in to access your account and manage your information.",
-      "instructionText": "Click below to sign in with your MIT credentials.",
+      "instructionText": "Student sign-in with MIT credentials.",
       "signInButton": "Sign In with MIT",
       "dividerText": "or",
       "success": "Signed in successfully",
+      "organizationButton": "Organization Login",
+      "org": {
+        "title": "Organization Login",
+        "signIn": "Sign In",
+        "signUp": "Sign Up",
+        "signInTitle": "Organization Sign In",
+        "signUpTitle": "Organization Sign Up",
+        "email": "Email",
+        "emailPlaceholder": "your-org@mit.edu",
+        "password": "Password",
+        "confirmPassword": "Confirm Password",
+        "club": "Club",
+        "livingGroup": "Living Group",
+        "clubName": "Club Name",
+        "clubNamePlaceholder": "e.g., MIT Robotics Club",
+        "livingGroupType": "Type",
+        "dorm": "Dorm",
+        "fsilg": "FSILG",
+        "selectDorm": "Select Dorm",
+        "fsilgName": "FSILG Full Name (unabbreviated)",
+        "fsilgNamePlaceholder": "e.g., Alpha Delta Phi",
+        "signInButton": "Sign In",
+        "signUpButton": "Create Account",
+        "signingIn": "Signing in...",
+        "signingUp": "Creating account...",
+        "emailRequired": "Email is required",
+        "emailInvalid": "Email must be an @mit.edu address",
+        "passwordRequired": "Password is required",
+        "passwordMin": "Password must be at least 8 characters",
+        "passwordMismatch": "Passwords do not match",
+        "clubNameRequired": "Club name is required",
+        "livingGroupTypeRequired": "Please select dorm or FSILG",
+        "dormRequired": "Please select a dorm",
+        "fsilgNameRequired": "Please enter the FSILG name",
+        "accountExists": "An account with this email already exists",
+        "invalidCredentials": "Invalid email or password",
+        "emailNotVerified": "Please verify your email before signing in",
+        "signInSuccess": "Signed in successfully!",
+        "signUpSuccess": "Account created! Check your email to verify.",
+        "forgotPassword": "Forgot password?",
+        "forgotPasswordTitle": "Reset Password",
+        "forgotPasswordDescription": "Enter your email to receive a password reset link.",
+        "sendResetLink": "Send Reset Link",
+        "sendingResetLink": "Sending...",
+        "resetLinkSent": "If an account exists, a reset link has been sent.",
+        "backToSignIn": "Back to Sign In",
+        "needAccount": "Need an account?",
+        "haveAccount": "Already have an account?"
+      },
       "admin": {
         "title": "Admin Login",
         "description": "For Technique administrators only.",
@@ -279,11 +328,13 @@
         "seniorBio": "Senior Bio",
         "clubInfo": "Club Info",
         "scheduling": "Scheduling",
-        "myClubs": "My Clubs"
+        "myClubs": "My Clubs",
+        "myLivingGroups": "My Living Groups"
       },
       "myClubs": {
         "title": "My Clubs",
         "searchTitle": "Search Clubs",
+        "description": "Join your club(s) to be included in the yearbook photos.",
         "memberships": "Your Memberships",
         "noMemberships": "You are not a member of any clubs yet.",
         "pendingRequests": "Pending Requests",
@@ -756,7 +807,8 @@
       "filters": {
         "all": "All",
         "active": "Active",
-        "disabled": "Disabled"
+        "disabled": "Disabled",
+        "upcoming": "Upcoming Photoshoots"
       },
       "noLivingGroups": "No living groups found",
       "status": {
@@ -766,7 +818,11 @@
       "leader": "Leader",
       "bookedTime": "Booked Time",
       "disable": "Disable",
-      "enable": "Enable"
+      "enable": "Enable",
+      "members": "Members",
+      "memberCount": "{count} members",
+      "expectedCount": "Expected: {count}",
+      "showMemberCounts": "Show Member Counts"
     },
     "users": {
       "title": "User Management",
@@ -953,8 +1009,13 @@
   },
 
   "livingGroupPage": {
-    "title": "Living Group Photoshoot",
+    "title": "Living Group Dashboard",
     "welcome": "Welcome, {name}",
+    "tabs": {
+      "scheduling": "Scheduling",
+      "members": "Members",
+      "joinRequests": "Join Requests"
+    },
     "disabled": "Your account has been disabled",
     "disabledHint": "Please contact an administrator for assistance",
     "frozen": "Booking is currently frozen. You cannot make changes at this time.",
@@ -970,7 +1031,65 @@
     "book": "Book This Time",
     "booking": "Booking...",
     "bookSuccess": "Time slot booked successfully",
-    "bookError": "Failed to book time slot"
+    "bookError": "Failed to book time slot",
+    "members": {
+      "title": "Members",
+      "totalMembers": "Total Members: {count}",
+      "totalExpected": "Total Expected: {count}",
+      "noMembers": "No members yet",
+      "memberCount": "{count} member(s)",
+      "expectedCount": "Expected: {count}",
+      "setExpected": "Set Expected",
+      "updateExpected": "Update",
+      "expectedPlaceholder": "Expected count",
+      "updateSuccess": "Expected count updated",
+      "updateError": "Failed to update expected count"
+    },
+    "joinRequests": {
+      "title": "Join Requests",
+      "noRequests": "No pending requests",
+      "approve": "Approve",
+      "deny": "Deny",
+      "approving": "Approving...",
+      "denying": "Denying...",
+      "approveSuccess": "Member approved",
+      "denySuccess": "Request denied",
+      "actionError": "Failed to process request"
+    }
+  },
+
+  "joinLivingGroup": {
+    "title": "Search Living Groups",
+    "description": "Join your dorm or FSILG to be included in the yearbook photos.",
+    "searchPlaceholder": "Search by name...",
+    "searchHint": "e.g., Baker House, East Campus, Alpha Delta Phi...",
+    "filterAll": "All",
+    "filterDorms": "Dorms",
+    "filterFSILGs": "FSILGs",
+    "noResults": "No living groups found",
+    "selectSection": "Select your section",
+    "sectionRequired": "Please select a section",
+    "join": "Join",
+    "joining": "Joining...",
+    "requestToJoin": "Request to Join",
+    "joinSuccess": "Successfully joined!",
+    "requestSuccess": "Request submitted. Waiting for approval.",
+    "joinError": "Failed to join living group",
+    "alreadyMember": "You are already a member of this living group",
+    "currentMemberships": {
+      "title": "Your Memberships",
+      "dorm": "Dorm",
+      "fsilg": "FSILG",
+      "section": "Section: {section}",
+      "pending": "Pending Approval",
+      "active": "Active",
+      "leave": "Leave",
+      "cancelRequest": "Cancel Request",
+      "leaving": "Leaving...",
+      "leaveSuccess": "Left successfully",
+      "leaveError": "Failed to leave",
+      "noMemberships": "You haven't joined any living groups yet"
+    }
   },
 
   "resources": {

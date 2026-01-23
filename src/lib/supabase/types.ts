@@ -41,11 +41,15 @@ export interface Club {
   updated_at: string;
 }
 
+export type LivingGroupType = 'dorm' | 'fsilg';
+export type LivingGroupMembershipStatus = 'pending' | 'active' | 'removed';
+
 export interface LivingGroup {
   id: string;
   user_id: string;
   name: string;
   status: LivingGroupStatus;
+  living_group_type: LivingGroupType;
   promoted_by: string | null;
   promoted_at: string | null;
   disabled_by: string | null;
@@ -189,4 +193,56 @@ export interface ClubLeaderRequestWithDetails extends ClubLeaderRequest {
   user?: Pick<User, 'id' | 'email' | 'first_name' | 'last_name'>;
   club?: Club;
   requester?: Pick<User, 'id' | 'email' | 'first_name' | 'last_name'>;
+}
+
+// Living group section and membership types
+export interface DormSection {
+  id: string;
+  dorm_name: string;
+  section_name: string;
+  display_order: number;
+  created_at: string;
+}
+
+export interface LivingGroupMembership {
+  id: string;
+  living_group_id: string;
+  user_id: string;
+  section_id: string | null;
+  membership_type: LivingGroupType;
+  status: LivingGroupMembershipStatus;
+  joined_at: string;
+  approved_by: string | null;
+  approved_at: string | null;
+}
+
+export interface SectionExpectedCount {
+  id: string;
+  living_group_id: string;
+  section_id: string | null;
+  expected_count: number;
+  updated_at: string;
+  updated_by: string | null;
+}
+
+// Extended living group types with relations
+export interface LivingGroupMembershipWithUser extends LivingGroupMembership {
+  user?: Pick<User, 'id' | 'email' | 'first_name' | 'last_name'>;
+  section?: DormSection;
+}
+
+export interface LivingGroupMembershipWithDetails extends LivingGroupMembership {
+  user?: Pick<User, 'id' | 'email' | 'first_name' | 'last_name'>;
+  section?: DormSection;
+  living_group?: LivingGroup;
+}
+
+export interface LivingGroupWithMemberCount extends LivingGroup {
+  member_count?: number;
+  expected_count?: number;
+}
+
+export interface SectionWithCounts extends DormSection {
+  member_count: number;
+  expected_count: number;
 }

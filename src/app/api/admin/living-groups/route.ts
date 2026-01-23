@@ -7,7 +7,8 @@ export async function GET(request: NextRequest) {
   try {
     const user = await getCurrentUser();
 
-    if (!user || user.role !== 'admin') {
+    // Allow admin and staph roles
+    if (!user || (user.role !== 'admin' && user.role !== 'staph')) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
@@ -18,6 +19,7 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const status = searchParams.get('status');
     const search = searchParams.get('search');
+    const includeMembers = searchParams.get('includeMembers') === 'true';
 
     let query = supabase
       .from('living_groups')
@@ -44,6 +46,39 @@ export async function GET(request: NextRequest) {
         { error: "Failed to fetch living groups" },
         { status: 500 }
       );
+    }
+
+    // If includeMembers flag is set, fetch member counts and expected counts
+    if (includeMembers && livingGroups) {
+      const enrichedLivingGroups = await Promise.all(
+        livingGroups.map(async (lg) => {
+          // Get active member count
+          const { count: memberCount } = await supabase
+            .from('living_group_memberships')
+            .select('*', { count: 'exact', head: true })
+            .eq('living_group_id', lg.id)
+            .eq('status', 'active');
+
+          // Get expected counts
+          const { data: expectedCounts } = await supabase
+            .from('section_expected_counts')
+            .select('expected_count')
+            .eq('living_group_id', lg.id);
+
+          const totalExpected = (expectedCounts || []).reduce(
+            (sum, ec) => sum + (ec.expected_count || 0),
+            0
+          );
+
+          return {
+            ...lg,
+            memberCount: memberCount || 0,
+            expectedCount: totalExpected,
+          };
+        })
+      );
+
+      return NextResponse.json({ livingGroups: enrichedLivingGroups });
     }
 
     return NextResponse.json({ livingGroups });

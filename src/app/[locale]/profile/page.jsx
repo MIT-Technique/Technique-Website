@@ -78,6 +78,23 @@ export default function ProfilePage() {
   const [cancellingRequestId, setCancellingRequestId] = useState(null);
   const [processingInvitationId, setProcessingInvitationId] = useState(null);
 
+  // My Living Groups state
+  const [lgMemberships, setLgMemberships] = useState([]);
+  const [lgSearch, setLgSearch] = useState('');
+  const [lgSearchResults, setLgSearchResults] = useState([]);
+  const [lgSearchLoading, setLgSearchLoading] = useState(false);
+  const [lgLoading, setLgLoading] = useState(true);
+  const [lgMessage, setLgMessage] = useState({ type: '', text: '' });
+  const [lgTypeFilter, setLgTypeFilter] = useState('all');
+  const [joiningLgId, setJoiningLgId] = useState(null);
+  const [selectedSection, setSelectedSection] = useState('');
+  const [availableSections, setAvailableSections] = useState([]);
+  const [sectionsLoading, setSectionsLoading] = useState(false);
+  const [leavingMembershipId, setLeavingMembershipId] = useState(null);
+
+  // Translations for living groups
+  const tLg = useTranslations('joinLivingGroup');
+
   // Staph request state
   const [staphRequestPending, setStaphRequestPending] = useState(false);
   const [staphRequestSubmitting, setStaphRequestSubmitting] = useState(false);
@@ -125,6 +142,13 @@ export default function ProfilePage() {
   useEffect(() => {
     if (isLoggedIn && (user?.role === 'student' || user?.role === 'living_group_leader')) {
       fetchMyClubsData();
+    }
+  }, [isLoggedIn, user]);
+
+  // Fetch my living groups data for students
+  useEffect(() => {
+    if (isLoggedIn && user?.role === 'student') {
+      fetchMyLivingGroupsData();
     }
   }, [isLoggedIn, user]);
 
@@ -224,6 +248,116 @@ export default function ProfilePage() {
     }
   }
 
+  async function fetchMyLivingGroupsData() {
+    try {
+      setLgLoading(true);
+      const res = await fetch('/api/living-groups/my-memberships');
+      const data = await res.json();
+      setLgMemberships(data.memberships || []);
+    } catch (error) {
+      console.error('Error fetching living groups data:', error);
+    } finally {
+      setLgLoading(false);
+    }
+  }
+
+  async function searchLivingGroups(query) {
+    if (!query || query.length < 2) {
+      setLgSearchResults([]);
+      return;
+    }
+    try {
+      setLgSearchLoading(true);
+      const typeParam = lgTypeFilter !== 'all' ? `&type=${lgTypeFilter}` : '';
+      const res = await fetch(`/api/living-groups/search?q=${encodeURIComponent(query)}${typeParam}`);
+      const data = await res.json();
+      // Filter out living groups user is already a member of
+      const memberLgIds = new Set(lgMemberships.map(m => m.living_group_id));
+      const filteredResults = (data.livingGroups || []).filter(
+        lg => !memberLgIds.has(lg.id)
+      );
+      setLgSearchResults(filteredResults);
+    } catch (error) {
+      console.error('Error searching living groups:', error);
+    } finally {
+      setLgSearchLoading(false);
+    }
+  }
+
+  async function fetchSectionsForDorm(dormName) {
+    try {
+      setSectionsLoading(true);
+      const res = await fetch(`/api/living-groups/sections?dorm=${encodeURIComponent(dormName)}`);
+      const data = await res.json();
+      setAvailableSections(data.sections || []);
+    } catch (error) {
+      console.error('Error fetching sections:', error);
+      setAvailableSections([]);
+    } finally {
+      setSectionsLoading(false);
+    }
+  }
+
+  async function handleJoinLivingGroup(livingGroupId, livingGroupType) {
+    // For dorms, require section selection
+    if (livingGroupType === 'dorm' && !selectedSection) {
+      setLgMessage({ type: 'error', text: tLg('sectionRequired') });
+      return;
+    }
+
+    setJoiningLgId(livingGroupId);
+    setLgMessage({ type: '', text: '' });
+    try {
+      const res = await fetch('/api/living-groups/join', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          livingGroupId,
+          sectionId: livingGroupType === 'dorm' ? selectedSection : null,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        const message = livingGroupType === 'dorm' ? tLg('joinSuccess') : tLg('requestSuccess');
+        setLgMessage({ type: 'success', text: message });
+        setLgSearch('');
+        setLgSearchResults([]);
+        setSelectedSection('');
+        setAvailableSections([]);
+        fetchMyLivingGroupsData();
+      } else {
+        setLgMessage({ type: 'error', text: data.error || tLg('joinError') });
+      }
+    } catch (error) {
+      setLgMessage({ type: 'error', text: tLg('joinError') });
+    } finally {
+      setJoiningLgId(null);
+    }
+  }
+
+  async function handleLeaveLivingGroup(membershipId) {
+    setLeavingMembershipId(membershipId);
+    setLgMessage({ type: '', text: '' });
+    try {
+      const res = await fetch('/api/living-groups/leave', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ membershipId }),
+      });
+      if (res.ok) {
+        setLgMessage({ type: 'success', text: tLg('currentMemberships.leaveSuccess') });
+        fetchMyLivingGroupsData();
+      } else {
+        const data = await res.json();
+        setLgMessage({ type: 'error', text: data.error || tLg('currentMemberships.leaveError') });
+      }
+    } catch (error) {
+      setLgMessage({ type: 'error', text: tLg('currentMemberships.leaveError') });
+    } finally {
+      setLeavingMembershipId(null);
+    }
+  }
+
   async function searchClubs(query) {
     if (!query || query.length < 2) {
       setClubSearchResults([]);
@@ -319,13 +453,21 @@ export default function ProfilePage() {
     }
   }
 
-  // Debounced search
+  // Debounced club search
   useEffect(() => {
     const timer = setTimeout(() => {
       searchClubs(clubSearch);
     }, 300);
     return () => clearTimeout(timer);
   }, [clubSearch, myMemberships, myPendingRequests]);
+
+  // Debounced living group search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      searchLivingGroups(lgSearch);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [lgSearch, lgTypeFilter, lgMemberships]);
 
   async function handleBioSubmit(e) {
     e.preventDefault();
@@ -415,6 +557,7 @@ export default function ProfilePage() {
 
     if (user?.role === 'student') {
       tabs.push({ id: 'myClubs', label: t('tabs.myClubs') });
+      tabs.push({ id: 'myLivingGroups', label: t('tabs.myLivingGroups') });
     } else if (user?.role === 'club') {
       tabs.push({ id: 'club', label: t('tabs.clubInfo') });
     } else if (user?.role === 'living_group_leader') {
@@ -848,6 +991,7 @@ export default function ProfilePage() {
               {/* Search for clubs */}
               <div className="mb-8">
                 <h2 className="text-lg font-medium mb-4">{t('myClubs.searchTitle')}</h2>
+                <p className="text-text-secondary text-sm mb-4">{t('myClubs.description')}</p>
                 <TextField
                   label={t('myClubs.searchPlaceholder')}
                   variant="outlined"
@@ -1004,6 +1148,221 @@ export default function ProfilePage() {
                             date: new Date(membership.joined_at).toLocaleDateString(locale),
                           })}
                         </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* My Living Groups Tab (Students) */}
+          {activeTab === 'myLivingGroups' && user?.role === 'student' && (
+            <div>
+              {lgMessage.text && (
+                <div className={`mb-6 p-4 rounded ${
+                  lgMessage.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
+                }`}>
+                  {lgMessage.text}
+                </div>
+              )}
+
+              {/* Search for living groups */}
+              <div className="mb-8">
+                <h2 className="text-lg font-medium mb-4">{tLg('title')}</h2>
+                <p className="text-text-secondary text-sm mb-4">{tLg('description')}</p>
+
+                {/* Type filter */}
+                <div className="flex gap-2 mb-4">
+                  <button
+                    onClick={() => setLgTypeFilter('all')}
+                    className={`px-3 py-1 text-sm rounded ${
+                      lgTypeFilter === 'all'
+                        ? 'bg-accent text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {tLg('filterAll')}
+                  </button>
+                  <button
+                    onClick={() => setLgTypeFilter('dorm')}
+                    className={`px-3 py-1 text-sm rounded ${
+                      lgTypeFilter === 'dorm'
+                        ? 'bg-accent text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {tLg('filterDorms')}
+                  </button>
+                  <button
+                    onClick={() => setLgTypeFilter('fsilg')}
+                    className={`px-3 py-1 text-sm rounded ${
+                      lgTypeFilter === 'fsilg'
+                        ? 'bg-accent text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {tLg('filterFSILGs')}
+                  </button>
+                </div>
+
+                <TextField
+                  label={tLg('searchPlaceholder')}
+                  placeholder={tLg('searchHint')}
+                  variant="outlined"
+                  InputLabelProps={{ shrink: true }}
+                  value={lgSearch}
+                  onChange={(e) => {
+                    setLgSearch(e.target.value);
+                    setSelectedSection('');
+                    setAvailableSections([]);
+                  }}
+                  sx={textFieldSx}
+                  fullWidth
+                />
+
+                {/* Search results */}
+                {lgSearchLoading ? (
+                  <p className="text-text-secondary mt-4">Loading...</p>
+                ) : lgSearchResults.length > 0 ? (
+                  <div className="mt-4 space-y-2">
+                    {lgSearchResults.map((lg) => (
+                      <div
+                        key={lg.id}
+                        className="p-4 border border-border rounded-lg"
+                      >
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p className="font-medium">{lg.name}</p>
+                            <p className="text-text-secondary text-xs capitalize">
+                              {lg.living_group_type === 'dorm' ? tLg('filterDorms') : 'FSILG'}
+                            </p>
+                          </div>
+                          {lg.living_group_type === 'fsilg' ? (
+                            <button
+                              onClick={() => handleJoinLivingGroup(lg.id, 'fsilg')}
+                              disabled={joiningLgId === lg.id}
+                              className="btn-primary text-sm"
+                            >
+                              {joiningLgId === lg.id ? tLg('joining') : tLg('requestToJoin')}
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                if (availableSections.length === 0 || lg.id !== joiningLgId) {
+                                  fetchSectionsForDorm(lg.name);
+                                  setJoiningLgId(lg.id);
+                                  setSelectedSection('');
+                                }
+                              }}
+                              className="text-sm text-accent hover:underline"
+                            >
+                              {tLg('selectSection')}
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Section selector for dorms */}
+                        {lg.living_group_type === 'dorm' && joiningLgId === lg.id && (
+                          <div className="mt-4 pt-4 border-t border-border">
+                            {sectionsLoading ? (
+                              <p className="text-text-secondary text-sm">Loading sections...</p>
+                            ) : (
+                              <>
+                                <FormControl fullWidth size="small">
+                                  <InputLabel shrink sx={{ "&.Mui-focused": { color: "#750014" } }}>
+                                    {tLg('selectSection')}
+                                  </InputLabel>
+                                  <Select
+                                    value={selectedSection}
+                                    label={tLg('selectSection')}
+                                    notched
+                                    onChange={(e) => setSelectedSection(e.target.value)}
+                                    sx={selectSx}
+                                  >
+                                    {availableSections.map((section) => (
+                                      <MenuItem key={section.id} value={section.id}>
+                                        {section.section_name}
+                                      </MenuItem>
+                                    ))}
+                                  </Select>
+                                </FormControl>
+                                <button
+                                  onClick={() => handleJoinLivingGroup(lg.id, 'dorm')}
+                                  disabled={!selectedSection}
+                                  className="mt-3 btn-primary text-sm w-full disabled:opacity-50"
+                                >
+                                  {tLg('join')}
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : lgSearch.length >= 2 ? (
+                  <p className="text-text-secondary mt-4">{tLg('noResults')}</p>
+                ) : null}
+              </div>
+
+              {/* Current memberships */}
+              <div>
+                <h2 className="text-lg font-medium mb-4">{tLg('currentMemberships.title')}</h2>
+                {lgLoading ? (
+                  <p className="text-text-secondary">Loading...</p>
+                ) : lgMemberships.length === 0 ? (
+                  <p className="text-text-secondary">{tLg('currentMemberships.noMemberships')}</p>
+                ) : (
+                  <div className="space-y-3">
+                    {lgMemberships.map((membership) => (
+                      <div
+                        key={membership.id}
+                        className={`p-4 border rounded-lg ${
+                          membership.status === 'pending'
+                            ? 'border-yellow-200 bg-yellow-50'
+                            : 'border-green-200 bg-green-50'
+                        }`}
+                      >
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p className="font-medium">
+                              {membership.living_group?.name || 'Unknown'}
+                            </p>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="text-xs px-2 py-0.5 bg-gray-200 text-gray-700 rounded">
+                                {membership.membership_type === 'dorm'
+                                  ? tLg('currentMemberships.dorm')
+                                  : tLg('currentMemberships.fsilg')}
+                              </span>
+                              <span className={`text-xs px-2 py-0.5 rounded ${
+                                membership.status === 'pending'
+                                  ? 'bg-yellow-200 text-yellow-800'
+                                  : 'bg-green-200 text-green-800'
+                              }`}>
+                                {membership.status === 'pending'
+                                  ? tLg('currentMemberships.pending')
+                                  : tLg('currentMemberships.active')}
+                              </span>
+                            </div>
+                            {membership.section && (
+                              <p className="text-text-secondary text-sm mt-1">
+                                {tLg('currentMemberships.section', { section: membership.section.section_name })}
+                              </p>
+                            )}
+                          </div>
+                          <button
+                            onClick={() => handleLeaveLivingGroup(membership.id)}
+                            disabled={leavingMembershipId === membership.id}
+                            className="text-sm text-red-600 hover:text-red-700"
+                          >
+                            {leavingMembershipId === membership.id
+                              ? tLg('currentMemberships.leaving')
+                              : membership.status === 'pending'
+                              ? tLg('currentMemberships.cancelRequest')
+                              : tLg('currentMemberships.leave')}
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>

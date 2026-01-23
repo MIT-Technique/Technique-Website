@@ -8,20 +8,23 @@ export default function LivingGroupsPage() {
   const [livingGroups, setLivingGroups] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+  const [showMemberCounts, setShowMemberCounts] = useState(false);
   const [showPromoteForm, setShowPromoteForm] = useState(false);
   const [promoteData, setPromoteData] = useState({ email: '', livingGroupName: '' });
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
     fetchLivingGroups();
-  }, [filter]);
+  }, [filter, showMemberCounts]);
 
   async function fetchLivingGroups() {
     try {
       setLoading(true);
-      let url = '/api/admin/living-groups';
-      if (filter !== 'all') url += `?status=${filter}`;
+      const params = new URLSearchParams();
+      if (filter !== 'all') params.append('status', filter);
+      if (showMemberCounts) params.append('includeMembers', 'true');
 
+      const url = `/api/admin/living-groups${params.toString() ? `?${params.toString()}` : ''}`;
       const res = await fetch(url);
       const data = await res.json();
       setLivingGroups(data.livingGroups || []);
@@ -151,7 +154,7 @@ export default function LivingGroupsPage() {
       )}
 
       {/* Filters */}
-      <div className="flex gap-2 mb-4">
+      <div className="flex flex-wrap gap-2 mb-4 items-center">
         {['all', 'active', 'disabled'].map((f) => (
           <button
             key={f}
@@ -165,6 +168,17 @@ export default function LivingGroupsPage() {
             {t(`filters.${f}`)}
           </button>
         ))}
+        <span className="mx-2 text-text-muted">|</span>
+        <button
+          onClick={() => setShowMemberCounts(!showMemberCounts)}
+          className={`px-3 py-1 text-sm rounded ${
+            showMemberCounts
+              ? 'bg-blue-600 text-white'
+              : 'bg-bg-secondary text-text-secondary hover:bg-bg-secondary/80'
+          }`}
+        >
+          {t('showMemberCounts')}
+        </button>
       </div>
 
       {/* Living Groups List */}
@@ -202,6 +216,22 @@ export default function LivingGroupsPage() {
                     <p className="text-sm text-text-muted mt-1">
                       {t('bookedTime')}: {new Date(lg.photoshoot_time[0].date).toLocaleDateString()} {lg.photoshoot_time[0].start_time}
                     </p>
+                  )}
+                  {showMemberCounts && (
+                    <div className="mt-2 flex items-center gap-4">
+                      <span className={`text-sm px-2 py-0.5 rounded ${
+                        lg.memberCount >= lg.expectedCount && lg.expectedCount > 0
+                          ? 'bg-green-100 text-green-800'
+                          : lg.expectedCount > 0
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-gray-100 text-gray-600'
+                      }`}>
+                        {t('memberCount', { count: lg.memberCount || 0 })}
+                      </span>
+                      <span className="text-sm text-text-muted">
+                        {t('expectedCount', { count: lg.expectedCount || 0 })}
+                      </span>
+                    </div>
                   )}
                 </div>
                 <div className="flex gap-2">

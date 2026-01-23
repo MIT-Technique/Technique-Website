@@ -173,10 +173,59 @@
       "metaTitle": "Iniciar Sesión - MIT Technique",
       "metaDescription": "Inicia sesión para acceder a tu cuenta.",
       "description": "Inicia sesión para acceder a tu cuenta y gestionar tu información.",
-      "instructionText": "Haz clic abajo para iniciar sesión con tus credenciales de MIT.",
+      "instructionText": "Inicio de sesión de estudiantes con credenciales de MIT.",
       "signInButton": "Iniciar Sesión con MIT",
       "dividerText": "o",
       "success": "Sesión iniciada exitosamente",
+      "organizationButton": "Acceso de Organización",
+      "org": {
+        "title": "Acceso de Organización",
+        "signIn": "Iniciar Sesión",
+        "signUp": "Registrarse",
+        "signInTitle": "Inicio de Sesión de Organización",
+        "signUpTitle": "Registro de Organización",
+        "email": "Email",
+        "emailPlaceholder": "tu-org@mit.edu",
+        "password": "Contraseña",
+        "confirmPassword": "Confirmar Contraseña",
+        "club": "Club",
+        "livingGroup": "Grupo de Vivienda",
+        "clubName": "Nombre del Club",
+        "clubNamePlaceholder": "ej., MIT Robotics Club",
+        "livingGroupType": "Tipo",
+        "dorm": "Dormitorio",
+        "fsilg": "FSILG",
+        "selectDorm": "Seleccionar Dormitorio",
+        "fsilgName": "Nombre Completo de FSILG (sin abreviar)",
+        "fsilgNamePlaceholder": "ej., Alpha Delta Phi",
+        "signInButton": "Iniciar Sesión",
+        "signUpButton": "Crear Cuenta",
+        "signingIn": "Iniciando sesión...",
+        "signingUp": "Creando cuenta...",
+        "emailRequired": "El email es requerido",
+        "emailInvalid": "El email debe ser una dirección @mit.edu",
+        "passwordRequired": "La contraseña es requerida",
+        "passwordMin": "La contraseña debe tener al menos 8 caracteres",
+        "passwordMismatch": "Las contraseñas no coinciden",
+        "clubNameRequired": "El nombre del club es requerido",
+        "livingGroupTypeRequired": "Por favor selecciona dormitorio o FSILG",
+        "dormRequired": "Por favor selecciona un dormitorio",
+        "fsilgNameRequired": "Por favor ingresa el nombre del FSILG",
+        "accountExists": "Ya existe una cuenta con este email",
+        "invalidCredentials": "Email o contraseña inválidos",
+        "emailNotVerified": "Por favor verifica tu email antes de iniciar sesión",
+        "signInSuccess": "¡Sesión iniciada exitosamente!",
+        "signUpSuccess": "¡Cuenta creada! Revisa tu email para verificar.",
+        "forgotPassword": "¿Olvidaste tu contraseña?",
+        "forgotPasswordTitle": "Restablecer Contraseña",
+        "forgotPasswordDescription": "Ingresa tu email para recibir un enlace de restablecimiento.",
+        "sendResetLink": "Enviar Enlace",
+        "sendingResetLink": "Enviando...",
+        "resetLinkSent": "Si existe una cuenta, se ha enviado un enlace de restablecimiento.",
+        "backToSignIn": "Volver a Iniciar Sesión",
+        "needAccount": "¿Necesitas una cuenta?",
+        "haveAccount": "¿Ya tienes una cuenta?"
+      },
       "admin": {
         "title": "Acceso de Administrador",
         "description": "Solo para administradores de Technique.",
@@ -279,11 +328,13 @@
         "seniorBio": "Bio de Senior",
         "clubInfo": "Info del Club",
         "scheduling": "Programación",
-        "myClubs": "Mis Clubes"
+        "myClubs": "Mis Clubes",
+        "myLivingGroups": "Mis Grupos de Vivienda"
       },
       "myClubs": {
         "title": "Mis Clubes",
         "searchTitle": "Buscar Clubes",
+        "description": "Únete a tu(s) club(es) para aparecer en las fotos del anuario.",
         "memberships": "Tus Membresías",
         "noMemberships": "Aún no eres miembro de ningún club.",
         "pendingRequests": "Solicitudes Pendientes",
@@ -757,7 +808,8 @@
       "filters": {
         "all": "Todos",
         "active": "Activos",
-        "disabled": "Deshabilitados"
+        "disabled": "Deshabilitados",
+        "upcoming": "Próximas Sesiones"
       },
       "noLivingGroups": "No se encontraron grupos",
       "status": {
@@ -767,7 +819,11 @@
       "leader": "Líder",
       "bookedTime": "Horario Reservado",
       "disable": "Deshabilitar",
-      "enable": "Habilitar"
+      "enable": "Habilitar",
+      "members": "Miembros",
+      "memberCount": "{count} miembros",
+      "expectedCount": "Esperados: {count}",
+      "showMemberCounts": "Mostrar Conteo de Miembros"
     },
     "users": {
       "title": "Gestión de Usuarios",
@@ -954,8 +1010,13 @@
   },
 
   "livingGroupPage": {
-    "title": "Sesión de Fotos del Grupo",
+    "title": "Panel del Grupo de Vivienda",
     "welcome": "Bienvenido, {name}",
+    "tabs": {
+      "scheduling": "Programación",
+      "members": "Miembros",
+      "joinRequests": "Solicitudes"
+    },
     "disabled": "Su cuenta ha sido deshabilitada",
     "disabledHint": "Por favor contacte a un administrador para asistencia",
     "frozen": "Las reservas están congeladas. No puede hacer cambios en este momento.",
@@ -971,7 +1032,65 @@
     "book": "Reservar Este Horario",
     "booking": "Reservando...",
     "bookSuccess": "Horario reservado exitosamente",
-    "bookError": "Error al reservar horario"
+    "bookError": "Error al reservar horario",
+    "members": {
+      "title": "Miembros",
+      "totalMembers": "Total de Miembros: {count}",
+      "totalExpected": "Total Esperado: {count}",
+      "noMembers": "Aún no hay miembros",
+      "memberCount": "{count} miembro(s)",
+      "expectedCount": "Esperado: {count}",
+      "setExpected": "Establecer Esperado",
+      "updateExpected": "Actualizar",
+      "expectedPlaceholder": "Cantidad esperada",
+      "updateSuccess": "Cantidad esperada actualizada",
+      "updateError": "Error al actualizar cantidad esperada"
+    },
+    "joinRequests": {
+      "title": "Solicitudes de Ingreso",
+      "noRequests": "No hay solicitudes pendientes",
+      "approve": "Aprobar",
+      "deny": "Rechazar",
+      "approving": "Aprobando...",
+      "denying": "Rechazando...",
+      "approveSuccess": "Miembro aprobado",
+      "denySuccess": "Solicitud rechazada",
+      "actionError": "Error al procesar solicitud"
+    }
+  },
+
+  "joinLivingGroup": {
+    "title": "Buscar Grupos de Vivienda",
+    "description": "Únete a tu dormitorio o FSILG para aparecer en las fotos del anuario.",
+    "searchPlaceholder": "Buscar por nombre...",
+    "searchHint": "ej. Baker House, East Campus, Alpha Delta Phi...",
+    "filterAll": "Todos",
+    "filterDorms": "Dormitorios",
+    "filterFSILGs": "FSILGs",
+    "noResults": "No se encontraron grupos",
+    "selectSection": "Selecciona tu sección",
+    "sectionRequired": "Por favor selecciona una sección",
+    "join": "Unirse",
+    "joining": "Uniéndose...",
+    "requestToJoin": "Solicitar Ingreso",
+    "joinSuccess": "¡Te uniste exitosamente!",
+    "requestSuccess": "Solicitud enviada. Esperando aprobación.",
+    "joinError": "Error al unirse al grupo",
+    "alreadyMember": "Ya eres miembro de este grupo",
+    "currentMemberships": {
+      "title": "Tus Membresías",
+      "dorm": "Dormitorio",
+      "fsilg": "FSILG",
+      "section": "Sección: {section}",
+      "pending": "Aprobación Pendiente",
+      "active": "Activo",
+      "leave": "Salir",
+      "cancelRequest": "Cancelar Solicitud",
+      "leaving": "Saliendo...",
+      "leaveSuccess": "Saliste exitosamente",
+      "leaveError": "Error al salir",
+      "noMemberships": "Aún no te has unido a ningún grupo"
+    }
   },
 
   "resources": {

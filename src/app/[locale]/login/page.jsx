@@ -1,6 +1,8 @@
 "use client";
 import Footer from "../../../components/Footer/Footer";
+import OrganizationAuthModal from "../../../components/OrganizationAuthModal/OrganizationAuthModal";
 import * as React from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Box from "@mui/material/Box";
 import { Button } from "@mui/material";
@@ -9,6 +11,7 @@ import { useLocale, useTranslations } from 'next-intl';
 export default function LoginPage() {
   const locale = useLocale();
   const t = useTranslations('pages.login');
+  const [orgModalOpen, setOrgModalOpen] = useState(false);
 
   return (
     <>
@@ -62,17 +65,26 @@ export default function LoginPage() {
             </Button>
           </Box>
 
-          {/* Club & Admin Login Links */}
-          <div className="text-center mt-6 space-y-2">
-            <div>
-              <span className="text-sm text-text-muted">{t('clubLinkPrefix')} </span>
-              <Link
-                href={`/${locale}/login/club`}
-                className="text-sm text-accent hover:underline"
-              >
-                {t('clubLink')}
-              </Link>
-            </div>
+          {/* Organization Login Button */}
+          <div className="text-center mt-6 space-y-3">
+            <Button
+              variant="outlined"
+              onClick={() => setOrgModalOpen(true)}
+              sx={{
+                borderColor: "#750014",
+                color: "#750014",
+                "&:hover": {
+                  borderColor: "#5C0010",
+                  backgroundColor: "rgba(117, 0, 20, 0.04)",
+                },
+                textTransform: "none",
+                fontWeight: 500,
+                py: 1,
+                px: 4,
+              }}
+            >
+              {t('organizationButton')}
+            </Button>
             <div>
               <span className="text-sm text-text-muted">{t('adminLinkPrefix')} </span>
               <Link
@@ -83,6 +95,12 @@ export default function LoginPage() {
               </Link>
             </div>
           </div>
+
+          {/* Organization Auth Modal */}
+          <OrganizationAuthModal
+            open={orgModalOpen}
+            onClose={() => setOrgModalOpen(false)}
+          />
         </section>
       </main>
       <Footer />

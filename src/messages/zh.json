@@ -173,8 +173,57 @@
       "metaTitle": "登录 - MIT Technique",
       "metaDescription": "登录以访问您的账户。",
       "description": "登录以访问您的账户并管理您的信息。",
-      "instructionText": "点击下方使用您的MIT凭据登录。",
+      "instructionText": "使用MIT凭据登录学生账户。",
       "signInButton": "使用MIT登录",
+      "organizationButton": "组织登录",
+      "org": {
+        "title": "组织登录",
+        "signIn": "登录",
+        "signUp": "注册",
+        "signInTitle": "组织登录",
+        "signUpTitle": "组织注册",
+        "email": "邮箱",
+        "emailPlaceholder": "your-org@mit.edu",
+        "password": "密码",
+        "confirmPassword": "确认密码",
+        "club": "社团",
+        "livingGroup": "宿舍",
+        "clubName": "社团名称",
+        "clubNamePlaceholder": "例如：MIT机器人社",
+        "livingGroupType": "类型",
+        "dorm": "宿舍楼",
+        "fsilg": "FSILG",
+        "selectDorm": "选择宿舍楼",
+        "fsilgName": "FSILG全称（不缩写）",
+        "fsilgNamePlaceholder": "例如：Alpha Delta Phi",
+        "signInButton": "登录",
+        "signUpButton": "创建账户",
+        "signingIn": "登录中...",
+        "signingUp": "创建账户中...",
+        "emailRequired": "请输入邮箱",
+        "emailInvalid": "邮箱必须是@mit.edu地址",
+        "passwordRequired": "请输入密码",
+        "passwordMin": "密码至少需要8个字符",
+        "passwordMismatch": "两次输入的密码不一致",
+        "clubNameRequired": "请输入社团名称",
+        "livingGroupTypeRequired": "请选择宿舍楼或FSILG",
+        "dormRequired": "请选择宿舍楼",
+        "fsilgNameRequired": "请输入FSILG名称",
+        "accountExists": "此邮箱已被注册",
+        "invalidCredentials": "邮箱或密码错误",
+        "emailNotVerified": "请先验证邮箱再登录",
+        "signInSuccess": "登录成功！",
+        "signUpSuccess": "账户创建成功！请查看邮箱进行验证。",
+        "forgotPassword": "忘记密码？",
+        "forgotPasswordTitle": "重置密码",
+        "forgotPasswordDescription": "输入您的邮箱以接收密码重置链接。",
+        "sendResetLink": "发送重置链接",
+        "sendingResetLink": "发送中...",
+        "resetLinkSent": "如果账户存在，重置链接已发送。",
+        "backToSignIn": "返回登录",
+        "needAccount": "需要注册账户？",
+        "haveAccount": "已有账户？"
+      },
       "dividerText": "或",
       "success": "成功登录",
       "admin": {
@@ -279,11 +328,13 @@
         "seniorBio": "毕业生简介",
         "clubInfo": "社团信息",
         "scheduling": "预约管理",
-        "myClubs": "我的社团"
+        "myClubs": "我的社团",
+        "myLivingGroups": "我的住宿组"
       },
       "myClubs": {
         "title": "我的社团",
         "searchTitle": "搜索社团",
+        "description": "加入您的社团以出现在年鉴照片中。",
         "memberships": "您的会员资格",
         "noMemberships": "您还未加入任何社团。",
         "pendingRequests": "待处理请求",
@@ -757,7 +808,8 @@
       "filters": {
         "all": "全部",
         "active": "活跃",
-        "disabled": "已禁用"
+        "disabled": "已禁用",
+        "upcoming": "即将拍摄"
       },
       "noLivingGroups": "未找到宿舍",
       "status": {
@@ -767,7 +819,11 @@
       "leader": "负责人",
       "bookedTime": "预约时间",
       "disable": "禁用",
-      "enable": "启用"
+      "enable": "启用",
+      "members": "成员",
+      "memberCount": "{count} 名成员",
+      "expectedCount": "预期: {count}",
+      "showMemberCounts": "显示成员人数"
     },
     "users": {
       "title": "用户管理",
@@ -954,8 +1010,13 @@
   },
 
   "livingGroupPage": {
-    "title": "宿舍拍摄预约",
+    "title": "住宿组管理面板",
     "welcome": "欢迎，{name}",
+    "tabs": {
+      "scheduling": "预约管理",
+      "members": "成员",
+      "joinRequests": "加入请求"
+    },
     "disabled": "您的账户已被禁用",
     "disabledHint": "请联系管理员获取帮助",
     "frozen": "预约功能目前已冻结。您暂时无法进行更改。",
@@ -971,7 +1032,65 @@
     "book": "预约此时间",
     "booking": "预约中...",
     "bookSuccess": "预约成功",
-    "bookError": "预约失败"
+    "bookError": "预约失败",
+    "members": {
+      "title": "成员",
+      "totalMembers": "总成员数: {count}",
+      "totalExpected": "预计人数: {count}",
+      "noMembers": "暂无成员",
+      "memberCount": "{count} 名成员",
+      "expectedCount": "预计: {count}",
+      "setExpected": "设置预计人数",
+      "updateExpected": "更新",
+      "expectedPlaceholder": "预计人数",
+      "updateSuccess": "预计人数已更新",
+      "updateError": "更新预计人数失败"
+    },
+    "joinRequests": {
+      "title": "加入申请",
+      "noRequests": "暂无待处理申请",
+      "approve": "批准",
+      "deny": "拒绝",
+      "approving": "批准中...",
+      "denying": "拒绝中...",
+      "approveSuccess": "成员已批准",
+      "denySuccess": "申请已拒绝",
+      "actionError": "处理申请失败"
+    }
+  },
+
+  "joinLivingGroup": {
+    "title": "搜索住宿组",
+    "description": "加入您的宿舍或FSILG，以便出现在年鉴照片中。",
+    "searchPlaceholder": "按名称搜索...",
+    "searchHint": "例如：Baker House, East Campus, Alpha Delta Phi...",
+    "filterAll": "全部",
+    "filterDorms": "宿舍",
+    "filterFSILGs": "FSILGs",
+    "noResults": "未找到住宿组",
+    "selectSection": "选择您的区域",
+    "sectionRequired": "请选择一个区域",
+    "join": "加入",
+    "joining": "加入中...",
+    "requestToJoin": "申请加入",
+    "joinSuccess": "加入成功！",
+    "requestSuccess": "申请已提交，等待审批。",
+    "joinError": "加入住宿组失败",
+    "alreadyMember": "您已是此住宿组的成员",
+    "currentMemberships": {
+      "title": "您的成员资格",
+      "dorm": "宿舍",
+      "fsilg": "FSILG",
+      "section": "区域: {section}",
+      "pending": "待审批",
+      "active": "已激活",
+      "leave": "退出",
+      "cancelRequest": "取消申请",
+      "leaving": "退出中...",
+      "leaveSuccess": "已成功退出",
+      "leaveError": "退出失败",
+      "noMemberships": "您尚未加入任何住宿组"
+    }
   },
 
   "resources": {
