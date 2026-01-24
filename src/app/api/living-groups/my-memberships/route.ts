@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { getSession } from "../../../../lib/auth/session";
+import { getCurrentUser } from "../../../../lib/auth/session";
 
 // GET /api/living-groups/my-memberships
 // Get the current user's living group memberships
 export async function GET(request: NextRequest) {
   try {
-    const session = await getSession();
-    if (!session?.user) {
+    const user = await getCurrentUser();
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
           section_name
         )
       `)
-      .eq("user_id", session.user.id)
+      .eq("user_id", user.id)
       .in("status", ["active", "pending"])
       .order("joined_at", { ascending: false });
 

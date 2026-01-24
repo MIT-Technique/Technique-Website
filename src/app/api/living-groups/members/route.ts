@@ -1,18 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { getSession } from "../../../../lib/auth/session";
+import { getCurrentUser } from "../../../../lib/auth/session";
 
 // GET /api/living-groups/members
 // Get members of the leader's living group, grouped by section
 export async function GET(request: NextRequest) {
   try {
-    const session = await getSession();
-    if (!session?.user) {
+    const user = await getCurrentUser();
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Only living group leaders can view members
-    if (session.user.role !== "living_group_leader") {
+    if (user.role !== "living_group_leader") {
       return NextResponse.json(
         { error: "Only living group leaders can view members" },
         { status: 403 }
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     const { data: livingGroup, error: lgError } = await supabase
       .from("living_groups")
       .select("id, name, living_group_type")
-      .eq("user_id", session.user.id)
+      .eq("user_id", user.id)
       .single();
 
     if (lgError || !livingGroup) {

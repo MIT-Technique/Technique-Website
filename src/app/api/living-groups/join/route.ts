@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { getSession } from "../../../../lib/auth/session";
+import { getCurrentUser } from "../../../../lib/auth/session";
 
 interface JoinRequest {
   livingGroupId: string;
@@ -11,13 +11,13 @@ interface JoinRequest {
 // Join a living group (dorm: instant, FSILG: pending approval)
 export async function POST(request: NextRequest) {
   try {
-    const session = await getSession();
-    if (!session?.user) {
+    const user = await getCurrentUser();
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Only students can join living groups
-    if (session.user.role !== "student") {
+    if (user.role !== "student") {
       return NextResponse.json(
         { error: "Only students can join living groups" },
         { status: 403 }
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
     const { data: existingMembership } = await supabase
       .from("living_group_memberships")
       .select("id, living_group_id, status")
-      .eq("user_id", session.user.id)
+      .eq("user_id", user.id)
       .eq("membership_type", membershipType)
       .in("status", ["active", "pending"])
       .maybeSingle();
@@ -126,7 +126,7 @@ export async function POST(request: NextRequest) {
       .from("living_group_memberships")
       .insert({
         living_group_id: livingGroupId,
-        user_id: session.user.id,
+        user_id: user.id,
         section_id: sectionId || null,
         membership_type: membershipType,
         status,

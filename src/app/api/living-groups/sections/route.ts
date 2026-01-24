@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { getSession } from "../../../../lib/auth/session";
+import { getCurrentUser } from "../../../../lib/auth/session";
 
 // GET /api/living-groups/sections?dorm=Baker House
 // Get sections for a specific dorm
 export async function GET(request: NextRequest) {
   try {
-    const session = await getSession();
-    if (!session?.user) {
+    const user = await getCurrentUser();
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

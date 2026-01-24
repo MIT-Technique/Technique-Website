@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { getSession } from "../../../../lib/auth/session";
+import { getCurrentUser } from "../../../../lib/auth/session";
 
 interface LeaveRequest {
   membershipId: string;
@@ -10,8 +10,8 @@ interface LeaveRequest {
 // Leave a living group or cancel a pending request
 export async function POST(request: NextRequest) {
   try {
-    const session = await getSession();
-    if (!session?.user) {
+    const user = await getCurrentUser();
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify the user owns this membership
-    if (membership.user_id !== session.user.id) {
+    if (membership.user_id !== user.id) {
       return NextResponse.json(
         { error: "You can only leave your own memberships" },
         { status: 403 }
