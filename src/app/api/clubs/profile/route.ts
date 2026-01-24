@@ -84,8 +84,8 @@ export async function PUT(request: NextRequest) {
       .single();
 
     // Validate and sanitize fields
+    // Note: 'name' is intentionally excluded - club names cannot be changed after creation
     const allowedFields = [
-      'name',
       'description',
       'member_list',
     ];

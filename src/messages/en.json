@@ -211,6 +211,7 @@
         "passwordMismatch": "Passwords do not match",
         "clubNameRequired": "Club name is required",
         "clubNameExists": "A club with this name already exists",
+        "clubNameCannotChange": "Club name cannot be changed after registration",
         "livingGroupTypeRequired": "Please select dorm or FSILG",
         "dormRequired": "Please select a dorm",
         "fsilgNameRequired": "Please enter the FSILG name",
@@ -915,12 +916,14 @@
     "frozen": "This form is currently frozen. You cannot make changes at this time.",
     "tabs": {
       "profile": "Profile",
+      "leaders": "Leaders",
       "members": "Members",
       "requests": "Join Requests",
-      "management": "User Management"
+      "documents": "Documents"
     },
     "form": {
       "name": "Club Name",
+      "nameCannotChange": "Club name cannot be changed after registration",
       "description": "Description",
       "memberList": "Member List",
       "memberListPlaceholder": "Enter member names, one per line or separated by commas",
@@ -936,6 +939,7 @@
       "noActiveMembers": "No active members yet.",
       "manual": "Manual Members",
       "manualMembers": "Manual Members",
+      "manuallyAddedMembers": "Manually Added Members",
       "noManualMembers": "No manual members added.",
       "addManual": "Add Member",
       "add": "Add",
@@ -967,6 +971,16 @@
         "leader": "Leader"
       }
     },
+    "leaders": {
+      "title": "Leaders",
+      "info": "Current leaders: {count}/{max}",
+      "noLeaders": "No leaders assigned",
+      "demoteToMember": "Demote to Member",
+      "pendingPromotions": "Pending Leader Promotions",
+      "awaitingApproval": "Awaiting admin approval",
+      "cancelRequest": "Cancel Request",
+      "searchAddLeader": "Search to add a leader..."
+    },
     "requests": {
       "title": "Join Requests",
       "pending": "Pending Requests",
@@ -978,6 +992,10 @@
     },
     "management": {
       "title": "User Management",
+      "leadersTitle": "Leaders",
+      "membersTitle": "Members",
+      "noLeaders": "No leaders assigned",
+      "addLeader": "Add Leader",
       "description": "Manage club members and leaders. You can have up to 2 leaders per club.",
       "noMembers": "No members to manage.",
       "removeMember": "Remove",
@@ -993,7 +1011,8 @@
       "promotionPending": "Promotion pending",
       "requestLeader": "Request Leader Promotion",
       "requestLeaderHint": "Admin approval required to promote members to leader",
-      "pendingLeaderRequest": "Promotion pending admin approval"
+      "pendingLeaderRequest": "Promotion pending admin approval",
+      "searchAddLeader": "Search to add a leader..."
     },
     "onboarding": {
       "addLeaderRequired": "Add a leader to continue",
@@ -1002,7 +1021,10 @@
       "addAsLeader": "Add as Leader",
       "adding": "Adding...",
       "leaderAdded": "Leader added successfully!",
-      "leaderError": "Failed to add leader"
+      "leaderError": "Failed to add leader",
+      "tabsBlockedWarning": "The Members, Join Requests, and User Management tabs are blocked until you add a club leader.",
+      "profileWarningTitle": "Action Required: Add a Club Leader",
+      "noResults": "No students found"
     },
     "invitations": {
       "title": "Invite Students",
@@ -1016,6 +1038,19 @@
       "invitedOn": "Invited on {date}",
       "cancel": "Cancel",
       "cancelling": "Cancelling..."
+    },
+    "documents": {
+      "title": "Club Documents",
+      "description": "Store important links and notes for your club. This information is private to club leaders.",
+      "linksLabel": "Important Links",
+      "linksPlaceholder": "Add important links (one per line)\nExample:\nhttps://drive.google.com/your-folder\nhttps://docs.google.com/your-doc",
+      "linksHint": "Add URLs to Google Drive folders, shared documents, etc.",
+      "notesLabel": "Notes",
+      "notesPlaceholder": "Add any important notes for club leaders...",
+      "notesHint": "Private notes visible only to club leaders",
+      "save": "Save Documents",
+      "saveSuccess": "Documents saved successfully",
+      "saveError": "Failed to save documents"
     },
     "success": "Your club profile has been updated",
     "error": "Failed to update club profile",

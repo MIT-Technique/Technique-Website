@@ -637,6 +637,7 @@ export function generateStaticParams() {
 - **Email:** technique@mit.edu
 - **Instagram:** @mit.tnq
 - **Office:** Walker Memorial, Room 50-320
+- **Meetingse:** Walker Memorial, Room 4-25, Saturday 12-2pm
 - **Mailing:** MIT Technique, 32 Vassar Street, Cambridge, MA 02139
 
 ---
@@ -646,6 +647,19 @@ export function generateStaticParams() {
 -- WARNING: This schema is for context only and is not meant to be run.
 -- Table order and constraints may not be valid for execution.
 
+CREATE TABLE public.club_invitations (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+club_id uuid NOT NULL,
+user_id uuid NOT NULL,
+invited_by uuid NOT NULL,
+status text NOT NULL DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'accepted'::text, 'declined'::text])),
+created_at timestamp with time zone DEFAULT now(),
+resolved_at timestamp with time zone,
+CONSTRAINT club_invitations_pkey PRIMARY KEY (id),
+CONSTRAINT club_invitations_club_id_fkey FOREIGN KEY (club_id) REFERENCES public.clubs(id),
+CONSTRAINT club_invitations_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
+CONSTRAINT club_invitations_invited_by_fkey FOREIGN KEY (invited_by) REFERENCES public.users(id)
+);
 CREATE TABLE public.club_join_requests (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 club_id uuid NOT NULL,
@@ -706,9 +720,18 @@ approved_by uuid,
 approved_at timestamp with time zone,
 created_at timestamp with time zone DEFAULT now(),
 updated_at timestamp with time zone DEFAULT now(),
+has_leader boolean DEFAULT false,
 CONSTRAINT clubs_pkey PRIMARY KEY (id),
 CONSTRAINT clubs_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
 CONSTRAINT clubs_approved_by_fkey FOREIGN KEY (approved_by) REFERENCES public.users(id)
+);
+CREATE TABLE public.dorm_sections (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+dorm_name character varying NOT NULL,
+section_name character varying NOT NULL,
+display_order integer DEFAULT 0,
+created_at timestamp with time zone DEFAULT now(),
+CONSTRAINT dorm_sections_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.form_settings (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -724,6 +747,22 @@ CONSTRAINT form_settings_pkey PRIMARY KEY (id),
 CONSTRAINT form_settings_frozen_by_fkey FOREIGN KEY (frozen_by) REFERENCES public.users(id),
 CONSTRAINT form_settings_unfrozen_by_fkey FOREIGN KEY (unfrozen_by) REFERENCES public.users(id)
 );
+CREATE TABLE public.living_group_memberships (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+living_group_id uuid NOT NULL,
+user_id uuid NOT NULL,
+section_id uuid,
+membership_type character varying NOT NULL CHECK (membership_type::text = ANY (ARRAY['dorm'::character varying, 'fsilg'::character varying]::text[])),
+status character varying NOT NULL DEFAULT 'active'::character varying CHECK (status::text = ANY (ARRAY['pending'::character varying, 'active'::character varying, 'removed'::character varying]::text[])),
+joined_at timestamp with time zone DEFAULT now(),
+approved_by uuid,
+approved_at timestamp with time zone,
+CONSTRAINT living_group_memberships_pkey PRIMARY KEY (id),
+CONSTRAINT living_group_memberships_living_group_fkey FOREIGN KEY (living_group_id) REFERENCES public.living_groups(id),
+CONSTRAINT living_group_memberships_user_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
+CONSTRAINT living_group_memberships_section_fkey FOREIGN KEY (section_id) REFERENCES public.dorm_sections(id),
+CONSTRAINT living_group_memberships_approved_by_fkey FOREIGN KEY (approved_by) REFERENCES public.users(id)
+);
 CREATE TABLE public.living_groups (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 user_id uuid NOT NULL,
@@ -735,10 +774,26 @@ disabled_by uuid,
 disabled_at timestamp with time zone,
 created_at timestamp with time zone DEFAULT now(),
 updated_at timestamp with time zone DEFAULT now(),
+living_group_type character varying DEFAULT 'dorm'::character varying CHECK (living_group_type::text = ANY (ARRAY['dorm'::character varying, 'fsilg'::character varying]::text[])),
 CONSTRAINT living_groups_pkey PRIMARY KEY (id),
 CONSTRAINT living_groups_disabled_by_fkey FOREIGN KEY (disabled_by) REFERENCES public.users(id),
 CONSTRAINT living_groups_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
 CONSTRAINT living_groups_promoted_by_fkey FOREIGN KEY (promoted_by) REFERENCES public.users(id)
+);
+CREATE TABLE public.photographer_permissions (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+user_id uuid NOT NULL UNIQUE,
+approved_by uuid,
+approved_at timestamp with time zone,
+is_active boolean DEFAULT false,
+revoked_by uuid,
+revoked_at timestamp with time zone,
+created_at timestamp with time zone DEFAULT now(),
+updated_at timestamp with time zone DEFAULT now(),
+CONSTRAINT photographer_permissions_pkey PRIMARY KEY (id),
+CONSTRAINT photographer_permissions_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
+CONSTRAINT photographer_permissions_approved_by_fkey FOREIGN KEY (approved_by) REFERENCES public.users(id),
+CONSTRAINT photographer_permissions_revoked_by_fkey FOREIGN KEY (revoked_by) REFERENCES public.users(id)
 );
 CREATE TABLE public.photoshoot_times (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -767,7 +822,7 @@ CONSTRAINT photoshoot_times_created_by_fkey FOREIGN KEY (created_by) REFERENCES 
 CREATE TABLE public.promotion_requests (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 user_id uuid NOT NULL,
-request_type character varying NOT NULL CHECK (request_type::text = ANY (ARRAY['club_promotion'::character varying, 'living_group_leader'::character varying]::text[])),
+request_type character varying NOT NULL CHECK (request_type::text = ANY (ARRAY['staph_request'::text, 'photographer_request'::text])),
 status character varying DEFAULT 'pending'::character varying CHECK (status::text = ANY (ARRAY['pending'::character varying, 'approved'::character varying, 'denied'::character varying]::text[])),
 request_reason text,
 living_group_name character varying,
@@ -779,6 +834,18 @@ updated_at timestamp with time zone DEFAULT now(),
 CONSTRAINT promotion_requests_pkey PRIMARY KEY (id),
 CONSTRAINT promotion_requests_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
 CONSTRAINT promotion_requests_reviewed_by_fkey FOREIGN KEY (reviewed_by) REFERENCES public.users(id)
+);
+CREATE TABLE public.section_expected_counts (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+living_group_id uuid NOT NULL,
+section_id uuid,
+expected_count integer NOT NULL DEFAULT 0,
+updated_at timestamp with time zone DEFAULT now(),
+updated_by uuid,
+CONSTRAINT section_expected_counts_pkey PRIMARY KEY (id),
+CONSTRAINT section_expected_counts_lg_fkey FOREIGN KEY (living_group_id) REFERENCES public.living_groups(id),
+CONSTRAINT section_expected_counts_section_fkey FOREIGN KEY (section_id) REFERENCES public.dorm_sections(id),
+CONSTRAINT section_expected_counts_updated_by_fkey FOREIGN KEY (updated_by) REFERENCES public.users(id)
 );
 CREATE TABLE public.sessions (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -792,10 +859,33 @@ updated_at timestamp with time zone DEFAULT now(),
 CONSTRAINT sessions_pkey PRIMARY KEY (id),
 CONSTRAINT sessions_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
 );
+CREATE TABLE public.time_proposals (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+living_group_id uuid NOT NULL,
+proposed_by uuid NOT NULL,
+date date NOT NULL,
+start_time time without time zone NOT NULL,
+end_time time without time zone NOT NULL,
+location text,
+notes text,
+status character varying DEFAULT 'pending'::character varying CHECK (status::text = ANY (ARRAY['pending'::character varying, 'accepted'::character varying, 'declined'::character varying, 'cancelled'::character varying]::text[])),
+accepted_by uuid,
+accepted_at timestamp with time zone,
+declined_by uuid,
+declined_at timestamp with time zone,
+decline_reason text,
+created_at timestamp with time zone DEFAULT now(),
+updated_at timestamp with time zone DEFAULT now(),
+CONSTRAINT time_proposals_pkey PRIMARY KEY (id),
+CONSTRAINT time_proposals_living_group_id_fkey FOREIGN KEY (living_group_id) REFERENCES public.living_groups(id),
+CONSTRAINT time_proposals_proposed_by_fkey FOREIGN KEY (proposed_by) REFERENCES public.users(id),
+CONSTRAINT time_proposals_accepted_by_fkey FOREIGN KEY (accepted_by) REFERENCES public.users(id),
+CONSTRAINT time_proposals_declined_by_fkey FOREIGN KEY (declined_by) REFERENCES public.users(id)
+);
 CREATE TABLE public.users (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 email character varying NOT NULL UNIQUE,
-role character varying NOT NULL DEFAULT 'student'::character varying CHECK (role::text = ANY (ARRAY['admin'::character varying, 'club'::character varying, 'living_group_leader'::character varying, 'student'::character varying]::text[])),
+role character varying NOT NULL DEFAULT 'student'::character varying CHECK (role::text = ANY (ARRAY['admin'::text, 'staph'::text, 'club'::text, 'living_group_leader'::text, 'student'::text])),
 first_name character varying,
 last_name character varying,
 major character varying,

@@ -211,6 +211,7 @@
         "passwordMismatch": "Las contraseñas no coinciden",
         "clubNameRequired": "El nombre del club es requerido",
         "clubNameExists": "Ya existe un club con este nombre",
+        "clubNameCannotChange": "El nombre del club no se puede cambiar después del registro",
         "livingGroupTypeRequired": "Por favor selecciona dormitorio o FSILG",
         "dormRequired": "Por favor selecciona un dormitorio",
         "fsilgNameRequired": "Por favor ingresa el nombre del FSILG",
@@ -916,12 +917,14 @@
     "frozen": "Este formulario está congelado. No puede hacer cambios en este momento.",
     "tabs": {
       "profile": "Perfil",
+      "leaders": "Líderes",
       "members": "Miembros",
       "requests": "Solicitudes",
-      "management": "Gestión"
+      "documents": "Documentos"
     },
     "form": {
       "name": "Nombre del Club",
+      "nameCannotChange": "El nombre del club no se puede cambiar después del registro",
       "description": "Descripción",
       "memberList": "Lista de Miembros",
       "memberListPlaceholder": "Ingrese nombres de miembros, uno por línea o separados por comas",
@@ -937,6 +940,7 @@
       "noActiveMembers": "Aún no hay miembros activos.",
       "manual": "Miembros Manuales",
       "manualMembers": "Miembros Manuales",
+      "manuallyAddedMembers": "Miembros Añadidos Manualmente",
       "noManualMembers": "No hay miembros manuales añadidos.",
       "addManual": "Añadir Miembro",
       "add": "Añadir",
@@ -968,6 +972,16 @@
         "leader": "Líder"
       }
     },
+    "leaders": {
+      "title": "Líderes",
+      "info": "Líderes actuales: {count}/{max}",
+      "noLeaders": "No hay líderes asignados",
+      "demoteToMember": "Degradar a Miembro",
+      "pendingPromotions": "Promociones Pendientes",
+      "awaitingApproval": "Esperando aprobación del admin",
+      "cancelRequest": "Cancelar Solicitud",
+      "searchAddLeader": "Buscar para añadir un líder..."
+    },
     "requests": {
       "title": "Solicitudes de Unión",
       "pending": "Solicitudes Pendientes",
@@ -979,6 +993,10 @@
     },
     "management": {
       "title": "Gestión de Usuarios",
+      "leadersTitle": "Líderes",
+      "membersTitle": "Miembros",
+      "noLeaders": "No hay líderes asignados",
+      "addLeader": "Añadir Líder",
       "description": "Gestiona los miembros y líderes del club. Puede tener hasta 2 líderes por club.",
       "noMembers": "No hay miembros que gestionar.",
       "removeMember": "Eliminar",
@@ -994,7 +1012,8 @@
       "promotionPending": "Promoción pendiente",
       "requestLeader": "Solicitar Promoción a Líder",
       "requestLeaderHint": "Se requiere aprobación del admin para promover a líder",
-      "pendingLeaderRequest": "Promoción pendiente de aprobación"
+      "pendingLeaderRequest": "Promoción pendiente de aprobación",
+      "searchAddLeader": "Buscar para añadir un líder..."
     },
     "onboarding": {
       "addLeaderRequired": "Añadir un líder para continuar",
@@ -1003,7 +1022,10 @@
       "addAsLeader": "Añadir como Líder",
       "adding": "Añadiendo...",
       "leaderAdded": "¡Líder añadido exitosamente!",
-      "leaderError": "Error al añadir líder"
+      "leaderError": "Error al añadir líder",
+      "tabsBlockedWarning": "Las pestañas de Miembros, Solicitudes de Unión y Gestión de Usuarios están bloqueadas hasta que añada un líder de club.",
+      "profileWarningTitle": "Acción Requerida: Añadir un Líder de Club",
+      "noResults": "No se encontraron estudiantes"
     },
     "invitations": {
       "title": "Invitar Estudiantes",
@@ -1017,6 +1039,19 @@
       "invitedOn": "Invitado el {date}",
       "cancel": "Cancelar",
       "cancelling": "Cancelando..."
+    },
+    "documents": {
+      "title": "Documentos del Club",
+      "description": "Almacena enlaces y notas importantes para tu club. Esta información es privada para los líderes del club.",
+      "linksLabel": "Enlaces Importantes",
+      "linksPlaceholder": "Añade enlaces importantes (uno por línea)\nEjemplo:\nhttps://drive.google.com/tu-carpeta\nhttps://docs.google.com/tu-documento",
+      "linksHint": "Añade URLs a carpetas de Google Drive, documentos compartidos, etc.",
+      "notesLabel": "Notas",
+      "notesPlaceholder": "Añade notas importantes para los líderes del club...",
+      "notesHint": "Notas privadas visibles solo para los líderes del club",
+      "save": "Guardar Documentos",
+      "saveSuccess": "Documentos guardados exitosamente",
+      "saveError": "Error al guardar documentos"
     },
     "success": "El perfil de su club ha sido actualizado",
     "error": "Error al actualizar el perfil del club",

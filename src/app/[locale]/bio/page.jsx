@@ -354,6 +354,34 @@ export default function BioPage() {
               </Select>
             </FormControl>
 
+            <FormControl fullWidth>
+              <InputLabel
+                id="second-major-label"
+                shrink
+                sx={{
+                  "&.Mui-focused": { color: "#750014" },
+                }}
+              >
+                Second Major *
+              </InputLabel>
+              <Select
+                labelId="second-major-label"
+                id="second-major-select"
+                value={secondMajor}
+                label="Second Major"
+                notched
+                required
+                onChange={(event) => setSecondMajor(event.target.value)}
+                sx={selectSx}
+              >
+                {second_majors.map((m) => (
+                  <MenuItem key={m} value={m}>
+                    {m}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            
             <TextField
               label={t('fields.quote')}
               variant="outlined"
@@ -367,6 +395,21 @@ export default function BioPage() {
               sx={textFieldSx}
               fullWidth
               placeholder={t('fields.quotePlaceholder')}
+            />
+
+            <TextField
+              label="Achievements"
+              variant="outlined"
+              InputLabelProps={{ shrink: true }}
+              value={extracurriculars}
+              onChange={(event) => setExtracurriculars(event.target.value)}
+              name="extracurriculars"
+              multiline
+              minRows={3}
+              maxRows={8}
+              sx={textFieldSx}
+              fullWidth
+              placeholder="Achievements you would like to highlight"
             />
 
             <Button

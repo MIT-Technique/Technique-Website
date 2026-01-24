@@ -45,9 +45,6 @@ export default function ClubPage() {
   const [pendingLeaderRequests, setPendingLeaderRequests] = useState([]);
   const [cancellingLeaderRequestId, setCancellingLeaderRequestId] = useState(null);
 
-  // Export state
-  const [exporting, setExporting] = useState(false);
-
   // Onboarding state (for adding first leader)
   const [leaderSearch, setLeaderSearch] = useState('');
   const [leaderSearchResults, setLeaderSearchResults] = useState([]);
@@ -62,6 +59,21 @@ export default function ClubPage() {
   const [invitingUserId, setInvitingUserId] = useState(null);
   const [pendingInvitations, setPendingInvitations] = useState([]);
   const [cancellingInvitationId, setCancellingInvitationId] = useState(null);
+
+  // Management tab leader search state
+  const [mgmtLeaderSearch, setMgmtLeaderSearch] = useState('');
+  const [mgmtLeaderSearchResults, setMgmtLeaderSearchResults] = useState([]);
+  const [mgmtLeaderSearchLoading, setMgmtLeaderSearchLoading] = useState(false);
+  const [addingMgmtLeader, setAddingMgmtLeader] = useState(false);
+
+  // Documents state
+  const [documents, setDocuments] = useState({
+    links: '',
+    notes: '',
+  });
+  const [savingDocuments, setSavingDocuments] = useState(false);
+  const [documentsMessage, setDocumentsMessage] = useState({ type: '', text: '' });
+  const [documentsLoading, setDocumentsLoading] = useState(true);
 
   useEffect(() => {
     if (!userLoading && (!isLoggedIn || user?.role !== 'club')) {
@@ -99,6 +111,7 @@ export default function ClubPage() {
       fetchJoinRequests();
       fetchLeaderRequests();
       fetchPendingInvitations();
+      fetchDocuments();
     }
   }, [isLoggedIn, user]);
 
@@ -119,6 +132,15 @@ export default function ClubPage() {
     }, 300);
     return () => clearTimeout(timer);
   }, [inviteSearch, club]);
+
+  // Debounced search for management tab leader search
+  useEffect(() => {
+    if (!club?.has_leader) return;
+    const timer = setTimeout(() => {
+      searchStudentsForMgmtLeader(mgmtLeaderSearch);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [mgmtLeaderSearch, club]);
 
   async function fetchMembers() {
     try {
@@ -168,6 +190,49 @@ export default function ClubPage() {
     }
   }
 
+  async function fetchDocuments() {
+    try {
+      setDocumentsLoading(true);
+      const res = await fetch('/api/clubs/documents');
+      const data = await res.json();
+      if (res.ok && data.documents) {
+        setDocuments({
+          links: data.documents.links || '',
+          notes: data.documents.notes || '',
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching documents:', error);
+    } finally {
+      setDocumentsLoading(false);
+    }
+  }
+
+  async function handleSaveDocuments(e) {
+    e.preventDefault();
+    setSavingDocuments(true);
+    setDocumentsMessage({ type: '', text: '' });
+
+    try {
+      const res = await fetch('/api/clubs/documents', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(documents),
+      });
+
+      if (res.ok) {
+        setDocumentsMessage({ type: 'success', text: t('documents.saveSuccess') });
+      } else {
+        const data = await res.json();
+        setDocumentsMessage({ type: 'error', text: data.error || t('documents.saveError') });
+      }
+    } catch (error) {
+      setDocumentsMessage({ type: 'error', text: t('documents.saveError') });
+    } finally {
+      setSavingDocuments(false);
+    }
+  }
+
   async function searchStudentsForLeader(query) {
     if (!query || query.length < 2) {
       setLeaderSearchResults([]);
@@ -199,6 +264,51 @@ export default function ClubPage() {
       console.error('Error searching students:', error);
     } finally {
       setInviteSearchLoading(false);
+    }
+  }
+
+  async function searchStudentsForMgmtLeader(query) {
+    if (!query || query.length < 2) {
+      setMgmtLeaderSearchResults([]);
+      return;
+    }
+    try {
+      setMgmtLeaderSearchLoading(true);
+      const res = await fetch(`/api/clubs/search-students?q=${encodeURIComponent(query)}`);
+      const data = await res.json();
+      setMgmtLeaderSearchResults(data.students || []);
+    } catch (error) {
+      console.error('Error searching students:', error);
+    } finally {
+      setMgmtLeaderSearchLoading(false);
+    }
+  }
+
+  async function handleAddMgmtLeader(userId) {
+    setAddingMgmtLeader(true);
+    setMembersMessage({ type: '', text: '' });
+
+    try {
+      const res = await fetch('/api/clubs/add-first-leader', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: userId }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setMembersMessage({ type: 'success', text: t('onboarding.leaderAdded') });
+        setMgmtLeaderSearch('');
+        setMgmtLeaderSearchResults([]);
+        fetchMembers();
+      } else {
+        setMembersMessage({ type: 'error', text: data.error || t('onboarding.leaderError') });
+      }
+    } catch (error) {
+      setMembersMessage({ type: 'error', text: t('onboarding.leaderError') });
+    } finally {
+      setAddingMgmtLeader(false);
     }
   }
 
@@ -484,25 +594,6 @@ export default function ClubPage() {
     }
   }
 
-  async function handleExport() {
-    setExporting(true);
-    try {
-      const res = await fetch('/api/clubs/export-members');
-      const data = await res.json();
-      if (res.ok) {
-        // Copy to clipboard
-        await navigator.clipboard.writeText(data.members);
-        setMembersMessage({ type: 'success', text: t('members.exportSuccess', { count: data.memberCount }) });
-      } else {
-        setMembersMessage({ type: 'error', text: data.error || t('members.exportError') });
-      }
-    } catch (error) {
-      setMembersMessage({ type: 'error', text: t('members.exportError') });
-    } finally {
-      setExporting(false);
-    }
-  }
-
   // Check if a member has a pending leader request
   function hasPendingLeaderRequest(userId) {
     return pendingLeaderRequests.some(r => r.user_id === userId);
@@ -526,9 +617,10 @@ export default function ClubPage() {
   const hasLeader = club?.has_leader;
   const tabs = [
     { id: 'profile', label: t('tabs.profile'), disabled: false },
+    { id: 'leaders', label: t('tabs.leaders'), disabled: !hasLeader },
     { id: 'members', label: t('tabs.members'), disabled: !hasLeader },
     { id: 'requests', label: t('tabs.requests'), disabled: !hasLeader },
-    { id: 'management', label: t('tabs.management'), disabled: !hasLeader },
+    { id: 'documents', label: t('tabs.documents'), disabled: !hasLeader },
   ];
 
   return (
@@ -540,37 +632,18 @@ export default function ClubPage() {
             {t('welcome', { email: user?.email })}
           </p>
 
-          {/* Status */}
-          {club && (
-            <div className={`mb-6 p-4 rounded-lg ${
-              club.approval_status === 'pending'
-                ? 'bg-yellow-50 border border-yellow-200'
-                : club.approval_status === 'approved'
-                ? 'bg-green-50 border border-green-200'
-                : 'bg-red-50 border border-red-200'
-            }`}>
-              <p className="font-medium">
-                {t('status')}: {t(`statusValues.${club.approval_status}`)}
-              </p>
-              <p className="text-sm text-text-secondary">
-                {t('clubId')}: {club.club_id}
-              </p>
-              {club.approval_notes && (
-                <p className="text-sm text-text-secondary mt-2">
-                  {t('notes')}: {club.approval_notes}
-                </p>
-              )}
-            </div>
-          )}
 
-          {/* Leader Onboarding Gate */}
+          {/* Leader Required Warning - shown above tabs when no leader */}
           {club && !club.has_leader && (
-            <div className="mb-8 p-6 bg-blue-50 border border-blue-200 rounded-lg">
-              <h2 className="text-lg font-medium mb-2">{t('onboarding.addLeaderRequired')}</h2>
-              <p className="text-text-secondary mb-4">{t('onboarding.addLeaderDescription')}</p>
+            <div className="mb-6 p-4 bg-gray-50 border border-gray-300 rounded-lg">
+              <h3 className="text-md font-semibold text-gray-800 mb-2">
+                {t('onboarding.profileWarningTitle')}
+              </h3>
+              <p className="text-gray-600 text-sm mb-2">{t('onboarding.addLeaderDescription')}</p>
+              <p className="text-gray-600 text-sm font-medium mb-4">{t('onboarding.tabsBlockedWarning')}</p>
 
               {onboardingMessage.text && (
-                <div className={`mb-4 p-3 rounded ${
+                <div className={`mb-4 p-3 rounded text-sm ${
                   onboardingMessage.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
                 }`}>
                   {onboardingMessage.text}
@@ -583,7 +656,7 @@ export default function ClubPage() {
                   value={leaderSearch}
                   onChange={(e) => setLeaderSearch(e.target.value)}
                   placeholder={t('onboarding.searchStudent')}
-                  className="w-full border border-border rounded px-4 py-2 mb-2"
+                  className="w-full border border-gray-300 rounded px-4 py-2 mb-2 bg-white text-sm"
                 />
 
                 {leaderSearchLoading && (
@@ -591,30 +664,35 @@ export default function ClubPage() {
                 )}
 
                 {leaderSearchResults.length > 0 && (
-                  <div className="border border-border rounded max-h-48 overflow-y-auto">
-                    {leaderSearchResults.map((student) => (
-                      <div
-                        key={student.id}
-                        className="p-3 border-b last:border-b-0 flex justify-between items-center hover:bg-gray-50"
-                      >
-                        <div>
-                          <p className="font-medium">{student.first_name} {student.last_name}</p>
-                          <p className="text-text-secondary text-sm">{student.email}</p>
-                        </div>
-                        <button
-                          onClick={() => handleAddFirstLeader(student.id)}
-                          disabled={addingLeader}
-                          className="text-sm px-3 py-1 bg-accent text-white rounded hover:bg-accent/90"
+                  <div className="border border-border rounded max-h-48 overflow-y-auto bg-white">
+                    {leaderSearchResults.map((student) => {
+                      const kerb = student.email?.split('@')[0] || '';
+                      return (
+                        <div
+                          key={student.id}
+                          className="p-3 border-b last:border-b-0 flex justify-between items-center hover:bg-gray-50"
                         >
-                          {addingLeader ? t('onboarding.adding') : t('onboarding.addAsLeader')}
-                        </button>
-                      </div>
-                    ))}
+                          <div>
+                            <p className="font-medium text-sm">
+                              {student.first_name} {student.last_name}
+                              <span className="ml-2 text-text-secondary font-normal">({kerb})</span>
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => handleAddFirstLeader(student.id)}
+                            disabled={addingLeader}
+                            className="text-sm px-3 py-1 bg-accent text-white rounded hover:bg-accent/90"
+                          >
+                            {addingLeader ? t('onboarding.adding') : t('onboarding.addAsLeader')}
+                          </button>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
 
                 {leaderSearch.length >= 2 && !leaderSearchLoading && leaderSearchResults.length === 0 && (
-                  <p className="text-text-secondary text-sm">{t('myClubs.noResults')}</p>
+                  <p className="text-text-secondary text-sm">{t('onboarding.noResults')}</p>
                 )}
               </div>
             </div>
@@ -654,17 +732,25 @@ export default function ClubPage() {
                 </div>
               )}
 
+              {club && (
+                <div className="mb-6 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                  <p className="text-sm text-text-secondary">
+                    {t('clubId')}: <span className="font-mono">{club.club_id}</span>
+                  </p>
+                </div>
+              )}
+
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium mb-2">{t('form.name')}</label>
                   <input
                     type="text"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full border border-border rounded px-4 py-2"
-                    disabled={isFrozen}
-                    required
+                    className="w-full border border-border rounded px-4 py-2 bg-gray-100 text-gray-500 cursor-not-allowed"
+                    disabled
+                    readOnly
                   />
+                  <p className="text-xs text-text-muted mt-1">{t('form.nameCannotChange')}</p>
                 </div>
 
                 <div>
@@ -727,15 +813,40 @@ export default function ClubPage() {
                 </div>
               )}
 
-              {/* Export button */}
-              <div className="mb-6 flex justify-end">
-                <button
-                  onClick={handleExport}
-                  disabled={exporting}
-                  className="text-sm text-accent hover:underline"
-                >
-                  {exporting ? t('members.exporting') : t('members.export')}
-                </button>
+              {/* Active Members */}
+              <div className="mb-8">
+                <h2 className="text-lg font-medium mb-4">{t('members.activeMembers')}</h2>
+                {membersLoading ? (
+                  <p className="text-text-secondary">Loading...</p>
+                ) : activeMembers.length === 0 ? (
+                  <p className="text-text-secondary">{t('members.noActiveMembers')}</p>
+                ) : (
+                  <div className="space-y-2">
+                    {activeMembers.map((member) => {
+                      const kerb = member.user?.email?.split('@')[0] || '';
+                      return (
+                        <div
+                          key={member.id}
+                          className="p-4 border border-border rounded-lg flex justify-between items-center"
+                        >
+                          <div>
+                            <p className="font-medium">
+                              {member.user?.first_name} {member.user?.last_name}
+                              <span className="ml-2 text-text-secondary font-normal">({kerb})</span>
+                            </p>
+                          </div>
+                          <span className={`text-xs px-2 py-1 rounded ${
+                            member.role === 'leader'
+                              ? 'bg-accent text-white'
+                              : 'bg-gray-200 text-gray-700'
+                          }`}>
+                            {member.role === 'leader' ? t('members.leader') : t('members.member')}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
               {/* Invite Students */}
@@ -756,29 +867,34 @@ export default function ClubPage() {
 
                   {inviteSearchResults.length > 0 && (
                     <div className="mt-2 border border-border rounded max-h-48 overflow-y-auto">
-                      {inviteSearchResults.map((student) => (
-                        <div
-                          key={student.id}
-                          className="p-3 border-b last:border-b-0 flex justify-between items-center hover:bg-gray-50"
-                        >
-                          <div>
-                            <p className="font-medium">{student.first_name} {student.last_name}</p>
-                            <p className="text-text-secondary text-sm">{student.email}</p>
-                          </div>
-                          <button
-                            onClick={() => handleInviteStudent(student.id)}
-                            disabled={invitingUserId === student.id}
-                            className="text-sm px-3 py-1 bg-accent text-white rounded hover:bg-accent/90"
+                      {inviteSearchResults.map((student) => {
+                        const kerb = student.email?.split('@')[0] || '';
+                        return (
+                          <div
+                            key={student.id}
+                            className="p-3 border-b last:border-b-0 flex justify-between items-center hover:bg-gray-50"
                           >
-                            {invitingUserId === student.id ? t('invitations.inviting') : t('invitations.invite')}
-                          </button>
-                        </div>
-                      ))}
+                            <div>
+                              <p className="font-medium">
+                                {student.first_name} {student.last_name}
+                                <span className="ml-2 text-text-secondary font-normal">({kerb})</span>
+                              </p>
+                            </div>
+                            <button
+                              onClick={() => handleInviteStudent(student.id)}
+                              disabled={invitingUserId === student.id}
+                              className="text-sm px-3 py-1 bg-accent text-white rounded hover:bg-accent/90"
+                            >
+                              {invitingUserId === student.id ? t('invitations.inviting') : t('invitations.invite')}
+                            </button>
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
 
                   {inviteSearch.length >= 2 && !inviteSearchLoading && inviteSearchResults.length === 0 && (
-                    <p className="text-text-secondary text-sm mt-2">{t('myClubs.noResults')}</p>
+                    <p className="text-text-secondary text-sm mt-2">{t('onboarding.noResults')}</p>
                   )}
                 </div>
 
@@ -787,67 +903,37 @@ export default function ClubPage() {
                   <div>
                     <h3 className="text-md font-medium mb-2">{t('invitations.pendingInvitations')}</h3>
                     <div className="space-y-2">
-                      {pendingInvitations.map((invitation) => (
-                        <div
-                          key={invitation.id}
-                          className="p-3 border border-yellow-200 bg-yellow-50 rounded-lg flex justify-between items-center"
-                        >
-                          <div>
-                            <p className="font-medium">
-                              {invitation.user?.first_name} {invitation.user?.last_name}
-                            </p>
-                            <p className="text-text-secondary text-sm">{invitation.user?.email}</p>
-                          </div>
-                          <button
-                            onClick={() => handleCancelInvitation(invitation.id)}
-                            disabled={cancellingInvitationId === invitation.id}
-                            className="text-sm text-red-600 hover:text-red-700"
+                      {pendingInvitations.map((invitation) => {
+                        const kerb = invitation.user?.email?.split('@')[0] || '';
+                        return (
+                          <div
+                            key={invitation.id}
+                            className="p-3 border border-yellow-200 bg-yellow-50 rounded-lg flex justify-between items-center"
                           >
-                            {cancellingInvitationId === invitation.id ? '...' : t('management.cancelRequest')}
-                          </button>
-                        </div>
-                      ))}
+                            <div>
+                              <p className="font-medium">
+                                {invitation.user?.first_name} {invitation.user?.last_name}
+                                <span className="ml-2 text-text-secondary font-normal">({kerb})</span>
+                              </p>
+                            </div>
+                            <button
+                              onClick={() => handleCancelInvitation(invitation.id)}
+                              disabled={cancellingInvitationId === invitation.id}
+                              className="text-sm text-red-600 hover:text-red-700"
+                            >
+                              {cancellingInvitationId === invitation.id ? '...' : t('invitations.cancel')}
+                            </button>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* Active Members */}
-              <div className="mb-8">
-                <h2 className="text-lg font-medium mb-4">{t('members.activeMembers')}</h2>
-                {membersLoading ? (
-                  <p className="text-text-secondary">Loading...</p>
-                ) : activeMembers.length === 0 ? (
-                  <p className="text-text-secondary">{t('members.noActiveMembers')}</p>
-                ) : (
-                  <div className="space-y-2">
-                    {activeMembers.map((member) => (
-                      <div
-                        key={member.id}
-                        className="p-4 border border-border rounded-lg flex justify-between items-center"
-                      >
-                        <div>
-                          <p className="font-medium">
-                            {member.user?.first_name} {member.user?.last_name}
-                          </p>
-                          <p className="text-text-secondary text-sm">{member.user?.email}</p>
-                        </div>
-                        <span className={`text-xs px-2 py-1 rounded ${
-                          member.role === 'leader'
-                            ? 'bg-accent text-white'
-                            : 'bg-gray-200 text-gray-700'
-                        }`}>
-                          {member.role === 'leader' ? t('members.leader') : t('members.member')}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Manual Members */}
+              {/* Manually Added Members */}
               <div>
-                <h2 className="text-lg font-medium mb-4">{t('members.manualMembers')}</h2>
+                <h2 className="text-lg font-medium mb-4">{t('members.manuallyAddedMembers')}</h2>
 
                 {/* Add manual member form */}
                 <form onSubmit={handleAddManualMember} className="mb-4 flex gap-2">
@@ -902,45 +988,48 @@ export default function ClubPage() {
                 <p className="text-text-secondary">{t('requests.noRequests')}</p>
               ) : (
                 <div className="space-y-2">
-                  {joinRequests.map((request) => (
-                    <div
-                      key={request.id}
-                      className="p-4 border border-border rounded-lg flex justify-between items-center"
-                    >
-                      <div>
-                        <p className="font-medium">
-                          {request.user?.first_name} {request.user?.last_name}
-                        </p>
-                        <p className="text-text-secondary text-sm">{request.user?.email}</p>
-                        <p className="text-text-muted text-xs">
-                          {new Date(request.created_at).toLocaleDateString(locale)}
-                        </p>
+                  {joinRequests.map((request) => {
+                    const kerb = request.user?.email?.split('@')[0] || '';
+                    return (
+                      <div
+                        key={request.id}
+                        className="p-4 border border-border rounded-lg flex justify-between items-center"
+                      >
+                        <div>
+                          <p className="font-medium">
+                            {request.user?.first_name} {request.user?.last_name}
+                            <span className="ml-2 text-text-secondary font-normal">({kerb})</span>
+                          </p>
+                          <p className="text-text-muted text-xs">
+                            {new Date(request.created_at).toLocaleDateString(locale)}
+                          </p>
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleProcessJoinRequest(request.id, 'approve')}
+                            disabled={processingRequestId === request.id}
+                            className="text-sm px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+                          >
+                            {processingRequestId === request.id ? '...' : t('requests.approve')}
+                          </button>
+                          <button
+                            onClick={() => handleProcessJoinRequest(request.id, 'deny')}
+                            disabled={processingRequestId === request.id}
+                            className="text-sm px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                          >
+                            {processingRequestId === request.id ? '...' : t('requests.deny')}
+                          </button>
+                        </div>
                       </div>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleProcessJoinRequest(request.id, 'approve')}
-                          disabled={processingRequestId === request.id}
-                          className="text-sm px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
-                        >
-                          {processingRequestId === request.id ? '...' : t('requests.approve')}
-                        </button>
-                        <button
-                          onClick={() => handleProcessJoinRequest(request.id, 'deny')}
-                          disabled={processingRequestId === request.id}
-                          className="text-sm px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
-                        >
-                          {processingRequestId === request.id ? '...' : t('requests.deny')}
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
           )}
 
-          {/* User Management Tab */}
-          {activeTab === 'management' && (
+          {/* Leaders Tab */}
+          {activeTab === 'leaders' && (
             <div>
               {membersMessage.text && (
                 <div className={`mb-6 p-4 rounded ${
@@ -952,100 +1041,189 @@ export default function ClubPage() {
 
               <div className="mb-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
                 <p className="text-sm text-text-secondary">
-                  {t('management.leaderInfo', { count: leaderCount, max: 2 })}
+                  {t('leaders.info', { count: leaderCount, max: 2 })}
                 </p>
               </div>
 
-              {/* Pending Leader Requests */}
-              {pendingLeaderRequests.length > 0 && (
-                <div className="mb-8">
-                  <h2 className="text-lg font-medium mb-4">{t('management.pendingPromotions')}</h2>
-                  <div className="space-y-2">
-                    {pendingLeaderRequests.map((request) => (
+              {/* Current Leaders */}
+              {membersLoading ? (
+                <p className="text-text-secondary">Loading...</p>
+              ) : (
+                <div className="space-y-2 mb-4">
+                  {activeMembers.filter(m => m.role === 'leader').map((member) => {
+                    const kerb = member.user?.email?.split('@')[0] || '';
+                    return (
                       <div
-                        key={request.id}
-                        className="p-4 border border-yellow-200 bg-yellow-50 rounded-lg flex justify-between items-center"
+                        key={member.id}
+                        className="p-4 border border-border rounded-lg flex justify-between items-center"
                       >
                         <div>
                           <p className="font-medium">
-                            {request.user?.first_name} {request.user?.last_name}
-                          </p>
-                          <p className="text-text-secondary text-sm">{t('management.awaitingApproval')}</p>
-                        </div>
-                        <button
-                          onClick={() => handleCancelLeaderRequest(request.id)}
-                          disabled={cancellingLeaderRequestId === request.id}
-                          className="text-sm text-red-600 hover:text-red-700"
-                        >
-                          {cancellingLeaderRequestId === request.id ? t('management.cancelling') : t('management.cancelRequest')}
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <h2 className="text-lg font-medium mb-4">{t('management.title')}</h2>
-              {membersLoading ? (
-                <p className="text-text-secondary">Loading...</p>
-              ) : activeMembers.length === 0 ? (
-                <p className="text-text-secondary">{t('members.noActiveMembers')}</p>
-              ) : (
-                <div className="space-y-2">
-                  {activeMembers.map((member) => (
-                    <div
-                      key={member.id}
-                      className="p-4 border border-border rounded-lg"
-                    >
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-medium">
                             {member.user?.first_name} {member.user?.last_name}
+                            <span className="ml-2 text-text-secondary font-normal">({kerb})</span>
                           </p>
-                          <p className="text-text-secondary text-sm">{member.user?.email}</p>
                         </div>
-                        <span className={`text-xs px-2 py-1 rounded ${
-                          member.role === 'leader'
-                            ? 'bg-accent text-white'
-                            : 'bg-gray-200 text-gray-700'
-                        }`}>
-                          {member.role === 'leader' ? t('members.leader') : t('members.member')}
-                        </span>
-                      </div>
-
-                      <div className="mt-3 flex gap-2 flex-wrap">
-                        {member.role === 'member' && !hasPendingLeaderRequest(member.user?.id) && leaderCount < 2 && (
-                          <button
-                            onClick={() => handleRequestPromotion(member.user?.id)}
-                            disabled={promotingMemberId === member.user?.id}
-                            className="text-sm px-3 py-1 bg-accent text-white rounded hover:bg-accent/90"
-                          >
-                            {promotingMemberId === member.user?.id ? '...' : t('management.promoteToLeader')}
-                          </button>
-                        )}
-                        {member.role === 'member' && hasPendingLeaderRequest(member.user?.id) && (
-                          <span className="text-sm text-yellow-600">{t('management.promotionPending')}</span>
-                        )}
-                        {member.role === 'leader' && (
+                        <div className="flex gap-2 items-center">
+                          <span className="text-xs px-2 py-1 rounded bg-accent text-white">
+                            {t('members.leader')}
+                          </span>
                           <button
                             onClick={() => handleDemoteLeader(member.id)}
                             disabled={demotingMemberId === member.id}
                             className="text-sm px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700"
                           >
-                            {demotingMemberId === member.id ? '...' : t('management.demoteToMember')}
+                            {demotingMemberId === member.id ? '...' : t('leaders.demoteToMember')}
                           </button>
-                        )}
-                        <button
-                          onClick={() => handleRemoveActiveMember(member.id)}
-                          disabled={removingMemberId === member.id}
-                          className="text-sm px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
-                        >
-                          {removingMemberId === member.id ? '...' : t('management.removeMember')}
-                        </button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
+                  {activeMembers.filter(m => m.role === 'leader').length === 0 && (
+                    <p className="text-text-secondary text-sm">{t('leaders.noLeaders')}</p>
+                  )}
                 </div>
+              )}
+
+              {/* Pending Leader Requests */}
+              {pendingLeaderRequests.length > 0 && (
+                <div className="mb-4">
+                  <h3 className="text-md font-medium mb-2">{t('leaders.pendingPromotions')}</h3>
+                  <div className="space-y-2">
+                    {pendingLeaderRequests.map((request) => {
+                      const kerb = request.user?.email?.split('@')[0] || '';
+                      return (
+                        <div
+                          key={request.id}
+                          className="p-3 border border-yellow-200 bg-yellow-50 rounded-lg flex justify-between items-center"
+                        >
+                          <div>
+                            <p className="font-medium text-sm">
+                              {request.user?.first_name} {request.user?.last_name}
+                              <span className="ml-2 text-text-secondary font-normal">({kerb})</span>
+                            </p>
+                            <p className="text-text-secondary text-xs">{t('leaders.awaitingApproval')}</p>
+                          </div>
+                          <button
+                            onClick={() => handleCancelLeaderRequest(request.id)}
+                            disabled={cancellingLeaderRequestId === request.id}
+                            className="text-sm text-red-600 hover:text-red-700"
+                          >
+                            {cancellingLeaderRequestId === request.id ? '...' : t('leaders.cancelRequest')}
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Add Leader Search */}
+              {leaderCount < 2 && (
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <div className="max-w-md">
+                    <input
+                      type="text"
+                      value={mgmtLeaderSearch}
+                      onChange={(e) => setMgmtLeaderSearch(e.target.value)}
+                      placeholder={t('leaders.searchAddLeader')}
+                      className="w-full border border-border rounded px-4 py-2 mb-2"
+                    />
+
+                    {mgmtLeaderSearchLoading && (
+                      <p className="text-text-secondary text-sm">Loading...</p>
+                    )}
+
+                    {mgmtLeaderSearchResults.length > 0 && (
+                      <div className="border border-border rounded max-h-48 overflow-y-auto">
+                        {mgmtLeaderSearchResults.map((student) => {
+                          const kerb = student.email?.split('@')[0] || '';
+                          return (
+                            <div
+                              key={student.id}
+                              className="p-3 border-b last:border-b-0 flex justify-between items-center hover:bg-gray-50"
+                            >
+                              <div>
+                                <p className="font-medium text-sm">
+                                  {student.first_name} {student.last_name}
+                                  <span className="ml-2 text-text-secondary font-normal">({kerb})</span>
+                                </p>
+                              </div>
+                              <button
+                                onClick={() => handleAddMgmtLeader(student.id)}
+                                disabled={addingMgmtLeader}
+                                className="text-sm px-3 py-1 bg-accent text-white rounded hover:bg-accent/90"
+                              >
+                                {addingMgmtLeader ? t('onboarding.adding') : t('onboarding.addAsLeader')}
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {mgmtLeaderSearch.length >= 2 && !mgmtLeaderSearchLoading && mgmtLeaderSearchResults.length === 0 && (
+                      <p className="text-text-secondary text-sm">{t('onboarding.noResults')}</p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Documents Tab */}
+          {activeTab === 'documents' && (
+            <div>
+              <h2 className="text-lg font-medium mb-2">{t('documents.title')}</h2>
+              <p className="text-text-secondary text-sm mb-6">{t('documents.description')}</p>
+
+              {documentsMessage.text && (
+                <div className={`mb-6 p-4 rounded ${
+                  documentsMessage.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
+                }`}>
+                  {documentsMessage.text}
+                </div>
+              )}
+
+              {documentsLoading ? (
+                <p className="text-text-secondary">Loading...</p>
+              ) : (
+                <form onSubmit={handleSaveDocuments} className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">{t('documents.linksLabel')}</label>
+                    <textarea
+                      value={documents.links}
+                      onChange={(e) => setDocuments({ ...documents, links: e.target.value })}
+                      placeholder={t('documents.linksPlaceholder')}
+                      className="w-full border border-border rounded px-4 py-2 min-h-[120px] font-mono text-sm"
+                      maxLength={2000}
+                    />
+                    <p className="text-xs text-text-muted mt-1">
+                      {t('documents.linksHint')} ({documents.links.length}/2000)
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">{t('documents.notesLabel')}</label>
+                    <textarea
+                      value={documents.notes}
+                      onChange={(e) => setDocuments({ ...documents, notes: e.target.value })}
+                      placeholder={t('documents.notesPlaceholder')}
+                      className="w-full border border-border rounded px-4 py-2 min-h-[150px]"
+                      maxLength={5000}
+                    />
+                    <p className="text-xs text-text-muted mt-1">
+                      {t('documents.notesHint')} ({documents.notes.length}/5000)
+                    </p>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={savingDocuments}
+                    className="btn-primary"
+                  >
+                    {savingDocuments ? t('saving') : t('documents.save')}
+                  </button>
+                </form>
               )}
             </div>
           )}

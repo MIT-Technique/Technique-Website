@@ -209,6 +209,7 @@
         "passwordMismatch": "两次输入的密码不一致",
         "clubNameRequired": "请输入社团名称",
         "clubNameExists": "已存在同名社团",
+        "clubNameCannotChange": "注册后无法更改社团名称",
         "livingGroupTypeRequired": "请选择宿舍楼或FSILG",
         "dormRequired": "请选择宿舍楼",
         "fsilgNameRequired": "请输入FSILG名称",
@@ -916,12 +917,14 @@
     "frozen": "此表单目前已冻结。您暂时无法进行更改。",
     "tabs": {
       "profile": "资料",
+      "leaders": "负责人",
       "members": "成员",
       "requests": "加入请求",
-      "management": "用户管理"
+      "documents": "文档"
     },
     "form": {
       "name": "社团名称",
+      "nameCannotChange": "注册后无法更改社团名称",
       "description": "描述",
       "memberList": "成员名单",
       "memberListPlaceholder": "输入成员姓名，每行一个或用逗号分隔",
@@ -937,6 +940,7 @@
       "noActiveMembers": "暂无活跃成员。",
       "manual": "手动添加的成员",
       "manualMembers": "手动添加的成员",
+      "manuallyAddedMembers": "手动添加的成员",
       "noManualMembers": "暂无手动添加的成员。",
       "addManual": "添加成员",
       "add": "添加",
@@ -968,6 +972,16 @@
         "leader": "负责人"
       }
     },
+    "leaders": {
+      "title": "负责人",
+      "info": "当前负责人：{count}/{max}",
+      "noLeaders": "未指定负责人",
+      "demoteToMember": "降为成员",
+      "pendingPromotions": "待处理的提升请求",
+      "awaitingApproval": "等待管理员批准",
+      "cancelRequest": "取消请求",
+      "searchAddLeader": "搜索添加负责人..."
+    },
     "requests": {
       "title": "加入请求",
       "pending": "待处理请求",
@@ -979,6 +993,10 @@
     },
     "management": {
       "title": "用户管理",
+      "leadersTitle": "负责人",
+      "membersTitle": "成员",
+      "noLeaders": "未指定负责人",
+      "addLeader": "添加负责人",
       "description": "管理社团成员和负责人。每个社团最多可有2名负责人。",
       "noMembers": "没有可管理的成员。",
       "removeMember": "移除",
@@ -994,7 +1012,8 @@
       "promotionPending": "提升待处理",
       "requestLeader": "申请负责人提升",
       "requestLeaderHint": "提升成员为负责人需管理员批准",
-      "pendingLeaderRequest": "提升请求待管理员批准"
+      "pendingLeaderRequest": "提升请求待管理员批准",
+      "searchAddLeader": "搜索添加负责人..."
     },
     "onboarding": {
       "addLeaderRequired": "添加负责人以继续",
@@ -1003,7 +1022,10 @@
       "addAsLeader": "添加为负责人",
       "adding": "添加中...",
       "leaderAdded": "负责人添加成功！",
-      "leaderError": "添加负责人失败"
+      "leaderError": "添加负责人失败",
+      "tabsBlockedWarning": "在添加社团负责人之前，成员、加入请求和用户管理选项卡将被锁定。",
+      "profileWarningTitle": "需要操作：添加社团负责人",
+      "noResults": "未找到学生"
     },
     "invitations": {
       "title": "邀请学生",
@@ -1017,6 +1039,19 @@
       "invitedOn": "邀请日期：{date}",
       "cancel": "取消",
       "cancelling": "取消中..."
+    },
+    "documents": {
+      "title": "社团文档",
+      "description": "存储社团重要链接和备注。此信息仅对社团负责人可见。",
+      "linksLabel": "重要链接",
+      "linksPlaceholder": "添加重要链接（每行一个）\n示例：\nhttps://drive.google.com/your-folder\nhttps://docs.google.com/your-doc",
+      "linksHint": "添加Google Drive文件夹、共享文档等的链接",
+      "notesLabel": "备注",
+      "notesPlaceholder": "添加社团负责人的重要备注...",
+      "notesHint": "仅对社团负责人可见的私密备注",
+      "save": "保存文档",
+      "saveSuccess": "文档保存成功",
+      "saveError": "保存文档失败"
     },
     "success": "社团资料已更新",
     "error": "更新社团资料失败",

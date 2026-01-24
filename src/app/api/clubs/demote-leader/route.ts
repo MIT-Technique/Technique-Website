@@ -89,6 +89,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check if there are any remaining leaders and update has_leader accordingly
+    const { count: leaderCount } = await supabase
+      .from('club_memberships')
+      .select('*', { count: 'exact', head: true })
+      .eq('club_id', club.id)
+      .eq('role', 'leader');
+
+    if (leaderCount === 0) {
+      await supabase
+        .from('clubs')
+        .update({ has_leader: false })
+        .eq('id', club.id);
+    }
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Demote leader error:", error);

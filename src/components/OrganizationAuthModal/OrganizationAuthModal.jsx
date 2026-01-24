@@ -570,7 +570,7 @@ export default function OrganizationAuthModal({ open, onClose }) {
                 onChange={(e) => setClubName(e.target.value)}
                 onBlur={() => handleBlur("clubName", clubName)}
                 error={touched.clubName && !!fieldErrors.clubName}
-                helperText={touched.clubName && fieldErrors.clubName}
+                helperText={(touched.clubName && fieldErrors.clubName) || t("clubNameCannotChange")}
                 sx={{ ...textFieldSx, mb: 3 }}
                 disabled={loading}
               />
