@@ -176,6 +176,8 @@
       "instructionText": "使用MIT凭据登录学生账户。",
       "signInButton": "使用MIT登录",
       "organizationButton": "组织登录",
+      "organizationPrefix": "代表社团或宿舍？",
+      "organizationLink": "组织登录",
       "org": {
         "title": "组织登录",
         "signIn": "登录",
@@ -203,9 +205,10 @@
         "emailRequired": "请输入邮箱",
         "emailInvalid": "邮箱必须是@mit.edu地址",
         "passwordRequired": "请输入密码",
-        "passwordMin": "密码至少需要8个字符",
+        "passwordMin": "密码至少需要8个字符，并包含数字或符号",
         "passwordMismatch": "两次输入的密码不一致",
         "clubNameRequired": "请输入社团名称",
+        "clubNameExists": "已存在同名社团",
         "livingGroupTypeRequired": "请选择宿舍楼或FSILG",
         "dormRequired": "请选择宿舍楼",
         "fsilgNameRequired": "请输入FSILG名称",
@@ -230,6 +233,7 @@
         "title": "管理员登录",
         "description": "仅限Technique管理员。",
         "emailLabel": "管理员邮箱",
+        "emailPlaceholder": "输入邮箱",
         "sendLinkButton": "发送登录链接",
         "sending": "发送中...",
         "success": "登录链接已发送！请查看您的邮箱。",
@@ -329,7 +333,9 @@
         "clubInfo": "社团信息",
         "scheduling": "预约管理",
         "myClubs": "我的社团",
-        "myLivingGroups": "我的住宿组"
+        "myLivingGroups": "我的住宿组",
+        "adminTools": "管理工具",
+        "photographerTimes": "摄影时段"
       },
       "myClubs": {
         "title": "我的社团",
@@ -373,7 +379,8 @@
           "invitedBy": "邀请人：{name}",
           "invitedOn": "{date}",
           "error": "处理邀请失败"
-        }
+        },
+        "manageDashboard": "管理社团"
       },
       "profile": {
         "title": "账户信息",
@@ -387,7 +394,15 @@
         "requestButton": "申请角色变更",
         "staphTitle": "需要TNQ工作人员权限？",
         "staphRequestButton": "申请工作人员权限",
-        "requestPending": "申请待处理"
+        "requestPending": "申请待处理",
+        "photographerTitle": "想成为Technique摄影师吗？",
+        "photographerRequestButton": "申请摄影师权限",
+        "photographerActive": "活跃摄影师"
+      },
+      "adminTools": {
+        "title": "管理工具",
+        "openDashboard": "打开仪表板",
+        "clubMaterialsComingSoon": "社团材料访问即将推出"
       },
       "bio": {
         "firstName": "名字",
@@ -1056,6 +1071,32 @@
       "approveSuccess": "成员已批准",
       "denySuccess": "申请已拒绝",
       "actionError": "处理申请失败"
+    },
+    "proposeTime": {
+      "title": "提议时间",
+      "description": "建议一个时间供摄影师接受。如果摄影师接受，您的拍照将会被安排。",
+      "date": "日期",
+      "startTime": "开始时间",
+      "endTime": "结束时间",
+      "location": "地点（可选）",
+      "notes": "备注（可选）",
+      "submit": "提交提议",
+      "submitting": "提交中...",
+      "submitSuccess": "时间提议已成功提交",
+      "submitError": "提交提议失败",
+      "fieldsRequired": "日期、开始时间和结束时间为必填项",
+      "yourProposals": "您的提议",
+      "noProposals": "暂无提议",
+      "cancel": "取消",
+      "cancelSuccess": "提议已取消",
+      "cancelError": "取消提议失败",
+      "acceptedBy": "由{name}接受",
+      "status": {
+        "pending": "待处理",
+        "accepted": "已接受",
+        "declined": "已拒绝",
+        "cancelled": "已取消"
+      }
     }
   },
 
@@ -1091,6 +1132,35 @@
       "leaveError": "退出失败",
       "noMemberships": "您尚未加入任何住宿组"
     }
+  },
+
+  "photographerTimes": {
+    "title": "摄影时间",
+    "addTime": "添加时间段",
+    "date": "日期",
+    "startTime": "开始时间",
+    "endTime": "结束时间",
+    "location": "地点（可选）",
+    "notes": "备注（可选）",
+    "addTimeButton": "添加时间",
+    "adding": "添加中...",
+    "addSuccess": "时间段添加成功",
+    "addError": "添加时间段失败",
+    "fieldsRequired": "日期、开始时间和结束时间为必填项",
+    "yourTimes": "您发布的时间段",
+    "noTimes": "您尚未发布任何时间段",
+    "delete": "删除",
+    "deleteSuccess": "时间段已删除",
+    "deleteError": "删除时间段失败",
+    "bookedBy": "已被{name}预约",
+    "pendingProposals": "待处理提议",
+    "noProposals": "暂无来自住宿组的待处理提议",
+    "accept": "接受",
+    "decline": "拒绝",
+    "acceptSuccess": "提议已接受并安排时间",
+    "declineSuccess": "提议已拒绝",
+    "actionError": "处理提议失败",
+    "declineReasonPrompt": "请输入拒绝原因（可选）："
   },
 
   "resources": {

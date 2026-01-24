@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { useUser } from '../../../hooks/useUser';
 import Footer from '../../../components/Footer/Footer';
+import ClubDashboardInline from '../../../components/ClubDashboardInline/ClubDashboardInline';
+import PhotographerTimesSection from '../../../components/PhotographerTimesSection/PhotographerTimesSection';
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
@@ -78,6 +80,9 @@ export default function ProfilePage() {
   const [cancellingRequestId, setCancellingRequestId] = useState(null);
   const [processingInvitationId, setProcessingInvitationId] = useState(null);
 
+  // Inline club dashboard state (for club leaders)
+  const [viewingClubDashboard, setViewingClubDashboard] = useState(null); // club_id or null
+
   // My Living Groups state
   const [lgMemberships, setLgMemberships] = useState([]);
   const [lgSearch, setLgSearch] = useState('');
@@ -98,6 +103,11 @@ export default function ProfilePage() {
   // Staph request state
   const [staphRequestPending, setStaphRequestPending] = useState(false);
   const [staphRequestSubmitting, setStaphRequestSubmitting] = useState(false);
+
+  // Photographer state
+  const [isPhotographer, setIsPhotographer] = useState(false);
+  const [photographerRequestPending, setPhotographerRequestPending] = useState(false);
+  const [photographerRequestSubmitting, setPhotographerRequestSubmitting] = useState(false);
 
   // Redirect admin to dashboard
   useEffect(() => {
@@ -159,6 +169,13 @@ export default function ProfilePage() {
     }
   }, [isLoggedIn, user]);
 
+  // Check photographer status for students
+  useEffect(() => {
+    if (isLoggedIn && user?.role === 'student') {
+      checkPhotographerStatus();
+    }
+  }, [isLoggedIn, user]);
+
   async function checkStaphRequest() {
     try {
       const res = await fetch('/api/user/request-promotion');
@@ -190,6 +207,38 @@ export default function ProfilePage() {
       console.error('Error submitting staph request:', error);
     } finally {
       setStaphRequestSubmitting(false);
+    }
+  }
+
+  async function checkPhotographerStatus() {
+    try {
+      const res = await fetch('/api/photographer/status');
+      const data = await res.json();
+      setIsPhotographer(data.isPhotographer);
+      setPhotographerRequestPending(data.hasPendingRequest);
+    } catch (error) {
+      console.error('Error checking photographer status:', error);
+    }
+  }
+
+  async function handlePhotographerRequest() {
+    setPhotographerRequestSubmitting(true);
+    try {
+      const res = await fetch('/api/user/request-promotion', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ request_type: 'photographer_request' }),
+      });
+      if (res.ok) {
+        setPhotographerRequestPending(true);
+      } else {
+        const data = await res.json();
+        console.error('Error submitting photographer request:', data.error);
+      }
+    } catch (error) {
+      console.error('Error submitting photographer request:', error);
+    } finally {
+      setPhotographerRequestSubmitting(false);
     }
   }
 
@@ -558,11 +607,17 @@ export default function ProfilePage() {
     if (user?.role === 'student') {
       tabs.push({ id: 'myClubs', label: t('tabs.myClubs') });
       tabs.push({ id: 'myLivingGroups', label: t('tabs.myLivingGroups') });
+      // Photographers get their times tab
+      if (isPhotographer) {
+        tabs.push({ id: 'photographerTimes', label: t('tabs.photographerTimes') });
+      }
     } else if (user?.role === 'club') {
       tabs.push({ id: 'club', label: t('tabs.clubInfo') });
     } else if (user?.role === 'living_group_leader') {
       tabs.push({ id: 'scheduling', label: t('tabs.scheduling') });
       tabs.push({ id: 'myClubs', label: t('tabs.myClubs') });
+    } else if (user?.role === 'staph') {
+      tabs.push({ id: 'adminTools', label: t('tabs.adminTools') });
     }
 
     return tabs;
@@ -597,6 +652,25 @@ export default function ProfilePage() {
   }
 
   const tabs = getTabs();
+
+  // If viewing a club dashboard, show the inline dashboard instead
+  if (viewingClubDashboard) {
+    return (
+      <>
+        <main className="min-h-screen pt-24 lg:pt-32 pb-12">
+          <ClubDashboardInline
+            clubId={viewingClubDashboard}
+            onBack={() => {
+              setViewingClubDashboard(null);
+              // Refresh memberships data after leaving dashboard
+              fetchMyClubsData();
+            }}
+          />
+        </main>
+        <Footer />
+      </>
+    );
+  }
 
   return (
     <>
@@ -641,9 +715,9 @@ export default function ProfilePage() {
                   </div>
                 </div>
 
-                {/* Staph request for students - small and unobtrusive */}
+                {/* Staph and Photographer requests for students - small and unobtrusive */}
                 {user?.role === 'student' && (
-                  <div className="mt-6 pt-4 border-t border-border/50">
+                  <div className="mt-6 pt-4 border-t border-border/50 space-y-2">
                     <p className="text-xs text-text-muted">
                       {t('promotion.staphTitle')}{' '}
                       {staphRequestPending ? (
@@ -655,6 +729,22 @@ export default function ProfilePage() {
                           className="text-accent hover:underline disabled:opacity-50"
                         >
                           {staphRequestSubmitting ? '...' : t('promotion.staphRequestButton')}
+                        </button>
+                      )}
+                    </p>
+                    <p className="text-xs text-text-muted">
+                      {t('promotion.photographerTitle')}{' '}
+                      {isPhotographer ? (
+                        <span className="text-green-600">{t('promotion.photographerActive')}</span>
+                      ) : photographerRequestPending ? (
+                        <span className="text-yellow-600">{t('promotion.requestPending')}</span>
+                      ) : (
+                        <button
+                          onClick={handlePhotographerRequest}
+                          disabled={photographerRequestSubmitting}
+                          className="text-accent hover:underline disabled:opacity-50"
+                        >
+                          {photographerRequestSubmitting ? '...' : t('promotion.photographerRequestButton')}
                         </button>
                       )}
                     </p>
@@ -1143,11 +1233,21 @@ export default function ProfilePage() {
                             {membership.role === 'leader' ? t('myClubs.leader') : t('myClubs.member')}
                           </span>
                         </div>
-                        <p className="text-text-muted text-xs mt-2">
-                          {t('myClubs.joinedOn', {
-                            date: new Date(membership.joined_at).toLocaleDateString(locale),
-                          })}
-                        </p>
+                        <div className="flex items-center justify-between mt-2">
+                          <p className="text-text-muted text-xs">
+                            {t('myClubs.joinedOn', {
+                              date: new Date(membership.joined_at).toLocaleDateString(locale),
+                            })}
+                          </p>
+                          {membership.role === 'leader' && (
+                            <button
+                              onClick={() => setViewingClubDashboard(membership.club_id)}
+                              className="text-xs px-3 py-1 bg-accent text-white rounded hover:bg-accent/90"
+                            >
+                              {t('myClubs.manageDashboard')}
+                            </button>
+                          )}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -1369,6 +1469,31 @@ export default function ProfilePage() {
                 )}
               </div>
             </div>
+          )}
+
+          {/* Admin Tools Tab - for staph users */}
+          {activeTab === 'adminTools' && user?.role === 'staph' && (
+            <div className="space-y-6">
+              <div className="bg-white border border-border rounded-lg p-6">
+                <h2 className="text-lg font-semibold text-text-primary mb-4">
+                  {t('adminTools.title')}
+                </h2>
+                <p className="text-text-secondary mb-4">
+                  {t('adminTools.clubMaterialsComingSoon')}
+                </p>
+                <a
+                  href={`/${locale}/dashboard`}
+                  className="inline-block px-4 py-2 bg-accent text-white rounded hover:bg-accent/90 transition-colors"
+                >
+                  {t('adminTools.openDashboard')}
+                </a>
+              </div>
+            </div>
+          )}
+
+          {/* Photographer Times Tab - for students with photographer permission */}
+          {activeTab === 'photographerTimes' && user?.role === 'student' && isPhotographer && (
+            <PhotographerTimesSection />
           )}
         </section>
       </main>

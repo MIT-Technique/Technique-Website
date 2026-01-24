@@ -55,7 +55,7 @@ function Sidebar({ pathname }) {
   };
 
   const isAboutActive = [`/${locale}/about`, `/${locale}/archives`, `/${locale}/portfolio`, `/${locale}/contact`].some(isActive);
-  const isPurchaseActive = [`/${locale}/yearbook`, `/${locale}/seniors`, `/${locale}/parents`, `/${locale}/alumni`].some(isActive);
+  const isPurchaseActive = [`/${locale}/purchase`, `/${locale}/seniors`, `/${locale}/parents`, `/${locale}/alumni`].some(isActive);
   const isFormsActive = [`/${locale}/login`, `/${locale}/invoice`, `/${locale}/parent-inquiry`, `/${locale}/alumni-inquiry`, `/${locale}/clubs`, `/${locale}/student-work-feature`].some(isActive);
   const isGetStartedActive = [`/${locale}/hire`, `/${locale}/join`].some(isActive);
 
@@ -186,14 +186,14 @@ function Sidebar({ pathname }) {
               </List>
             </Collapse>
 
-            {/* Purchase Dropdown */}
+            {/* Yearbook Dropdown */}
             <ListItem disablePadding>
               <ListItemButton
                 onClick={() => setPurchaseOpen(!purchaseOpen)}
                 sx={{ px: 3, py: 1.5 }}
               >
                 <ListItemText
-                  primary={t('purchase')}
+                  primary={t('yearbook')}
                   primaryTypographyProps={{
                     sx: {
                       fontSize: "0.75rem",
@@ -216,7 +216,7 @@ function Sidebar({ pathname }) {
             <Collapse in={purchaseOpen} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 {[
-                  { href: `/${locale}/yearbook`, label: t('yearbook') },
+                  { href: `/${locale}/purchase`, label: t('purchase') },
                   { href: `/${locale}/seniors`, label: t('seniors') },
                   { href: `/${locale}/parents`, label: t('parents') },
                   { href: `/${locale}/alumni`, label: t('alumni') },

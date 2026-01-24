@@ -24,10 +24,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate password
-    if (!password || password.length < 8) {
+    // Validate password (at least 8 characters and contains a number or symbol)
+    const hasNumberOrSymbol = /[0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password || "");
+    if (!password || password.length < 8 || !hasNumberOrSymbol) {
       return NextResponse.json(
-        { error: "Password must be at least 8 characters", code: "INVALID_PASSWORD" },
+        { error: "Password must be at least 8 characters and contain a number or symbol", code: "INVALID_PASSWORD" },
         { status: 400 }
       );
     }
@@ -67,6 +68,22 @@ export async function POST(request: NextRequest) {
     }
 
     const supabase = createAdminClient();
+
+    // Check for existing club with the same name (case-insensitive)
+    if (organizationType === "club") {
+      const { data: existingClub } = await supabase
+        .from("clubs")
+        .select("id")
+        .ilike("name", clubName!.trim())
+        .single();
+
+      if (existingClub) {
+        return NextResponse.json(
+          { error: "A club with this name already exists", code: "CLUB_NAME_EXISTS" },
+          { status: 409 }
+        );
+      }
+    }
 
     // Check for existing user
     const { data: existingUser } = await supabase

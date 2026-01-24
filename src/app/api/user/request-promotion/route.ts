@@ -16,8 +16,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { request_type, request_reason } = body;
 
-    // Only staph_request is allowed
-    if (request_type !== 'staph_request') {
+    // Allow staph_request and photographer_request
+    if (request_type !== 'staph_request' && request_type !== 'photographer_request') {
       return NextResponse.json(
         { error: "Invalid request type" },
         { status: 400 }

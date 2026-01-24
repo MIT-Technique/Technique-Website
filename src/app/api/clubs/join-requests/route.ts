@@ -2,45 +2,95 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "../../../../lib/auth/session";
 import { createAdminClient } from "../../../../lib/supabase/admin";
 
+// Helper to get club ID for either club account or club leader
+async function getClubIdForUser(
+  user: { id: string; role: string },
+  supabase: ReturnType<typeof createAdminClient>,
+  clubIdParam?: string | null
+): Promise<{ clubId: string | null; error?: string }> {
+  // If clubId is provided (for leaders), verify they're a leader of that club
+  if (clubIdParam) {
+    const { data: membership } = await supabase
+      .from("club_memberships")
+      .select("id")
+      .eq("club_id", clubIdParam)
+      .eq("user_id", user.id)
+      .eq("role", "leader")
+      .single();
+
+    if (membership) {
+      return { clubId: clubIdParam };
+    }
+
+    // Also check if they're the club account owner
+    if (user.role === "club") {
+      const { data: club } = await supabase
+        .from("clubs")
+        .select("id")
+        .eq("id", clubIdParam)
+        .eq("user_id", user.id)
+        .single();
+
+      if (club) {
+        return { clubId: clubIdParam };
+      }
+    }
+
+    return { clubId: null, error: "You are not a leader of this club" };
+  }
+
+  // For club accounts without clubId param, get their club
+  if (user.role === "club") {
+    const { data: club } = await supabase
+      .from("clubs")
+      .select("id")
+      .eq("user_id", user.id)
+      .single();
+
+    if (club) {
+      return { clubId: club.id };
+    }
+    return { clubId: null, error: "Club not found" };
+  }
+
+  return {
+    clubId: null,
+    error: "Only club accounts and club leaders can access this resource",
+  };
+}
+
 // GET - Get pending join requests for the club
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const user = await getCurrentUser();
 
     if (!user) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
-    }
-
-    if (user.role !== 'club') {
-      return NextResponse.json(
-        { error: "Only club accounts can access join requests" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const supabase = createAdminClient();
+    const searchParams = request.nextUrl.searchParams;
+    const clubIdParam = searchParams.get("clubId");
 
-    // Get club ID for current user
-    const { data: club, error: clubError } = await supabase
-      .from('clubs')
-      .select('id')
-      .eq('user_id', user.id)
-      .single();
+    // Get club ID (either from param for leaders, or from user account)
+    const { clubId, error: clubIdError } = await getClubIdForUser(
+      user,
+      supabase,
+      clubIdParam
+    );
 
-    if (clubError || !club) {
+    if (!clubId || clubIdError) {
       return NextResponse.json(
-        { error: "Club not found" },
-        { status: 404 }
+        { error: clubIdError || "Club not found" },
+        { status: 403 }
       );
     }
 
     // Get pending join requests with user details
     const { data: requests, error } = await supabase
-      .from('club_join_requests')
-      .select(`
+      .from("club_join_requests")
+      .select(
+        `
         id,
         status,
         created_at,
@@ -50,10 +100,11 @@ export async function GET() {
           first_name,
           last_name
         )
-      `)
-      .eq('club_id', club.id)
-      .eq('status', 'pending')
-      .order('created_at', { ascending: true });
+      `
+      )
+      .eq("club_id", clubId)
+      .eq("status", "pending")
+      .order("created_at", { ascending: true });
 
     if (error) {
       console.error("Get join requests error:", error);
@@ -79,21 +130,11 @@ export async function PUT(request: NextRequest) {
     const user = await getCurrentUser();
 
     if (!user) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
-    }
-
-    if (user.role !== 'club') {
-      return NextResponse.json(
-        { error: "Only club accounts can approve/deny join requests" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
-    const { request_id, action } = body;
+    const { request_id, action, clubId: clubIdParam } = body;
 
     if (!request_id || !action) {
       return NextResponse.json(
@@ -102,7 +143,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    if (!['approve', 'deny'].includes(action)) {
+    if (!["approve", "deny"].includes(action)) {
       return NextResponse.json(
         { error: "Action must be 'approve' or 'deny'" },
         { status: 400 }
@@ -111,25 +152,25 @@ export async function PUT(request: NextRequest) {
 
     const supabase = createAdminClient();
 
-    // Get club ID for current user
-    const { data: club, error: clubError } = await supabase
-      .from('clubs')
-      .select('id')
-      .eq('user_id', user.id)
-      .single();
+    // Get club ID (either from param for leaders, or from user account)
+    const { clubId, error: clubIdError } = await getClubIdForUser(
+      user,
+      supabase,
+      clubIdParam
+    );
 
-    if (clubError || !club) {
+    if (!clubId || clubIdError) {
       return NextResponse.json(
-        { error: "Club not found" },
-        { status: 404 }
+        { error: clubIdError || "Club not found" },
+        { status: 403 }
       );
     }
 
     // Get the join request
     const { data: joinRequest, error: requestError } = await supabase
-      .from('club_join_requests')
-      .select('id, club_id, user_id, status')
-      .eq('id', request_id)
+      .from("club_join_requests")
+      .select("id, club_id, user_id, status")
+      .eq("id", request_id)
       .single();
 
     if (requestError || !joinRequest) {
@@ -139,30 +180,30 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    if (joinRequest.club_id !== club.id) {
+    if (joinRequest.club_id !== clubId) {
       return NextResponse.json(
         { error: "Join request does not belong to your club" },
         { status: 403 }
       );
     }
 
-    if (joinRequest.status !== 'pending') {
+    if (joinRequest.status !== "pending") {
       return NextResponse.json(
         { error: "Join request has already been processed" },
         { status: 400 }
       );
     }
 
-    const newStatus = action === 'approve' ? 'approved' : 'denied';
+    const newStatus = action === "approve" ? "approved" : "denied";
 
     // Update the join request status
     const { error: updateError } = await supabase
-      .from('club_join_requests')
+      .from("club_join_requests")
       .update({
         status: newStatus,
         resolved_at: new Date().toISOString(),
       })
-      .eq('id', request_id);
+      .eq("id", request_id);
 
     if (updateError) {
       console.error("Update join request error:", updateError);
@@ -173,25 +214,25 @@ export async function PUT(request: NextRequest) {
     }
 
     // If approved, create membership
-    if (action === 'approve') {
+    if (action === "approve") {
       const { error: membershipError } = await supabase
-        .from('club_memberships')
+        .from("club_memberships")
         .insert({
-          club_id: club.id,
+          club_id: clubId,
           user_id: joinRequest.user_id,
-          role: 'member',
+          role: "member",
         });
 
       if (membershipError) {
         console.error("Create membership error:", membershipError);
         // Rollback the join request update
         await supabase
-          .from('club_join_requests')
+          .from("club_join_requests")
           .update({
-            status: 'pending',
+            status: "pending",
             resolved_at: null,
           })
-          .eq('id', request_id);
+          .eq("id", request_id);
 
         return NextResponse.json(
           { error: "Failed to add member to club" },

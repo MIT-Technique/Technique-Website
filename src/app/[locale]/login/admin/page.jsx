@@ -2,14 +2,13 @@
 import Footer from "../../../../components/Footer/Footer";
 import { useState } from "react";
 import * as React from "react";
-import Link from "next/link";
 import Box from "@mui/material/Box";
 import { Button, TextField } from "@mui/material";
 import Snackbar from "@mui/material/Snackbar";
 import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import Alert from "@mui/material/Alert";
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 const textFieldSx = {
   "& .MuiOutlinedInput-root": {
@@ -21,7 +20,6 @@ const textFieldSx = {
 };
 
 export default function AdminLoginPage() {
-  const locale = useLocale();
   const t = useTranslations('pages.login');
   const [adminEmail, setAdminEmail] = useState('');
   const [adminSending, setAdminSending] = useState(false);
@@ -102,7 +100,7 @@ export default function AdminLoginPage() {
               variant="outlined"
               value={adminEmail}
               onChange={(e) => setAdminEmail(e.target.value)}
-              placeholder="technique@mit.edu"
+              placeholder={t('admin.emailPlaceholder')}
               sx={{ ...textFieldSx, mb: 2 }}
               fullWidth
               InputLabelProps={{ shrink: true }}
@@ -140,16 +138,6 @@ export default function AdminLoginPage() {
               {adminSending ? t('admin.sending') : t('admin.sendLinkButton')}
             </Button>
           </Box>
-
-          {/* Back to regular login */}
-          <div className="text-center mt-6">
-            <Link
-              href={`/${locale}/login`}
-              className="text-sm text-text-secondary hover:text-accent"
-            >
-              {t('backToLogin')}
-            </Link>
-          </div>
         </section>
       </main>
 

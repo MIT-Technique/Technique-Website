@@ -130,7 +130,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // If approved, update user role to staph
+    // If approved, apply the appropriate change
     if (action === 'approved') {
       const targetUserId = promotionRequest.user_id;
       const requestType = promotionRequest.request_type;
@@ -149,6 +149,24 @@ export async function PUT(request: NextRequest) {
           console.error("Error updating user role:", roleError);
           return NextResponse.json(
             { error: "Failed to update user role" },
+            { status: 500 }
+          );
+        }
+      } else if (requestType === 'photographer_request') {
+        // Create photographer permission record
+        const { error: permissionError } = await supabase
+          .from('photographer_permissions')
+          .insert({
+            user_id: targetUserId,
+            approved_by: user.id,
+            approved_at: new Date().toISOString(),
+            is_active: true,
+          });
+
+        if (permissionError) {
+          console.error("Error creating photographer permission:", permissionError);
+          return NextResponse.json(
+            { error: "Failed to grant photographer permission" },
             { status: 500 }
           );
         }

@@ -90,6 +90,10 @@ export default function OrganizationAuthModal({ open, onClose }) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  // Field-level error states
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [touched, setTouched] = useState({});
+
   const resetForm = () => {
     setEmail("");
     setPassword("");
@@ -103,6 +107,8 @@ export default function OrganizationAuthModal({ open, onClose }) {
     setSuccess("");
     setShowForgotPassword(false);
     setForgotEmail("");
+    setFieldErrors({});
+    setTouched({});
   };
 
   const handleClose = () => {
@@ -134,7 +140,8 @@ export default function OrganizationAuthModal({ open, onClose }) {
     const emailError = validateEmail(email);
     if (emailError) return emailError;
     if (!password) return t("passwordRequired");
-    if (password.length < 8) return t("passwordMin");
+    const hasNumberOrSymbol = /[0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+    if (password.length < 8 || !hasNumberOrSymbol) return t("passwordMin");
     if (password !== confirmPassword) return t("passwordMismatch");
 
     if (orgType === "club") {
@@ -145,6 +152,46 @@ export default function OrganizationAuthModal({ open, onClose }) {
       if (livingGroupType === "fsilg" && !fsilgName.trim()) return t("fsilgNameRequired");
     }
     return null;
+  };
+
+  // Field-level validation
+  const validateField = (field, value) => {
+    switch (field) {
+      case "email":
+      case "forgotEmail":
+        if (!value) return t("emailRequired");
+        if (!value.toLowerCase().endsWith("@mit.edu")) return t("emailInvalid");
+        return null;
+      case "password":
+        if (!value) return t("passwordRequired");
+        const hasNumberOrSymbol = /[0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value);
+        if (value.length < 8 || !hasNumberOrSymbol) return t("passwordMin");
+        return null;
+      case "confirmPassword":
+        if (!value) return t("passwordRequired");
+        if (value !== password) return t("passwordMismatch");
+        return null;
+      case "clubName":
+        if (!value.trim()) return t("clubNameRequired");
+        return null;
+      case "livingGroupType":
+        if (!value) return t("livingGroupTypeRequired");
+        return null;
+      case "dormName":
+        if (!value) return t("dormRequired");
+        return null;
+      case "fsilgName":
+        if (!value.trim()) return t("fsilgNameRequired");
+        return null;
+      default:
+        return null;
+    }
+  };
+
+  const handleBlur = (field, value) => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+    const error = validateField(field, value);
+    setFieldErrors((prev) => ({ ...prev, [field]: error }));
   };
 
   const handleSignIn = async (e) => {
@@ -233,6 +280,8 @@ export default function OrganizationAuthModal({ open, onClose }) {
       if (!res.ok) {
         if (data.code === "EMAIL_EXISTS") {
           setError(t("accountExists"));
+        } else if (data.code === "CLUB_NAME_EXISTS") {
+          setError(t("clubNameExists"));
         } else {
           setError(data.error || "Sign up failed");
         }
@@ -316,6 +365,9 @@ export default function OrganizationAuthModal({ open, onClose }) {
               placeholder={t("emailPlaceholder")}
               value={forgotEmail}
               onChange={(e) => setForgotEmail(e.target.value)}
+              onBlur={() => handleBlur("forgotEmail", forgotEmail)}
+              error={touched.forgotEmail && !!fieldErrors.forgotEmail}
+              helperText={touched.forgotEmail && fieldErrors.forgotEmail}
               sx={{ ...textFieldSx, mb: 3 }}
               disabled={loading || success}
             />
@@ -385,6 +437,9 @@ export default function OrganizationAuthModal({ open, onClose }) {
               placeholder={t("emailPlaceholder")}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              onBlur={() => handleBlur("email", email)}
+              error={touched.email && !!fieldErrors.email}
+              helperText={touched.email && fieldErrors.email}
               sx={{ ...textFieldSx, mb: 2 }}
               disabled={loading}
             />
@@ -394,6 +449,9 @@ export default function OrganizationAuthModal({ open, onClose }) {
               label={t("password")}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              onBlur={() => handleBlur("password", password)}
+              error={touched.password && !!fieldErrors.password}
+              helperText={touched.password && fieldErrors.password}
               sx={{ ...textFieldSx, mb: 3 }}
               disabled={loading}
             />
@@ -471,6 +529,9 @@ export default function OrganizationAuthModal({ open, onClose }) {
               placeholder={t("emailPlaceholder")}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              onBlur={() => handleBlur("email", email)}
+              error={touched.email && !!fieldErrors.email}
+              helperText={touched.email && fieldErrors.email}
               sx={{ ...textFieldSx, mb: 2 }}
               disabled={loading}
             />
@@ -480,6 +541,9 @@ export default function OrganizationAuthModal({ open, onClose }) {
               label={t("password")}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              onBlur={() => handleBlur("password", password)}
+              error={touched.password && !!fieldErrors.password}
+              helperText={touched.password && fieldErrors.password}
               sx={{ ...textFieldSx, mb: 2 }}
               disabled={loading}
             />
@@ -489,6 +553,9 @@ export default function OrganizationAuthModal({ open, onClose }) {
               label={t("confirmPassword")}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
+              onBlur={() => handleBlur("confirmPassword", confirmPassword)}
+              error={touched.confirmPassword && !!fieldErrors.confirmPassword}
+              helperText={touched.confirmPassword && fieldErrors.confirmPassword}
               sx={{ ...textFieldSx, mb: 2 }}
               disabled={loading}
             />
@@ -501,6 +568,9 @@ export default function OrganizationAuthModal({ open, onClose }) {
                 placeholder={t("clubNamePlaceholder")}
                 value={clubName}
                 onChange={(e) => setClubName(e.target.value)}
+                onBlur={() => handleBlur("clubName", clubName)}
+                error={touched.clubName && !!fieldErrors.clubName}
+                helperText={touched.clubName && fieldErrors.clubName}
                 sx={{ ...textFieldSx, mb: 3 }}
                 disabled={loading}
               />
@@ -509,7 +579,11 @@ export default function OrganizationAuthModal({ open, onClose }) {
             {/* Living Group-specific fields */}
             {orgType === "living_group" && (
               <>
-                <FormControl fullWidth sx={{ ...textFieldSx, mb: 2 }}>
+                <FormControl
+                  fullWidth
+                  sx={{ ...textFieldSx, mb: 2 }}
+                  error={touched.livingGroupType && !!fieldErrors.livingGroupType}
+                >
                   <InputLabel>{t("livingGroupType")}</InputLabel>
                   <Select
                     value={livingGroupType}
@@ -519,20 +593,31 @@ export default function OrganizationAuthModal({ open, onClose }) {
                       setDormName("");
                       setFsilgName("");
                     }}
+                    onBlur={() => handleBlur("livingGroupType", livingGroupType)}
                     disabled={loading}
                   >
                     <MenuItem value="dorm">{t("dorm")}</MenuItem>
                     <MenuItem value="fsilg">{t("fsilg")}</MenuItem>
                   </Select>
+                  {touched.livingGroupType && fieldErrors.livingGroupType && (
+                    <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.75 }}>
+                      {fieldErrors.livingGroupType}
+                    </Typography>
+                  )}
                 </FormControl>
 
                 {livingGroupType === "dorm" && (
-                  <FormControl fullWidth sx={{ ...textFieldSx, mb: 3 }}>
+                  <FormControl
+                    fullWidth
+                    sx={{ ...textFieldSx, mb: 3 }}
+                    error={touched.dormName && !!fieldErrors.dormName}
+                  >
                     <InputLabel>{t("selectDorm")}</InputLabel>
                     <Select
                       value={dormName}
                       label={t("selectDorm")}
                       onChange={(e) => setDormName(e.target.value)}
+                      onBlur={() => handleBlur("dormName", dormName)}
                       disabled={loading}
                     >
                       {DORM_OPTIONS.map((dorm) => (
@@ -541,6 +626,11 @@ export default function OrganizationAuthModal({ open, onClose }) {
                         </MenuItem>
                       ))}
                     </Select>
+                    {touched.dormName && fieldErrors.dormName && (
+                      <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.75 }}>
+                        {fieldErrors.dormName}
+                      </Typography>
+                    )}
                   </FormControl>
                 )}
 
@@ -551,6 +641,9 @@ export default function OrganizationAuthModal({ open, onClose }) {
                     placeholder={t("fsilgNamePlaceholder")}
                     value={fsilgName}
                     onChange={(e) => setFsilgName(e.target.value)}
+                    onBlur={() => handleBlur("fsilgName", fsilgName)}
+                    error={touched.fsilgName && !!fieldErrors.fsilgName}
+                    helperText={touched.fsilgName && fieldErrors.fsilgName}
                     sx={{ ...textFieldSx, mb: 3 }}
                     disabled={loading}
                   />

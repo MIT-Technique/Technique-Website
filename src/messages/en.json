@@ -178,6 +178,8 @@
       "dividerText": "or",
       "success": "Signed in successfully",
       "organizationButton": "Organization Login",
+      "organizationPrefix": "Representing a club or living group?",
+      "organizationLink": "Organization Login",
       "org": {
         "title": "Organization Login",
         "signIn": "Sign In",
@@ -205,9 +207,10 @@
         "emailRequired": "Email is required",
         "emailInvalid": "Email must be an @mit.edu address",
         "passwordRequired": "Password is required",
-        "passwordMin": "Password must be at least 8 characters",
+        "passwordMin": "Password must be at least 8 characters and contain a number or symbol",
         "passwordMismatch": "Passwords do not match",
         "clubNameRequired": "Club name is required",
+        "clubNameExists": "A club with this name already exists",
         "livingGroupTypeRequired": "Please select dorm or FSILG",
         "dormRequired": "Please select a dorm",
         "fsilgNameRequired": "Please enter the FSILG name",
@@ -230,6 +233,7 @@
         "title": "Admin Login",
         "description": "For Technique administrators only.",
         "emailLabel": "Admin Email",
+        "emailPlaceholder": "Enter email",
         "sendLinkButton": "Send Login Link",
         "sending": "Sending...",
         "success": "Login link sent! Check your email.",
@@ -329,7 +333,9 @@
         "clubInfo": "Club Info",
         "scheduling": "Scheduling",
         "myClubs": "My Clubs",
-        "myLivingGroups": "My Living Groups"
+        "myLivingGroups": "My Living Groups",
+        "adminTools": "Admin Tools",
+        "photographerTimes": "Photography Times"
       },
       "myClubs": {
         "title": "My Clubs",
@@ -373,7 +379,8 @@
           "invitedBy": "Invited by {name}",
           "invitedOn": "{date}",
           "error": "Failed to process invitation"
-        }
+        },
+        "manageDashboard": "Manage Club"
       },
       "profile": {
         "title": "Account Information",
@@ -387,7 +394,15 @@
         "requestButton": "Request Role Change",
         "staphTitle": "Need TNQ staph access?",
         "staphRequestButton": "Request Staph Access",
-        "requestPending": "Request Pending"
+        "requestPending": "Request Pending",
+        "photographerTitle": "Want to become a Technique photographer?",
+        "photographerRequestButton": "Request Photographer Access",
+        "photographerActive": "Active Photographer"
+      },
+      "adminTools": {
+        "title": "Admin Tools",
+        "openDashboard": "Open Dashboard",
+        "clubMaterialsComingSoon": "Club materials access coming soon"
       },
       "bio": {
         "firstName": "First Name",
@@ -1055,6 +1070,32 @@
       "approveSuccess": "Member approved",
       "denySuccess": "Request denied",
       "actionError": "Failed to process request"
+    },
+    "proposeTime": {
+      "title": "Propose a Time",
+      "description": "Suggest a time for photographers to accept. If a photographer accepts, your photoshoot will be scheduled.",
+      "date": "Date",
+      "startTime": "Start Time",
+      "endTime": "End Time",
+      "location": "Location (optional)",
+      "notes": "Notes (optional)",
+      "submit": "Submit Proposal",
+      "submitting": "Submitting...",
+      "submitSuccess": "Time proposal submitted successfully",
+      "submitError": "Failed to submit proposal",
+      "fieldsRequired": "Date, start time, and end time are required",
+      "yourProposals": "Your Proposals",
+      "noProposals": "No proposals yet",
+      "cancel": "Cancel",
+      "cancelSuccess": "Proposal cancelled",
+      "cancelError": "Failed to cancel proposal",
+      "acceptedBy": "Accepted by {name}",
+      "status": {
+        "pending": "Pending",
+        "accepted": "Accepted",
+        "declined": "Declined",
+        "cancelled": "Cancelled"
+      }
     }
   },
 
@@ -1090,6 +1131,35 @@
       "leaveError": "Failed to leave",
       "noMemberships": "You haven't joined any living groups yet"
     }
+  },
+
+  "photographerTimes": {
+    "title": "Photography Times",
+    "addTime": "Add Time Slot",
+    "date": "Date",
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "location": "Location (optional)",
+    "notes": "Notes (optional)",
+    "addTimeButton": "Add Time",
+    "adding": "Adding...",
+    "addSuccess": "Time slot added successfully",
+    "addError": "Failed to add time slot",
+    "fieldsRequired": "Date, start time, and end time are required",
+    "yourTimes": "Your Posted Times",
+    "noTimes": "You haven't posted any times yet",
+    "delete": "Delete",
+    "deleteSuccess": "Time slot deleted",
+    "deleteError": "Failed to delete time slot",
+    "bookedBy": "Booked by {name}",
+    "pendingProposals": "Pending Proposals",
+    "noProposals": "No pending proposals from living groups",
+    "accept": "Accept",
+    "decline": "Decline",
+    "acceptSuccess": "Proposal accepted and time scheduled",
+    "declineSuccess": "Proposal declined",
+    "actionError": "Failed to process proposal",
+    "declineReasonPrompt": "Enter a reason for declining (optional):"
   },
 
   "resources": {

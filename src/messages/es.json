@@ -178,6 +178,8 @@
       "dividerText": "o",
       "success": "Sesión iniciada exitosamente",
       "organizationButton": "Acceso de Organización",
+      "organizationPrefix": "¿Representas a un club o grupo de vivienda?",
+      "organizationLink": "Acceso de Organización",
       "org": {
         "title": "Acceso de Organización",
         "signIn": "Iniciar Sesión",
@@ -205,9 +207,10 @@
         "emailRequired": "El email es requerido",
         "emailInvalid": "El email debe ser una dirección @mit.edu",
         "passwordRequired": "La contraseña es requerida",
-        "passwordMin": "La contraseña debe tener al menos 8 caracteres",
+        "passwordMin": "La contraseña debe tener al menos 8 caracteres y contener un número o símbolo",
         "passwordMismatch": "Las contraseñas no coinciden",
         "clubNameRequired": "El nombre del club es requerido",
+        "clubNameExists": "Ya existe un club con este nombre",
         "livingGroupTypeRequired": "Por favor selecciona dormitorio o FSILG",
         "dormRequired": "Por favor selecciona un dormitorio",
         "fsilgNameRequired": "Por favor ingresa el nombre del FSILG",
@@ -230,6 +233,7 @@
         "title": "Acceso de Administrador",
         "description": "Solo para administradores de Technique.",
         "emailLabel": "Email de Administrador",
+        "emailPlaceholder": "Ingrese email",
         "sendLinkButton": "Enviar Enlace de Acceso",
         "sending": "Enviando...",
         "success": "¡Enlace de acceso enviado! Revisa tu correo.",
@@ -329,7 +333,9 @@
         "clubInfo": "Info del Club",
         "scheduling": "Programación",
         "myClubs": "Mis Clubes",
-        "myLivingGroups": "Mis Grupos de Vivienda"
+        "myLivingGroups": "Mis Grupos de Vivienda",
+        "adminTools": "Herramientas de Admin",
+        "photographerTimes": "Horarios de Fotografía"
       },
       "myClubs": {
         "title": "Mis Clubes",
@@ -373,7 +379,8 @@
           "invitedBy": "Invitado por {name}",
           "invitedOn": "{date}",
           "error": "Error al procesar invitación"
-        }
+        },
+        "manageDashboard": "Administrar Club"
       },
       "profile": {
         "title": "Información de la Cuenta",
@@ -387,7 +394,15 @@
         "requestButton": "Solicitar Cambio de Rol",
         "staphTitle": "¿Necesitas acceso de staph TNQ?",
         "staphRequestButton": "Solicitar Acceso Staph",
-        "requestPending": "Solicitud Pendiente"
+        "requestPending": "Solicitud Pendiente",
+        "photographerTitle": "¿Quieres ser fotógrafo de Technique?",
+        "photographerRequestButton": "Solicitar Acceso de Fotógrafo",
+        "photographerActive": "Fotógrafo Activo"
+      },
+      "adminTools": {
+        "title": "Herramientas de Admin",
+        "openDashboard": "Abrir Dashboard",
+        "clubMaterialsComingSoon": "Acceso a materiales de clubes próximamente"
       },
       "bio": {
         "firstName": "Nombre",
@@ -1056,6 +1071,32 @@
       "approveSuccess": "Miembro aprobado",
       "denySuccess": "Solicitud rechazada",
       "actionError": "Error al procesar solicitud"
+    },
+    "proposeTime": {
+      "title": "Proponer un Horario",
+      "description": "Sugiere un horario para que los fotógrafos acepten. Si un fotógrafo acepta, tu sesión será programada.",
+      "date": "Fecha",
+      "startTime": "Hora de Inicio",
+      "endTime": "Hora de Fin",
+      "location": "Ubicación (opcional)",
+      "notes": "Notas (opcional)",
+      "submit": "Enviar Propuesta",
+      "submitting": "Enviando...",
+      "submitSuccess": "Propuesta enviada exitosamente",
+      "submitError": "Error al enviar propuesta",
+      "fieldsRequired": "Fecha, hora de inicio y hora de fin son requeridos",
+      "yourProposals": "Tus Propuestas",
+      "noProposals": "Sin propuestas aún",
+      "cancel": "Cancelar",
+      "cancelSuccess": "Propuesta cancelada",
+      "cancelError": "Error al cancelar propuesta",
+      "acceptedBy": "Aceptado por {name}",
+      "status": {
+        "pending": "Pendiente",
+        "accepted": "Aceptado",
+        "declined": "Rechazado",
+        "cancelled": "Cancelado"
+      }
     }
   },
 
@@ -1091,6 +1132,35 @@
       "leaveError": "Error al salir",
       "noMemberships": "Aún no te has unido a ningún grupo"
     }
+  },
+
+  "photographerTimes": {
+    "title": "Horarios de Fotografía",
+    "addTime": "Agregar Horario",
+    "date": "Fecha",
+    "startTime": "Hora de Inicio",
+    "endTime": "Hora de Fin",
+    "location": "Ubicación (opcional)",
+    "notes": "Notas (opcional)",
+    "addTimeButton": "Agregar Horario",
+    "adding": "Agregando...",
+    "addSuccess": "Horario agregado exitosamente",
+    "addError": "Error al agregar horario",
+    "fieldsRequired": "Fecha, hora de inicio y hora de fin son requeridos",
+    "yourTimes": "Tus Horarios Publicados",
+    "noTimes": "No has publicado ningún horario aún",
+    "delete": "Eliminar",
+    "deleteSuccess": "Horario eliminado",
+    "deleteError": "Error al eliminar horario",
+    "bookedBy": "Reservado por {name}",
+    "pendingProposals": "Propuestas Pendientes",
+    "noProposals": "No hay propuestas pendientes de grupos de vivienda",
+    "accept": "Aceptar",
+    "decline": "Rechazar",
+    "acceptSuccess": "Propuesta aceptada y horario programado",
+    "declineSuccess": "Propuesta rechazada",
+    "actionError": "Error al procesar propuesta",
+    "declineReasonPrompt": "Ingresa una razón para rechazar (opcional):"
   },
 
   "resources": {

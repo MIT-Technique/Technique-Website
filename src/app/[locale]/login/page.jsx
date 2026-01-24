@@ -3,13 +3,11 @@ import Footer from "../../../components/Footer/Footer";
 import OrganizationAuthModal from "../../../components/OrganizationAuthModal/OrganizationAuthModal";
 import * as React from "react";
 import { useState } from "react";
-import Link from "next/link";
 import Box from "@mui/material/Box";
 import { Button } from "@mui/material";
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 export default function LoginPage() {
-  const locale = useLocale();
   const t = useTranslations('pages.login');
   const [orgModalOpen, setOrgModalOpen] = useState(false);
 
@@ -65,35 +63,15 @@ export default function LoginPage() {
             </Button>
           </Box>
 
-          {/* Organization Login Button */}
-          <div className="text-center mt-6 space-y-3">
-            <Button
-              variant="outlined"
+          {/* Organization Login Link */}
+          <div className="text-center mt-6">
+            <span className="text-sm text-text-muted">{t('organizationPrefix')} </span>
+            <button
               onClick={() => setOrgModalOpen(true)}
-              sx={{
-                borderColor: "#750014",
-                color: "#750014",
-                "&:hover": {
-                  borderColor: "#5C0010",
-                  backgroundColor: "rgba(117, 0, 20, 0.04)",
-                },
-                textTransform: "none",
-                fontWeight: 500,
-                py: 1,
-                px: 4,
-              }}
+              className="text-sm text-accent hover:underline"
             >
-              {t('organizationButton')}
-            </Button>
-            <div>
-              <span className="text-sm text-text-muted">{t('adminLinkPrefix')} </span>
-              <Link
-                href={`/${locale}/login/admin`}
-                className="text-sm text-accent hover:underline"
-              >
-                {t('adminLink')}
-              </Link>
-            </div>
+              {t('organizationLink')}
+            </button>
           </div>
 
           {/* Organization Auth Modal */}

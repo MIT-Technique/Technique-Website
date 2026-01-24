@@ -2,7 +2,7 @@ export type UserRole = 'admin' | 'staph' | 'club' | 'living_group_leader' | 'stu
 export type AuthProvider = 'mit_sso' | 'supabase_auth';
 export type ApprovalStatus = 'pending' | 'approved' | 'denied';
 export type LivingGroupStatus = 'active' | 'disabled' | 'pending';
-export type PromotionRequestType = 'staph_request';
+export type PromotionRequestType = 'staph_request' | 'photographer_request';
 export type RequestStatus = 'pending' | 'approved' | 'denied';
 
 export interface User {
@@ -245,4 +245,50 @@ export interface LivingGroupWithMemberCount extends LivingGroup {
 export interface SectionWithCounts extends DormSection {
   member_count: number;
   expected_count: number;
+}
+
+// Photographer permission types
+export interface PhotographerPermission {
+  id: string;
+  user_id: string;
+  approved_by: string | null;
+  approved_at: string | null;
+  is_active: boolean;
+  revoked_by: string | null;
+  revoked_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PhotographerPermissionWithUser extends PhotographerPermission {
+  user?: Pick<User, 'id' | 'email' | 'first_name' | 'last_name'>;
+  approver?: Pick<User, 'id' | 'email' | 'first_name' | 'last_name'>;
+}
+
+// Time proposal types (bidirectional scheduling)
+export type TimeProposalStatus = 'pending' | 'accepted' | 'declined' | 'cancelled';
+
+export interface TimeProposal {
+  id: string;
+  living_group_id: string;
+  proposed_by: string;
+  date: string;
+  start_time: string;
+  end_time: string;
+  location: string | null;
+  notes: string | null;
+  status: TimeProposalStatus;
+  accepted_by: string | null;
+  accepted_at: string | null;
+  declined_by: string | null;
+  declined_at: string | null;
+  decline_reason: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TimeProposalWithDetails extends TimeProposal {
+  living_group?: LivingGroup;
+  proposer?: Pick<User, 'id' | 'email' | 'first_name' | 'last_name'>;
+  accepter?: Pick<User, 'id' | 'email' | 'first_name' | 'last_name'>;
 }

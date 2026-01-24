@@ -48,9 +48,9 @@ function Navbar() {
       ],
     },
     {
-      label: t('purchase'),
+      label: t('yearbook'),
       dropdown: [
-        { href: `/${locale}/yearbook`, label: t('yearbook') },
+        { href: `/${locale}/purchase`, label: t('purchase') },
         { href: `/${locale}/seniors`, label: t('seniors') },
         { href: `/${locale}/parents`, label: t('parents') },
         { href: `/${locale}/alumni`, label: t('alumni') },
