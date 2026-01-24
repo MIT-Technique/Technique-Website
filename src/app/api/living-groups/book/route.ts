@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "../../../../lib/auth/session";
 import { createAdminClient } from "../../../../lib/supabase/admin";
-import { createLog } from "../../admin/logs/route";
+import { createLog } from "../../../../lib/admin-logs";
 
 // POST - Book a photoshoot time
 export async function POST(request: NextRequest) {

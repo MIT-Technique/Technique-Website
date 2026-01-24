@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "../../../../lib/auth/session";
 import { createAdminClient } from "../../../../lib/supabase/admin";
-import { createLog } from "../logs/route";
+import { createLog } from "../../../../lib/admin-logs";
 
 // PUT - Toggle is_staph boolean for a user (admin only)
 export async function PUT(request: NextRequest) {

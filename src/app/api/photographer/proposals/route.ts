@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "../../../../lib/auth/session";
 import { createAdminClient } from "../../../../lib/supabase/admin";
-import { createLog } from "../../admin/logs/route";
+import { createLog } from "../../../../lib/admin-logs";
 
 // Helper to check if user is staph or has active photographer permissions
 async function isStaphOrPhotographer(

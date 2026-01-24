@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "../../../../lib/auth/session";
 import { createAdminClient } from "../../../../lib/supabase/admin";
-import { createLog } from "../logs/route";
+import { createLog } from "../../../../lib/admin-logs";
 
 // GET - List all photoshoot times
 export async function GET(request: NextRequest) {

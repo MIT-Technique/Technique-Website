@@ -55,26 +55,3 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Failed to fetch logs" }, { status: 500 });
   }
 }
-
-// Helper function to create a log entry (exported for use in other routes)
-export async function createLog(
-  actorId: string,
-  actionType: string,
-  targetType: string,
-  targetId: string | null,
-  details: Record<string, unknown>
-) {
-  const supabase = createAdminClient();
-
-  const { error } = await supabase.from("admin_logs").insert({
-    actor_id: actorId,
-    action_type: actionType,
-    target_type: targetType,
-    target_id: targetId,
-    details,
-  });
-
-  if (error) {
-    console.error("Error creating log:", error);
-  }
-}

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "../../../../lib/auth/session";
 import { createAdminClient } from "../../../../lib/supabase/admin";
 import { UserRole } from "../../../../lib/supabase/types";
-import { createLog } from "../logs/route";
+import { createLog } from "../../../../lib/admin-logs";
 
 // GET - List all users
 export async function GET(request: NextRequest) {
