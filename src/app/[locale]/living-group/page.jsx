@@ -7,6 +7,22 @@ import { useUser } from '../../../hooks/useUser';
 import Footer from '../../../components/Footer/Footer';
 import TextField from "@mui/material/TextField";
 
+// Strip seconds from time string (HH:MM:SS -> HH:MM)
+function formatTime(time) {
+  if (!time) return '';
+  return time.slice(0, 5);
+}
+
+// MUI styling to match other forms
+const textFieldSx = {
+  "& .MuiOutlinedInput-root": {
+    "& fieldset": { borderColor: "#E5E5E5" },
+    "&:hover fieldset": { borderColor: "#D0D0D0" },
+    "&.Mui-focused fieldset": { borderColor: "#750014" },
+  },
+  "& .MuiInputLabel-root.Mui-focused": { color: "#750014" },
+};
+
 export default function LivingGroupPage() {
   const router = useRouter();
   const locale = useLocale();
@@ -48,6 +64,34 @@ export default function LivingGroupPage() {
   });
   const [submittingProposal, setSubmittingProposal] = useState(false);
   const [cancellingProposalId, setCancellingProposalId] = useState(null);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(0);
+  const ITEMS_PER_PAGE = 8;
+
+  // Expanded time slots (to show location/notes)
+  const [expandedTimeIds, setExpandedTimeIds] = useState(new Set());
+
+  // Toggle expansion for a time slot
+  function toggleTimeExpanded(timeId) {
+    setExpandedTimeIds(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(timeId)) {
+        newSet.delete(timeId);
+      } else {
+        newSet.add(timeId);
+      }
+      return newSet;
+    });
+  }
+
+  // Helper to get creator display name for time slots
+  function getCreatorLabel(time) {
+    if (!time?.creator) return t('unknownCreator');
+    if (time.creator.role === 'admin') return 'TNQ Photo';
+    const name = `${time.creator.first_name || ''} ${time.creator.last_name || ''}`.trim();
+    return name || time.creator.email || t('unknownCreator');
+  }
 
   useEffect(() => {
     if (!userLoading && (!isLoggedIn || user?.role !== 'living_group_leader')) {
@@ -419,7 +463,7 @@ export default function LivingGroupPage() {
                       })}
                     </p>
                     <p className="text-text-secondary">
-                      {bookedTime.start_time} - {bookedTime.end_time}
+                      {formatTime(bookedTime.start_time)} - {formatTime(bookedTime.end_time)} EST
                     </p>
                     {bookedTime.cancellation_requested && (
                       <p className="text-yellow-600 text-sm mt-2">{t('cancellationPending')}</p>
@@ -439,41 +483,98 @@ export default function LivingGroupPage() {
 
               {/* Available Times */}
               {!bookedTime && !isDisabled && (
-                <div>
-                  <h2 className="text-lg font-medium mb-4">{t('availableTimes')}</h2>
-                  {loading ? (
-                    <p className="text-text-secondary">Loading...</p>
-                  ) : availableTimes.length === 0 ? (
-                    <p className="text-text-secondary">{t('noTimes')}</p>
-                  ) : (
-                    <div className="space-y-3">
-                      {availableTimes.map((time) => (
-                        <div
-                          key={time.id}
-                          className="p-4 border border-border rounded-lg flex justify-between items-center"
+                <div className="bg-white border border-border rounded-lg p-6">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="font-medium">{t('availableTimes')}</h3>
+                    {availableTimes.length > ITEMS_PER_PAGE && (
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
+                          disabled={currentPage === 0}
+                          className="p-1 text-text-secondary hover:text-text disabled:opacity-30 disabled:cursor-not-allowed"
+                          aria-label="Previous page"
                         >
-                          <div>
-                            <p className="font-medium">
-                              {new Date(time.date).toLocaleDateString(locale, {
-                                weekday: 'long',
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric',
-                              })}
-                            </p>
-                            <p className="text-text-secondary text-sm">
-                              {time.start_time} - {time.end_time}
-                            </p>
-                          </div>
-                          <button
-                            onClick={() => handleBook(time.id)}
-                            disabled={booking || isFrozen}
-                            className="btn-primary text-sm"
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                          </svg>
+                        </button>
+                        <span className="text-sm text-text-secondary">
+                          {currentPage + 1} / {Math.ceil(availableTimes.length / ITEMS_PER_PAGE)}
+                        </span>
+                        <button
+                          onClick={() => setCurrentPage(p => Math.min(Math.ceil(availableTimes.length / ITEMS_PER_PAGE) - 1, p + 1))}
+                          disabled={currentPage >= Math.ceil(availableTimes.length / ITEMS_PER_PAGE) - 1}
+                          className="p-1 text-text-secondary hover:text-text disabled:opacity-30 disabled:cursor-not-allowed"
+                          aria-label="Next page"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  {loading ? (
+                    <p className="text-text-secondary text-sm">Loading...</p>
+                  ) : availableTimes.length === 0 ? (
+                    <p className="text-text-secondary text-sm">{t('noTimes')}</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {availableTimes.slice(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE).map((time) => {
+                        const hasDetails = time.location || time.notes;
+                        const isExpanded = expandedTimeIds.has(time.id);
+                        return (
+                          <div
+                            key={time.id}
+                            className={`px-3 py-2 border border-border rounded-lg ${hasDetails ? 'cursor-pointer' : ''}`}
+                            onClick={hasDetails ? () => toggleTimeExpanded(time.id) : undefined}
                           >
-                            {booking ? t('booking') : t('book')}
-                          </button>
-                        </div>
-                      ))}
+                            <div className="flex justify-between items-center">
+                              <div className="flex items-center gap-4 flex-1 min-w-0">
+                                <div className="flex items-center gap-2 flex-shrink-0">
+                                  {hasDetails && (
+                                    <svg
+                                      className={`w-4 h-4 text-text-muted transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                    </svg>
+                                  )}
+                                  <span className="font-medium text-sm">
+                                    {new Date(time.date).toLocaleDateString(locale, {
+                                      weekday: 'short',
+                                      month: 'short',
+                                      day: 'numeric',
+                                    })}
+                                  </span>
+                                  <span className="text-text-secondary text-sm">
+                                    {formatTime(time.start_time)} - {formatTime(time.end_time)} EST
+                                  </span>
+                                </div>
+                                <span className="text-text-muted text-xs">
+                                  {t('postedBy', { name: getCreatorLabel(time) })}
+                                </span>
+                              </div>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); handleBook(time.id); }}
+                                disabled={booking || isFrozen}
+                                className="btn-primary text-sm flex-shrink-0"
+                              >
+                                {booking ? t('booking') : t('book')}
+                              </button>
+                            </div>
+                            {/* Expandable details */}
+                            {isExpanded && hasDetails && (
+                              <div className="mt-2 pt-2 border-t border-border/50 text-xs text-text-muted space-y-0.5">
+                                {time.location && <p><span className="font-medium">{t('locationLabel')}:</span> {time.location}</p>}
+                                {time.notes && <p><span className="font-medium">{t('notesLabel')}:</span> {time.notes}</p>}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -481,141 +582,151 @@ export default function LivingGroupPage() {
 
               {/* Propose Time Section */}
               {!bookedTime && !isDisabled && (
-                <div className="mt-8 pt-8 border-t border-border">
-                  <h2 className="text-lg font-medium mb-2">{t('proposeTime.title')}</h2>
-                  <p className="text-text-secondary text-sm mb-4">{t('proposeTime.description')}</p>
+                <div className="mt-8">
+                  <div className="bg-white border border-border rounded-lg p-6">
+                    <h3 className="font-medium mb-2">{t('proposeTime.title')}</h3>
+                    <p className="text-text-secondary text-sm mb-2">{t('proposeTime.description')}</p>
+                    <p className="text-text-muted text-xs mb-4">{t('proposeTime.timezoneNote')}</p>
 
-                  <form onSubmit={handleSubmitProposal} className="space-y-4 mb-6">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <TextField
-                        type="date"
-                        label={t('proposeTime.date')}
-                        value={proposalForm.date}
-                        onChange={(e) => setProposalForm({ ...proposalForm, date: e.target.value })}
-                        InputLabelProps={{ shrink: true }}
-                        required
-                        size="small"
-                        fullWidth
-                      />
-                      <TextField
-                        type="time"
-                        label={t('proposeTime.startTime')}
-                        value={proposalForm.start_time}
-                        onChange={(e) => setProposalForm({ ...proposalForm, start_time: e.target.value })}
-                        InputLabelProps={{ shrink: true }}
-                        required
-                        size="small"
-                        fullWidth
-                      />
-                      <TextField
-                        type="time"
-                        label={t('proposeTime.endTime')}
-                        value={proposalForm.end_time}
-                        onChange={(e) => setProposalForm({ ...proposalForm, end_time: e.target.value })}
-                        InputLabelProps={{ shrink: true }}
-                        required
-                        size="small"
-                        fullWidth
-                      />
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <TextField
-                        label={t('proposeTime.location')}
-                        value={proposalForm.location}
-                        onChange={(e) => setProposalForm({ ...proposalForm, location: e.target.value })}
-                        size="small"
-                        fullWidth
-                      />
-                      <TextField
-                        label={t('proposeTime.notes')}
-                        value={proposalForm.notes}
-                        onChange={(e) => setProposalForm({ ...proposalForm, notes: e.target.value })}
-                        size="small"
-                        fullWidth
-                      />
-                    </div>
-                    <button
-                      type="submit"
-                      disabled={submittingProposal || isFrozen}
-                      className="btn-primary text-sm"
-                    >
-                      {submittingProposal ? t('proposeTime.submitting') : t('proposeTime.submit')}
-                    </button>
-                  </form>
+                    <form onSubmit={handleSubmitProposal} className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <TextField
+                          type="date"
+                          label={t('proposeTime.date')}
+                          value={proposalForm.date}
+                          onChange={(e) => setProposalForm({ ...proposalForm, date: e.target.value })}
+                          InputLabelProps={{ shrink: true }}
+                          required
+                          size="small"
+                          fullWidth
+                          sx={textFieldSx}
+                        />
+                        <TextField
+                          type="time"
+                          label={t('proposeTime.startTime')}
+                          value={proposalForm.start_time}
+                          onChange={(e) => setProposalForm({ ...proposalForm, start_time: e.target.value })}
+                          InputLabelProps={{ shrink: true }}
+                          required
+                          size="small"
+                          fullWidth
+                          sx={textFieldSx}
+                        />
+                        <TextField
+                          type="time"
+                          label={t('proposeTime.endTime')}
+                          value={proposalForm.end_time}
+                          onChange={(e) => setProposalForm({ ...proposalForm, end_time: e.target.value })}
+                          InputLabelProps={{ shrink: true }}
+                          required
+                          size="small"
+                          fullWidth
+                          sx={textFieldSx}
+                        />
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <TextField
+                          label={t('proposeTime.location')}
+                          value={proposalForm.location}
+                          onChange={(e) => setProposalForm({ ...proposalForm, location: e.target.value })}
+                          size="small"
+                          fullWidth
+                          sx={textFieldSx}
+                        />
+                        <TextField
+                          label={t('proposeTime.notes')}
+                          value={proposalForm.notes}
+                          onChange={(e) => setProposalForm({ ...proposalForm, notes: e.target.value })}
+                          size="small"
+                          fullWidth
+                          sx={textFieldSx}
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        disabled={submittingProposal || isFrozen}
+                        className="btn-primary text-sm"
+                      >
+                        {submittingProposal ? t('proposeTime.submitting') : t('proposeTime.submit')}
+                      </button>
+                    </form>
+                  </div>
 
                   {/* Your Proposals */}
-                  <h3 className="font-medium mb-3">{t('proposeTime.yourProposals')}</h3>
-                  {proposalsLoading ? (
-                    <p className="text-text-secondary text-sm">Loading...</p>
-                  ) : proposals.length === 0 ? (
-                    <p className="text-text-secondary text-sm">{t('proposeTime.noProposals')}</p>
-                  ) : (
-                    <div className="space-y-3">
-                      {proposals.map((proposal) => (
-                        <div
-                          key={proposal.id}
-                          className={`p-4 border rounded-lg ${
-                            proposal.status === 'pending'
-                              ? 'border-yellow-200 bg-yellow-50'
-                              : proposal.status === 'accepted'
-                              ? 'border-green-200 bg-green-50'
-                              : proposal.status === 'declined'
-                              ? 'border-red-200 bg-red-50'
-                              : 'border-gray-200 bg-gray-50'
-                          }`}
-                        >
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <p className="font-medium">
-                                {new Date(proposal.date).toLocaleDateString(locale, {
-                                  weekday: 'long',
-                                  year: 'numeric',
-                                  month: 'long',
-                                  day: 'numeric',
-                                })}
-                              </p>
-                              <p className="text-text-secondary text-sm">
-                                {proposal.start_time} - {proposal.end_time}
-                              </p>
-                              {proposal.location && (
-                                <p className="text-text-muted text-xs mt-1">{proposal.location}</p>
-                              )}
-                              <span className={`inline-block mt-2 text-xs px-2 py-0.5 rounded ${
-                                proposal.status === 'pending'
-                                  ? 'bg-yellow-200 text-yellow-800'
-                                  : proposal.status === 'accepted'
-                                  ? 'bg-green-200 text-green-800'
-                                  : proposal.status === 'declined'
-                                  ? 'bg-red-200 text-red-800'
-                                  : 'bg-gray-200 text-gray-800'
-                              }`}>
-                                {t(`proposeTime.status.${proposal.status}`)}
-                              </span>
-                              {proposal.status === 'declined' && proposal.decline_reason && (
-                                <p className="text-red-600 text-xs mt-1">{proposal.decline_reason}</p>
-                              )}
-                              {proposal.status === 'accepted' && proposal.accepter && (
-                                <p className="text-green-600 text-xs mt-1">
-                                  {t('proposeTime.acceptedBy', {
-                                    name: `${proposal.accepter.first_name || ''} ${proposal.accepter.last_name || ''}`.trim() || proposal.accepter.email,
+                  <div className="bg-white border border-border rounded-lg p-6 mt-6">
+                    <h3 className="font-medium mb-4">{t('proposeTime.yourProposals')}</h3>
+                    {proposalsLoading ? (
+                      <p className="text-text-secondary text-sm">Loading...</p>
+                    ) : proposals.length === 0 ? (
+                      <p className="text-text-secondary text-sm">{t('proposeTime.noProposals')}</p>
+                    ) : (
+                      <div className="space-y-3">
+                        {proposals.map((proposal) => (
+                          <div
+                            key={proposal.id}
+                            className={`p-4 border rounded-lg ${
+                              proposal.status === 'pending'
+                                ? 'border-yellow-200 bg-yellow-50'
+                                : proposal.status === 'accepted'
+                                ? 'border-green-200 bg-green-50'
+                                : proposal.status === 'declined'
+                                ? 'border-red-200 bg-red-50'
+                                : 'border-gray-200 bg-gray-50'
+                            }`}
+                          >
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <p className="font-medium">
+                                  {new Date(proposal.date).toLocaleDateString(locale, {
+                                    weekday: 'long',
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric',
                                   })}
                                 </p>
+                                <p className="text-text-secondary text-sm">
+                                  {formatTime(proposal.start_time)} - {formatTime(proposal.end_time)} EST
+                                </p>
+                                {proposal.location && (
+                                  <p className="text-text-muted text-xs mt-1">{proposal.location}</p>
+                                )}
+                                <span className={`inline-block mt-2 text-xs px-2 py-0.5 rounded ${
+                                  proposal.status === 'pending'
+                                    ? 'bg-yellow-200 text-yellow-800'
+                                    : proposal.status === 'accepted'
+                                    ? 'bg-green-200 text-green-800'
+                                    : proposal.status === 'declined'
+                                    ? 'bg-red-200 text-red-800'
+                                    : 'bg-gray-200 text-gray-800'
+                                }`}>
+                                  {t(`proposeTime.status.${proposal.status}`)}
+                                </span>
+                                {proposal.status === 'declined' && proposal.decline_reason && (
+                                  <p className="text-red-600 text-xs mt-1">{proposal.decline_reason}</p>
+                                )}
+                                {proposal.status === 'accepted' && proposal.accepter && (
+                                  <p className="text-green-600 text-xs mt-1">
+                                    {t('proposeTime.acceptedBy', {
+                                      name: `${proposal.accepter.first_name || ''} ${proposal.accepter.last_name || ''}`.trim() || proposal.accepter.email,
+                                    })}
+                                  </p>
+                                )}
+                              </div>
+                              {proposal.status === 'pending' && !isFrozen && (
+                                <button
+                                  onClick={() => handleCancelProposal(proposal.id)}
+                                  disabled={cancellingProposalId === proposal.id}
+                                  className="text-sm text-red-600 hover:text-red-700"
+                                >
+                                  {cancellingProposalId === proposal.id ? '...' : t('proposeTime.cancel')}
+                                </button>
                               )}
                             </div>
-                            {proposal.status === 'pending' && !isFrozen && (
-                              <button
-                                onClick={() => handleCancelProposal(proposal.id)}
-                                disabled={cancellingProposalId === proposal.id}
-                                className="text-sm text-red-600 hover:text-red-700"
-                              >
-                                {cancellingProposalId === proposal.id ? '...' : t('proposeTime.cancel')}
-                              </button>
-                            )}
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </>

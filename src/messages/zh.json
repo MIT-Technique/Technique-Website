@@ -335,8 +335,7 @@
         "scheduling": "预约管理",
         "myClubs": "我的社团",
         "myLivingGroups": "我的住宿组",
-        "adminTools": "管理工具",
-        "photographerTimes": "摄影时段"
+        "photographerTools": "Staph工具"
       },
       "myClubs": {
         "title": "我的社团",
@@ -392,13 +391,7 @@
       "promotion": {
         "title": "需要其他权限？",
         "description": "如果您代表社团或宿舍，可以申请角色变更。",
-        "requestButton": "申请角色变更",
-        "staphTitle": "需要TNQ工作人员权限？",
-        "staphRequestButton": "申请工作人员权限",
-        "requestPending": "申请待处理",
-        "photographerTitle": "想成为Technique摄影师吗？",
-        "photographerRequestButton": "申请摄影师权限",
-        "photographerActive": "活跃摄影师"
+        "requestButton": "申请角色变更"
       },
       "adminTools": {
         "title": "管理工具",
@@ -728,7 +721,7 @@
       "settings": "设置"
     },
     "stats": {
-      "pendingClubs": "待审核社团",
+      "pendingClubs": "未验证社团",
       "pendingRequests": "待处理请求",
       "upcomingPhotoshoots": "已预约拍摄",
       "cancellationRequests": "取消请求"
@@ -740,8 +733,8 @@
     "actions": {
       "managePhotoshoots": "管理拍摄时间",
       "managePhotoshootsDesc": "添加、编辑或删除拍摄时间段",
-      "reviewClubs": "审核社团",
-      "reviewClubsDesc": "批准或拒绝社团申请",
+      "reviewClubs": "审核晋升",
+      "reviewClubsDesc": "审核和批准晋升请求",
       "formSettings": "表单设置",
       "formSettingsDesc": "冻结或解冻表单"
     },
@@ -860,13 +853,18 @@
         "email": "邮箱",
         "name": "姓名",
         "role": "角色",
+        "staph": "工作人员",
         "status": "状态",
         "actions": "注册时间"
       },
       "active": "活跃",
       "inactive": "未激活",
+      "staphYes": "工作人员",
+      "staphNo": "否",
+      "grantStaphConfirm": "授予此用户工作人员权限？",
+      "revokeStaphConfirm": "撤销此用户的工作人员权限？",
       "requestType": "请求类型",
-      "staphRequest": "工作人员申请",
+      "staphRequest": "Staph申请",
       "clubPromotion": "社团提升",
       "lglPromotion": "宿舍负责人",
       "livingGroupName": "宿舍",
@@ -878,7 +876,11 @@
       "designateAdmin": "指定管理员",
       "designateConfirm": "将此工作人员指定为管理员？",
       "maxAdmins": "已达管理员上限 ({count}/{max})",
-      "designatedAdmins": "已指定管理员: {count}/{max}"
+      "designatedAdmins": "已指定管理员: {count}/{max}",
+      "logs": {
+        "title": "日志",
+        "noLogs": "暂无活动日志"
+      }
     },
     "settings": {
       "title": "设置",
@@ -1062,6 +1064,8 @@
   "livingGroupPage": {
     "title": "住宿组管理面板",
     "welcome": "欢迎，{name}",
+    "locationLabel": "地点",
+    "notesLabel": "备注",
     "tabs": {
       "scheduling": "预约管理",
       "members": "成员",
@@ -1083,6 +1087,8 @@
     "booking": "预约中...",
     "bookSuccess": "预约成功",
     "bookError": "预约失败",
+    "postedBy": "发布者：{name}",
+    "unknownCreator": "未知",
     "members": {
       "title": "成员",
       "totalMembers": "总成员数: {count}",
@@ -1109,7 +1115,8 @@
     },
     "proposeTime": {
       "title": "提议时间",
-      "description": "建议一个时间供摄影师接受。如果摄影师接受，您的拍照将会被安排。",
+      "description": "建议一个时间供Staph接受。如果Staph接受，您的拍照将会被安排。",
+      "timezoneNote": "所有时间均为美国东部标准时间（EST）",
       "date": "日期",
       "startTime": "开始时间",
       "endTime": "结束时间",
@@ -1170,7 +1177,8 @@
   },
 
   "photographerTimes": {
-    "title": "摄影时间",
+    "title": "Staph排期",
+    "timezoneNote": "所有时间均为美国东部标准时间（EST）",
     "addTime": "添加时间段",
     "date": "日期",
     "startTime": "开始时间",
@@ -1183,13 +1191,17 @@
     "addError": "添加时间段失败",
     "fieldsRequired": "日期、开始时间和结束时间为必填项",
     "yourTimes": "您发布的时间段",
-    "noTimes": "您尚未发布任何时间段",
+    "allTimes": "所有已发布的时间段",
+    "noTimes": "尚未发布任何时间段",
+    "postedBy": "发布者：{name}",
+    "unknownCreator": "未知",
     "delete": "删除",
+    "confirm": "确认",
     "deleteSuccess": "时间段已删除",
     "deleteError": "删除时间段失败",
     "bookedBy": "已被{name}预约",
-    "pendingProposals": "待处理提议",
-    "noProposals": "暂无来自住宿组的待处理提议",
+    "pendingProposals": "提议的时间段",
+    "noProposals": "暂无来自住宿组的提议时间段",
     "accept": "接受",
     "decline": "拒绝",
     "acceptSuccess": "提议已接受并安排时间",

@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
       .from('promotion_requests')
       .select(`
         *,
-        user:users(id, email, first_name, last_name, role),
+        user:users!promotion_requests_user_id_fkey(id, email, first_name, last_name, role),
         reviewed_by_user:users!promotion_requests_reviewed_by_fkey(id, email, first_name, last_name)
       `)
       .order('created_at', { ascending: false });
@@ -92,7 +92,7 @@ export async function PUT(request: NextRequest) {
     // Get the request details
     const { data: promotionRequest, error: fetchError } = await supabase
       .from('promotion_requests')
-      .select('*, user:users(id, email, role)')
+      .select('*, user:users!promotion_requests_user_id_fkey(id, email, role)')
       .eq('id', requestId)
       .single();
 

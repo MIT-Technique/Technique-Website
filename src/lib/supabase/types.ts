@@ -9,6 +9,7 @@ export interface User {
   id: string;
   email: string;
   role: UserRole;
+  is_staph: boolean;
   first_name: string | null;
   last_name: string | null;
   major: string | null;

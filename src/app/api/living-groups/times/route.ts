@@ -30,10 +30,18 @@ export async function GET(request: NextRequest) {
       .eq('user_id', user.id)
       .single();
 
-    // Get available (unbooked) times
+    // Get available (unbooked) times with creator info
     const { data: availableTimes, error } = await supabase
       .from('photoshoot_times')
-      .select('id, date, start_time, end_time, notes')
+      .select(`
+        id,
+        date,
+        start_time,
+        end_time,
+        notes,
+        created_by,
+        creator:users!photoshoot_times_created_by_fkey(id, email, first_name, last_name, role)
+      `)
       .is('living_group_id', null)
       .is('cancelled_at', null)
       .gte('date', new Date().toISOString().split('T')[0])
@@ -48,12 +56,15 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get user's booked time (if any)
+    // Get user's booked time (if any) with creator info
     let bookedTime = null;
     if (livingGroup) {
       const { data: booked } = await supabase
         .from('photoshoot_times')
-        .select('*')
+        .select(`
+          *,
+          creator:users!photoshoot_times_created_by_fkey(id, email, first_name, last_name, role)
+        `)
         .eq('living_group_id', livingGroup.id)
         .is('cancelled_at', null)
         .single();

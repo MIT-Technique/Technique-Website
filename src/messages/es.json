@@ -335,8 +335,7 @@
         "scheduling": "Programación",
         "myClubs": "Mis Clubes",
         "myLivingGroups": "Mis Grupos de Vivienda",
-        "adminTools": "Herramientas de Admin",
-        "photographerTimes": "Horarios de Fotografía"
+        "photographerTools": "Herramientas de Staph"
       },
       "myClubs": {
         "title": "Mis Clubes",
@@ -392,13 +391,7 @@
       "promotion": {
         "title": "¿Necesitas otro acceso?",
         "description": "Solicita un cambio de rol si representas un club o grupo de vivienda.",
-        "requestButton": "Solicitar Cambio de Rol",
-        "staphTitle": "¿Necesitas acceso de staph TNQ?",
-        "staphRequestButton": "Solicitar Acceso Staph",
-        "requestPending": "Solicitud Pendiente",
-        "photographerTitle": "¿Quieres ser fotógrafo de Technique?",
-        "photographerRequestButton": "Solicitar Acceso de Fotógrafo",
-        "photographerActive": "Fotógrafo Activo"
+        "requestButton": "Solicitar Cambio de Rol"
       },
       "adminTools": {
         "title": "Herramientas de Admin",
@@ -728,7 +721,7 @@
       "settings": "Configuración"
     },
     "stats": {
-      "pendingClubs": "Clubes Pendientes",
+      "pendingClubs": "Clubes No Verificados",
       "pendingRequests": "Solicitudes Pendientes",
       "upcomingPhotoshoots": "Sesiones Reservadas",
       "cancellationRequests": "Solicitudes de Cancelación"
@@ -740,8 +733,8 @@
     "actions": {
       "managePhotoshoots": "Gestionar Sesiones",
       "managePhotoshootsDesc": "Agregar, editar o eliminar horarios de sesiones",
-      "reviewClubs": "Revisar Clubes",
-      "reviewClubsDesc": "Aprobar o rechazar solicitudes de clubes",
+      "reviewClubs": "Revisar Promociones",
+      "reviewClubsDesc": "Revisar y aprobar solicitudes de promoción",
       "formSettings": "Configuración de Formularios",
       "formSettingsDesc": "Congelar o descongelar formularios"
     },
@@ -860,11 +853,16 @@
         "email": "Email",
         "name": "Nombre",
         "role": "Rol",
+        "staph": "Staph",
         "status": "Estado",
         "actions": "Registrado"
       },
       "active": "Activo",
       "inactive": "Inactivo",
+      "staphYes": "Staph",
+      "staphNo": "No",
+      "grantStaphConfirm": "¿Conceder acceso staph a este usuario?",
+      "revokeStaphConfirm": "¿Revocar acceso staph de este usuario?",
       "requestType": "Tipo de Solicitud",
       "staphRequest": "Solicitud de Staph",
       "clubPromotion": "Promoción a Club",
@@ -878,7 +876,11 @@
       "designateAdmin": "Designar Admin",
       "designateConfirm": "¿Designar a este staph como admin?",
       "maxAdmins": "Máximo de admins alcanzado ({count}/{max})",
-      "designatedAdmins": "Admins Designados: {count}/{max}"
+      "designatedAdmins": "Admins Designados: {count}/{max}",
+      "logs": {
+        "title": "Registros",
+        "noLogs": "No hay registros de actividad todavía"
+      }
     },
     "settings": {
       "title": "Configuración",
@@ -1062,6 +1064,8 @@
   "livingGroupPage": {
     "title": "Panel del Grupo de Vivienda",
     "welcome": "Bienvenido, {name}",
+    "locationLabel": "Ubicación",
+    "notesLabel": "Notas",
     "tabs": {
       "scheduling": "Programación",
       "members": "Miembros",
@@ -1083,6 +1087,8 @@
     "booking": "Reservando...",
     "bookSuccess": "Horario reservado exitosamente",
     "bookError": "Error al reservar horario",
+    "postedBy": "Publicado por {name}",
+    "unknownCreator": "Desconocido",
     "members": {
       "title": "Miembros",
       "totalMembers": "Total de Miembros: {count}",
@@ -1109,7 +1115,8 @@
     },
     "proposeTime": {
       "title": "Proponer un Horario",
-      "description": "Sugiere un horario para que los fotógrafos acepten. Si un fotógrafo acepta, tu sesión será programada.",
+      "description": "Sugiere un horario para que el staph acepte. Si el staph acepta, tu sesión será programada.",
+      "timezoneNote": "Todos los horarios están en Hora Estándar del Este (EST)",
       "date": "Fecha",
       "startTime": "Hora de Inicio",
       "endTime": "Hora de Fin",
@@ -1170,7 +1177,8 @@
   },
 
   "photographerTimes": {
-    "title": "Horarios de Fotografía",
+    "title": "Programación de Staph",
+    "timezoneNote": "Todos los horarios están en Hora Estándar del Este (EST)",
     "addTime": "Agregar Horario",
     "date": "Fecha",
     "startTime": "Hora de Inicio",
@@ -1183,13 +1191,17 @@
     "addError": "Error al agregar horario",
     "fieldsRequired": "Fecha, hora de inicio y hora de fin son requeridos",
     "yourTimes": "Tus Horarios Publicados",
-    "noTimes": "No has publicado ningún horario aún",
+    "allTimes": "Todos los Horarios Publicados",
+    "noTimes": "No se han publicado horarios aún",
+    "postedBy": "Publicado por {name}",
+    "unknownCreator": "Desconocido",
     "delete": "Eliminar",
+    "confirm": "Confirmar",
     "deleteSuccess": "Horario eliminado",
     "deleteError": "Error al eliminar horario",
     "bookedBy": "Reservado por {name}",
-    "pendingProposals": "Propuestas Pendientes",
-    "noProposals": "No hay propuestas pendientes de grupos de vivienda",
+    "pendingProposals": "Horarios Propuestos",
+    "noProposals": "No hay horarios propuestos de grupos de vivienda",
     "accept": "Aceptar",
     "decline": "Rechazar",
     "acceptSuccess": "Propuesta aceptada y horario programado",

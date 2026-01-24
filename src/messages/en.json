@@ -335,8 +335,7 @@
         "scheduling": "Scheduling",
         "myClubs": "My Clubs",
         "myLivingGroups": "My Living Groups",
-        "adminTools": "Admin Tools",
-        "photographerTimes": "Photography Times"
+        "photographerTools": "Staph Tools"
       },
       "myClubs": {
         "title": "My Clubs",
@@ -392,13 +391,7 @@
       "promotion": {
         "title": "Need different access?",
         "description": "Request a role change if you represent a club or living group.",
-        "requestButton": "Request Role Change",
-        "staphTitle": "Need TNQ staph access?",
-        "staphRequestButton": "Request Staph Access",
-        "requestPending": "Request Pending",
-        "photographerTitle": "Want to become a Technique photographer?",
-        "photographerRequestButton": "Request Photographer Access",
-        "photographerActive": "Active Photographer"
+        "requestButton": "Request Role Change"
       },
       "adminTools": {
         "title": "Admin Tools",
@@ -727,7 +720,7 @@
       "settings": "Settings"
     },
     "stats": {
-      "pendingClubs": "Pending Clubs",
+      "pendingClubs": "Unverified Clubs",
       "pendingRequests": "Pending Requests",
       "upcomingPhotoshoots": "Booked Photoshoots",
       "cancellationRequests": "Cancellation Requests"
@@ -739,8 +732,8 @@
     "actions": {
       "managePhotoshoots": "Manage Photoshoots",
       "managePhotoshootsDesc": "Add, edit, or remove photoshoot time slots",
-      "reviewClubs": "Review Clubs",
-      "reviewClubsDesc": "Approve or deny pending club submissions",
+      "reviewClubs": "Review Promotions",
+      "reviewClubsDesc": "Review and approve promotion requests",
       "formSettings": "Form Settings",
       "formSettingsDesc": "Freeze or unfreeze forms"
     },
@@ -859,11 +852,16 @@
         "email": "Email",
         "name": "Name",
         "role": "Role",
+        "staph": "Staph",
         "status": "Status",
         "actions": "Joined"
       },
       "active": "Active",
       "inactive": "Inactive",
+      "staphYes": "Staph",
+      "staphNo": "No",
+      "grantStaphConfirm": "Grant staph access to this user?",
+      "revokeStaphConfirm": "Revoke staph access from this user?",
       "requestType": "Request Type",
       "staphRequest": "Staph Request",
       "clubPromotion": "Club Promotion",
@@ -877,7 +875,11 @@
       "designateAdmin": "Designate Admin",
       "designateConfirm": "Designate this staph member as admin?",
       "maxAdmins": "Max admins reached ({count}/{max})",
-      "designatedAdmins": "Designated Admins: {count}/{max}"
+      "designatedAdmins": "Designated Admins: {count}/{max}",
+      "logs": {
+        "title": "Logs",
+        "noLogs": "No activity logs yet"
+      }
     },
     "settings": {
       "title": "Settings",
@@ -1061,6 +1063,8 @@
   "livingGroupPage": {
     "title": "Living Group Dashboard",
     "welcome": "Welcome, {name}",
+    "locationLabel": "Location",
+    "notesLabel": "Notes",
     "tabs": {
       "scheduling": "Scheduling",
       "members": "Members",
@@ -1082,6 +1086,8 @@
     "booking": "Booking...",
     "bookSuccess": "Time slot booked successfully",
     "bookError": "Failed to book time slot",
+    "postedBy": "Posted by {name}",
+    "unknownCreator": "Unknown",
     "members": {
       "title": "Members",
       "totalMembers": "Total Members: {count}",
@@ -1108,7 +1114,8 @@
     },
     "proposeTime": {
       "title": "Propose a Time",
-      "description": "Suggest a time for photographers to accept. If a photographer accepts, your photoshoot will be scheduled.",
+      "description": "Suggest a time for staph to accept. If staph accepts, your photoshoot will be scheduled.",
+      "timezoneNote": "All times are in Eastern Standard Time (EST)",
       "date": "Date",
       "startTime": "Start Time",
       "endTime": "End Time",
@@ -1169,7 +1176,8 @@
   },
 
   "photographerTimes": {
-    "title": "Photography Times",
+    "title": "Staph Scheduling",
+    "timezoneNote": "All times are in Eastern Standard Time (EST)",
     "addTime": "Add Time Slot",
     "date": "Date",
     "startTime": "Start Time",
@@ -1182,13 +1190,17 @@
     "addError": "Failed to add time slot",
     "fieldsRequired": "Date, start time, and end time are required",
     "yourTimes": "Your Posted Times",
-    "noTimes": "You haven't posted any times yet",
+    "allTimes": "All Posted Times",
+    "noTimes": "No times have been posted yet",
+    "postedBy": "Posted by {name}",
+    "unknownCreator": "Unknown",
     "delete": "Delete",
+    "confirm": "Confirm",
     "deleteSuccess": "Time slot deleted",
     "deleteError": "Failed to delete time slot",
     "bookedBy": "Booked by {name}",
-    "pendingProposals": "Pending Proposals",
-    "noProposals": "No pending proposals from living groups",
+    "pendingProposals": "Proposed Timeslots",
+    "noProposals": "No proposed timeslots from living groups",
     "accept": "Accept",
     "decline": "Decline",
     "acceptSuccess": "Proposal accepted and time scheduled",

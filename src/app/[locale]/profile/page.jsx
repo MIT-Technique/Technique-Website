@@ -14,6 +14,12 @@ import Select from "@mui/material/Select";
 import InputLabel from "@mui/material/InputLabel";
 import { Button } from "@mui/material";
 
+// Strip seconds from time string (HH:MM:SS -> HH:MM)
+function formatTime(time) {
+  if (!time) return '';
+  return time.slice(0, 5);
+}
+
 // MUI styling
 const textFieldSx = {
   "& .MuiOutlinedInput-root": {
@@ -100,14 +106,6 @@ export default function ProfilePage() {
   // Translations for living groups
   const tLg = useTranslations('joinLivingGroup');
 
-  // Staph request state
-  const [staphRequestPending, setStaphRequestPending] = useState(false);
-  const [staphRequestSubmitting, setStaphRequestSubmitting] = useState(false);
-
-  // Photographer state
-  const [isPhotographer, setIsPhotographer] = useState(false);
-  const [photographerRequestPending, setPhotographerRequestPending] = useState(false);
-  const [photographerRequestSubmitting, setPhotographerRequestSubmitting] = useState(false);
 
   // Redirect admin to dashboard
   useEffect(() => {
@@ -162,85 +160,7 @@ export default function ProfilePage() {
     }
   }, [isLoggedIn, user]);
 
-  // Check for pending staph request for students
-  useEffect(() => {
-    if (isLoggedIn && user?.role === 'student') {
-      checkStaphRequest();
-    }
-  }, [isLoggedIn, user]);
 
-  // Check photographer status for students
-  useEffect(() => {
-    if (isLoggedIn && user?.role === 'student') {
-      checkPhotographerStatus();
-    }
-  }, [isLoggedIn, user]);
-
-  async function checkStaphRequest() {
-    try {
-      const res = await fetch('/api/user/request-promotion');
-      const data = await res.json();
-      const pendingStaphRequest = (data.requests || []).find(
-        r => r.request_type === 'staph_request' && r.status === 'pending'
-      );
-      setStaphRequestPending(!!pendingStaphRequest);
-    } catch (error) {
-      console.error('Error checking staph request:', error);
-    }
-  }
-
-  async function handleStaphRequest() {
-    setStaphRequestSubmitting(true);
-    try {
-      const res = await fetch('/api/user/request-promotion', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ request_type: 'staph_request' }),
-      });
-      if (res.ok) {
-        setStaphRequestPending(true);
-      } else {
-        const data = await res.json();
-        console.error('Error submitting staph request:', data.error);
-      }
-    } catch (error) {
-      console.error('Error submitting staph request:', error);
-    } finally {
-      setStaphRequestSubmitting(false);
-    }
-  }
-
-  async function checkPhotographerStatus() {
-    try {
-      const res = await fetch('/api/photographer/status');
-      const data = await res.json();
-      setIsPhotographer(data.isPhotographer);
-      setPhotographerRequestPending(data.hasPendingRequest);
-    } catch (error) {
-      console.error('Error checking photographer status:', error);
-    }
-  }
-
-  async function handlePhotographerRequest() {
-    setPhotographerRequestSubmitting(true);
-    try {
-      const res = await fetch('/api/user/request-promotion', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ request_type: 'photographer_request' }),
-      });
-      if (res.ok) {
-        setPhotographerRequestPending(true);
-      } else {
-        const data = await res.json();
-        console.error('Error submitting photographer request:', data.error);
-      }
-    } catch (error) {
-      console.error('Error submitting photographer request:', error);
-    } finally {
-      setPhotographerRequestSubmitting(false);
-    }
-  }
 
   async function fetchBioData() {
     try {
@@ -604,20 +524,19 @@ export default function ProfilePage() {
   function getTabs() {
     const tabs = [{ id: 'profile', label: t('tabs.profile') }];
 
+    // Staph users get Staph Tools tab right after Profile
+    if (user?.is_staph) {
+      tabs.push({ id: 'photographerTools', label: t('tabs.photographerTools') });
+    }
+
     if (user?.role === 'student') {
       tabs.push({ id: 'myClubs', label: t('tabs.myClubs') });
       tabs.push({ id: 'myLivingGroups', label: t('tabs.myLivingGroups') });
-      // Photographers get their times tab
-      if (isPhotographer) {
-        tabs.push({ id: 'photographerTimes', label: t('tabs.photographerTimes') });
-      }
     } else if (user?.role === 'club') {
       tabs.push({ id: 'club', label: t('tabs.clubInfo') });
     } else if (user?.role === 'living_group_leader') {
       tabs.push({ id: 'scheduling', label: t('tabs.scheduling') });
       tabs.push({ id: 'myClubs', label: t('tabs.myClubs') });
-    } else if (user?.role === 'staph') {
-      tabs.push({ id: 'adminTools', label: t('tabs.adminTools') });
     }
 
     return tabs;
@@ -711,45 +630,10 @@ export default function ProfilePage() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-text-secondary">{t('profile.role')}</span>
-                    <span className="capitalize">{user?.role?.replace('_', ' ')}</span>
+                    <span className="capitalize">{user?.is_staph ? 'Staph' : user?.role?.replace('_', ' ')}</span>
                   </div>
                 </div>
 
-                {/* Staph and Photographer requests for students - small and unobtrusive */}
-                {user?.role === 'student' && (
-                  <div className="mt-6 pt-4 border-t border-border/50 space-y-2">
-                    <p className="text-xs text-text-muted">
-                      {t('promotion.staphTitle')}{' '}
-                      {staphRequestPending ? (
-                        <span className="text-yellow-600">{t('promotion.requestPending')}</span>
-                      ) : (
-                        <button
-                          onClick={handleStaphRequest}
-                          disabled={staphRequestSubmitting}
-                          className="text-accent hover:underline disabled:opacity-50"
-                        >
-                          {staphRequestSubmitting ? '...' : t('promotion.staphRequestButton')}
-                        </button>
-                      )}
-                    </p>
-                    <p className="text-xs text-text-muted">
-                      {t('promotion.photographerTitle')}{' '}
-                      {isPhotographer ? (
-                        <span className="text-green-600">{t('promotion.photographerActive')}</span>
-                      ) : photographerRequestPending ? (
-                        <span className="text-yellow-600">{t('promotion.requestPending')}</span>
-                      ) : (
-                        <button
-                          onClick={handlePhotographerRequest}
-                          disabled={photographerRequestSubmitting}
-                          className="text-accent hover:underline disabled:opacity-50"
-                        >
-                          {photographerRequestSubmitting ? '...' : t('promotion.photographerRequestButton')}
-                        </button>
-                      )}
-                    </p>
-                  </div>
-                )}
               </div>
 
               {/* Student Information Section */}
@@ -996,7 +880,7 @@ export default function ProfilePage() {
                       })}
                     </p>
                     <p className="text-text-secondary">
-                      {bookedTime.start_time} - {bookedTime.end_time}
+                      {formatTime(bookedTime.start_time)} - {formatTime(bookedTime.end_time)} EST
                     </p>
                     {bookedTime.location && (
                       <p className="text-text-secondary text-sm mt-1">
@@ -1048,7 +932,7 @@ export default function ProfilePage() {
                               })}
                             </p>
                             <p className="text-text-secondary text-sm">
-                              {time.start_time} - {time.end_time}
+                              {formatTime(time.start_time)} - {formatTime(time.end_time)} EST
                             </p>
                           </div>
                           <button
@@ -1471,30 +1355,11 @@ export default function ProfilePage() {
             </div>
           )}
 
-          {/* Admin Tools Tab - for staph users */}
-          {activeTab === 'adminTools' && user?.role === 'staph' && (
-            <div className="space-y-6">
-              <div className="bg-white border border-border rounded-lg p-6">
-                <h2 className="text-lg font-semibold text-text-primary mb-4">
-                  {t('adminTools.title')}
-                </h2>
-                <p className="text-text-secondary mb-4">
-                  {t('adminTools.clubMaterialsComingSoon')}
-                </p>
-                <a
-                  href={`/${locale}/dashboard`}
-                  className="inline-block px-4 py-2 bg-accent text-white rounded hover:bg-accent/90 transition-colors"
-                >
-                  {t('adminTools.openDashboard')}
-                </a>
-              </div>
-            </div>
-          )}
-
-          {/* Photographer Times Tab - for students with photographer permission */}
-          {activeTab === 'photographerTimes' && user?.role === 'student' && isPhotographer && (
+          {/* Staph Tools Tab - for staph users */}
+          {activeTab === 'photographerTools' && user?.is_staph && (
             <PhotographerTimesSection />
           )}
+
         </section>
       </main>
       <Footer />

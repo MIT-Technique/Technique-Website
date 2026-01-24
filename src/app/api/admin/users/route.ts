@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "../../../../lib/auth/session";
 import { createAdminClient } from "../../../../lib/supabase/admin";
 import { UserRole } from "../../../../lib/supabase/types";
+import { createLog } from "../logs/route";
 
 // GET - List all users
 export async function GET(request: NextRequest) {
@@ -112,6 +113,15 @@ export async function PUT(request: NextRequest) {
         { error: "Failed to update user" },
         { status: 500 }
       );
+    }
+
+    // Log role change
+    if (role && existingUser?.role !== role) {
+      await createLog(user.id, "role_change", "user", userId, {
+        old_role: existingUser?.role,
+        new_role: role,
+        target_email: updatedUser?.email,
+      });
     }
 
     // If changing role to 'club' and user wasn't already a club, create clubs entry

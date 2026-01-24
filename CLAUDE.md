@@ -721,6 +721,8 @@ approved_at timestamp with time zone,
 created_at timestamp with time zone DEFAULT now(),
 updated_at timestamp with time zone DEFAULT now(),
 has_leader boolean DEFAULT false,
+document_links text,
+document_notes text,
 CONSTRAINT clubs_pkey PRIMARY KEY (id),
 CONSTRAINT clubs_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
 CONSTRAINT clubs_approved_by_fkey FOREIGN KEY (approved_by) REFERENCES public.users(id)
@@ -732,6 +734,11 @@ section_name character varying NOT NULL,
 display_order integer DEFAULT 0,
 created_at timestamp with time zone DEFAULT now(),
 CONSTRAINT dorm_sections_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.export_club_members (
+club_name text NOT NULL,
+row_index integer NOT NULL,
+member_name text
 );
 CREATE TABLE public.form_settings (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -898,6 +905,7 @@ supabase_auth_id uuid,
 is_active boolean DEFAULT true,
 created_at timestamp with time zone DEFAULT now(),
 updated_at timestamp with time zone DEFAULT now(),
+is_staph boolean DEFAULT false,
 CONSTRAINT users_pkey PRIMARY KEY (id),
 CONSTRAINT users_supabase_auth_id_fkey FOREIGN KEY (supabase_auth_id) REFERENCES auth.users(id)
 );
@@ -971,6 +979,7 @@ When working on this project:
 7. **Clean build cache** if encountering module errors
 8. **NEVER change `getSession` imports in `/api/userSignIn`** - must use `lib/lib.ts`
 9. **Understand the dual session system** - see "CRITICAL: Authentication System Rules" above
+10. **Update Times Properly** - All posted times should be in EST, and all times shown should explicitly mention EST.
 
 ### Common Issues
 

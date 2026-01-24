@@ -4,12 +4,29 @@ import { useEffect, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import TextField from "@mui/material/TextField";
 
+// Strip seconds from time string (HH:MM:SS -> HH:MM)
+function formatTime(time) {
+  if (!time) return '';
+  return time.slice(0, 5);
+}
+
+// MUI styling to match other forms
+const textFieldSx = {
+  "& .MuiOutlinedInput-root": {
+    "& fieldset": { borderColor: "#E5E5E5" },
+    "&:hover fieldset": { borderColor: "#D0D0D0" },
+    "&.Mui-focused fieldset": { borderColor: "#750014" },
+  },
+  "& .MuiInputLabel-root.Mui-focused": { color: "#750014" },
+};
+
 export default function PhotographerTimesSection() {
   const locale = useLocale();
   const t = useTranslations('photographerTimes');
 
   // Time slots state
   const [times, setTimes] = useState([]);
+  const [currentUserId, setCurrentUserId] = useState(null);
   const [timesLoading, setTimesLoading] = useState(true);
   const [timeForm, setTimeForm] = useState({
     date: '',
@@ -20,13 +37,48 @@ export default function PhotographerTimesSection() {
   });
   const [submittingTime, setSubmittingTime] = useState(false);
   const [deletingTimeId, setDeletingTimeId] = useState(null);
+  const [confirmingDeleteId, setConfirmingDeleteId] = useState(null);
 
   // Proposals state
   const [proposals, setProposals] = useState([]);
   const [proposalsLoading, setProposalsLoading] = useState(true);
   const [processingProposalId, setProcessingProposalId] = useState(null);
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(0);
+  const ITEMS_PER_PAGE = 8;
+
+  // Expanded time slots (to show location/notes)
+  const [expandedTimeIds, setExpandedTimeIds] = useState(new Set());
+  const [expandedProposalIds, setExpandedProposalIds] = useState(new Set());
+
   const [message, setMessage] = useState({ type: '', text: '' });
+
+  // Toggle expansion for a time slot
+  function toggleTimeExpanded(timeId) {
+    setExpandedTimeIds(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(timeId)) {
+        newSet.delete(timeId);
+      } else {
+        newSet.add(timeId);
+      }
+      return newSet;
+    });
+  }
+
+  // Toggle expansion for a proposal
+  function toggleProposalExpanded(proposalId) {
+    setExpandedProposalIds(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(proposalId)) {
+        newSet.delete(proposalId);
+      } else {
+        newSet.add(proposalId);
+      }
+      return newSet;
+    });
+  }
 
   useEffect(() => {
     fetchTimes();
@@ -39,11 +91,20 @@ export default function PhotographerTimesSection() {
       const res = await fetch('/api/photographer/times');
       const data = await res.json();
       setTimes(data.times || []);
+      setCurrentUserId(data.currentUserId || null);
     } catch (error) {
       console.error('Error fetching times:', error);
     } finally {
       setTimesLoading(false);
     }
+  }
+
+  // Helper to get creator display name
+  function getCreatorLabel(time) {
+    if (!time.creator) return t('unknownCreator');
+    if (time.creator.role === 'admin') return 'TNQ Photo';
+    const name = `${time.creator.first_name || ''} ${time.creator.last_name || ''}`.trim();
+    return name || time.creator.email || t('unknownCreator');
   }
 
   async function fetchProposals() {
@@ -98,8 +159,24 @@ export default function PhotographerTimesSection() {
     }
   }
 
+  function handleDeleteClick(e, timeId) {
+    e.stopPropagation();
+    if (confirmingDeleteId === timeId) {
+      // Second click - actually delete
+      handleDeleteTime(timeId);
+    } else {
+      // First click - show confirmation
+      setConfirmingDeleteId(timeId);
+      // Auto-clear confirmation after 3 seconds
+      setTimeout(() => {
+        setConfirmingDeleteId(prev => prev === timeId ? null : prev);
+      }, 3000);
+    }
+  }
+
   async function handleDeleteTime(timeId) {
     setDeletingTimeId(timeId);
+    setConfirmingDeleteId(null);
     setMessage({ type: '', text: '' });
 
     try {
@@ -172,6 +249,7 @@ export default function PhotographerTimesSection() {
       {/* Add Time Slot Form */}
       <div className="bg-white border border-border rounded-lg p-6">
         <h3 className="font-medium mb-4">{t('addTime')}</h3>
+        <p className="text-text-muted text-xs mb-4">{t('timezoneNote')}</p>
         <form onSubmit={handleSubmitTime} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <TextField
@@ -231,63 +309,117 @@ export default function PhotographerTimesSection() {
         </form>
       </div>
 
-      {/* Your Posted Times */}
+      {/* All Posted Times */}
       <div className="bg-white border border-border rounded-lg p-6">
-        <h3 className="font-medium mb-4">{t('yourTimes')}</h3>
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="font-medium">{t('allTimes')}</h3>
+          {times.length > ITEMS_PER_PAGE && (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
+                disabled={currentPage === 0}
+                className="p-1 text-text-secondary hover:text-text disabled:opacity-30 disabled:cursor-not-allowed"
+                aria-label="Previous page"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <span className="text-sm text-text-secondary">
+                {currentPage + 1} / {Math.ceil(times.length / ITEMS_PER_PAGE)}
+              </span>
+              <button
+                onClick={() => setCurrentPage(p => Math.min(Math.ceil(times.length / ITEMS_PER_PAGE) - 1, p + 1))}
+                disabled={currentPage >= Math.ceil(times.length / ITEMS_PER_PAGE) - 1}
+                className="p-1 text-text-secondary hover:text-text disabled:opacity-30 disabled:cursor-not-allowed"
+                aria-label="Next page"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          )}
+        </div>
         {timesLoading ? (
           <p className="text-text-secondary text-sm">Loading...</p>
         ) : times.length === 0 ? (
           <p className="text-text-secondary text-sm">{t('noTimes')}</p>
         ) : (
-          <div className="space-y-3">
-            {times.map((time) => (
-              <div
-                key={time.id}
-                className={`p-4 border rounded-lg ${
-                  time.living_group_id
-                    ? 'border-green-200 bg-green-50'
-                    : 'border-border'
-                }`}
-              >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="font-medium">
-                      {new Date(time.date).toLocaleDateString(locale, {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })}
-                    </p>
-                    <p className="text-text-secondary text-sm">
-                      {time.start_time} - {time.end_time}
-                    </p>
-                    {time.location && (
-                      <p className="text-text-muted text-xs mt-1">{time.location}</p>
-                    )}
-                    {time.living_group && (
-                      <p className="text-green-600 text-sm mt-2">
-                        {t('bookedBy', { name: time.living_group.name })}
-                      </p>
-                    )}
+          <div className="space-y-2">
+            {times.slice(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE).map((time) => {
+              const hasDetails = time.location || time.notes;
+              const isExpanded = expandedTimeIds.has(time.id);
+              return (
+                <div
+                  key={time.id}
+                  className={`px-3 py-2 border rounded-lg ${
+                    time.living_group_id
+                      ? 'border-green-200 bg-green-50'
+                      : 'border-border'
+                  } ${hasDetails ? 'cursor-pointer' : ''}`}
+                  onClick={hasDetails ? () => toggleTimeExpanded(time.id) : undefined}
+                >
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-4 flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        {hasDetails && (
+                          <svg
+                            className={`w-4 h-4 text-text-muted transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        )}
+                        <span className="font-medium text-sm">
+                          {new Date(time.date).toLocaleDateString(locale, {
+                            weekday: 'short',
+                            month: 'short',
+                            day: 'numeric',
+                          })}
+                        </span>
+                        <span className="text-text-secondary text-sm">
+                          {formatTime(time.start_time)} - {formatTime(time.end_time)} EST
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 flex-shrink-0">
+                      <span className="text-text-muted text-xs">
+                        {t('postedBy', { name: getCreatorLabel(time) })}
+                      </span>
+                      {time.living_group && (
+                        <span className="text-green-600 text-xs font-medium">
+                          {t('bookedBy', { name: time.living_group.name })}
+                        </span>
+                      )}
+                      {!time.living_group_id && time.created_by === currentUserId && (
+                        <button
+                          onClick={(e) => handleDeleteClick(e, time.id)}
+                          disabled={deletingTimeId === time.id}
+                          className={`text-xs ${confirmingDeleteId === time.id ? 'text-red-700 font-medium' : 'text-red-600 hover:text-red-700'}`}
+                        >
+                          {deletingTimeId === time.id ? '...' : confirmingDeleteId === time.id ? t('confirm') : t('delete')}
+                        </button>
+                      )}
+                    </div>
                   </div>
-                  {!time.living_group_id && (
-                    <button
-                      onClick={() => handleDeleteTime(time.id)}
-                      disabled={deletingTimeId === time.id}
-                      className="text-sm text-red-600 hover:text-red-700"
-                    >
-                      {deletingTimeId === time.id ? '...' : t('delete')}
-                    </button>
+                  {/* Expandable details */}
+                  {isExpanded && hasDetails && (
+                    <div className="mt-2 pt-2 border-t border-border/50 text-xs text-text-muted space-y-0.5">
+                      {time.location && <p><span className="font-medium">Location:</span> {time.location}</p>}
+                      {time.notes && <p><span className="font-medium">Notes:</span> {time.notes}</p>}
+                    </div>
                   )}
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
 
-      {/* Pending Proposals from Living Groups */}
+      {/* Proposed Timeslots from Living Groups */}
       <div className="bg-white border border-border rounded-lg p-6">
         <h3 className="font-medium mb-4">{t('pendingProposals')}</h3>
         {proposalsLoading ? (
@@ -295,54 +427,71 @@ export default function PhotographerTimesSection() {
         ) : proposals.length === 0 ? (
           <p className="text-text-secondary text-sm">{t('noProposals')}</p>
         ) : (
-          <div className="space-y-3">
-            {proposals.map((proposal) => (
-              <div
-                key={proposal.id}
-                className="p-4 border border-yellow-200 bg-yellow-50 rounded-lg"
-              >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="font-medium">
-                      {proposal.living_group?.name || 'Unknown Living Group'}
-                    </p>
-                    <p className="text-text-secondary text-sm">
-                      {new Date(proposal.date).toLocaleDateString(locale, {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })}
-                    </p>
-                    <p className="text-text-secondary text-sm">
-                      {proposal.start_time} - {proposal.end_time}
-                    </p>
-                    {proposal.location && (
-                      <p className="text-text-muted text-xs mt-1">{t('location')}: {proposal.location}</p>
-                    )}
-                    {proposal.notes && (
-                      <p className="text-text-muted text-xs mt-1">{t('notes')}: {proposal.notes}</p>
-                    )}
+          <div className="space-y-2">
+            {proposals.map((proposal) => {
+              const hasDetails = proposal.location || proposal.notes;
+              const isExpanded = expandedProposalIds.has(proposal.id);
+              return (
+                <div
+                  key={proposal.id}
+                  className={`px-3 py-2 border border-yellow-200 bg-yellow-50 rounded-lg ${hasDetails ? 'cursor-pointer' : ''}`}
+                  onClick={hasDetails ? () => toggleProposalExpanded(proposal.id) : undefined}
+                >
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-4 flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        {hasDetails && (
+                          <svg
+                            className={`w-4 h-4 text-text-muted transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        )}
+                        <span className="font-medium text-sm">
+                          {new Date(proposal.date).toLocaleDateString(locale, {
+                            weekday: 'short',
+                            month: 'short',
+                            day: 'numeric',
+                          })}
+                        </span>
+                        <span className="text-text-secondary text-sm">
+                          {formatTime(proposal.start_time)} - {formatTime(proposal.end_time)} EST
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 flex-shrink-0">
+                      <span className="text-text-muted text-xs">
+                        {proposal.living_group?.name || 'Unknown Living Group'}
+                      </span>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleProposalAction(proposal.id, 'accept'); }}
+                        disabled={processingProposalId === proposal.id}
+                        className="text-xs px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
+                      >
+                        {processingProposalId === proposal.id ? '...' : t('accept')}
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleProposalAction(proposal.id, 'decline'); }}
+                        disabled={processingProposalId === proposal.id}
+                        className="text-xs px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
+                      >
+                        {processingProposalId === proposal.id ? '...' : t('decline')}
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleProposalAction(proposal.id, 'accept')}
-                      disabled={processingProposalId === proposal.id}
-                      className="text-sm px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
-                    >
-                      {processingProposalId === proposal.id ? '...' : t('accept')}
-                    </button>
-                    <button
-                      onClick={() => handleProposalAction(proposal.id, 'decline')}
-                      disabled={processingProposalId === proposal.id}
-                      className="text-sm px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
-                    >
-                      {processingProposalId === proposal.id ? '...' : t('decline')}
-                    </button>
-                  </div>
+                  {/* Expandable details */}
+                  {isExpanded && hasDetails && (
+                    <div className="mt-2 pt-2 border-t border-yellow-200/50 text-xs text-text-muted space-y-0.5">
+                      {proposal.location && <p><span className="font-medium">Location:</span> {proposal.location}</p>}
+                      {proposal.notes && <p><span className="font-medium">Notes:</span> {proposal.notes}</p>}
+                    </div>
+                  )}
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

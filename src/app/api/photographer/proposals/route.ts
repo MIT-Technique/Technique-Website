@@ -1,19 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "../../../../lib/auth/session";
 import { createAdminClient } from "../../../../lib/supabase/admin";
+import { createLog } from "../../admin/logs/route";
 
-// Helper to check if user is an active photographer
-async function isActivePhotographer(
+// Helper to check if user is staph or has active photographer permissions
+async function isStaphOrPhotographer(
   userId: string,
   supabase: ReturnType<typeof createAdminClient>
 ): Promise<boolean> {
-  const { data } = await supabase
+  // Check if user is staph
+  const { data: userData } = await supabase
+    .from("users")
+    .select("is_staph")
+    .eq("id", userId)
+    .single();
+
+  if (userData?.is_staph) {
+    return true;
+  }
+
+  // Check photographer_permissions as fallback
+  const { data: permData } = await supabase
     .from("photographer_permissions")
     .select("id")
     .eq("user_id", userId)
     .eq("is_active", true)
     .single();
-  return !!data;
+  return !!permData;
 }
 
 // GET - View all pending proposals from living groups
@@ -28,10 +41,10 @@ export async function GET() {
     const supabase = createAdminClient();
 
     // Check if user is a photographer
-    const isPhotographer = await isActivePhotographer(user.id, supabase);
+    const isPhotographer = await isStaphOrPhotographer(user.id, supabase);
     if (!isPhotographer) {
       return NextResponse.json(
-        { error: "You are not a photographer" },
+        { error: "You don't have staph access" },
         { status: 403 }
       );
     }
@@ -87,10 +100,10 @@ export async function PUT(request: NextRequest) {
     const supabase = createAdminClient();
 
     // Check if user is a photographer
-    const isPhotographer = await isActivePhotographer(user.id, supabase);
+    const isPhotographer = await isStaphOrPhotographer(user.id, supabase);
     if (!isPhotographer) {
       return NextResponse.json(
-        { error: "You are not a photographer" },
+        { error: "You don't have staph access" },
         { status: 403 }
       );
     }
@@ -112,10 +125,10 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Get the proposal
+    // Get the proposal with living group info
     const { data: proposal, error: fetchError } = await supabase
       .from("time_proposals")
-      .select("id, living_group_id, status, date, start_time, end_time, location, notes")
+      .select("id, living_group_id, status, date, start_time, end_time, location, notes, living_group:living_groups(id, name)")
       .eq("id", proposalId)
       .single();
 
@@ -187,6 +200,17 @@ export async function PUT(request: NextRequest) {
         );
       }
 
+      // Log the proposal acceptance
+      const livingGroupName = Array.isArray(proposal.living_group)
+        ? proposal.living_group[0]?.name
+        : (proposal.living_group as { name?: string })?.name;
+      await createLog(user.id, "proposal_accepted", "time_proposal", proposalId, {
+        living_group_name: livingGroupName || "Unknown",
+        date: proposal.date,
+        start_time: proposal.start_time,
+        end_time: proposal.end_time,
+      });
+
       return NextResponse.json({ success: true, status: "accepted" });
     } else {
       // Decline the proposal
@@ -208,6 +232,16 @@ export async function PUT(request: NextRequest) {
           { status: 500 }
         );
       }
+
+      // Log the proposal decline
+      const livingGroupNameDecline = Array.isArray(proposal.living_group)
+        ? proposal.living_group[0]?.name
+        : (proposal.living_group as { name?: string })?.name;
+      await createLog(user.id, "proposal_declined", "time_proposal", proposalId, {
+        living_group_name: livingGroupNameDecline || "Unknown",
+        date: proposal.date,
+        decline_reason: decline_reason || null,
+      });
 
       return NextResponse.json({ success: true, status: "declined" });
     }

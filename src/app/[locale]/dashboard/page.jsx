@@ -109,7 +109,7 @@ export default function DashboardPage() {
           <p className="text-sm text-text-secondary">{t('actions.managePhotoshootsDesc')}</p>
         </Link>
         <Link
-          href={`/${locale}/dashboard/clubs`}
+          href={`/${locale}/dashboard/users`}
           className="p-4 border border-border rounded-lg hover:border-accent transition-colors"
         >
           <h4 className="font-medium mb-1">{t('actions.reviewClubs')}</h4>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "../../../../lib/auth/session";
 import { createAdminClient } from "../../../../lib/supabase/admin";
+import { createLog } from "../../admin/logs/route";
 
 // POST - Request cancellation of a booked photoshoot time
 export async function POST(request: NextRequest) {
@@ -29,7 +30,7 @@ export async function POST(request: NextRequest) {
     // Get user's living group
     const { data: livingGroup } = await supabase
       .from('living_groups')
-      .select('id, status')
+      .select('id, status, name')
       .eq('user_id', user.id)
       .single();
 
@@ -51,7 +52,7 @@ export async function POST(request: NextRequest) {
     // Get the current booking
     const { data: currentBooking } = await supabase
       .from('photoshoot_times')
-      .select('id, date, time, cancellation_requested')
+      .select('id, date, start_time, end_time, cancellation_requested')
       .eq('living_group_id', livingGroup.id)
       .is('cancelled_at', null)
       .single();
@@ -89,6 +90,15 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    // Log the cancellation request
+    await createLog(user.id, "cancellation_requested", "photoshoot_time", currentBooking.id, {
+      living_group_name: livingGroup.name,
+      date: currentBooking.date,
+      start_time: currentBooking.start_time,
+      end_time: currentBooking.end_time,
+      reason: reason || null,
+    });
 
     return NextResponse.json({
       success: true,

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "../../../../lib/auth/session";
 import { createAdminClient } from "../../../../lib/supabase/admin";
+import { createLog } from "../../admin/logs/route";
 
 // POST - Book a photoshoot time
 export async function POST(request: NextRequest) {
@@ -44,7 +45,7 @@ export async function POST(request: NextRequest) {
     // Get user's living group
     const { data: livingGroup } = await supabase
       .from('living_groups')
-      .select('id, status')
+      .select('id, status, name')
       .eq('user_id', user.id)
       .single();
 
@@ -101,6 +102,14 @@ export async function POST(request: NextRequest) {
         { status: 409 }
       );
     }
+
+    // Log the booking
+    await createLog(user.id, "time_booked", "photoshoot_time", timeId, {
+      living_group_name: livingGroup.name,
+      date: bookedTime.date,
+      start_time: bookedTime.start_time,
+      end_time: bookedTime.end_time,
+    });
 
     return NextResponse.json({
       success: true,

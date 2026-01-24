@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "../../../../lib/auth/session";
 import { createAdminClient } from "../../../../lib/supabase/admin";
+import { createLog } from "../logs/route";
 
 // GET - List all photoshoot times
 export async function GET(request: NextRequest) {
@@ -131,6 +132,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Log the time creation
+    await createLog(user.id, "admin_time_created", "photoshoot_time", newTime.id, {
+      date,
+      start_time: startTime,
+      end_time: endTime,
+    });
+
     return NextResponse.json({
       success: true,
       time: newTime,
@@ -169,57 +177,88 @@ export async function PUT(request: NextRequest) {
     const supabase = createAdminClient();
 
     // Handle cancellation approval/denial
-    if (action === 'approve_cancellation') {
-      const { data: updatedTime, error } = await supabase
+    if (action === 'approve_cancellation' || action === 'deny_cancellation') {
+      // Get time info before update for logging
+      const { data: timeInfo } = await supabase
         .from('photoshoot_times')
-        .update({
-          cancellation_approved: true,
-          cancelled_at: new Date().toISOString(),
-          cancelled_by: user.id,
-          living_group_id: null,
-          booked_at: null,
-          booked_by: null,
-          cancellation_requested: false,
-          cancellation_request_reason: null,
-          updated_at: new Date().toISOString(),
-        })
+        .select('date, start_time, end_time, living_group:living_groups(name)')
         .eq('id', timeId)
-        .select()
         .single();
 
-      if (error) {
-        console.error("Error approving cancellation:", error);
-        return NextResponse.json(
-          { error: "Failed to approve cancellation" },
-          { status: 500 }
-        );
+      if (action === 'approve_cancellation') {
+        const { data: updatedTime, error } = await supabase
+          .from('photoshoot_times')
+          .update({
+            cancellation_approved: true,
+            cancelled_at: new Date().toISOString(),
+            cancelled_by: user.id,
+            living_group_id: null,
+            booked_at: null,
+            booked_by: null,
+            cancellation_requested: false,
+            cancellation_request_reason: null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', timeId)
+          .select()
+          .single();
+
+        if (error) {
+          console.error("Error approving cancellation:", error);
+          return NextResponse.json(
+            { error: "Failed to approve cancellation" },
+            { status: 500 }
+          );
+        }
+
+        // Log the cancellation approval
+        const lgName = Array.isArray(timeInfo?.living_group)
+          ? timeInfo.living_group[0]?.name
+          : (timeInfo?.living_group as { name?: string } | null)?.name;
+        await createLog(user.id, "cancellation_approved", "photoshoot_time", timeId, {
+          living_group_name: lgName || "Unknown",
+          date: timeInfo?.date,
+          start_time: timeInfo?.start_time,
+          end_time: timeInfo?.end_time,
+        });
+
+        return NextResponse.json({ time: updatedTime });
       }
 
-      return NextResponse.json({ time: updatedTime });
-    }
+      if (action === 'deny_cancellation') {
+        const { data: updatedTime, error } = await supabase
+          .from('photoshoot_times')
+          .update({
+            cancellation_approved: false,
+            cancellation_requested: false,
+            cancellation_request_reason: null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', timeId)
+          .select()
+          .single();
 
-    if (action === 'deny_cancellation') {
-      const { data: updatedTime, error } = await supabase
-        .from('photoshoot_times')
-        .update({
-          cancellation_approved: false,
-          cancellation_requested: false,
-          cancellation_request_reason: null,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', timeId)
-        .select()
-        .single();
+        if (error) {
+          console.error("Error denying cancellation:", error);
+          return NextResponse.json(
+            { error: "Failed to deny cancellation" },
+            { status: 500 }
+          );
+        }
 
-      if (error) {
-        console.error("Error denying cancellation:", error);
-        return NextResponse.json(
-          { error: "Failed to deny cancellation" },
-          { status: 500 }
-        );
+        // Log the cancellation denial
+        const lgName = Array.isArray(timeInfo?.living_group)
+          ? timeInfo.living_group[0]?.name
+          : (timeInfo?.living_group as { name?: string } | null)?.name;
+        await createLog(user.id, "cancellation_denied", "photoshoot_time", timeId, {
+          living_group_name: lgName || "Unknown",
+          date: timeInfo?.date,
+          start_time: timeInfo?.start_time,
+          end_time: timeInfo?.end_time,
+        });
+
+        return NextResponse.json({ time: updatedTime });
       }
-
-      return NextResponse.json({ time: updatedTime });
     }
 
     // Regular update
@@ -281,6 +320,13 @@ export async function DELETE(request: NextRequest) {
 
     const supabase = createAdminClient();
 
+    // Get time info before delete for logging
+    const { data: timeInfo } = await supabase
+      .from('photoshoot_times')
+      .select('date, start_time, end_time')
+      .eq('id', timeId)
+      .single();
+
     const { data: deletedTime, error } = await supabase
       .from('photoshoot_times')
       .update({
@@ -299,6 +345,13 @@ export async function DELETE(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    // Log the time deletion
+    await createLog(user.id, "admin_time_deleted", "photoshoot_time", timeId, {
+      date: timeInfo?.date,
+      start_time: timeInfo?.start_time,
+      end_time: timeInfo?.end_time,
+    });
 
     return NextResponse.json({
       success: true,

@@ -1,22 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "../../../../lib/auth/session";
 import { createAdminClient } from "../../../../lib/supabase/admin";
+import { createLog } from "../../admin/logs/route";
 
-// Helper to check if user is an active photographer
-async function isActivePhotographer(
+// Helper to check if user is staph or has active photographer permissions
+async function isStaphOrPhotographer(
   userId: string,
   supabase: ReturnType<typeof createAdminClient>
 ): Promise<boolean> {
-  const { data } = await supabase
+  // Check if user is staph
+  const { data: userData } = await supabase
+    .from("users")
+    .select("is_staph")
+    .eq("id", userId)
+    .single();
+
+  if (userData?.is_staph) {
+    return true;
+  }
+
+  // Check photographer_permissions as fallback
+  const { data: permData } = await supabase
     .from("photographer_permissions")
     .select("id")
     .eq("user_id", userId)
     .eq("is_active", true)
     .single();
-  return !!data;
+  return !!permData;
 }
 
-// GET - List photographer's own posted times
+// GET - List ALL posted times with creator info (for staph dashboard)
 export async function GET() {
   try {
     const user = await getCurrentUser();
@@ -27,16 +40,16 @@ export async function GET() {
 
     const supabase = createAdminClient();
 
-    // Check if user is a photographer
-    const isPhotographer = await isActivePhotographer(user.id, supabase);
+    // Check if user is staph
+    const isPhotographer = await isStaphOrPhotographer(user.id, supabase);
     if (!isPhotographer) {
       return NextResponse.json(
-        { error: "You are not a photographer" },
+        { error: "You don't have staph access" },
         { status: 403 }
       );
     }
 
-    // Get photographer's posted times
+    // Get ALL posted times with creator info
     const { data: times, error } = await supabase
       .from("photoshoot_times")
       .select(
@@ -51,10 +64,11 @@ export async function GET() {
         booked_at,
         booked_by,
         created_at,
-        living_group:living_groups(id, name)
+        created_by,
+        living_group:living_groups(id, name),
+        creator:users!photoshoot_times_created_by_fkey(id, email, first_name, last_name, role)
       `
       )
-      .eq("created_by", user.id)
       .order("date", { ascending: true })
       .order("start_time", { ascending: true });
 
@@ -66,7 +80,8 @@ export async function GET() {
       );
     }
 
-    return NextResponse.json({ times: times || [] });
+    // Return times with current user id so frontend can determine ownership
+    return NextResponse.json({ times: times || [], currentUserId: user.id });
   } catch (error) {
     console.error("Get photographer times error:", error);
     return NextResponse.json(
@@ -88,10 +103,10 @@ export async function POST(request: NextRequest) {
     const supabase = createAdminClient();
 
     // Check if user is a photographer
-    const isPhotographer = await isActivePhotographer(user.id, supabase);
+    const isPhotographer = await isStaphOrPhotographer(user.id, supabase);
     if (!isPhotographer) {
       return NextResponse.json(
-        { error: "You are not a photographer" },
+        { error: "You don't have staph access" },
         { status: 403 }
       );
     }
@@ -128,6 +143,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Log the time creation
+    await createLog(user.id, "time_created", "photoshoot_time", data.id, {
+      date,
+      start_time,
+      end_time,
+      location,
+    });
+
     return NextResponse.json({ success: true, time: data });
   } catch (error) {
     console.error("Create time slot error:", error);
@@ -150,10 +173,10 @@ export async function DELETE(request: NextRequest) {
     const supabase = createAdminClient();
 
     // Check if user is a photographer
-    const isPhotographer = await isActivePhotographer(user.id, supabase);
+    const isPhotographer = await isStaphOrPhotographer(user.id, supabase);
     if (!isPhotographer) {
       return NextResponse.json(
-        { error: "You are not a photographer" },
+        { error: "You don't have staph access" },
         { status: 403 }
       );
     }
@@ -171,7 +194,7 @@ export async function DELETE(request: NextRequest) {
     // Check if time slot exists and belongs to user
     const { data: timeSlot, error: fetchError } = await supabase
       .from("photoshoot_times")
-      .select("id, created_by, living_group_id")
+      .select("id, created_by, living_group_id, date, start_time, end_time")
       .eq("id", timeId)
       .single();
 
@@ -209,6 +232,13 @@ export async function DELETE(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    // Log the time deletion
+    await createLog(user.id, "time_deleted", "photoshoot_time", timeId, {
+      date: timeSlot.date,
+      start_time: timeSlot.start_time,
+      end_time: timeSlot.end_time,
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {
