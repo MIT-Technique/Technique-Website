@@ -3,19 +3,94 @@ import { createClient } from "@supabase/supabase-js";
 import { createAdminClient } from "../../../../lib/supabase/admin";
 import { getSession } from "../../../../lib/auth/session";
 
+// Generate the same system email as signup
+function generateSystemEmail(name: string): string {
+  const slug = name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+  return `${slug}@lg.technique.mit.edu`;
+}
+
 interface OrgSigninRequest {
-  email: string;
+  // For clubs: email is required
+  email?: string;
+  // For living groups: name is required
+  name?: string;
   password: string;
+  orgType: "club" | "living_group";
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body: OrgSigninRequest = await request.json();
-    const { email, password } = body;
+    const { email, name, password, orgType } = body;
 
-    if (!email || !password) {
+    if (!password) {
       return NextResponse.json(
-        { error: "Email and password are required", code: "MISSING_FIELDS" },
+        { error: "Password is required", code: "MISSING_PASSWORD" },
+        { status: 400 }
+      );
+    }
+
+    const supabaseAdmin = createAdminClient();
+    let authEmail: string;
+    let expectedRole: string;
+
+    // ==================== CLUB SIGNIN ====================
+    if (orgType === "club") {
+      if (!email) {
+        return NextResponse.json(
+          { error: "Email is required", code: "MISSING_EMAIL" },
+          { status: 400 }
+        );
+      }
+
+      authEmail = email.toLowerCase();
+      expectedRole = "club";
+    }
+    // ==================== LIVING GROUP SIGNIN ====================
+    else if (orgType === "living_group") {
+      if (!name) {
+        return NextResponse.json(
+          { error: "Living group name is required", code: "MISSING_NAME" },
+          { status: 400 }
+        );
+      }
+
+      // Look up living group by name to get the system email
+      const { data: livingGroup, error: lgError } = await supabaseAdmin
+        .from("living_groups")
+        .select("id, name, user_id")
+        .ilike("name", name.trim())
+        .single();
+
+      if (lgError || !livingGroup) {
+        return NextResponse.json(
+          { error: "Living group not found", code: "LG_NOT_FOUND" },
+          { status: 404 }
+        );
+      }
+
+      // Get the user record to find the system email
+      const { data: lgUser, error: userLookupError } = await supabaseAdmin
+        .from("users")
+        .select("email")
+        .eq("id", livingGroup.user_id)
+        .single();
+
+      if (userLookupError || !lgUser) {
+        return NextResponse.json(
+          { error: "Living group account not found", code: "LG_ACCOUNT_NOT_FOUND" },
+          { status: 404 }
+        );
+      }
+
+      authEmail = lgUser.email;
+      expectedRole = "living_group_leader";
+    } else {
+      return NextResponse.json(
+        { error: "Invalid organization type", code: "INVALID_ORG_TYPE" },
         { status: 400 }
       );
     }
@@ -28,20 +103,20 @@ export async function POST(request: NextRequest) {
 
     // Authenticate with Supabase Auth
     const { data: authData, error: authError } = await supabaseAuth.auth.signInWithPassword({
-      email: email.toLowerCase(),
+      email: authEmail,
       password,
     });
 
     if (authError || !authData.user) {
       console.error("Auth error:", authError);
       return NextResponse.json(
-        { error: "Invalid email or password", code: "INVALID_CREDENTIALS" },
+        { error: "Invalid credentials", code: "INVALID_CREDENTIALS" },
         { status: 401 }
       );
     }
 
-    // Check if email is verified
-    if (!authData.user.email_confirmed_at) {
+    // Check if email is verified (only for clubs - living groups use system emails that are auto-confirmed)
+    if (orgType === "club" && !authData.user.email_confirmed_at) {
       return NextResponse.json(
         { error: "Please verify your email before signing in", code: "EMAIL_NOT_VERIFIED" },
         { status: 401 }
@@ -49,11 +124,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user record from our users table
-    const supabaseAdmin = createAdminClient();
     const { data: user, error: userError } = await supabaseAdmin
       .from("users")
       .select("*")
-      .eq("email", email.toLowerCase())
+      .eq("email", authEmail)
       .single();
 
     if (userError || !user) {
@@ -63,8 +137,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify user has an organization role
-    if (user.role !== "club" && user.role !== "living_group_leader") {
+    // Verify user has the expected organization role
+    if (user.role !== expectedRole) {
       return NextResponse.json(
         { error: "This login is for organizations only", code: "INVALID_ROLE" },
         { status: 403 }

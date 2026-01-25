@@ -65,6 +65,10 @@ export default function LivingGroupPage() {
   const [submittingProposal, setSubmittingProposal] = useState(false);
   const [cancellingProposalId, setCancellingProposalId] = useState(null);
 
+  // FSILG onboarding state (for adding first leader)
+  const [leaderEmail, setLeaderEmail] = useState('');
+  const [addingLeader, setAddingLeader] = useState(false);
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(0);
   const ITEMS_PER_PAGE = 8;
@@ -365,6 +369,40 @@ export default function LivingGroupPage() {
     }
   }
 
+  // Handle adding first leader for FSILG onboarding
+  async function handleAddFirstLeader() {
+    if (!leaderEmail.trim()) {
+      setMessage({ type: 'error', text: t('onboarding.emailRequired') });
+      return;
+    }
+
+    setAddingLeader(true);
+    setMessage({ type: '', text: '' });
+
+    try {
+      const res = await fetch('/api/living-groups/add-first-leader', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ studentEmail: leaderEmail.trim() }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setMessage({ type: 'success', text: t('onboarding.leaderAdded') });
+        setLeaderEmail('');
+        // Refetch user data to update livingGroup.has_leader
+        refetch();
+      } else {
+        setMessage({ type: 'error', text: data.error || t('onboarding.addLeaderError') });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: t('onboarding.addLeaderError') });
+    } finally {
+      setAddingLeader(false);
+    }
+  }
+
   // Get available tabs based on living group type
   function getTabs() {
     const tabs = [{ id: 'scheduling', label: t('tabs.scheduling') }];
@@ -393,6 +431,9 @@ export default function LivingGroupPage() {
   const isDisabled = livingGroup?.status === 'disabled';
   const tabs = getTabs();
 
+  // Check if FSILG needs onboarding (no leader yet)
+  const needsOnboarding = livingGroup?.living_group_type === 'fsilg' && !livingGroup?.has_leader;
+
   return (
     <>
       <main className="min-h-screen pt-24 lg:pt-32 pb-12">
@@ -410,8 +451,45 @@ export default function LivingGroupPage() {
             </div>
           )}
 
+          {/* FSILG Onboarding - Add First Leader */}
+          {needsOnboarding && !isDisabled && (
+            <div className="mb-6 p-6 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <h3 className="text-lg font-semibold text-yellow-800">
+                {t('onboarding.title')}
+              </h3>
+              <p className="text-yellow-700 mt-2">
+                {t('onboarding.description')}
+              </p>
+              <div className="mt-4 flex flex-col sm:flex-row gap-2">
+                <TextField
+                  type="email"
+                  placeholder={t('onboarding.studentEmailPlaceholder')}
+                  value={leaderEmail}
+                  onChange={(e) => setLeaderEmail(e.target.value)}
+                  size="small"
+                  fullWidth
+                  sx={{
+                    ...textFieldSx,
+                    flex: 1,
+                    "& .MuiOutlinedInput-root": {
+                      ...textFieldSx["& .MuiOutlinedInput-root"],
+                      backgroundColor: "white",
+                    },
+                  }}
+                />
+                <button
+                  onClick={handleAddFirstLeader}
+                  disabled={addingLeader}
+                  className="px-4 py-2 bg-[#750014] text-white rounded hover:bg-[#5C0010] disabled:opacity-50 whitespace-nowrap"
+                >
+                  {addingLeader ? t('onboarding.addingLeader') : t('onboarding.addLeader')}
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Frozen Notice */}
-          {isFrozen && !isDisabled && activeTab === 'scheduling' && (
+          {isFrozen && !isDisabled && !needsOnboarding && activeTab === 'scheduling' && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
               <p className="text-red-600 font-medium">{t('frozen')}</p>
             </div>
@@ -425,23 +503,28 @@ export default function LivingGroupPage() {
             </div>
           )}
 
-          {/* Tabs */}
-          <div className="flex gap-4 mb-8 border-b border-border">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
-                  activeTab === tab.id
-                    ? 'border-accent text-accent'
-                    : 'border-transparent text-text-secondary hover:text-text-primary'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
+          {/* Tabs - Hidden during onboarding */}
+          {!needsOnboarding && (
+            <div className="flex gap-4 mb-8 border-b border-border">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
+                    activeTab === tab.id
+                      ? 'border-accent text-accent'
+                      : 'border-transparent text-text-secondary hover:text-text-primary'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          )}
 
+          {/* Tab Content - Hidden during onboarding */}
+          {!needsOnboarding && (
+            <>
           {/* Scheduling Tab */}
           {activeTab === 'scheduling' && (
             <>
@@ -890,6 +973,8 @@ export default function LivingGroupPage() {
                 </div>
               )}
             </div>
+          )}
+            </>
           )}
         </section>
       </main>

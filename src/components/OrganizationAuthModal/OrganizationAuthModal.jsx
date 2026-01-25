@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -18,6 +18,8 @@ import {
   CircularProgress,
   IconButton,
   Typography,
+  ToggleButtonGroup,
+  ToggleButton,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useTranslations } from "next-intl";
@@ -63,6 +65,24 @@ const linkButtonSx = {
   "&:hover": { backgroundColor: "transparent", textDecoration: "underline" },
 };
 
+const toggleButtonGroupSx = {
+  mb: 3,
+  width: "100%",
+  "& .MuiToggleButton-root": {
+    flex: 1,
+    textTransform: "none",
+    fontWeight: 500,
+    borderColor: "#E5E5E5",
+    "&.Mui-selected": {
+      backgroundColor: "#750014",
+      color: "white",
+      "&:hover": {
+        backgroundColor: "#5C0010",
+      },
+    },
+  },
+};
+
 export default function OrganizationAuthModal({ open, onClose }) {
   const t = useTranslations("pages.login.org");
 
@@ -74,6 +94,10 @@ export default function OrganizationAuthModal({ open, onClose }) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  // Sign in specific - org type toggle for sign in
+  const [signInOrgType, setSignInOrgType] = useState("club");
+  const [signInName, setSignInName] = useState(""); // For living group sign in
+
   // Sign up specific fields
   const [orgType, setOrgType] = useState("club");
   const [clubName, setClubName] = useState("");
@@ -81,9 +105,15 @@ export default function OrganizationAuthModal({ open, onClose }) {
   const [dormName, setDormName] = useState("");
   const [fsilgName, setFsilgName] = useState("");
 
+  // Dorm availability check
+  const [takenDorms, setTakenDorms] = useState([]);
+  const [loadingAvailability, setLoadingAvailability] = useState(false);
+
   // Forgot password state
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotOrgType, setForgotOrgType] = useState("club");
   const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotName, setForgotName] = useState("");
 
   // UI state
   const [loading, setLoading] = useState(false);
@@ -94,11 +124,35 @@ export default function OrganizationAuthModal({ open, onClose }) {
   const [fieldErrors, setFieldErrors] = useState({});
   const [touched, setTouched] = useState({});
 
+  // Fetch dorm availability when sign up view opens with living group selected
+  useEffect(() => {
+    if (open && view === "signUp" && orgType === "living_group") {
+      fetchDormAvailability();
+    }
+  }, [open, view, orgType]);
+
+  const fetchDormAvailability = async () => {
+    setLoadingAvailability(true);
+    try {
+      const res = await fetch("/api/living-groups/check-availability");
+      const data = await res.json();
+      if (data.takenDorms) {
+        setTakenDorms(data.takenDorms);
+      }
+    } catch (err) {
+      console.error("Failed to check dorm availability:", err);
+    } finally {
+      setLoadingAvailability(false);
+    }
+  };
+
   const resetForm = () => {
     setEmail("");
     setPassword("");
     setConfirmPassword("");
     setOrgType("club");
+    setSignInOrgType("club");
+    setSignInName("");
     setClubName("");
     setLivingGroupType("");
     setDormName("");
@@ -106,7 +160,9 @@ export default function OrganizationAuthModal({ open, onClose }) {
     setError("");
     setSuccess("");
     setShowForgotPassword(false);
+    setForgotOrgType("club");
     setForgotEmail("");
+    setForgotName("");
     setFieldErrors({});
     setTouched({});
   };
@@ -130,23 +186,28 @@ export default function OrganizationAuthModal({ open, onClose }) {
   };
 
   const validateSignIn = () => {
-    const emailError = validateEmail(email);
-    if (emailError) return emailError;
+    if (signInOrgType === "club") {
+      const emailError = validateEmail(email);
+      if (emailError) return emailError;
+    } else {
+      if (!signInName.trim()) return t("livingGroupNameRequired");
+    }
     if (!password) return t("passwordRequired");
     return null;
   };
 
   const validateSignUp = () => {
-    const emailError = validateEmail(email);
-    if (emailError) return emailError;
     if (!password) return t("passwordRequired");
     const hasNumberOrSymbol = /[0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
     if (password.length < 8 || !hasNumberOrSymbol) return t("passwordMin");
     if (password !== confirmPassword) return t("passwordMismatch");
 
     if (orgType === "club") {
+      const emailError = validateEmail(email);
+      if (emailError) return emailError;
       if (!clubName.trim()) return t("clubNameRequired");
     } else {
+      // Living group - no email required
       if (!livingGroupType) return t("livingGroupTypeRequired");
       if (livingGroupType === "dorm" && !dormName) return t("dormRequired");
       if (livingGroupType === "fsilg" && !fsilgName.trim()) return t("fsilgNameRequired");
@@ -183,6 +244,10 @@ export default function OrganizationAuthModal({ open, onClose }) {
       case "fsilgName":
         if (!value.trim()) return t("fsilgNameRequired");
         return null;
+      case "signInName":
+      case "forgotName":
+        if (!value.trim()) return t("livingGroupNameRequired");
+        return null;
       default:
         return null;
     }
@@ -207,10 +272,21 @@ export default function OrganizationAuthModal({ open, onClose }) {
 
     setLoading(true);
     try {
+      const payload = {
+        password,
+        orgType: signInOrgType,
+      };
+
+      if (signInOrgType === "club") {
+        payload.email = email;
+      } else {
+        payload.name = signInName.trim();
+      }
+
       const res = await fetch("/api/auth/org-signin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -220,6 +296,8 @@ export default function OrganizationAuthModal({ open, onClose }) {
           setError(t("emailNotVerified"));
         } else if (data.code === "INVALID_CREDENTIALS") {
           setError(t("invalidCredentials"));
+        } else if (data.code === "LG_NOT_FOUND") {
+          setError(t("livingGroupNotFound"));
         } else {
           setError(data.error || t("invalidCredentials"));
         }
@@ -253,14 +331,15 @@ export default function OrganizationAuthModal({ open, onClose }) {
     setLoading(true);
     try {
       const payload = {
-        email,
         password,
         organizationType: orgType,
       };
 
       if (orgType === "club") {
+        payload.email = email;
         payload.clubName = clubName.trim();
       } else {
+        // Living group - no email needed
         payload.livingGroupType = livingGroupType;
         if (livingGroupType === "dorm") {
           payload.dormName = dormName;
@@ -282,13 +361,20 @@ export default function OrganizationAuthModal({ open, onClose }) {
           setError(t("accountExists"));
         } else if (data.code === "CLUB_NAME_EXISTS") {
           setError(t("clubNameExists"));
+        } else if (data.code === "LG_NAME_EXISTS") {
+          setError(t("livingGroupNameExists"));
         } else {
           setError(data.error || "Sign up failed");
         }
         return;
       }
 
-      setSuccess(t("signUpSuccess"));
+      // Different success message for clubs vs living groups
+      if (orgType === "club") {
+        setSuccess(t("signUpSuccess"));
+      } else {
+        setSuccess(t("signUpSuccessLivingGroup"));
+      }
     } catch (err) {
       setError("Sign up failed");
     } finally {
@@ -301,22 +387,50 @@ export default function OrganizationAuthModal({ open, onClose }) {
     setError("");
     setSuccess("");
 
-    const emailError = validateEmail(forgotEmail);
-    if (emailError) {
-      setError(emailError);
-      return;
+    if (forgotOrgType === "club") {
+      const emailError = validateEmail(forgotEmail);
+      if (emailError) {
+        setError(emailError);
+        return;
+      }
+    } else {
+      if (!forgotName.trim()) {
+        setError(t("livingGroupNameRequired"));
+        return;
+      }
     }
 
     setLoading(true);
     try {
+      const payload = {
+        orgType: forgotOrgType,
+      };
+
+      if (forgotOrgType === "club") {
+        payload.email = forgotEmail;
+      } else {
+        payload.name = forgotName.trim();
+      }
+
       const res = await fetch("/api/auth/org-forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: forgotEmail }),
+        body: JSON.stringify(payload),
       });
 
-      // Always show success message to prevent email enumeration
-      setSuccess(t("resetLinkSent"));
+      const data = await res.json();
+
+      if (!res.ok && data.code === "NO_LEADER") {
+        setError(t("noLeaderError"));
+        return;
+      }
+
+      // Show success message
+      if (forgotOrgType === "club") {
+        setSuccess(t("resetLinkSent"));
+      } else {
+        setSuccess(data.message || t("resetSentToLeader"));
+      }
     } catch (err) {
       setSuccess(t("resetLinkSent"));
     } finally {
@@ -343,9 +457,32 @@ export default function OrganizationAuthModal({ open, onClose }) {
           </IconButton>
         </DialogTitle>
         <DialogContent>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
             {t("forgotPasswordDescription")}
           </Typography>
+
+          {/* Organization Type Toggle */}
+          <ToggleButtonGroup
+            value={forgotOrgType}
+            exclusive
+            onChange={(e, value) => {
+              if (value) {
+                setForgotOrgType(value);
+                setError("");
+                setSuccess("");
+              }
+            }}
+            sx={toggleButtonGroupSx}
+          >
+            <ToggleButton value="club">{t("signInOrgTypeClub")}</ToggleButton>
+            <ToggleButton value="living_group">{t("signInOrgTypeLivingGroup")}</ToggleButton>
+          </ToggleButtonGroup>
+
+          {forgotOrgType === "living_group" && (
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2, fontSize: "0.85rem" }}>
+              {t("forgotPasswordLivingGroupInfo")}
+            </Typography>
+          )}
 
           {error && (
             <Alert severity="error" sx={{ mb: 2 }}>
@@ -359,18 +496,33 @@ export default function OrganizationAuthModal({ open, onClose }) {
           )}
 
           <Box component="form" onSubmit={handleForgotPassword}>
-            <TextField
-              fullWidth
-              label={t("email")}
-              placeholder={t("emailPlaceholder")}
-              value={forgotEmail}
-              onChange={(e) => setForgotEmail(e.target.value)}
-              onBlur={() => handleBlur("forgotEmail", forgotEmail)}
-              error={touched.forgotEmail && !!fieldErrors.forgotEmail}
-              helperText={touched.forgotEmail && fieldErrors.forgotEmail}
-              sx={{ ...textFieldSx, mb: 3 }}
-              disabled={loading || success}
-            />
+            {forgotOrgType === "club" ? (
+              <TextField
+                fullWidth
+                label={t("email")}
+                placeholder={t("emailPlaceholder")}
+                value={forgotEmail}
+                onChange={(e) => setForgotEmail(e.target.value)}
+                onBlur={() => handleBlur("forgotEmail", forgotEmail)}
+                error={touched.forgotEmail && !!fieldErrors.forgotEmail}
+                helperText={touched.forgotEmail && fieldErrors.forgotEmail}
+                sx={{ ...textFieldSx, mb: 3 }}
+                disabled={loading || success}
+              />
+            ) : (
+              <TextField
+                fullWidth
+                label={t("livingGroupName")}
+                placeholder={t("livingGroupNamePlaceholder")}
+                value={forgotName}
+                onChange={(e) => setForgotName(e.target.value)}
+                onBlur={() => handleBlur("forgotName", forgotName)}
+                error={touched.forgotName && !!fieldErrors.forgotName}
+                helperText={touched.forgotName && fieldErrors.forgotName}
+                sx={{ ...textFieldSx, mb: 3 }}
+                disabled={loading || success}
+              />
+            )}
 
             <Button
               type="submit"
@@ -387,6 +539,7 @@ export default function OrganizationAuthModal({ open, onClose }) {
               onClick={() => {
                 setShowForgotPassword(false);
                 setForgotEmail("");
+                setForgotName("");
                 setError("");
                 setSuccess("");
               }}
@@ -431,18 +584,50 @@ export default function OrganizationAuthModal({ open, onClose }) {
         {/* Sign In View */}
         {view === "signIn" && (
           <Box component="form" onSubmit={handleSignIn}>
-            <TextField
-              fullWidth
-              label={t("email")}
-              placeholder={t("emailPlaceholder")}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              onBlur={() => handleBlur("email", email)}
-              error={touched.email && !!fieldErrors.email}
-              helperText={touched.email && fieldErrors.email}
-              sx={{ ...textFieldSx, mb: 2 }}
-              disabled={loading}
-            />
+            {/* Organization Type Toggle for Sign In */}
+            <ToggleButtonGroup
+              value={signInOrgType}
+              exclusive
+              onChange={(e, value) => {
+                if (value) {
+                  setSignInOrgType(value);
+                  setError("");
+                }
+              }}
+              sx={toggleButtonGroupSx}
+            >
+              <ToggleButton value="club">{t("signInOrgTypeClub")}</ToggleButton>
+              <ToggleButton value="living_group">{t("signInOrgTypeLivingGroup")}</ToggleButton>
+            </ToggleButtonGroup>
+
+            {signInOrgType === "club" ? (
+              <TextField
+                fullWidth
+                label={t("email")}
+                placeholder={t("emailPlaceholder")}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onBlur={() => handleBlur("email", email)}
+                error={touched.email && !!fieldErrors.email}
+                helperText={touched.email && fieldErrors.email}
+                sx={{ ...textFieldSx, mb: 2 }}
+                disabled={loading}
+              />
+            ) : (
+              <TextField
+                fullWidth
+                label={t("livingGroupName")}
+                placeholder={t("livingGroupNamePlaceholder")}
+                value={signInName}
+                onChange={(e) => setSignInName(e.target.value)}
+                onBlur={() => handleBlur("signInName", signInName)}
+                error={touched.signInName && !!fieldErrors.signInName}
+                helperText={touched.signInName && fieldErrors.signInName}
+                sx={{ ...textFieldSx, mb: 2 }}
+                disabled={loading}
+              />
+            )}
+
             <TextField
               fullWidth
               type="password"
@@ -503,7 +688,10 @@ export default function OrganizationAuthModal({ open, onClose }) {
             {/* Organization Type Tabs */}
             <Tabs
               value={orgType === "club" ? 0 : 1}
-              onChange={(e, value) => setOrgType(value === 0 ? "club" : "living_group")}
+              onChange={(e, value) => {
+                setOrgType(value === 0 ? "club" : "living_group");
+                setError("");
+              }}
               variant="fullWidth"
               sx={{
                 mb: 3,
@@ -523,62 +711,64 @@ export default function OrganizationAuthModal({ open, onClose }) {
               <Tab label={t("livingGroup")} />
             </Tabs>
 
-            <TextField
-              fullWidth
-              label={t("email")}
-              placeholder={t("emailPlaceholder")}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              onBlur={() => handleBlur("email", email)}
-              error={touched.email && !!fieldErrors.email}
-              helperText={touched.email && fieldErrors.email}
-              sx={{ ...textFieldSx, mb: 2 }}
-              disabled={loading}
-            />
-            <TextField
-              fullWidth
-              type="password"
-              label={t("password")}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onBlur={() => handleBlur("password", password)}
-              error={touched.password && !!fieldErrors.password}
-              helperText={touched.password && fieldErrors.password}
-              sx={{ ...textFieldSx, mb: 2 }}
-              disabled={loading}
-            />
-            <TextField
-              fullWidth
-              type="password"
-              label={t("confirmPassword")}
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              onBlur={() => handleBlur("confirmPassword", confirmPassword)}
-              error={touched.confirmPassword && !!fieldErrors.confirmPassword}
-              helperText={touched.confirmPassword && fieldErrors.confirmPassword}
-              sx={{ ...textFieldSx, mb: 2 }}
-              disabled={loading}
-            />
-
             {/* Club-specific fields */}
             {orgType === "club" && (
-              <TextField
-                fullWidth
-                label={t("clubName")}
-                placeholder={t("clubNamePlaceholder")}
-                value={clubName}
-                onChange={(e) => setClubName(e.target.value)}
-                onBlur={() => handleBlur("clubName", clubName)}
-                error={touched.clubName && !!fieldErrors.clubName}
-                helperText={(touched.clubName && fieldErrors.clubName) || t("clubNameCannotChange")}
-                sx={{ ...textFieldSx, mb: 3 }}
-                disabled={loading}
-              />
+              <>
+                <TextField
+                  fullWidth
+                  label={t("email")}
+                  placeholder={t("emailPlaceholder")}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onBlur={() => handleBlur("email", email)}
+                  error={touched.email && !!fieldErrors.email}
+                  helperText={touched.email && fieldErrors.email}
+                  sx={{ ...textFieldSx, mb: 2 }}
+                  disabled={loading}
+                />
+                <TextField
+                  fullWidth
+                  type="password"
+                  label={t("password")}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onBlur={() => handleBlur("password", password)}
+                  error={touched.password && !!fieldErrors.password}
+                  helperText={touched.password && fieldErrors.password}
+                  sx={{ ...textFieldSx, mb: 2 }}
+                  disabled={loading}
+                />
+                <TextField
+                  fullWidth
+                  type="password"
+                  label={t("confirmPassword")}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  onBlur={() => handleBlur("confirmPassword", confirmPassword)}
+                  error={touched.confirmPassword && !!fieldErrors.confirmPassword}
+                  helperText={touched.confirmPassword && fieldErrors.confirmPassword}
+                  sx={{ ...textFieldSx, mb: 2 }}
+                  disabled={loading}
+                />
+                <TextField
+                  fullWidth
+                  label={t("clubName")}
+                  placeholder={t("clubNamePlaceholder")}
+                  value={clubName}
+                  onChange={(e) => setClubName(e.target.value)}
+                  onBlur={() => handleBlur("clubName", clubName)}
+                  error={touched.clubName && !!fieldErrors.clubName}
+                  helperText={(touched.clubName && fieldErrors.clubName) || t("clubNameCannotChange")}
+                  sx={{ ...textFieldSx, mb: 3 }}
+                  disabled={loading}
+                />
+              </>
             )}
 
-            {/* Living Group-specific fields */}
+            {/* Living Group-specific fields - NO EMAIL */}
             {orgType === "living_group" && (
               <>
+                {/* Living Group Type FIRST */}
                 <FormControl
                   fullWidth
                   sx={{ ...textFieldSx, mb: 2 }}
@@ -606,10 +796,11 @@ export default function OrganizationAuthModal({ open, onClose }) {
                   )}
                 </FormControl>
 
+                {/* Dorm dropdown with availability check */}
                 {livingGroupType === "dorm" && (
                   <FormControl
                     fullWidth
-                    sx={{ ...textFieldSx, mb: 3 }}
+                    sx={{ ...textFieldSx, mb: 2 }}
                     error={touched.dormName && !!fieldErrors.dormName}
                   >
                     <InputLabel>{t("selectDorm")}</InputLabel>
@@ -618,13 +809,21 @@ export default function OrganizationAuthModal({ open, onClose }) {
                       label={t("selectDorm")}
                       onChange={(e) => setDormName(e.target.value)}
                       onBlur={() => handleBlur("dormName", dormName)}
-                      disabled={loading}
+                      disabled={loading || loadingAvailability}
                     >
-                      {DORM_OPTIONS.map((dorm) => (
-                        <MenuItem key={dorm} value={dorm}>
-                          {dorm}
-                        </MenuItem>
-                      ))}
+                      {DORM_OPTIONS.map((dorm) => {
+                        const isTaken = takenDorms.includes(dorm);
+                        return (
+                          <MenuItem
+                            key={dorm}
+                            value={dorm}
+                            disabled={isTaken}
+                            sx={isTaken ? { color: "text.disabled" } : {}}
+                          >
+                            {dorm}{isTaken ? ` ${t("dormTaken")}` : ""}
+                          </MenuItem>
+                        );
+                      })}
                     </Select>
                     {touched.dormName && fieldErrors.dormName && (
                       <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.75 }}>
@@ -634,6 +833,7 @@ export default function OrganizationAuthModal({ open, onClose }) {
                   </FormControl>
                 )}
 
+                {/* FSILG name input */}
                 {livingGroupType === "fsilg" && (
                   <TextField
                     fullWidth
@@ -644,10 +844,36 @@ export default function OrganizationAuthModal({ open, onClose }) {
                     onBlur={() => handleBlur("fsilgName", fsilgName)}
                     error={touched.fsilgName && !!fieldErrors.fsilgName}
                     helperText={touched.fsilgName && fieldErrors.fsilgName}
-                    sx={{ ...textFieldSx, mb: 3 }}
+                    sx={{ ...textFieldSx, mb: 2 }}
                     disabled={loading}
                   />
                 )}
+
+                {/* Password fields AFTER name selection */}
+                <TextField
+                  fullWidth
+                  type="password"
+                  label={t("password")}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onBlur={() => handleBlur("password", password)}
+                  error={touched.password && !!fieldErrors.password}
+                  helperText={touched.password && fieldErrors.password}
+                  sx={{ ...textFieldSx, mb: 2 }}
+                  disabled={loading}
+                />
+                <TextField
+                  fullWidth
+                  type="password"
+                  label={t("confirmPassword")}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  onBlur={() => handleBlur("confirmPassword", confirmPassword)}
+                  error={touched.confirmPassword && !!fieldErrors.confirmPassword}
+                  helperText={touched.confirmPassword && fieldErrors.confirmPassword}
+                  sx={{ ...textFieldSx, mb: 3 }}
+                  disabled={loading}
+                />
               </>
             )}
 

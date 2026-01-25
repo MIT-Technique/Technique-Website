@@ -53,6 +53,7 @@ export interface LivingGroup {
   name: string;
   status: LivingGroupStatus;
   living_group_type: LivingGroupType;
+  has_leader: boolean;
   promoted_by: string | null;
   promoted_at: string | null;
   disabled_by: string | null;

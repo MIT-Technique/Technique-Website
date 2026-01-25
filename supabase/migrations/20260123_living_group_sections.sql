@@ -211,7 +211,7 @@ INSERT INTO dorm_sections (dorm_name, section_name, display_order) VALUES
 ('McCormick Hall', 'West Tower 8', 16)
 ON CONFLICT (dorm_name, section_name) DO NOTHING;
 
--- New House (Houses 1-6)
+-- New House (9 Houses)
 INSERT INTO dorm_sections (dorm_name, section_name, display_order) VALUES
 ('New House', 'Chocolate City', 1),
 ('New House', 'French House', 2),

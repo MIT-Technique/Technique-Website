@@ -226,7 +226,18 @@
         "resetLinkSent": "如果账户存在，重置链接已发送。",
         "backToSignIn": "返回登录",
         "needAccount": "需要注册账户？",
-        "haveAccount": "已有账户？"
+        "haveAccount": "已有账户？",
+        "signInOrgType": "组织类型",
+        "signInOrgTypeClub": "社团",
+        "signInOrgTypeLivingGroup": "住宿组",
+        "livingGroupName": "住宿组名称",
+        "livingGroupNamePlaceholder": "例如：Baker House",
+        "dormTaken": "(已注册)",
+        "forgotPasswordLivingGroupInfo": "密码重置链接将发送到您的住宿组负责人的邮箱。",
+        "noLeaderError": "此住宿组没有负责人。请联系 tnq-exec@mit.edu 获取帮助。",
+        "resetSentToLeader": "重置信息已发送。请联系您的住宿组负责人。",
+        "livingGroupSignUpSuccess": "账户创建成功！您现在可以登录。",
+        "livingGroupNotFound": "未找到住宿组"
       },
       "dividerText": "或",
       "success": "成功登录",
@@ -1139,6 +1150,16 @@
         "declined": "已拒绝",
         "cancelled": "已取消"
       }
+    },
+    "onboarding": {
+      "title": "添加住宿组负责人",
+      "description": "在访问排程和成员功能之前，您需要添加至少一名MIT学生作为住宿组负责人。他们将接收密码重置邮件并帮助管理您的团体。",
+      "studentEmailPlaceholder": "学生的MIT邮箱 (例如：student@mit.edu)",
+      "addLeader": "添加负责人",
+      "addingLeader": "添加中...",
+      "leaderAdded": "负责人添加成功！",
+      "emailRequired": "请输入学生邮箱",
+      "addLeaderError": "添加负责人失败"
     }
   },
 

@@ -228,7 +228,18 @@
         "resetLinkSent": "If an account exists, a reset link has been sent.",
         "backToSignIn": "Back to Sign In",
         "needAccount": "Need an account?",
-        "haveAccount": "Already have an account?"
+        "haveAccount": "Already have an account?",
+        "signInOrgType": "Organization Type",
+        "signInOrgTypeClub": "Club",
+        "signInOrgTypeLivingGroup": "Living Group",
+        "livingGroupName": "Living Group Name",
+        "livingGroupNamePlaceholder": "e.g., Baker House",
+        "dormTaken": "(Already registered)",
+        "forgotPasswordLivingGroupInfo": "A password reset link will be sent to your Living Group Leader's email.",
+        "noLeaderError": "No leader assigned to this Living Group. Please contact tnq-exec@mit.edu for assistance.",
+        "resetSentToLeader": "Password reset info has been sent. Check with your Living Group Leader.",
+        "livingGroupSignUpSuccess": "Account created successfully! You can now sign in.",
+        "livingGroupNotFound": "Living group not found"
       },
       "admin": {
         "title": "Admin Login",
@@ -1138,6 +1149,16 @@
         "declined": "Declined",
         "cancelled": "Cancelled"
       }
+    },
+    "onboarding": {
+      "title": "Add a Living Group Leader",
+      "description": "Before you can access scheduling and member features, you need to add at least one MIT student as a Living Group Leader. They will receive password reset emails and help manage your group.",
+      "studentEmailPlaceholder": "Student's MIT email (e.g., student@mit.edu)",
+      "addLeader": "Add Leader",
+      "addingLeader": "Adding...",
+      "leaderAdded": "Leader added successfully!",
+      "emailRequired": "Please enter a student email",
+      "addLeaderError": "Failed to add leader"
     }
   },
 

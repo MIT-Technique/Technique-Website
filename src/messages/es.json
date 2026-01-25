@@ -228,7 +228,18 @@
         "resetLinkSent": "Si existe una cuenta, se ha enviado un enlace de restablecimiento.",
         "backToSignIn": "Volver a Iniciar Sesión",
         "needAccount": "¿Necesitas una cuenta?",
-        "haveAccount": "¿Ya tienes una cuenta?"
+        "haveAccount": "¿Ya tienes una cuenta?",
+        "signInOrgType": "Tipo de Organización",
+        "signInOrgTypeClub": "Club",
+        "signInOrgTypeLivingGroup": "Grupo de Vivienda",
+        "livingGroupName": "Nombre del Grupo de Vivienda",
+        "livingGroupNamePlaceholder": "ej., Baker House",
+        "dormTaken": "(Ya registrado)",
+        "forgotPasswordLivingGroupInfo": "Se enviará un enlace de restablecimiento al correo de su Líder del Grupo de Vivienda.",
+        "noLeaderError": "No hay líder asignado a este Grupo de Vivienda. Por favor contacte a tnq-exec@mit.edu para asistencia.",
+        "resetSentToLeader": "La información de restablecimiento ha sido enviada. Consulte con su Líder del Grupo de Vivienda.",
+        "livingGroupSignUpSuccess": "¡Cuenta creada exitosamente! Ahora puede iniciar sesión.",
+        "livingGroupNotFound": "Grupo de vivienda no encontrado"
       },
       "admin": {
         "title": "Acceso de Administrador",
@@ -1139,6 +1150,16 @@
         "declined": "Rechazado",
         "cancelled": "Cancelado"
       }
+    },
+    "onboarding": {
+      "title": "Agregar Líder del Grupo de Vivienda",
+      "description": "Antes de acceder a las funciones de programación y miembros, necesita agregar al menos un estudiante de MIT como Líder del Grupo de Vivienda. Ellos recibirán los correos de restablecimiento de contraseña y ayudarán a administrar su grupo.",
+      "studentEmailPlaceholder": "Email MIT del estudiante (ej., student@mit.edu)",
+      "addLeader": "Agregar Líder",
+      "addingLeader": "Agregando...",
+      "leaderAdded": "¡Líder agregado exitosamente!",
+      "emailRequired": "Por favor ingrese un email de estudiante",
+      "addLeaderError": "Error al agregar líder"
     }
   },
 
