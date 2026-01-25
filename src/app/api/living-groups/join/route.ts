@@ -4,7 +4,7 @@ import { getCurrentUser } from "../../../../lib/auth/session";
 
 interface JoinRequest {
   livingGroupId: string;
-  sectionId?: string; // Required for dorms, null for FSILGs
+  sectionName?: string; // Required for dorms, null for FSILGs
 }
 
 // POST /api/living-groups/join
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     );
 
     const body: JoinRequest = await request.json();
-    const { livingGroupId, sectionId } = body;
+    const { livingGroupId, sectionName } = body;
 
     if (!livingGroupId) {
       return NextResponse.json(
@@ -39,10 +39,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get the living group to determine type
+    // Get the living group to determine type and validate section
     const { data: livingGroup, error: lgError } = await supabase
       .from("living_groups")
-      .select("id, name, living_group_type, status")
+      .select("id, name, living_group_type, status, dorm_sections")
       .eq("id", livingGroupId)
       .single();
 
@@ -63,32 +63,19 @@ export async function POST(request: NextRequest) {
     const membershipType = livingGroup.living_group_type;
 
     // For dorms, section is required
-    if (membershipType === "dorm" && !sectionId) {
+    if (membershipType === "dorm" && !sectionName) {
       return NextResponse.json(
         { error: "Section is required for dorm membership" },
         { status: 400 }
       );
     }
 
-    // Validate section belongs to the correct dorm
-    if (sectionId) {
-      const { data: section, error: sectionError } = await supabase
-        .from("dorm_sections")
-        .select("id, dorm_name")
-        .eq("id", sectionId)
-        .single();
-
-      if (sectionError || !section) {
+    // Validate section belongs to the living group's sections
+    if (sectionName && membershipType === "dorm") {
+      const dormSections = livingGroup.dorm_sections || [];
+      if (!dormSections.includes(sectionName)) {
         return NextResponse.json(
-          { error: "Invalid section" },
-          { status: 400 }
-        );
-      }
-
-      // Verify section belongs to the living group's dorm
-      if (section.dorm_name !== livingGroup.name) {
-        return NextResponse.json(
-          { error: "Section does not belong to this dorm" },
+          { error: "Invalid section for this dorm" },
           { status: 400 }
         );
       }
@@ -127,7 +114,7 @@ export async function POST(request: NextRequest) {
       .insert({
         living_group_id: livingGroupId,
         user_id: user.id,
-        section_id: sectionId || null,
+        section_name: sectionName || null,
         membership_type: membershipType,
         status,
         joined_at: new Date().toISOString(),

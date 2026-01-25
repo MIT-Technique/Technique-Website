@@ -33,7 +33,7 @@ function Sidebar({ pathname }) {
         return `/${locale}/dashboard`;
       case 'club':
         return `/${locale}/club`;
-      case 'living_group_leader':
+      case 'living_group':
         return `/${locale}/living-group`;
       default:
         return `/${locale}/bio`;

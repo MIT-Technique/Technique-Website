@@ -647,6 +647,17 @@ export function generateStaticParams() {
 -- WARNING: This schema is for context only and is not meant to be run.
 -- Table order and constraints may not be valid for execution.
 
+CREATE TABLE public.admin_logs (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+actor_id uuid NOT NULL,
+action_type character varying NOT NULL,
+target_type character varying NOT NULL,
+target_id uuid,
+details jsonb DEFAULT '{}'::jsonb,
+created_at timestamp with time zone DEFAULT now(),
+CONSTRAINT admin_logs_pkey PRIMARY KEY (id),
+CONSTRAINT admin_logs_actor_id_fkey FOREIGN KEY (actor_id) REFERENCES public.users(id)
+);
 CREATE TABLE public.club_invitations (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 club_id uuid NOT NULL,
@@ -727,14 +738,6 @@ CONSTRAINT clubs_pkey PRIMARY KEY (id),
 CONSTRAINT clubs_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
 CONSTRAINT clubs_approved_by_fkey FOREIGN KEY (approved_by) REFERENCES public.users(id)
 );
-CREATE TABLE public.dorm_sections (
-id uuid NOT NULL DEFAULT gen_random_uuid(),
-dorm_name character varying NOT NULL,
-section_name character varying NOT NULL,
-display_order integer DEFAULT 0,
-created_at timestamp with time zone DEFAULT now(),
-CONSTRAINT dorm_sections_pkey PRIMARY KEY (id)
-);
 CREATE TABLE public.export_club_members (
 club_name text NOT NULL,
 row_index integer NOT NULL,
@@ -754,38 +757,68 @@ CONSTRAINT form_settings_pkey PRIMARY KEY (id),
 CONSTRAINT form_settings_frozen_by_fkey FOREIGN KEY (frozen_by) REFERENCES public.users(id),
 CONSTRAINT form_settings_unfrozen_by_fkey FOREIGN KEY (unfrozen_by) REFERENCES public.users(id)
 );
+CREATE TABLE public.living_group_leader_permissions (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+user_id uuid NOT NULL,
+living_group_id uuid NOT NULL,
+invited_by uuid,
+invited_at timestamp with time zone,
+accepted_at timestamp with time zone,
+status character varying DEFAULT 'pending'::character varying CHECK (status::text = ANY (ARRAY['pending'::character varying, 'active'::character varying, 'declined'::character varying, 'removed'::character varying]::text[])),
+removed_by uuid,
+removed_at timestamp with time zone,
+created_at timestamp with time zone DEFAULT now(),
+updated_at timestamp with time zone DEFAULT now(),
+CONSTRAINT living_group_leader_permissions_pkey PRIMARY KEY (id),
+CONSTRAINT living_group_leader_permissions_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
+CONSTRAINT living_group_leader_permissions_living_group_id_fkey FOREIGN KEY (living_group_id) REFERENCES public.living_groups(id),
+CONSTRAINT living_group_leader_permissions_invited_by_fkey FOREIGN KEY (invited_by) REFERENCES public.users(id),
+CONSTRAINT living_group_leader_permissions_removed_by_fkey FOREIGN KEY (removed_by) REFERENCES public.users(id)
+);
 CREATE TABLE public.living_group_memberships (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 living_group_id uuid NOT NULL,
 user_id uuid NOT NULL,
-section_id uuid,
 membership_type character varying NOT NULL CHECK (membership_type::text = ANY (ARRAY['dorm'::character varying, 'fsilg'::character varying]::text[])),
 status character varying NOT NULL DEFAULT 'active'::character varying CHECK (status::text = ANY (ARRAY['pending'::character varying, 'active'::character varying, 'removed'::character varying]::text[])),
 joined_at timestamp with time zone DEFAULT now(),
 approved_by uuid,
 approved_at timestamp with time zone,
+section_name text,
 CONSTRAINT living_group_memberships_pkey PRIMARY KEY (id),
 CONSTRAINT living_group_memberships_living_group_fkey FOREIGN KEY (living_group_id) REFERENCES public.living_groups(id),
 CONSTRAINT living_group_memberships_user_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
-CONSTRAINT living_group_memberships_section_fkey FOREIGN KEY (section_id) REFERENCES public.dorm_sections(id),
 CONSTRAINT living_group_memberships_approved_by_fkey FOREIGN KEY (approved_by) REFERENCES public.users(id)
+);
+CREATE TABLE public.living_group_time_assignments (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+photoshoot_time_id uuid NOT NULL,
+living_group_id uuid NOT NULL,
+slot_start time without time zone NOT NULL,
+slot_end time without time zone NOT NULL,
+assigned_by uuid NOT NULL,
+created_at timestamp with time zone DEFAULT now(),
+section_name text,
+CONSTRAINT living_group_time_assignments_pkey PRIMARY KEY (id),
+CONSTRAINT living_group_time_assignments_photoshoot_time_id_fkey FOREIGN KEY (photoshoot_time_id) REFERENCES public.photoshoot_times(id),
+CONSTRAINT living_group_time_assignments_living_group_id_fkey FOREIGN KEY (living_group_id) REFERENCES public.living_groups(id),
+CONSTRAINT living_group_time_assignments_assigned_by_fkey FOREIGN KEY (assigned_by) REFERENCES public.users(id)
 );
 CREATE TABLE public.living_groups (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 user_id uuid NOT NULL,
 name character varying NOT NULL,
 status character varying DEFAULT 'pending'::character varying CHECK (status::text = ANY (ARRAY['active'::character varying, 'disabled'::character varying, 'pending'::character varying]::text[])),
-promoted_by uuid,
-promoted_at timestamp with time zone,
 disabled_by uuid,
 disabled_at timestamp with time zone,
 created_at timestamp with time zone DEFAULT now(),
 updated_at timestamp with time zone DEFAULT now(),
 living_group_type character varying DEFAULT 'dorm'::character varying CHECK (living_group_type::text = ANY (ARRAY['dorm'::character varying, 'fsilg'::character varying]::text[])),
+has_leader boolean DEFAULT false,
+dorm_sections ARRAY DEFAULT '{}'::text[],
 CONSTRAINT living_groups_pkey PRIMARY KEY (id),
 CONSTRAINT living_groups_disabled_by_fkey FOREIGN KEY (disabled_by) REFERENCES public.users(id),
-CONSTRAINT living_groups_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
-CONSTRAINT living_groups_promoted_by_fkey FOREIGN KEY (promoted_by) REFERENCES public.users(id)
+CONSTRAINT living_groups_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
 );
 CREATE TABLE public.photographer_permissions (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -845,13 +878,12 @@ CONSTRAINT promotion_requests_reviewed_by_fkey FOREIGN KEY (reviewed_by) REFEREN
 CREATE TABLE public.section_expected_counts (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 living_group_id uuid NOT NULL,
-section_id uuid,
 expected_count integer NOT NULL DEFAULT 0,
 updated_at timestamp with time zone DEFAULT now(),
 updated_by uuid,
+section_name text,
 CONSTRAINT section_expected_counts_pkey PRIMARY KEY (id),
 CONSTRAINT section_expected_counts_lg_fkey FOREIGN KEY (living_group_id) REFERENCES public.living_groups(id),
-CONSTRAINT section_expected_counts_section_fkey FOREIGN KEY (section_id) REFERENCES public.dorm_sections(id),
 CONSTRAINT section_expected_counts_updated_by_fkey FOREIGN KEY (updated_by) REFERENCES public.users(id)
 );
 CREATE TABLE public.sessions (
@@ -906,6 +938,7 @@ is_active boolean DEFAULT true,
 created_at timestamp with time zone DEFAULT now(),
 updated_at timestamp with time zone DEFAULT now(),
 is_staph boolean DEFAULT false,
+is_living_group_leader boolean,
 CONSTRAINT users_pkey PRIMARY KEY (id),
 CONSTRAINT users_supabase_auth_id_fkey FOREIGN KEY (supabase_auth_id) REFERENCES auth.users(id)
 );

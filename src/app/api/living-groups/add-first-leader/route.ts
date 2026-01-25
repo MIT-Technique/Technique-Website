@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (user.role !== 'living_group_leader') {
+    if (user.role !== 'living_group') {
       return NextResponse.json(
         { error: "Only living group accounts can add first leader" },
         { status: 403 }

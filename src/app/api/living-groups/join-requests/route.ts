@@ -11,9 +11,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (user.role !== "living_group_leader") {
+    if (user.role !== "living_group") {
       return NextResponse.json(
-        { error: "Only living group leaders can view join requests" },
+        { error: "Only living group accounts can view join requests" },
         { status: 403 }
       );
     }

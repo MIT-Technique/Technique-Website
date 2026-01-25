@@ -55,7 +55,7 @@ export async function GET() {
       club = data;
     }
 
-    if (user.role === 'living_group_leader') {
+    if (user.role === 'living_group') {
       const { data } = await supabase
         .from('living_groups')
         .select('*')

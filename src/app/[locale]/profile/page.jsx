@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useUser } from '../../../hooks/useUser';
 import Footer from '../../../components/Footer/Footer';
 import ClubDashboardInline from '../../../components/ClubDashboardInline/ClubDashboardInline';
+import LivingGroupDashboardInline from '../../../components/LivingGroupDashboardInline/LivingGroupDashboardInline';
 import PhotographerTimesSection from '../../../components/PhotographerTimesSection/PhotographerTimesSection';
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
@@ -89,6 +90,13 @@ export default function ProfilePage() {
   // Inline club dashboard state (for club leaders)
   const [viewingClubDashboard, setViewingClubDashboard] = useState(null); // club_id or null
 
+  // LG Leader state (for students who are also LG leaders)
+  const [isLGLeader, setIsLGLeader] = useState(false);
+  const [leaderLivingGroups, setLeaderLivingGroups] = useState([]);
+  const [pendingLGInvitations, setPendingLGInvitations] = useState([]);
+  const [viewingLGDashboard, setViewingLGDashboard] = useState(null); // living_group_id or null
+  const [processingLGInvitationId, setProcessingLGInvitationId] = useState(null);
+
   // My Living Groups state
   const [lgMemberships, setLgMemberships] = useState([]);
   const [lgSearch, setLgSearch] = useState('');
@@ -139,16 +147,16 @@ export default function ProfilePage() {
     }
   }, [club]);
 
-  // Fetch scheduling data for living group leaders
+  // Fetch scheduling data for living group accounts
   useEffect(() => {
-    if (isLoggedIn && user?.role === 'living_group_leader') {
+    if (isLoggedIn && user?.role === 'living_group') {
       fetchSchedulingData();
     }
   }, [isLoggedIn, user]);
 
-  // Fetch my clubs data for students and living group leaders
+  // Fetch my clubs data for students
   useEffect(() => {
-    if (isLoggedIn && (user?.role === 'student' || user?.role === 'living_group_leader')) {
+    if (isLoggedIn && user?.role === 'student') {
       fetchMyClubsData();
     }
   }, [isLoggedIn, user]);
@@ -160,7 +168,43 @@ export default function ProfilePage() {
     }
   }, [isLoggedIn, user]);
 
+  // Fetch LG leader status for students (add-on permission)
+  useEffect(() => {
+    if (isLoggedIn && user?.role === 'student') {
+      fetchLGLeaderStatus();
+    }
+  }, [isLoggedIn, user]);
 
+  async function fetchLGLeaderStatus() {
+    try {
+      const res = await fetch('/api/user/lg-leader-status');
+      const data = await res.json();
+      setIsLGLeader(data.isLeader || false);
+      setLeaderLivingGroups(data.livingGroups || []);
+      setPendingLGInvitations(data.pendingInvitations || []);
+    } catch (error) {
+      console.error('Error fetching LG leader status:', error);
+    }
+  }
+
+  async function handleLGInvitationResponse(invitationId, action) {
+    setProcessingLGInvitationId(invitationId);
+    try {
+      const res = await fetch('/api/living-groups/leaders', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ invitation_id: invitationId, action }),
+      });
+      if (res.ok) {
+        // Refresh LG leader status
+        fetchLGLeaderStatus();
+      }
+    } catch (error) {
+      console.error('Error responding to LG invitation:', error);
+    } finally {
+      setProcessingLGInvitationId(null);
+    }
+  }
 
   async function fetchBioData() {
     try {
@@ -532,11 +576,18 @@ export default function ProfilePage() {
     if (user?.role === 'student') {
       tabs.push({ id: 'myClubs', label: t('tabs.myClubs') });
       tabs.push({ id: 'myLivingGroups', label: t('tabs.myLivingGroups') });
+
+      // Add tabs for each living group where user is a leader (add-on permission)
+      leaderLivingGroups.forEach(lg => {
+        tabs.push({
+          id: `lg-${lg.id}`,
+          label: lg.name,  // e.g., "Baker House"
+        });
+      });
     } else if (user?.role === 'club') {
       tabs.push({ id: 'club', label: t('tabs.clubInfo') });
-    } else if (user?.role === 'living_group_leader') {
+    } else if (user?.role === 'living_group') {
       tabs.push({ id: 'scheduling', label: t('tabs.scheduling') });
-      tabs.push({ id: 'myClubs', label: t('tabs.myClubs') });
     }
 
     return tabs;
@@ -591,6 +642,25 @@ export default function ProfilePage() {
     );
   }
 
+  // If viewing a living group dashboard, show the inline dashboard instead
+  if (viewingLGDashboard) {
+    return (
+      <>
+        <main className="min-h-screen pt-24 lg:pt-32 pb-12">
+          <LivingGroupDashboardInline
+            livingGroupId={viewingLGDashboard}
+            onBack={() => {
+              setViewingLGDashboard(null);
+              // Refresh LG leader status after leaving dashboard
+              fetchLGLeaderStatus();
+            }}
+          />
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
   return (
     <>
       <main className="min-h-screen pt-24 lg:pt-32 pb-12">
@@ -630,11 +700,69 @@ export default function ProfilePage() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-text-secondary">{t('profile.role')}</span>
-                    <span className="capitalize">{user?.is_staph ? 'Staph' : user?.role?.replace('_', ' ')}</span>
+                    <span className="capitalize">
+                      {(() => {
+                        const parts = [];
+                        // Base role display
+                        if (user?.is_staph) parts.push('Staph');
+                        else if (user?.role === 'admin') parts.push('Admin');
+                        else if (user?.role !== 'student') parts.push(user?.role?.replace('_', ' '));
+
+                        // LG Leader add-on for students
+                        if (user?.role === 'student' && isLGLeader && leaderLivingGroups.length > 0) {
+                          const lgNames = leaderLivingGroups.map(lg => lg.name).join(', ');
+                          parts.push(`${lgNames} Leader`);
+                        }
+
+                        return parts.length > 0 ? parts.join(', ') : 'Student';
+                      })()}
+                    </span>
                   </div>
                 </div>
 
               </div>
+
+              {/* Pending LG Leader Invitations */}
+              {user?.role === 'student' && pendingLGInvitations.length > 0 && (
+                <div className="card-elevated p-6">
+                  <h2 className="text-lg font-medium mb-4">{t('lgLeaderInvitations.title')}</h2>
+                  <div className="space-y-3">
+                    {pendingLGInvitations.map((invitation) => (
+                      <div
+                        key={invitation.id}
+                        className="p-4 border border-blue-200 bg-blue-50 rounded-lg"
+                      >
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p className="font-medium">{invitation.living_group?.name || 'Unknown Living Group'}</p>
+                            <p className="text-text-muted text-xs mt-1">
+                              {t('lgLeaderInvitations.invitedOn', {
+                                date: new Date(invitation.invited_at).toLocaleDateString(locale),
+                              })}
+                            </p>
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleLGInvitationResponse(invitation.id, 'accept')}
+                              disabled={processingLGInvitationId === invitation.id}
+                              className="text-sm px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+                            >
+                              {processingLGInvitationId === invitation.id ? '...' : t('lgLeaderInvitations.accept')}
+                            </button>
+                            <button
+                              onClick={() => handleLGInvitationResponse(invitation.id, 'decline')}
+                              disabled={processingLGInvitationId === invitation.id}
+                              className="text-sm px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700"
+                            >
+                              {processingLGInvitationId === invitation.id ? '...' : t('lgLeaderInvitations.decline')}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Student Information Section */}
               {user?.role === 'student' && (
@@ -837,8 +965,8 @@ export default function ProfilePage() {
             </div>
           )}
 
-          {/* Scheduling Tab (Living Group Leaders) */}
-          {activeTab === 'scheduling' && user?.role === 'living_group_leader' && (
+          {/* Scheduling Tab (Living Group Accounts) */}
+          {activeTab === 'scheduling' && user?.role === 'living_group' && (
             <div>
               {/* Living group info */}
               {livingGroup && (
@@ -951,8 +1079,8 @@ export default function ProfilePage() {
             </div>
           )}
 
-          {/* My Clubs Tab (Students and Living Group Leaders) */}
-          {activeTab === 'myClubs' && (user?.role === 'student' || user?.role === 'living_group_leader') && (
+          {/* My Clubs Tab (Students only) */}
+          {activeTab === 'myClubs' && user?.role === 'student' && (
             <div>
               {clubsMessage.text && (
                 <div className={`mb-6 p-4 rounded ${
@@ -1358,6 +1486,14 @@ export default function ProfilePage() {
           {/* Staph Tools Tab - for staph users */}
           {activeTab === 'photographerTools' && user?.is_staph && (
             <PhotographerTimesSection />
+          )}
+
+          {/* LG Leader Tab - inline dashboard for living group management */}
+          {activeTab.startsWith('lg-') && user?.role === 'student' && (
+            <LivingGroupDashboardInline
+              livingGroupId={activeTab.replace('lg-', '')}
+              onBack={() => setActiveTab('profile')}
+            />
           )}
 
         </section>

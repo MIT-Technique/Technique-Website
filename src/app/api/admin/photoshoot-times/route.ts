@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "../../../../lib/auth/session";
 import { createAdminClient } from "../../../../lib/supabase/admin";
 import { createLog } from "../../../../lib/admin-logs";
+import { isValidTimeSlot } from "../../../../lib/utils/time";
 
 // GET - List all photoshoot times
 export async function GET(request: NextRequest) {
@@ -86,6 +87,14 @@ export async function POST(request: NextRequest) {
     if (!date || !startTime || !endTime) {
       return NextResponse.json(
         { error: "Date, start time, and end time are required" },
+        { status: 400 }
+      );
+    }
+
+    // Validate 30-minute time boundaries
+    if (!isValidTimeSlot(startTime) || !isValidTimeSlot(endTime)) {
+      return NextResponse.json(
+        { error: "Times must be on 30-minute boundaries (XX:00 or XX:30)" },
         { status: 400 }
       );
     }

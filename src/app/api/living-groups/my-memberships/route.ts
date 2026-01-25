@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
       .select(`
         id,
         living_group_id,
-        section_id,
+        section_name,
         membership_type,
         status,
         joined_at,
@@ -32,11 +32,6 @@ export async function GET(request: NextRequest) {
           name,
           living_group_type,
           status
-        ),
-        section:dorm_sections!living_group_memberships_section_fkey(
-          id,
-          dorm_name,
-          section_name
         )
       `)
       .eq("user_id", user.id)

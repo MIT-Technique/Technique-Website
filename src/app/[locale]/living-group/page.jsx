@@ -30,11 +30,11 @@ export default function LivingGroupPage() {
   const { isLoggedIn, user, livingGroup, loading: userLoading, refetch } = useUser();
 
   // Tab state
-  const [activeTab, setActiveTab] = useState('scheduling');
+  const [activeTab, setActiveTab] = useState('book');
 
   // Scheduling state
   const [availableTimes, setAvailableTimes] = useState([]);
-  const [bookedTime, setBookedTime] = useState(null);
+  const [bookedTimes, setBookedTimes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [booking, setBooking] = useState(false);
   const [cancelling, setCancelling] = useState(false);
@@ -44,8 +44,14 @@ export default function LivingGroupPage() {
   // Members state
   const [membersData, setMembersData] = useState(null);
   const [membersLoading, setMembersLoading] = useState(true);
-  const [expectedCountInputs, setExpectedCountInputs] = useState({});
-  const [updatingExpected, setUpdatingExpected] = useState(null);
+
+  // Member search state
+  const [memberSearchQuery, setMemberSearchQuery] = useState('');
+  const [memberSearchResults, setMemberSearchResults] = useState([]);
+  const [memberSearching, setMemberSearching] = useState(false);
+  const [selectedSection, setSelectedSection] = useState('');
+  const [addingMemberId, setAddingMemberId] = useState(null);
+  const [removingMemberId, setRemovingMemberId] = useState(null);
 
   // Join requests state (FSILGs only)
   const [joinRequests, setJoinRequests] = useState([]);
@@ -68,6 +74,11 @@ export default function LivingGroupPage() {
   // FSILG onboarding state (for adding first leader)
   const [leaderEmail, setLeaderEmail] = useState('');
   const [addingLeader, setAddingLeader] = useState(false);
+
+  // Group Leaders state
+  const [inviteLeaderEmail, setInviteLeaderEmail] = useState('');
+  const [invitingLeader, setInvitingLeader] = useState(false);
+  const [removingLeaderId, setRemovingLeaderId] = useState(null);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(0);
@@ -98,13 +109,13 @@ export default function LivingGroupPage() {
   }
 
   useEffect(() => {
-    if (!userLoading && (!isLoggedIn || user?.role !== 'living_group_leader')) {
+    if (!userLoading && (!isLoggedIn || user?.role !== 'living_group')) {
       router.push(`/${locale}/login`);
     }
   }, [isLoggedIn, user, userLoading, router, locale]);
 
   useEffect(() => {
-    if (isLoggedIn && user?.role === 'living_group_leader') {
+    if (isLoggedIn && user?.role === 'living_group') {
       fetchTimes();
       checkFrozen();
       fetchMembers();
@@ -121,7 +132,7 @@ export default function LivingGroupPage() {
       const res = await fetch('/api/living-groups/times');
       const data = await res.json();
       setAvailableTimes(data.availableTimes || []);
-      setBookedTime(data.bookedTime || null);
+      setBookedTimes(data.bookedTimes || []);
     } catch (error) {
       console.error('Error fetching times:', error);
     } finally {
@@ -169,7 +180,7 @@ export default function LivingGroupPage() {
     }
   }
 
-  async function handleCancelRequest() {
+  async function handleCancelRequest(timeId) {
     if (isFrozen) return;
 
     const reason = prompt(t('cancelReason'));
@@ -182,7 +193,7 @@ export default function LivingGroupPage() {
       const res = await fetch('/api/living-groups/cancel-request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reason }),
+        body: JSON.stringify({ reason, timeId }),
       });
 
       const data = await res.json();
@@ -206,21 +217,88 @@ export default function LivingGroupPage() {
       const res = await fetch('/api/living-groups/members');
       const data = await res.json();
       setMembersData(data);
-
-      // Initialize expected count inputs from data
-      if (data.membersBySection) {
-        const inputs = {};
-        data.membersBySection.forEach((section) => {
-          inputs[section.section.id] = section.expectedCount || 0;
-        });
-        setExpectedCountInputs(inputs);
-      } else if (data.expectedCount !== undefined) {
-        setExpectedCountInputs({ total: data.expectedCount });
-      }
     } catch (error) {
       console.error('Error fetching members:', error);
     } finally {
       setMembersLoading(false);
+    }
+  }
+
+  async function searchStudents(query) {
+    if (!query || query.length < 2) {
+      setMemberSearchResults([]);
+      return;
+    }
+
+    setMemberSearching(true);
+    try {
+      const res = await fetch(
+        `/api/living-groups/search-students?q=${encodeURIComponent(query)}&livingGroupId=${livingGroup?.id}&excludeMembers=true`
+      );
+      const data = await res.json();
+      setMemberSearchResults(data.students || []);
+    } catch (error) {
+      console.error('Error searching students:', error);
+      setMemberSearchResults([]);
+    } finally {
+      setMemberSearching(false);
+    }
+  }
+
+  async function handleAddMember(userId) {
+    setAddingMemberId(userId);
+    setMessage({ type: '', text: '' });
+
+    try {
+      const res = await fetch('/api/living-groups/members', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          livingGroupId: livingGroup?.id,
+          userId,
+          sectionName: livingGroup?.living_group_type === 'dorm' ? selectedSection : null,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setMessage({ type: 'success', text: t('members.addSuccess') });
+        setMemberSearchQuery('');
+        setMemberSearchResults([]);
+        fetchMembers();
+      } else {
+        setMessage({ type: 'error', text: data.error || t('members.addError') });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: t('members.addError') });
+    } finally {
+      setAddingMemberId(null);
+    }
+  }
+
+  async function handleRemoveMember(membershipId) {
+    if (!confirm(t('members.confirmRemove'))) return;
+
+    setRemovingMemberId(membershipId);
+    setMessage({ type: '', text: '' });
+
+    try {
+      const res = await fetch(`/api/living-groups/members?membershipId=${membershipId}`, {
+        method: 'DELETE',
+      });
+
+      if (res.ok) {
+        setMessage({ type: 'success', text: t('members.removeSuccess') });
+        fetchMembers();
+      } else {
+        const data = await res.json();
+        setMessage({ type: 'error', text: data.error || t('members.removeError') });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: t('members.removeError') });
+    } finally {
+      setRemovingMemberId(null);
     }
   }
 
@@ -312,34 +390,6 @@ export default function LivingGroupPage() {
     }
   }
 
-  async function handleUpdateExpectedCount(sectionId) {
-    setUpdatingExpected(sectionId);
-    setMessage({ type: '', text: '' });
-
-    try {
-      const res = await fetch('/api/living-groups/expected-counts', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sectionId: sectionId === 'total' ? null : sectionId,
-          expectedCount: parseInt(expectedCountInputs[sectionId]) || 0,
-        }),
-      });
-
-      if (res.ok) {
-        setMessage({ type: 'success', text: t('members.updateSuccess') });
-        fetchMembers();
-      } else {
-        const data = await res.json();
-        setMessage({ type: 'error', text: data.error || t('members.updateError') });
-      }
-    } catch (error) {
-      setMessage({ type: 'error', text: t('members.updateError') });
-    } finally {
-      setUpdatingExpected(null);
-    }
-  }
-
   async function handleJoinRequestAction(requestId, action) {
     setProcessingRequestId(requestId);
     setMessage({ type: '', text: '' });
@@ -403,10 +453,149 @@ export default function LivingGroupPage() {
     }
   }
 
+  // Sections state (for assign tab)
+  const [sections, setSections] = useState([]);
+  const [sectionsLoading, setSectionsLoading] = useState(false);
+
+  // Leaders state
+  const [leaders, setLeaders] = useState({ activeLeaders: [], pendingInvitations: [] });
+  const [leadersLoading, setLeadersLoading] = useState(false);
+
+  // Fetch sections for dorms
+  useEffect(() => {
+    if (livingGroup?.living_group_type === 'dorm') {
+      fetchSections();
+    }
+  }, [livingGroup]);
+
+  async function fetchSections() {
+    try {
+      setSectionsLoading(true);
+      const res = await fetch(`/api/living-groups/sections?livingGroupId=${livingGroup.id}`);
+      const data = await res.json();
+      setSections(data.sections || []);
+    } catch (error) {
+      console.error('Error fetching sections:', error);
+    } finally {
+      setSectionsLoading(false);
+    }
+  }
+
+  async function fetchLeaders() {
+    if (!livingGroup?.id) return;
+    try {
+      setLeadersLoading(true);
+      const res = await fetch(`/api/living-groups/leaders?livingGroupId=${livingGroup.id}`);
+      const data = await res.json();
+      setLeaders({
+        activeLeaders: data.activeLeaders || [],
+        pendingInvitations: data.pendingInvitations || [],
+      });
+    } catch (error) {
+      console.error('Error fetching leaders:', error);
+    } finally {
+      setLeadersLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (livingGroup?.id) {
+      fetchLeaders();
+    }
+  }, [livingGroup?.id]);
+
+  // Handle inviting a new leader
+  async function handleInviteLeader() {
+    if (!inviteLeaderEmail.trim() || !livingGroup?.id) return;
+
+    setInvitingLeader(true);
+    setMessage({ type: '', text: '' });
+
+    try {
+      const res = await fetch('/api/living-groups/leaders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          livingGroupId: livingGroup.id,
+          studentEmail: inviteLeaderEmail.trim(),
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setMessage({ type: 'success', text: t('groupLeaders.inviteSent') });
+        setInviteLeaderEmail('');
+        fetchLeaders();
+      } else {
+        setMessage({ type: 'error', text: data.error || t('groupLeaders.inviteError') });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: t('groupLeaders.inviteError') });
+    } finally {
+      setInvitingLeader(false);
+    }
+  }
+
+  // Handle removing a leader
+  async function handleRemoveLeader(permissionId) {
+    if (!confirm(t('groupLeaders.confirmRemove'))) return;
+
+    setRemovingLeaderId(permissionId);
+    setMessage({ type: '', text: '' });
+
+    try {
+      const res = await fetch(`/api/living-groups/leaders?permissionId=${permissionId}`, {
+        method: 'DELETE',
+      });
+
+      if (res.ok) {
+        setMessage({ type: 'success', text: t('groupLeaders.removed') });
+        fetchLeaders();
+      } else {
+        const data = await res.json();
+        setMessage({ type: 'error', text: data.error || t('groupLeaders.removeError') });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: t('groupLeaders.removeError') });
+    } finally {
+      setRemovingLeaderId(null);
+    }
+  }
+
+  // Handle canceling a leader invitation
+  async function handleCancelLeaderInvitation(permissionId) {
+    setMessage({ type: '', text: '' });
+
+    try {
+      const res = await fetch(`/api/living-groups/leaders?permissionId=${permissionId}`, {
+        method: 'DELETE',
+      });
+
+      if (res.ok) {
+        setMessage({ type: 'success', text: t('groupLeaders.invitationCancelled') });
+        fetchLeaders();
+      } else {
+        const data = await res.json();
+        setMessage({ type: 'error', text: data.error || t('groupLeaders.cancelError') });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: t('groupLeaders.cancelError') });
+    }
+  }
+
   // Get available tabs based on living group type
   function getTabs() {
-    const tabs = [{ id: 'scheduling', label: t('tabs.scheduling') }];
+    const tabs = [{ id: 'book', label: t('tabs.book') }];
+
+    // Only show Assign tab for dorms with multiple sections
+    if (livingGroup?.living_group_type === 'dorm' && sections.length > 1) {
+      tabs.push({ id: 'assign', label: t('tabs.assign') });
+    }
+
     tabs.push({ id: 'members', label: t('tabs.members') });
+    tabs.push({ id: 'groupLeaders', label: t('tabs.groupLeaders') });
+
     if (livingGroup?.living_group_type === 'fsilg') {
       tabs.push({ id: 'joinRequests', label: t('tabs.joinRequests') });
     }
@@ -423,7 +612,7 @@ export default function LivingGroupPage() {
     );
   }
 
-  if (!isLoggedIn || user?.role !== 'living_group_leader') {
+  if (!isLoggedIn || user?.role !== 'living_group') {
     return null;
   }
 
@@ -525,47 +714,51 @@ export default function LivingGroupPage() {
           {/* Tab Content - Hidden during onboarding */}
           {!needsOnboarding && (
             <>
-          {/* Scheduling Tab */}
-          {activeTab === 'scheduling' && (
+          {/* Book Tab */}
+          {activeTab === 'book' && (
             <>
-              {/* Current Booking */}
-              {bookedTime && (
+              {/* Current Bookings */}
+              {bookedTimes.length > 0 && (
                 <div className="mb-8">
                   <h2 className="text-lg font-medium mb-4">{t('currentBooking')}</h2>
-                  <div className={`p-4 border rounded-lg ${
-                    bookedTime.cancellation_requested
-                      ? 'border-yellow-200 bg-yellow-50'
-                      : 'border-green-200 bg-green-50'
-                  }`}>
-                    <p className="font-medium">
-                      {new Date(bookedTime.date).toLocaleDateString(locale, {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })}
-                    </p>
-                    <p className="text-text-secondary">
-                      {formatTime(bookedTime.start_time)} - {formatTime(bookedTime.end_time)} EST
-                    </p>
-                    {bookedTime.cancellation_requested && (
-                      <p className="text-yellow-600 text-sm mt-2">{t('cancellationPending')}</p>
-                    )}
-                    {!bookedTime.cancellation_requested && !isDisabled && !isFrozen && (
-                      <button
-                        onClick={handleCancelRequest}
-                        disabled={cancelling}
-                        className="mt-4 px-4 py-2 text-sm text-red-600 border border-red-200 rounded hover:bg-red-50"
-                      >
-                        {cancelling ? t('requesting') : t('requestCancel')}
-                      </button>
-                    )}
+                  <div className="space-y-3">
+                    {bookedTimes.map((bookedTime) => (
+                      <div key={bookedTime.id} className={`p-4 border rounded-lg ${
+                        bookedTime.cancellation_requested
+                          ? 'border-yellow-200 bg-yellow-50'
+                          : 'border-green-200 bg-green-50'
+                      }`}>
+                        <p className="font-medium">
+                          {new Date(bookedTime.date).toLocaleDateString(locale, {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                          })}
+                        </p>
+                        <p className="text-text-secondary">
+                          {formatTime(bookedTime.start_time)} - {formatTime(bookedTime.end_time)} EST
+                        </p>
+                        {bookedTime.cancellation_requested && (
+                          <p className="text-yellow-600 text-sm mt-2">{t('cancellationPending')}</p>
+                        )}
+                        {!bookedTime.cancellation_requested && !isDisabled && !isFrozen && (
+                          <button
+                            onClick={() => handleCancelRequest(bookedTime.id)}
+                            disabled={cancelling}
+                            className="mt-4 px-4 py-2 text-sm text-red-600 border border-red-200 rounded hover:bg-red-50"
+                          >
+                            {cancelling ? t('requesting') : t('requestCancel')}
+                          </button>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
 
               {/* Available Times */}
-              {!bookedTime && !isDisabled && (
+              {!isDisabled && (
                 <div className="bg-white border border-border rounded-lg p-6">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="font-medium">{t('availableTimes')}</h3>
@@ -664,7 +857,7 @@ export default function LivingGroupPage() {
               )}
 
               {/* Propose Time Section */}
-              {!bookedTime && !isDisabled && (
+              {!isDisabled && (
                 <div className="mt-8">
                   <div className="bg-white border border-border rounded-lg p-6">
                     <h3 className="font-medium mb-2">{t('proposeTime.title')}</h3>
@@ -822,107 +1015,276 @@ export default function LivingGroupPage() {
 
               {membersLoading ? (
                 <p className="text-text-secondary">Loading...</p>
-              ) : membersData?.membersBySection ? (
-                // Dorm view - grouped by section
+              ) : (
                 <div className="space-y-6">
-                  <div className="flex justify-between items-center text-sm text-text-secondary mb-4">
-                    <span>{t('members.totalMembers', { count: membersData.totalMembers || 0 })}</span>
-                    <span>{t('members.totalExpected', { count: membersData.totalExpected || 0 })}</span>
+                  {/* Total Members */}
+                  <div className="text-sm text-text-secondary">
+                    <span>{t('members.totalMembers', { count: membersData?.totalMembers || 0 })}</span>
                   </div>
 
-                  {membersData.membersBySection.map((sectionData) => (
-                    <div key={sectionData.section.id} className="border border-border rounded-lg overflow-hidden">
-                      <div className="bg-bg-secondary px-4 py-3 flex justify-between items-center">
-                        <div>
-                          <h3 className="font-medium">{sectionData.section.section_name}</h3>
-                          <p className="text-sm text-text-secondary">
-                            {t('members.memberCount', { count: sectionData.memberCount })} •{' '}
-                            {t('members.expectedCount', { count: sectionData.expectedCount || 0 })}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <TextField
-                            size="small"
-                            type="number"
-                            value={expectedCountInputs[sectionData.section.id] || 0}
-                            onChange={(e) => setExpectedCountInputs({
-                              ...expectedCountInputs,
-                              [sectionData.section.id]: e.target.value,
-                            })}
-                            sx={{ width: 80 }}
-                            inputProps={{ min: 0 }}
-                          />
-                          <button
-                            onClick={() => handleUpdateExpectedCount(sectionData.section.id)}
-                            disabled={updatingExpected === sectionData.section.id}
-                            className="text-sm px-3 py-1 bg-accent text-white rounded hover:bg-accent/90 disabled:opacity-50"
-                          >
-                            {updatingExpected === sectionData.section.id ? '...' : t('members.updateExpected')}
-                          </button>
-                        </div>
-                      </div>
-                      {sectionData.members.length > 0 ? (
-                        <ul className="divide-y divide-border">
-                          {sectionData.members.map((member) => (
-                            <li key={member.id} className="px-4 py-2 text-sm">
-                              {member.user?.first_name} {member.user?.last_name}
-                              <span className="text-text-muted ml-2">({member.user?.email})</span>
-                            </li>
+                  {/* Add Member Section */}
+                  <div className="bg-white border border-border rounded-lg p-4">
+                    <h3 className="text-sm font-medium mb-3">{t('members.addMember')}</h3>
+                    <div className="flex gap-2 flex-wrap">
+                      {/* Section dropdown (dorms only) */}
+                      {livingGroup?.living_group_type === 'dorm' && sections.length > 0 && (
+                        <select
+                          value={selectedSection}
+                          onChange={(e) => setSelectedSection(e.target.value)}
+                          className="px-3 py-2 border border-border rounded text-sm"
+                        >
+                          <option value="">{t('members.selectSection')}</option>
+                          {sections.map((section) => (
+                            <option key={section.name} value={section.name}>{section.name}</option>
                           ))}
-                        </ul>
-                      ) : (
-                        <p className="px-4 py-3 text-sm text-text-muted">{t('members.noMembers')}</p>
+                        </select>
                       )}
+                      {/* Search input */}
+                      <div className="flex-1 min-w-[200px]">
+                        <TextField
+                          type="text"
+                          placeholder={t('members.searchPlaceholder')}
+                          value={memberSearchQuery}
+                          onChange={(e) => {
+                            setMemberSearchQuery(e.target.value);
+                            searchStudents(e.target.value);
+                          }}
+                          size="small"
+                          fullWidth
+                          sx={textFieldSx}
+                        />
+                      </div>
                     </div>
-                  ))}
-                </div>
-              ) : membersData?.members ? (
-                // FSILG view - flat list
-                <div>
-                  <div className="flex justify-between items-center mb-4">
-                    <span className="text-sm text-text-secondary">
-                      {t('members.totalMembers', { count: membersData.totalMembers || 0 })}
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-text-secondary">{t('members.setExpected')}:</span>
-                      <TextField
-                        size="small"
-                        type="number"
-                        value={expectedCountInputs['total'] || 0}
-                        onChange={(e) => setExpectedCountInputs({
-                          ...expectedCountInputs,
-                          total: e.target.value,
-                        })}
-                        sx={{ width: 80 }}
-                        inputProps={{ min: 0 }}
-                      />
-                      <button
-                        onClick={() => handleUpdateExpectedCount('total')}
-                        disabled={updatingExpected === 'total'}
-                        className="text-sm px-3 py-1 bg-accent text-white rounded hover:bg-accent/90 disabled:opacity-50"
-                      >
-                        {updatingExpected === 'total' ? '...' : t('members.updateExpected')}
-                      </button>
-                    </div>
+
+                    {/* Search results */}
+                    {memberSearchQuery.length >= 2 && (
+                      <div className="mt-3">
+                        {memberSearching ? (
+                          <p className="text-sm text-text-muted">Loading...</p>
+                        ) : memberSearchResults.length > 0 ? (
+                          <ul className="border border-border rounded divide-y divide-border max-h-48 overflow-y-auto">
+                            {memberSearchResults.map((student) => (
+                              <li key={student.id} className="px-3 py-2 flex justify-between items-center text-sm hover:bg-bg-secondary">
+                                <div>
+                                  <span className="font-medium">{student.displayName}</span>
+                                  <span className="text-text-muted ml-2">({student.email})</span>
+                                </div>
+                                <button
+                                  onClick={() => handleAddMember(student.id)}
+                                  disabled={addingMemberId === student.id || (livingGroup?.living_group_type === 'dorm' && !selectedSection)}
+                                  className="px-3 py-1 text-sm bg-[#750014] text-white rounded hover:bg-[#5C0010] disabled:opacity-50"
+                                >
+                                  {addingMemberId === student.id ? t('members.adding') : t('members.add')}
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="text-sm text-text-muted">{t('members.noResults')}</p>
+                        )}
+                      </div>
+                    )}
                   </div>
 
-                  {membersData.members.length > 0 ? (
-                    <div className="border border-border rounded-lg overflow-hidden">
-                      <ul className="divide-y divide-border">
-                        {membersData.members.map((member) => (
-                          <li key={member.id} className="px-4 py-3 text-sm">
-                            {member.user?.first_name} {member.user?.last_name}
-                            <span className="text-text-muted ml-2">({member.user?.email})</span>
-                          </li>
-                        ))}
-                      </ul>
+                  {/* Member List */}
+                  {membersData?.membersBySection ? (
+                    // Dorm view - grouped by section
+                    <div className="space-y-4">
+                      {membersData.membersBySection.map((sectionData) => (
+                        <div key={sectionData.section.name} className="border border-border rounded-lg overflow-hidden">
+                          <div className="bg-bg-secondary px-4 py-3">
+                            <h3 className="font-medium">{sectionData.section.name}</h3>
+                            <p className="text-sm text-text-secondary">
+                              {t('members.memberCount', { count: sectionData.memberCount })}
+                            </p>
+                          </div>
+                          {sectionData.members.length > 0 ? (
+                            <ul className="divide-y divide-border">
+                              {sectionData.members.map((member) => (
+                                <li key={member.id} className="px-4 py-2 text-sm flex justify-between items-center">
+                                  <div>
+                                    {member.user?.first_name} {member.user?.last_name}
+                                    <span className="text-text-muted ml-2">({member.user?.email})</span>
+                                  </div>
+                                  <button
+                                    onClick={() => handleRemoveMember(member.id)}
+                                    disabled={removingMemberId === member.id}
+                                    className="text-sm text-red-600 hover:text-red-700"
+                                  >
+                                    {removingMemberId === member.id ? t('members.removing') : t('members.remove')}
+                                  </button>
+                                </li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p className="px-4 py-3 text-sm text-text-muted">{t('members.noMembers')}</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : membersData?.members ? (
+                    // FSILG view - flat list
+                    <div>
+                      {membersData.members.length > 0 ? (
+                        <div className="border border-border rounded-lg overflow-hidden">
+                          <ul className="divide-y divide-border">
+                            {membersData.members.map((member) => (
+                              <li key={member.id} className="px-4 py-3 text-sm flex justify-between items-center">
+                                <div>
+                                  {member.user?.first_name} {member.user?.last_name}
+                                  <span className="text-text-muted ml-2">({member.user?.email})</span>
+                                </div>
+                                <button
+                                  onClick={() => handleRemoveMember(member.id)}
+                                  disabled={removingMemberId === member.id}
+                                  className="text-sm text-red-600 hover:text-red-700"
+                                >
+                                  {removingMemberId === member.id ? t('members.removing') : t('members.remove')}
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ) : (
+                        <p className="text-text-secondary">{t('members.noMembers')}</p>
+                      )}
                     </div>
                   ) : (
                     <p className="text-text-secondary">{t('members.noMembers')}</p>
                   )}
                 </div>
+              )}
+            </div>
+          )}
+
+          {/* Assign Tab (Dorms with multiple sections only) */}
+          {activeTab === 'assign' && livingGroup?.living_group_type === 'dorm' && sections.length > 1 && (
+            <div>
+              <h2 className="text-lg font-medium mb-4">{t('assign.title')}</h2>
+              <p className="text-text-secondary text-sm mb-6">{t('assign.description')}</p>
+
+              {bookedTimes.length === 0 ? (
+                <p className="text-text-secondary">{t('assign.noBooking')}</p>
               ) : (
-                <p className="text-text-secondary">{t('members.noMembers')}</p>
+                <div className="space-y-4">
+                  {bookedTimes.map((bookedTime) => (
+                    <div key={bookedTime.id} className="bg-white border border-border rounded-lg p-6">
+                      <div className="mb-4">
+                        <p className="font-medium">
+                          {new Date(bookedTime.date).toLocaleDateString(locale, {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                          })}
+                        </p>
+                        <p className="text-text-secondary text-sm">
+                          {formatTime(bookedTime.start_time)} - {formatTime(bookedTime.end_time)} EST
+                        </p>
+                      </div>
+
+                      <p className="text-text-muted text-xs mb-4">{t('assign.comingSoon')}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Group Leaders Tab */}
+          {activeTab === 'groupLeaders' && (
+            <div>
+              <h2 className="text-lg font-medium mb-4">{t('groupLeaders.title')}</h2>
+
+              {leadersLoading ? (
+                <p className="text-text-secondary">Loading...</p>
+              ) : (
+                <>
+                  {/* Current Leaders */}
+                  <div className="mb-6">
+                    <h3 className="text-sm font-medium text-text-secondary mb-3">
+                      {t('groupLeaders.currentLeaders')} ({leaders.activeLeaders.length})
+                    </h3>
+                    {leaders.activeLeaders.length === 0 ? (
+                      <p className="text-text-muted text-sm">{t('groupLeaders.noLeaders')}</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {leaders.activeLeaders.map((leader) => (
+                          <div
+                            key={leader.id}
+                            className="p-3 border border-border rounded-lg flex justify-between items-center"
+                          >
+                            <div>
+                              <p className="font-medium text-sm">
+                                {leader.firstName} {leader.lastName}
+                              </p>
+                              <p className="text-text-muted text-xs">{leader.email}</p>
+                            </div>
+                            <button
+                              onClick={() => handleRemoveLeader(leader.id)}
+                              className="text-sm text-red-600 hover:text-red-700"
+                            >
+                              {t('groupLeaders.remove')}
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Pending Invitations */}
+                  {leaders.pendingInvitations.length > 0 && (
+                    <div className="mb-6">
+                      <h3 className="text-sm font-medium text-text-secondary mb-3">
+                        {t('groupLeaders.pendingInvitations')} ({leaders.pendingInvitations.length})
+                      </h3>
+                      <div className="space-y-2">
+                        {leaders.pendingInvitations.map((invitation) => (
+                          <div
+                            key={invitation.id}
+                            className="p-3 border border-yellow-200 bg-yellow-50 rounded-lg flex justify-between items-center"
+                          >
+                            <div>
+                              <p className="font-medium text-sm">
+                                {invitation.firstName} {invitation.lastName}
+                              </p>
+                              <p className="text-text-muted text-xs">{invitation.email}</p>
+                            </div>
+                            <button
+                              onClick={() => handleCancelLeaderInvitation(invitation.id)}
+                              className="text-sm text-red-600 hover:text-red-700"
+                            >
+                              {t('groupLeaders.cancel')}
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Invite New Leader */}
+                  <div className="bg-white border border-border rounded-lg p-4">
+                    <h3 className="text-sm font-medium mb-3">{t('groupLeaders.inviteLeader')}</h3>
+                    <div className="flex gap-2">
+                      <TextField
+                        type="email"
+                        placeholder={t('groupLeaders.searchPlaceholder')}
+                        value={inviteLeaderEmail}
+                        onChange={(e) => setInviteLeaderEmail(e.target.value)}
+                        size="small"
+                        fullWidth
+                        sx={textFieldSx}
+                      />
+                      <button
+                        onClick={handleInviteLeader}
+                        disabled={invitingLeader || !inviteLeaderEmail.trim()}
+                        className="px-4 py-2 bg-[#750014] text-white rounded hover:bg-[#5C0010] disabled:opacity-50 whitespace-nowrap text-sm"
+                      >
+                        {invitingLeader ? '...' : t('groupLeaders.invite')}
+                      </button>
+                    </div>
+                  </div>
+                </>
               )}
             </div>
           )}

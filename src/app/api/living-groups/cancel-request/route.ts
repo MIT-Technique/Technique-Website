@@ -15,15 +15,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (user.role !== 'living_group_leader') {
+    if (user.role !== 'living_group') {
       return NextResponse.json(
-        { error: "Only living group leaders can request cancellation" },
+        { error: "Only living group accounts can request cancellation" },
         { status: 403 }
       );
     }
 
     const body = await request.json();
-    const { reason } = body;
+    const { reason, timeId } = body;
 
     const supabase = createAdminClient();
 
@@ -49,13 +49,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get the current booking
-    const { data: currentBooking } = await supabase
+    // Get the booking to cancel
+    let query = supabase
       .from('photoshoot_times')
       .select('id, date, start_time, end_time, cancellation_requested')
       .eq('living_group_id', livingGroup.id)
-      .is('cancelled_at', null)
-      .single();
+      .is('cancelled_at', null);
+
+    // If timeId is provided, get that specific booking; otherwise get any booking (backward compat)
+    if (timeId) {
+      query = query.eq('id', timeId);
+    }
+
+    const { data: currentBooking } = await query.single();
 
     if (!currentBooking) {
       return NextResponse.json(

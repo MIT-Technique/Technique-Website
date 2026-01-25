@@ -15,9 +15,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (user.role !== 'living_group_leader') {
+    if (user.role !== 'living_group') {
       return NextResponse.json(
-        { error: "Only living group leaders can book times" },
+        { error: "Only living group accounts can book times" },
         { status: 403 }
       );
     }
@@ -61,21 +61,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "Your living group account is disabled. Contact admin for assistance." },
         { status: 403 }
-      );
-    }
-
-    // Check if living group already has a booked time
-    const { data: existingBooking } = await supabase
-      .from('photoshoot_times')
-      .select('id')
-      .eq('living_group_id', livingGroup.id)
-      .is('cancelled_at', null)
-      .single();
-
-    if (existingBooking) {
-      return NextResponse.json(
-        { error: "You already have a booked time. Cancel your existing booking first." },
-        { status: 409 }
       );
     }
 

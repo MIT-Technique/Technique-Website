@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
       }
 
       authEmail = lgUser.email;
-      expectedRole = "living_group_leader";
+      expectedRole = "living_group";
     } else {
       return NextResponse.json(
         { error: "Invalid organization type", code: "INVALID_ORG_TYPE" },

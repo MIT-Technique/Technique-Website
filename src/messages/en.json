@@ -404,6 +404,12 @@
         "description": "Request a role change if you represent a club or living group.",
         "requestButton": "Request Role Change"
       },
+      "lgLeaderInvitations": {
+        "title": "Living Group Leader Invitations",
+        "invitedOn": "Invited on {date}",
+        "accept": "Accept",
+        "decline": "Decline"
+      },
       "adminTools": {
         "title": "Admin Tools",
         "openDashboard": "Open Dashboard",
@@ -1077,8 +1083,10 @@
     "locationLabel": "Location",
     "notesLabel": "Notes",
     "tabs": {
-      "scheduling": "Scheduling",
+      "book": "Book",
+      "assign": "Assign",
       "members": "Members",
+      "groupLeaders": "Group Leaders",
       "joinRequests": "Join Requests"
     },
     "disabled": "Your account has been disabled",
@@ -1110,7 +1118,21 @@
       "updateExpected": "Update",
       "expectedPlaceholder": "Expected count",
       "updateSuccess": "Expected count updated",
-      "updateError": "Failed to update expected count"
+      "updateError": "Failed to update expected count",
+      "addMember": "Add Member",
+      "searchPlaceholder": "Search by email...",
+      "selectSection": "Select section",
+      "allSections": "All Sections",
+      "noResults": "No students found",
+      "add": "Add",
+      "adding": "Adding...",
+      "addSuccess": "Member added successfully",
+      "addError": "Failed to add member",
+      "remove": "Remove",
+      "removing": "Removing...",
+      "removeSuccess": "Member removed successfully",
+      "removeError": "Failed to remove member",
+      "confirmRemove": "Remove this member?"
     },
     "joinRequests": {
       "title": "Join Requests",
@@ -1159,6 +1181,46 @@
       "leaderAdded": "Leader added successfully!",
       "emailRequired": "Please enter a student email",
       "addLeaderError": "Failed to add leader"
+    },
+    "assign": {
+      "title": "Assign Sections to Time Slots",
+      "description": "Assign different sections of your living group to 30-minute time slots during your booked photoshoot.",
+      "selectDate": "Select a booked date",
+      "noBooking": "No booked time slots available. Book a photoshoot time first.",
+      "slot": "Slot",
+      "section": "Section",
+      "notAssigned": "Not assigned",
+      "save": "Save",
+      "saving": "Saving...",
+      "saved": "Assignment saved",
+      "saveError": "Failed to save assignment",
+      "comingSoon": "Section assignment coming soon"
+    },
+    "groupLeaders": {
+      "title": "Group Leaders",
+      "description": "Manage leaders who can help manage your living group's photoshoot scheduling and members.",
+      "currentLeaders": "Current Leaders",
+      "noLeaders": "No leaders assigned yet",
+      "pendingInvitations": "Pending Invitations",
+      "noPending": "No pending invitations",
+      "inviteLeader": "Invite New Leader",
+      "searchPlaceholder": "Search by MIT email",
+      "invite": "Invite",
+      "inviting": "Inviting...",
+      "inviteSent": "Invitation sent successfully",
+      "inviteError": "Failed to send invitation",
+      "remove": "Remove",
+      "removing": "Removing...",
+      "confirmRemove": "Remove {name} as a leader?",
+      "removed": "Leader removed",
+      "removeError": "Failed to remove leader",
+      "cancel": "Cancel",
+      "cancelling": "Cancelling...",
+      "invitationCancelled": "Invitation cancelled",
+      "cancelError": "Failed to cancel invitation",
+      "emailRequired": "Please enter a student email",
+      "invitedBy": "Invited by {name}",
+      "acceptedAt": "Accepted {date}"
     }
   },
 

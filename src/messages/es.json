@@ -404,6 +404,12 @@
         "description": "Solicita un cambio de rol si representas un club o grupo de vivienda.",
         "requestButton": "Solicitar Cambio de Rol"
       },
+      "lgLeaderInvitations": {
+        "title": "Invitaciones de Líder de Grupo de Vivienda",
+        "invitedOn": "Invitado el {date}",
+        "accept": "Aceptar",
+        "decline": "Rechazar"
+      },
       "adminTools": {
         "title": "Herramientas de Admin",
         "openDashboard": "Abrir Dashboard",
@@ -1078,8 +1084,10 @@
     "locationLabel": "Ubicación",
     "notesLabel": "Notas",
     "tabs": {
-      "scheduling": "Programación",
+      "book": "Reservar",
+      "assign": "Asignar",
       "members": "Miembros",
+      "groupLeaders": "Líderes del Grupo",
       "joinRequests": "Solicitudes"
     },
     "disabled": "Su cuenta ha sido deshabilitada",
@@ -1111,7 +1119,21 @@
       "updateExpected": "Actualizar",
       "expectedPlaceholder": "Cantidad esperada",
       "updateSuccess": "Cantidad esperada actualizada",
-      "updateError": "Error al actualizar cantidad esperada"
+      "updateError": "Error al actualizar cantidad esperada",
+      "addMember": "Añadir Miembro",
+      "searchPlaceholder": "Buscar por email...",
+      "selectSection": "Seleccionar sección",
+      "allSections": "Todas las Secciones",
+      "noResults": "No se encontraron estudiantes",
+      "add": "Añadir",
+      "adding": "Añadiendo...",
+      "addSuccess": "Miembro añadido exitosamente",
+      "addError": "Error al añadir miembro",
+      "remove": "Eliminar",
+      "removing": "Eliminando...",
+      "removeSuccess": "Miembro eliminado exitosamente",
+      "removeError": "Error al eliminar miembro",
+      "confirmRemove": "¿Eliminar este miembro?"
     },
     "joinRequests": {
       "title": "Solicitudes de Ingreso",
@@ -1160,6 +1182,46 @@
       "leaderAdded": "¡Líder agregado exitosamente!",
       "emailRequired": "Por favor ingrese un email de estudiante",
       "addLeaderError": "Error al agregar líder"
+    },
+    "assign": {
+      "title": "Asignar Secciones a Horarios",
+      "description": "Asigne diferentes secciones de su grupo de vivienda a bloques de 30 minutos durante su sesión de fotos reservada.",
+      "selectDate": "Seleccione una fecha reservada",
+      "noBooking": "No hay horarios reservados disponibles. Reserve un horario primero.",
+      "slot": "Bloque",
+      "section": "Sección",
+      "notAssigned": "Sin asignar",
+      "save": "Guardar",
+      "saving": "Guardando...",
+      "saved": "Asignación guardada",
+      "saveError": "Error al guardar asignación",
+      "comingSoon": "Asignación de secciones próximamente"
+    },
+    "groupLeaders": {
+      "title": "Líderes del Grupo",
+      "description": "Administre los líderes que pueden ayudar a gestionar la programación de sesiones de fotos y los miembros de su grupo de vivienda.",
+      "currentLeaders": "Líderes Actuales",
+      "noLeaders": "Aún no hay líderes asignados",
+      "pendingInvitations": "Invitaciones Pendientes",
+      "noPending": "No hay invitaciones pendientes",
+      "inviteLeader": "Invitar Nuevo Líder",
+      "searchPlaceholder": "Buscar por email MIT",
+      "invite": "Invitar",
+      "inviting": "Invitando...",
+      "inviteSent": "Invitación enviada exitosamente",
+      "inviteError": "Error al enviar invitación",
+      "remove": "Remover",
+      "removing": "Removiendo...",
+      "confirmRemove": "¿Remover a {name} como líder?",
+      "removed": "Líder removido",
+      "removeError": "Error al remover líder",
+      "cancel": "Cancelar",
+      "cancelling": "Cancelando...",
+      "invitationCancelled": "Invitación cancelada",
+      "cancelError": "Error al cancelar invitación",
+      "emailRequired": "Por favor ingrese un email de estudiante",
+      "invitedBy": "Invitado por {name}",
+      "acceptedAt": "Aceptado {date}"
     }
   },
 

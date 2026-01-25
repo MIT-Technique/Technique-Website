@@ -53,8 +53,8 @@ async function getClubIdForUser(
     return { clubId: null, error: "Club not found" };
   }
 
-  // For students/living group leaders, check if they're a leader of any club
-  if (user.role === "student" || user.role === "living_group_leader") {
+  // For students, check if they're a leader of any club
+  if (user.role === "student") {
     const { data: membership } = await supabase
       .from("club_memberships")
       .select("club_id")

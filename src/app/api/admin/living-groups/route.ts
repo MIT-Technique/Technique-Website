@@ -129,18 +129,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (targetUser.role === 'living_group_leader') {
+    if (targetUser.role === 'living_group') {
       return NextResponse.json(
-        { error: "User is already a living group leader" },
+        { error: "User is already a living group account" },
         { status: 409 }
       );
     }
 
-    // Update user role to living_group_leader
+    // Update user role to living_group
     const { error: roleError } = await supabase
       .from('users')
       .update({
-        role: 'living_group_leader',
+        role: 'living_group',
         updated_at: new Date().toISOString(),
       })
       .eq('id', userId);

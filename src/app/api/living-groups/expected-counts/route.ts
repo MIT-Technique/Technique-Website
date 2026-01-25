@@ -3,7 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { getCurrentUser } from "../../../../lib/auth/session";
 
 interface UpdateExpectedCountRequest {
-  sectionId?: string | null; // null for FSILG total
+  sectionName?: string | null; // null for FSILG total
   expectedCount: number;
 }
 
@@ -16,9 +16,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (user.role !== "living_group_leader") {
+    if (user.role !== "living_group") {
       return NextResponse.json(
-        { error: "Only living group leaders can view expected counts" },
+        { error: "Only living group accounts can view expected counts" },
         { status: 403 }
       );
     }
@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     // Get the leader's living group
     const { data: livingGroup, error: lgError } = await supabase
       .from("living_groups")
-      .select("id, name, living_group_type")
+      .select("id, name, living_group_type, dorm_sections")
       .eq("user_id", user.id)
       .single();
 
@@ -47,14 +47,9 @@ export async function GET(request: NextRequest) {
       .from("section_expected_counts")
       .select(`
         id,
-        section_id,
+        section_name,
         expected_count,
-        updated_at,
-        section:dorm_sections!section_expected_counts_section_fkey(
-          id,
-          section_name,
-          display_order
-        )
+        updated_at
       `)
       .eq("living_group_id", livingGroup.id);
 
@@ -88,9 +83,9 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (user.role !== "living_group_leader") {
+    if (user.role !== "living_group") {
       return NextResponse.json(
-        { error: "Only living group leaders can update expected counts" },
+        { error: "Only living group accounts can update expected counts" },
         { status: 403 }
       );
     }
@@ -101,7 +96,7 @@ export async function PUT(request: NextRequest) {
     );
 
     const body: UpdateExpectedCountRequest = await request.json();
-    const { sectionId, expectedCount } = body;
+    const { sectionName, expectedCount } = body;
 
     if (typeof expectedCount !== "number" || expectedCount < 0) {
       return NextResponse.json(
@@ -113,7 +108,7 @@ export async function PUT(request: NextRequest) {
     // Get the leader's living group
     const { data: livingGroup, error: lgError } = await supabase
       .from("living_groups")
-      .select("id, name, living_group_type")
+      .select("id, name, living_group_type, dorm_sections")
       .eq("user_id", user.id)
       .single();
 
@@ -125,14 +120,9 @@ export async function PUT(request: NextRequest) {
     }
 
     // For dorms, validate section belongs to this dorm
-    if (livingGroup.living_group_type === "dorm" && sectionId) {
-      const { data: section } = await supabase
-        .from("dorm_sections")
-        .select("id, dorm_name")
-        .eq("id", sectionId)
-        .single();
-
-      if (!section || section.dorm_name !== livingGroup.name) {
+    if (livingGroup.living_group_type === "dorm" && sectionName) {
+      const dormSections = livingGroup.dorm_sections || [];
+      if (!dormSections.includes(sectionName)) {
         return NextResponse.json(
           { error: "Invalid section for this dorm" },
           { status: 400 }
@@ -141,7 +131,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // For FSILGs, section should be null
-    if (livingGroup.living_group_type === "fsilg" && sectionId) {
+    if (livingGroup.living_group_type === "fsilg" && sectionName) {
       return NextResponse.json(
         { error: "FSILGs do not have sections" },
         { status: 400 }
@@ -154,13 +144,13 @@ export async function PUT(request: NextRequest) {
       .upsert(
         {
           living_group_id: livingGroup.id,
-          section_id: sectionId || null,
+          section_name: sectionName || null,
           expected_count: expectedCount,
           updated_at: new Date().toISOString(),
           updated_by: user.id,
         },
         {
-          onConflict: "living_group_id,section_id",
+          onConflict: "living_group_id,section_name",
         }
       )
       .select()

@@ -1,4 +1,4 @@
-export type UserRole = 'admin' | 'staph' | 'club' | 'living_group_leader' | 'student';
+export type UserRole = 'admin' | 'staph' | 'club' | 'living_group' | 'student';
 export type AuthProvider = 'mit_sso' | 'supabase_auth';
 export type ApprovalStatus = 'pending' | 'approved' | 'denied';
 export type LivingGroupStatus = 'active' | 'disabled' | 'pending';
@@ -10,6 +10,7 @@ export interface User {
   email: string;
   role: UserRole;
   is_staph: boolean;
+  is_living_group_leader: boolean;
   first_name: string | null;
   last_name: string | null;
   major: string | null;

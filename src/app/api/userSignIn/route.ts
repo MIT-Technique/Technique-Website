@@ -51,7 +51,7 @@ export async function GET(request: NextRequest, response: NextResponse) {
   if (user?.role === 'club') {
     return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/en/club`);
   }
-  if (user?.role === 'living_group_leader') {
+  if (user?.role === 'living_group') {
     return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/en/living-group`);
   }
 

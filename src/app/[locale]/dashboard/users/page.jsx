@@ -293,7 +293,7 @@ export default function UsersPage() {
               <option value="all">{t('filters.allRoles')}</option>
               <option value="student">{t('filters.student')}</option>
               <option value="club">{t('filters.club')}</option>
-              <option value="living_group_leader">{t('filters.lgl')}</option>
+              <option value="living_group">{t('filters.lgl')}</option>
               <option value="admin">{t('filters.admin')}</option>
             </select>
           </div>
@@ -329,7 +329,7 @@ export default function UsersPage() {
                         >
                           <option value="student">Student</option>
                           <option value="club">Club</option>
-                          <option value="living_group_leader">Living Group Leader</option>
+                          <option value="living_group">Living Group</option>
                           <option value="admin">Admin</option>
                         </select>
                       </td>

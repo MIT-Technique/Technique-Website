@@ -14,9 +14,9 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    if (user.role !== 'living_group_leader' && user.role !== 'admin') {
+    if (user.role !== 'living_group' && user.role !== 'admin') {
       return NextResponse.json(
-        { error: "Only living group leaders can view times" },
+        { error: "Only living group accounts can view times" },
         { status: 403 }
       );
     }
@@ -56,8 +56,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get user's booked time (if any) with creator info
-    let bookedTime = null;
+    // Get user's booked times (can have multiple)
+    let bookedTimes: any[] = [];
     if (livingGroup) {
       const { data: booked } = await supabase
         .from('photoshoot_times')
@@ -67,14 +67,17 @@ export async function GET(request: NextRequest) {
         `)
         .eq('living_group_id', livingGroup.id)
         .is('cancelled_at', null)
-        .single();
+        .order('date', { ascending: true })
+        .order('start_time', { ascending: true });
 
-      bookedTime = booked;
+      bookedTimes = booked || [];
     }
 
     return NextResponse.json({
       availableTimes,
-      bookedTime,
+      bookedTimes,
+      // Keep bookedTime for backward compatibility (first booked time or null)
+      bookedTime: bookedTimes.length > 0 ? bookedTimes[0] : null,
       livingGroup,
       isDisabled: livingGroup?.status === 'disabled',
     });

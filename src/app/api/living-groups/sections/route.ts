@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { getCurrentUser } from "../../../../lib/auth/session";
 
-// GET /api/living-groups/sections?dorm=Baker House
-// Get sections for a specific dorm
+// GET /api/living-groups/sections?livingGroupId=xxx
+// Get sections for a specific living group (from dorm_sections column)
 export async function GET(request: NextRequest) {
   try {
     const user = await getCurrentUser();
@@ -17,30 +17,37 @@ export async function GET(request: NextRequest) {
     );
 
     const searchParams = request.nextUrl.searchParams;
-    const dormName = searchParams.get("dorm");
+    const livingGroupId = searchParams.get("livingGroupId");
 
-    if (!dormName) {
+    if (!livingGroupId) {
       return NextResponse.json(
-        { error: "Dorm name is required" },
+        { error: "Living group ID is required" },
         { status: 400 }
       );
     }
 
-    const { data: sections, error } = await supabase
-      .from("dorm_sections")
-      .select("id, dorm_name, section_name, display_order")
-      .eq("dorm_name", dormName)
-      .order("display_order", { ascending: true });
+    // Get the living group's sections from the dorm_sections column
+    const { data: livingGroup, error } = await supabase
+      .from("living_groups")
+      .select("id, name, living_group_type, dorm_sections")
+      .eq("id", livingGroupId)
+      .single();
 
-    if (error) {
-      console.error("Get sections error:", error);
+    if (error || !livingGroup) {
+      console.error("Get living group error:", error);
       return NextResponse.json(
-        { error: "Failed to get sections" },
-        { status: 500 }
+        { error: "Living group not found" },
+        { status: 404 }
       );
     }
 
-    return NextResponse.json({ sections: sections || [] });
+    // Convert the text array to objects for consistency with frontend
+    const sections = (livingGroup.dorm_sections || []).map((name: string, index: number) => ({
+      name,
+      displayOrder: index,
+    }));
+
+    return NextResponse.json({ sections });
   } catch (error) {
     console.error("Get sections error:", error);
     return NextResponse.json(
@@ -49,6 +56,3 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-
-// GET /api/living-groups/sections/all
-// Get all dorms with their sections (for listing available dorms)

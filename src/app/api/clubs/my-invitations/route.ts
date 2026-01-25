@@ -14,8 +14,8 @@ export async function GET() {
       );
     }
 
-    // Only students and living group leaders can receive invitations
-    if (user.role !== 'student' && user.role !== 'living_group_leader') {
+    // Only students can receive invitations
+    if (user.role !== 'student') {
       return NextResponse.json({ invitations: [] });
     }
 
@@ -72,7 +72,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    if (user.role !== 'student' && user.role !== 'living_group_leader') {
+    if (user.role !== 'student') {
       return NextResponse.json(
         { error: "Only students can respond to invitations" },
         { status: 403 }

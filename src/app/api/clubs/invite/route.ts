@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
         );
       }
       clubId = club?.id || null;
-    } else if (user.role === 'student' || user.role === 'living_group_leader') {
+    } else if (user.role === 'student') {
       const { data: membership } = await supabase
         .from('club_memberships')
         .select('club_id')
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (student.role !== 'student' && student.role !== 'living_group_leader') {
+    if (student.role !== 'student') {
       return NextResponse.json(
         { error: "Can only invite students" },
         { status: 400 }
@@ -183,7 +183,7 @@ export async function GET() {
         .eq('user_id', user.id)
         .single();
       clubId = club?.id || null;
-    } else if (user.role === 'student' || user.role === 'living_group_leader') {
+    } else if (user.role === 'student') {
       const { data: membership } = await supabase
         .from('club_memberships')
         .select('club_id')
@@ -291,7 +291,7 @@ export async function DELETE(request: NextRequest) {
         .eq('user_id', user.id)
         .single();
       clubId = club?.id || null;
-    } else if (user.role === 'student' || user.role === 'living_group_leader') {
+    } else if (user.role === 'student') {
       const { data: membership } = await supabase
         .from('club_memberships')
         .select('club_id')

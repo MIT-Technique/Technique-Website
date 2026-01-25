@@ -263,7 +263,7 @@ export async function POST(request: NextRequest) {
         .from("users")
         .insert({
           email: systemEmail,
-          role: "living_group_leader",
+          role: "living_group",
           first_name: livingGroupName,
           auth_provider: "supabase_auth",
           supabase_auth_id: authData.user.id,

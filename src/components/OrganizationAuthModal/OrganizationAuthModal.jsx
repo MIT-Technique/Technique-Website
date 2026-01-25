@@ -22,7 +22,7 @@ import {
   ToggleButton,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 const DORM_OPTIONS = [
   "Baker House",
@@ -85,6 +85,7 @@ const toggleButtonGroupSx = {
 
 export default function OrganizationAuthModal({ open, onClose }) {
   const t = useTranslations("pages.login.org");
+  const locale = useLocale();
 
   // View state: 'signIn' or 'signUp'
   const [view, setView] = useState("signIn");
@@ -369,11 +370,35 @@ export default function OrganizationAuthModal({ open, onClose }) {
         return;
       }
 
-      // Different success message for clubs vs living groups
+      // Different success message and redirect for clubs vs living groups
       if (orgType === "club") {
         setSuccess(t("signUpSuccess"));
+        // Clubs need email verification, so don't redirect immediately
       } else {
         setSuccess(t("signUpSuccessLivingGroup"));
+        // Living groups don't need email verification, auto-sign in and redirect
+        // Get the name used for signup
+        const lgName = livingGroupType === "dorm" ? dormName : fsilgName.trim();
+        try {
+          const signInRes = await fetch("/api/auth/org-signin", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              password,
+              orgType: "living_group",
+              name: lgName,
+            }),
+          });
+
+          if (signInRes.ok) {
+            setTimeout(() => {
+              window.location.href = `/${locale}/living-group`;
+            }, 1000);
+          }
+        } catch (signInErr) {
+          // If auto-signin fails, they can still sign in manually
+          console.error("Auto sign-in failed:", signInErr);
+        }
       }
     } catch (err) {
       setError("Sign up failed");

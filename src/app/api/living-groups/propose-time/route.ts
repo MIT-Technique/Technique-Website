@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "../../../../lib/auth/session";
 import { createAdminClient } from "../../../../lib/supabase/admin";
+import { isValidTimeSlot } from "../../../../lib/utils/time";
 
 // GET - Get living group's time proposals
 export async function GET() {
@@ -11,9 +12,9 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (user.role !== "living_group_leader") {
+    if (user.role !== "living_group") {
       return NextResponse.json(
-        { error: "Only living group leaders can view proposals" },
+        { error: "Only living group accounts can view proposals" },
         { status: 403 }
       );
     }
@@ -85,9 +86,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (user.role !== "living_group_leader") {
+    if (user.role !== "living_group") {
       return NextResponse.json(
-        { error: "Only living group leaders can propose times" },
+        { error: "Only living group accounts can propose times" },
         { status: 403 }
       );
     }
@@ -121,6 +122,14 @@ export async function POST(request: NextRequest) {
     if (!date || !start_time || !end_time) {
       return NextResponse.json(
         { error: "Date, start time, and end time are required" },
+        { status: 400 }
+      );
+    }
+
+    // Validate 30-minute time boundaries
+    if (!isValidTimeSlot(start_time) || !isValidTimeSlot(end_time)) {
+      return NextResponse.json(
+        { error: "Times must be on 30-minute boundaries (XX:00 or XX:30)" },
         { status: 400 }
       );
     }
@@ -168,9 +177,9 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (user.role !== "living_group_leader") {
+    if (user.role !== "living_group") {
       return NextResponse.json(
-        { error: "Only living group leaders can cancel proposals" },
+        { error: "Only living group accounts can cancel proposals" },
         { status: 403 }
       );
     }

@@ -404,6 +404,12 @@
         "description": "如果您代表社团或宿舍，可以申请角色变更。",
         "requestButton": "申请角色变更"
       },
+      "lgLeaderInvitations": {
+        "title": "住宿组负责人邀请",
+        "invitedOn": "邀请于 {date}",
+        "accept": "接受",
+        "decline": "拒绝"
+      },
       "adminTools": {
         "title": "管理工具",
         "openDashboard": "打开仪表板",
@@ -1078,8 +1084,10 @@
     "locationLabel": "地点",
     "notesLabel": "备注",
     "tabs": {
-      "scheduling": "预约管理",
+      "book": "预约",
+      "assign": "分配",
       "members": "成员",
+      "groupLeaders": "组长",
       "joinRequests": "加入请求"
     },
     "disabled": "您的账户已被禁用",
@@ -1111,7 +1119,21 @@
       "updateExpected": "更新",
       "expectedPlaceholder": "预计人数",
       "updateSuccess": "预计人数已更新",
-      "updateError": "更新预计人数失败"
+      "updateError": "更新预计人数失败",
+      "addMember": "添加成员",
+      "searchPlaceholder": "搜索邮箱...",
+      "selectSection": "选择区域",
+      "allSections": "所有区域",
+      "noResults": "未找到学生",
+      "add": "添加",
+      "adding": "添加中...",
+      "addSuccess": "成员添加成功",
+      "addError": "添加成员失败",
+      "remove": "移除",
+      "removing": "移除中...",
+      "removeSuccess": "成员移除成功",
+      "removeError": "移除成员失败",
+      "confirmRemove": "确认移除此成员？"
     },
     "joinRequests": {
       "title": "加入申请",
@@ -1160,6 +1182,46 @@
       "leaderAdded": "负责人添加成功！",
       "emailRequired": "请输入学生邮箱",
       "addLeaderError": "添加负责人失败"
+    },
+    "assign": {
+      "title": "分配时间段",
+      "description": "将住宿组的不同分区分配到预约拍摄期间的30分钟时间段。",
+      "selectDate": "选择已预约的日期",
+      "noBooking": "暂无已预约的时间段。请先预约拍摄时间。",
+      "slot": "时段",
+      "section": "分区",
+      "notAssigned": "未分配",
+      "save": "保存",
+      "saving": "保存中...",
+      "saved": "分配已保存",
+      "saveError": "保存分配失败",
+      "comingSoon": "分区分配功能即将推出"
+    },
+    "groupLeaders": {
+      "title": "组长管理",
+      "description": "管理可以帮助管理住宿组拍摄排程和成员的负责人。",
+      "currentLeaders": "当前组长",
+      "noLeaders": "暂无组长",
+      "pendingInvitations": "待处理邀请",
+      "noPending": "暂无待处理邀请",
+      "inviteLeader": "邀请新组长",
+      "searchPlaceholder": "按MIT邮箱搜索",
+      "invite": "邀请",
+      "inviting": "邀请中...",
+      "inviteSent": "邀请已发送",
+      "inviteError": "发送邀请失败",
+      "remove": "移除",
+      "removing": "移除中...",
+      "confirmRemove": "确定移除{name}的组长身份？",
+      "removed": "组长已移除",
+      "removeError": "移除组长失败",
+      "cancel": "取消",
+      "cancelling": "取消中...",
+      "invitationCancelled": "邀请已取消",
+      "cancelError": "取消邀请失败",
+      "emailRequired": "请输入学生邮箱",
+      "invitedBy": "由{name}邀请",
+      "acceptedAt": "接受于{date}"
     }
   },
 

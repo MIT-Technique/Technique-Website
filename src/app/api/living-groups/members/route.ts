@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { getCurrentUser } from "../../../../lib/auth/session";
+import { createAdminClient } from "../../../../lib/supabase/admin";
 
 // GET /api/living-groups/members
 // Get members of the leader's living group, grouped by section
@@ -11,31 +12,76 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Only living group leaders can view members
-    if (user.role !== "living_group_leader") {
-      return NextResponse.json(
-        { error: "Only living group leaders can view members" },
-        { status: 403 }
-      );
-    }
-
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // Get the leader's living group
-    const { data: livingGroup, error: lgError } = await supabase
-      .from("living_groups")
-      .select("id, name, living_group_type")
-      .eq("user_id", user.id)
-      .single();
+    const searchParams = request.nextUrl.searchParams;
+    const livingGroupId = searchParams.get("livingGroupId");
 
-    if (lgError || !livingGroup) {
-      return NextResponse.json(
-        { error: "Living group not found" },
-        { status: 404 }
-      );
+    let livingGroup;
+
+    if (livingGroupId) {
+      // Fetch specific living group (for LG leader permissions)
+      const { data: lg, error: lgError } = await supabase
+        .from("living_groups")
+        .select("id, name, living_group_type, user_id, dorm_sections")
+        .eq("id", livingGroupId)
+        .single();
+
+      if (lgError || !lg) {
+        return NextResponse.json(
+          { error: "Living group not found" },
+          { status: 404 }
+        );
+      }
+
+      // Check authorization: owner, LG leader permission, admin, or staph
+      const isOwner = lg.user_id === user.id;
+      let isLeader = false;
+      if (!isOwner) {
+        const { data: leaderPermission } = await supabase
+          .from("living_group_leader_permissions")
+          .select("id")
+          .eq("living_group_id", livingGroupId)
+          .eq("user_id", user.id)
+          .eq("status", "active")
+          .single();
+        isLeader = !!leaderPermission;
+      }
+
+      if (!isOwner && !isLeader && user.role !== "admin" && user.role !== "staph") {
+        return NextResponse.json(
+          { error: "Access denied" },
+          { status: 403 }
+        );
+      }
+
+      livingGroup = lg;
+    } else {
+      // Legacy behavior: get the leader's living group by user_id
+      if (user.role !== "living_group") {
+        return NextResponse.json(
+          { error: "Only living group accounts can view members" },
+          { status: 403 }
+        );
+      }
+
+      const { data: lg, error: lgError } = await supabase
+        .from("living_groups")
+        .select("id, name, living_group_type, dorm_sections")
+        .eq("user_id", user.id)
+        .single();
+
+      if (lgError || !lg) {
+        return NextResponse.json(
+          { error: "Living group not found" },
+          { status: 404 }
+        );
+      }
+
+      livingGroup = lg;
     }
 
     // Get all active members
@@ -43,7 +89,7 @@ export async function GET(request: NextRequest) {
       .from("living_group_memberships")
       .select(`
         id,
-        section_id,
+        section_name,
         membership_type,
         status,
         joined_at,
@@ -52,11 +98,6 @@ export async function GET(request: NextRequest) {
           email,
           first_name,
           last_name
-        ),
-        section:dorm_sections!living_group_memberships_section_fkey(
-          id,
-          section_name,
-          display_order
         )
       `)
       .eq("living_group_id", livingGroup.id)
@@ -74,44 +115,40 @@ export async function GET(request: NextRequest) {
     // Get expected counts for this living group
     const { data: expectedCounts, error: countsError } = await supabase
       .from("section_expected_counts")
-      .select("section_id, expected_count")
+      .select("section_name, expected_count")
       .eq("living_group_id", livingGroup.id);
 
     if (countsError) {
       console.error("Get expected counts error:", countsError);
     }
 
-    // Build a map of expected counts by section_id
+    // Build a map of expected counts by section_name
     const expectedCountMap: Record<string, number> = {};
     expectedCounts?.forEach((ec) => {
-      const key = ec.section_id || "total";
+      const key = ec.section_name || "total";
       expectedCountMap[key] = ec.expected_count;
     });
 
     // Group members by section (for dorms) or return flat list (for FSILGs)
     if (livingGroup.living_group_type === "dorm") {
-      // Get all sections for this dorm
-      const { data: sections } = await supabase
-        .from("dorm_sections")
-        .select("id, section_name, display_order")
-        .eq("dorm_name", livingGroup.name)
-        .order("display_order", { ascending: true });
+      // Get sections from the dorm_sections column
+      const sections = livingGroup.dorm_sections || [];
 
       // Group members by section
-      const membersBySection = sections?.map((section) => {
+      const membersBySection = sections.map((sectionName: string) => {
         const sectionMembers = members?.filter(
-          (m) => m.section_id === section.id
+          (m) => m.section_name === sectionName
         ) || [];
         return {
-          section,
+          section: { name: sectionName },
           members: sectionMembers,
           memberCount: sectionMembers.length,
-          expectedCount: expectedCountMap[section.id] || 0,
+          expectedCount: expectedCountMap[sectionName] || 0,
         };
-      }) || [];
+      });
 
       // Add any members with no section (shouldn't happen for dorms, but just in case)
-      const noSectionMembers = members?.filter((m) => !m.section_id) || [];
+      const noSectionMembers = members?.filter((m) => !m.section_name) || [];
 
       return NextResponse.json({
         livingGroup,
@@ -131,6 +168,237 @@ export async function GET(request: NextRequest) {
     }
   } catch (error) {
     console.error("Get members error:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+// POST /api/living-groups/members
+// Add a student as a member of the living group
+export async function POST(request: NextRequest) {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const supabase = createAdminClient();
+    const body = await request.json();
+    const { livingGroupId, userId, sectionName } = body;
+
+    if (!livingGroupId || !userId) {
+      return NextResponse.json(
+        { error: "Living group ID and user ID are required" },
+        { status: 400 }
+      );
+    }
+
+    // Get the living group
+    const { data: livingGroup, error: lgError } = await supabase
+      .from("living_groups")
+      .select("id, name, living_group_type, user_id, dorm_sections")
+      .eq("id", livingGroupId)
+      .single();
+
+    if (lgError || !livingGroup) {
+      return NextResponse.json(
+        { error: "Living group not found" },
+        { status: 404 }
+      );
+    }
+
+    // Check authorization: owner, LG leader permission, admin, or staph
+    const isOwner = livingGroup.user_id === user.id;
+    let isLeader = false;
+    if (!isOwner) {
+      const { data: leaderPermission } = await supabase
+        .from("living_group_leader_permissions")
+        .select("id")
+        .eq("living_group_id", livingGroupId)
+        .eq("user_id", user.id)
+        .eq("status", "active")
+        .single();
+      isLeader = !!leaderPermission;
+    }
+
+    if (!isOwner && !isLeader && user.role !== "admin" && user.role !== "staph") {
+      return NextResponse.json(
+        { error: "Access denied" },
+        { status: 403 }
+      );
+    }
+
+    // Verify the user to be added is a student
+    const { data: student, error: studentError } = await supabase
+      .from("users")
+      .select("id, email, role")
+      .eq("id", userId)
+      .single();
+
+    if (studentError || !student) {
+      return NextResponse.json(
+        { error: "Student not found" },
+        { status: 404 }
+      );
+    }
+
+    if (student.role !== "student") {
+      return NextResponse.json(
+        { error: "Can only add students as members" },
+        { status: 400 }
+      );
+    }
+
+    // Check if student is already a member
+    const { data: existingMembership } = await supabase
+      .from("living_group_memberships")
+      .select("id")
+      .eq("living_group_id", livingGroupId)
+      .eq("user_id", userId)
+      .eq("status", "active")
+      .single();
+
+    if (existingMembership) {
+      return NextResponse.json(
+        { error: "Student is already a member of this living group" },
+        { status: 400 }
+      );
+    }
+
+    // For dorms, validate section name if provided
+    if (livingGroup.living_group_type === "dorm" && sectionName) {
+      const validSections = livingGroup.dorm_sections || [];
+      if (!validSections.includes(sectionName)) {
+        return NextResponse.json(
+          { error: "Invalid section name" },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Add the membership
+    const { data: membership, error: membershipError } = await supabase
+      .from("living_group_memberships")
+      .insert({
+        living_group_id: livingGroupId,
+        user_id: userId,
+        section_name: livingGroup.living_group_type === "dorm" ? sectionName : null,
+        membership_type: livingGroup.living_group_type,
+        status: "active",
+        joined_at: new Date().toISOString(),
+      })
+      .select()
+      .single();
+
+    if (membershipError) {
+      console.error("Add member error:", membershipError);
+      return NextResponse.json(
+        { error: "Failed to add member" },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      membership,
+    });
+  } catch (error) {
+    console.error("Add member error:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+// DELETE /api/living-groups/members
+// Remove a member from the living group
+export async function DELETE(request: NextRequest) {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const supabase = createAdminClient();
+    const { searchParams } = new URL(request.url);
+    const membershipId = searchParams.get("membershipId");
+
+    if (!membershipId) {
+      return NextResponse.json(
+        { error: "Membership ID is required" },
+        { status: 400 }
+      );
+    }
+
+    // Get the membership
+    const { data: membership, error: membershipError } = await supabase
+      .from("living_group_memberships")
+      .select("id, living_group_id, user_id")
+      .eq("id", membershipId)
+      .single();
+
+    if (membershipError || !membership) {
+      return NextResponse.json(
+        { error: "Membership not found" },
+        { status: 404 }
+      );
+    }
+
+    // Get the living group
+    const { data: livingGroup, error: lgError } = await supabase
+      .from("living_groups")
+      .select("id, user_id")
+      .eq("id", membership.living_group_id)
+      .single();
+
+    if (lgError || !livingGroup) {
+      return NextResponse.json(
+        { error: "Living group not found" },
+        { status: 404 }
+      );
+    }
+
+    // Check authorization: owner, LG leader permission, admin, or staph
+    const isOwner = livingGroup.user_id === user.id;
+    let isLeader = false;
+    if (!isOwner) {
+      const { data: leaderPermission } = await supabase
+        .from("living_group_leader_permissions")
+        .select("id")
+        .eq("living_group_id", livingGroup.id)
+        .eq("user_id", user.id)
+        .eq("status", "active")
+        .single();
+      isLeader = !!leaderPermission;
+    }
+
+    if (!isOwner && !isLeader && user.role !== "admin" && user.role !== "staph") {
+      return NextResponse.json(
+        { error: "Access denied" },
+        { status: 403 }
+      );
+    }
+
+    // Remove the membership (soft delete by setting status to removed)
+    const { error: deleteError } = await supabase
+      .from("living_group_memberships")
+      .update({ status: "removed" })
+      .eq("id", membershipId);
+
+    if (deleteError) {
+      console.error("Remove member error:", deleteError);
+      return NextResponse.json(
+        { error: "Failed to remove member" },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Remove member error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

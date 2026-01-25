@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "../../../../lib/auth/session";
 import { createAdminClient } from "../../../../lib/supabase/admin";
 import { createLog } from "../../../../lib/admin-logs";
+import { isValidTimeSlot } from "../../../../lib/utils/time";
 
 // Helper to check if user is staph or has active photographer permissions
 async function isStaphOrPhotographer(
@@ -117,6 +118,14 @@ export async function POST(request: NextRequest) {
     if (!date || !start_time || !end_time) {
       return NextResponse.json(
         { error: "Date, start time, and end time are required" },
+        { status: 400 }
+      );
+    }
+
+    // Validate 30-minute time boundaries
+    if (!isValidTimeSlot(start_time) || !isValidTimeSlot(end_time)) {
+      return NextResponse.json(
+        { error: "Times must be on 30-minute boundaries (XX:00 or XX:30)" },
         { status: 400 }
       );
     }
