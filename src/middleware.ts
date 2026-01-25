@@ -19,6 +19,10 @@ export async function middleware(req: NextRequest) {
       const locale = req.cookies.get("NEXT_LOCALE")?.value || "en";
       return NextResponse.redirect(new URL(`/${locale}/bio`, req.url));
     }
+    else if (pathname === "/login")
+    {
+      return intlMiddleware(req);
+    }
     // Let these routes through without any processing
     return NextResponse.next();
   }
