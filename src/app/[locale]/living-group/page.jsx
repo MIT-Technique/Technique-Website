@@ -5,7 +5,70 @@ import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { useUser } from '../../../hooks/useUser';
 import Footer from '../../../components/Footer/Footer';
+import ConfirmationModal from '../../../components/ConfirmationModal/ConfirmationModal';
 import TextField from "@mui/material/TextField";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+
+// Generate 30-minute time slot options (06:00 to 23:30)
+function generateTimeOptions() {
+  const options = [];
+  for (let h = 6; h <= 23; h++) {
+    for (let m = 0; m < 60; m += 30) {
+      const time = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+      options.push(time);
+    }
+  }
+  return options;
+}
+
+// Format time for display (14:30 -> 2:30 PM)
+function formatTimeDisplay(time) {
+  if (!time) return '';
+  const [hours, minutes] = time.split(':').map(Number);
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  const displayHours = hours % 12 || 12;
+  return `${displayHours}:${String(minutes).padStart(2, '0')} ${ampm}`;
+}
+
+const TIME_OPTIONS = generateTimeOptions();
+
+// Get the next 30-minute time slot from now
+function getDefaultStartTime() {
+  const now = new Date();
+  let hours = now.getHours();
+  let minutes = now.getMinutes();
+
+  // Round up to next 30-minute interval
+  if (minutes > 30) {
+    hours += 1;
+    minutes = 0;
+  } else if (minutes > 0) {
+    minutes = 30;
+  }
+
+  // Ensure within TIME_OPTIONS range (06:00 - 23:30)
+  if (hours < 6) {
+    hours = 6;
+    minutes = 0;
+  } else if (hours >= 24) {
+    hours = 6;
+    minutes = 0;
+  }
+
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+}
+
+// Get end time 1 hour after start
+function getDefaultEndTime(startTime) {
+  if (!startTime) return '07:00';
+  const [h, m] = startTime.split(':').map(Number);
+  let endH = h + 1;
+  if (endH > 23) endH = 23;
+  return `${String(endH).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+}
 
 // Strip seconds from time string (HH:MM:SS -> HH:MM)
 function formatTime(time) {
@@ -52,6 +115,7 @@ export default function LivingGroupPage() {
   const [selectedSection, setSelectedSection] = useState('');
   const [addingMemberId, setAddingMemberId] = useState(null);
   const [removingMemberId, setRemovingMemberId] = useState(null);
+  const [confirmingMemberId, setConfirmingMemberId] = useState(null);
 
   // Join requests state (FSILGs only)
   const [joinRequests, setJoinRequests] = useState([]);
@@ -74,6 +138,11 @@ export default function LivingGroupPage() {
   // FSILG onboarding state (for adding first leader)
   const [leaderEmail, setLeaderEmail] = useState('');
   const [addingLeader, setAddingLeader] = useState(false);
+
+  // Time assignment state (for dorms with multiple sections)
+  const [timeAssignments, setTimeAssignments] = useState({}); // { photoshootTimeId: { 'HH:mm-HH:mm': sectionName } }
+  const [assignmentsLoading, setAssignmentsLoading] = useState(false);
+  const [savingSlot, setSavingSlot] = useState(null); // 'photoshootTimeId-slotKey' being saved
 
   // Group Leaders state
   const [inviteLeaderEmail, setInviteLeaderEmail] = useState('');
@@ -125,6 +194,19 @@ export default function LivingGroupPage() {
       }
     }
   }, [isLoggedIn, user, livingGroup]);
+
+  // Set default proposal form values on mount
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+    const defaultStart = getDefaultStartTime();
+    const defaultEnd = getDefaultEndTime(defaultStart);
+    setProposalForm(prev => ({
+      ...prev,
+      date: today,
+      start_time: defaultStart,
+      end_time: defaultEnd,
+    }));
+  }, []);
 
   async function fetchTimes() {
     try {
@@ -278,8 +360,13 @@ export default function LivingGroupPage() {
   }
 
   async function handleRemoveMember(membershipId) {
-    if (!confirm(t('members.confirmRemove'))) return;
+    // First click: Show confirmation state
+    if (confirmingMemberId !== membershipId) {
+      setConfirmingMemberId(membershipId);
+      return;
+    }
 
+    // Second click: Perform deletion
     setRemovingMemberId(membershipId);
     setMessage({ type: '', text: '' });
 
@@ -299,7 +386,13 @@ export default function LivingGroupPage() {
       setMessage({ type: 'error', text: t('members.removeError') });
     } finally {
       setRemovingMemberId(null);
+      setConfirmingMemberId(null);
     }
+  }
+
+  // Reset confirmation when clicking away (optional)
+  function cancelRemoveConfirmation() {
+    setConfirmingMemberId(null);
   }
 
   async function fetchJoinRequests() {
@@ -320,7 +413,11 @@ export default function LivingGroupPage() {
       setProposalsLoading(true);
       const res = await fetch('/api/living-groups/propose-time');
       const data = await res.json();
-      setProposals(data.proposals || []);
+      if (res.ok) {
+        setProposals(data.proposals || []);
+      } else {
+        console.error('Error fetching proposals:', data.error);
+      }
     } catch (error) {
       console.error('Error fetching proposals:', error);
     } finally {
@@ -328,10 +425,119 @@ export default function LivingGroupPage() {
     }
   }
 
+  async function fetchTimeAssignments() {
+    if (!livingGroup?.id) return;
+    try {
+      setAssignmentsLoading(true);
+      const res = await fetch(`/api/living-groups/time-assignments?livingGroupId=${livingGroup.id}`);
+      const data = await res.json();
+
+      // Convert array to map: { photoshootTimeId: { 'slotStart-slotEnd': sectionName } }
+      const assignmentsMap = {};
+      (data.assignments || []).forEach(a => {
+        if (!assignmentsMap[a.photoshootTimeId]) {
+          assignmentsMap[a.photoshootTimeId] = {};
+        }
+        const slotKey = `${a.slotStart}-${a.slotEnd}`;
+        assignmentsMap[a.photoshootTimeId][slotKey] = a.sectionName || '';
+      });
+      setTimeAssignments(assignmentsMap);
+    } catch (error) {
+      console.error('Error fetching time assignments:', error);
+    } finally {
+      setAssignmentsLoading(false);
+    }
+  }
+
+  // Generate 30-minute slots for a time range
+  function generateSlots(startTime, endTime) {
+    const slots = [];
+    const [startH, startM] = startTime.split(':').map(Number);
+    const [endH, endM] = endTime.split(':').map(Number);
+
+    let h = startH;
+    let m = startM;
+
+    // Round to nearest 30-min boundary
+    if (m !== 0 && m !== 30) {
+      m = m < 30 ? 30 : 0;
+      if (m === 0) h++;
+    }
+
+    while (h < endH || (h === endH && m < endM)) {
+      const slotStart = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+      m += 30;
+      if (m >= 60) { m = 0; h++; }
+      const slotEnd = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+      slots.push({ start: slotStart, end: slotEnd });
+    }
+    return slots;
+  }
+
+  async function handleAssignSection(photoshootTimeId, slotStart, slotEnd, sectionName) {
+    const slotKey = `${slotStart}-${slotEnd}`;
+    setSavingSlot(`${photoshootTimeId}-${slotKey}`);
+
+    try {
+      const res = await fetch('/api/living-groups/time-assignments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          photoshootTimeId,
+          livingGroupId: livingGroup?.id,
+          sectionName: sectionName || null,
+          slotStart,
+          slotEnd,
+        }),
+      });
+
+      if (res.ok) {
+        // Update local state
+        setTimeAssignments(prev => ({
+          ...prev,
+          [photoshootTimeId]: {
+            ...(prev[photoshootTimeId] || {}),
+            [slotKey]: sectionName || '',
+          },
+        }));
+        setMessage({ type: 'success', text: t('assign.saved') });
+      } else {
+        const data = await res.json();
+        setMessage({ type: 'error', text: data.error || t('assign.saveError') });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: t('assign.saveError') });
+    } finally {
+      setSavingSlot(null);
+    }
+  }
+
+  // Get sections that haven't been assigned to any slot for a specific booked time
+  function getUnassignedSections(photoshootTimeId) {
+    const assignments = timeAssignments[photoshootTimeId] || {};
+    const assignedSections = new Set(Object.values(assignments).filter(Boolean));
+    return sections.filter(s => !assignedSections.has(s.name));
+  }
+
   async function handleSubmitProposal(e) {
     e.preventDefault();
     if (!proposalForm.date || !proposalForm.start_time || !proposalForm.end_time) {
       setMessage({ type: 'error', text: t('proposeTime.fieldsRequired') });
+      return;
+    }
+
+    // Validate start time is before end time
+    const startMins = parseInt(proposalForm.start_time.split(':')[0]) * 60 + parseInt(proposalForm.start_time.split(':')[1]);
+    const endMins = parseInt(proposalForm.end_time.split(':')[0]) * 60 + parseInt(proposalForm.end_time.split(':')[1]);
+    if (startMins >= endMins) {
+      setMessage({ type: 'error', text: t('proposeTime.startBeforeEnd') });
+      return;
+    }
+
+    // Validate date is not in the past
+    const today = new Date().toISOString().split('T')[0];
+    if (proposalForm.date < today) {
+      setMessage({ type: 'error', text: t('proposeTime.noPastDates') });
       return;
     }
 
@@ -349,6 +555,10 @@ export default function LivingGroupPage() {
 
       if (res.ok) {
         setMessage({ type: 'success', text: t('proposeTime.submitSuccess') });
+        // Optimistically add the new proposal to the list
+        if (data.proposal) {
+          setProposals(prev => [data.proposal, ...prev]);
+        }
         setProposalForm({
           date: '',
           start_time: '',
@@ -356,7 +566,6 @@ export default function LivingGroupPage() {
           location: '',
           notes: '',
         });
-        fetchProposals();
       } else {
         setMessage({ type: 'error', text: data.error || t('proposeTime.submitError') });
       }
@@ -378,7 +587,10 @@ export default function LivingGroupPage() {
 
       if (res.ok) {
         setMessage({ type: 'success', text: t('proposeTime.cancelSuccess') });
-        fetchProposals();
+        // Optimistically update the proposal status
+        setProposals(prev => prev.map(p =>
+          p.id === proposalId ? { ...p, status: 'cancelled' } : p
+        ));
       } else {
         const data = await res.json();
         setMessage({ type: 'error', text: data.error || t('proposeTime.cancelError') });
@@ -460,6 +672,7 @@ export default function LivingGroupPage() {
   // Leaders state
   const [leaders, setLeaders] = useState({ activeLeaders: [], pendingInvitations: [] });
   const [leadersLoading, setLeadersLoading] = useState(false);
+  const [confirmationModal, setConfirmationModal] = useState({ open: false, leaderName: '', leaderId: '' });
 
   // Fetch sections for dorms
   useEffect(() => {
@@ -504,6 +717,13 @@ export default function LivingGroupPage() {
     }
   }, [livingGroup?.id]);
 
+  // Fetch time assignments when Assign tab is active
+  useEffect(() => {
+    if (activeTab === 'assign' && livingGroup?.id && livingGroup?.living_group_type === 'dorm' && sections.length > 1) {
+      fetchTimeAssignments();
+    }
+  }, [activeTab, livingGroup?.id, sections.length]);
+
   // Handle inviting a new leader
   async function handleInviteLeader() {
     if (!inviteLeaderEmail.trim() || !livingGroup?.id) return;
@@ -537,15 +757,24 @@ export default function LivingGroupPage() {
     }
   }
 
-  // Handle removing a leader
-  async function handleRemoveLeader(permissionId) {
-    if (!confirm(t('groupLeaders.confirmRemove'))) return;
+  // Handle opening the remove leader confirmation modal
+  function handleRemoveLeaderClick(permissionId, leaderName) {
+    setConfirmationModal({
+      open: true,
+      leaderName,
+      leaderId: permissionId,
+    });
+  }
 
-    setRemovingLeaderId(permissionId);
+  // Handle confirming leader removal
+  async function handleConfirmRemoveLeader() {
+    const { leaderId } = confirmationModal;
+    setConfirmationModal({ open: false, leaderName: '', leaderId: '' });
+    setRemovingLeaderId(leaderId);
     setMessage({ type: '', text: '' });
 
     try {
-      const res = await fetch(`/api/living-groups/leaders?permissionId=${permissionId}`, {
+      const res = await fetch(`/api/living-groups/leaders?permissionId=${leaderId}`, {
         method: 'DELETE',
       });
 
@@ -561,6 +790,11 @@ export default function LivingGroupPage() {
     } finally {
       setRemovingLeaderId(null);
     }
+  }
+
+  // Handle canceling leader removal
+  function handleCancelRemoveLeader() {
+    setConfirmationModal({ open: false, leaderName: '', leaderId: '' });
   }
 
   // Handle canceling a leader invitation
@@ -728,28 +962,32 @@ export default function LivingGroupPage() {
                           ? 'border-yellow-200 bg-yellow-50'
                           : 'border-green-200 bg-green-50'
                       }`}>
-                        <p className="font-medium">
-                          {new Date(bookedTime.date).toLocaleDateString(locale, {
-                            weekday: 'long',
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                          })}
-                        </p>
-                        <p className="text-text-secondary">
-                          {formatTime(bookedTime.start_time)} - {formatTime(bookedTime.end_time)} EST
-                        </p>
+                        <div className="flex justify-between items-start gap-4 mb-2">
+                          <div>
+                            <p className="font-medium">
+                              {new Date(bookedTime.date).toLocaleDateString(locale, {
+                                weekday: 'long',
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                              })}
+                            </p>
+                            <p className="text-text-secondary">
+                              {formatTime(bookedTime.start_time)} - {formatTime(bookedTime.end_time)} EST
+                            </p>
+                          </div>
+                          {!bookedTime.cancellation_requested && !isDisabled && !isFrozen && (
+                            <button
+                              onClick={() => handleCancelRequest(bookedTime.id)}
+                              disabled={cancelling}
+                              className="px-4 py-2 text-sm text-red-600 border border-red-200 rounded hover:bg-red-50 whitespace-nowrap"
+                            >
+                              {cancelling ? t('requesting') : t('requestCancel')}
+                            </button>
+                          )}
+                        </div>
                         {bookedTime.cancellation_requested && (
-                          <p className="text-yellow-600 text-sm mt-2">{t('cancellationPending')}</p>
-                        )}
-                        {!bookedTime.cancellation_requested && !isDisabled && !isFrozen && (
-                          <button
-                            onClick={() => handleCancelRequest(bookedTime.id)}
-                            disabled={cancelling}
-                            className="mt-4 px-4 py-2 text-sm text-red-600 border border-red-200 rounded hover:bg-red-50"
-                          >
-                            {cancelling ? t('requesting') : t('requestCancel')}
-                          </button>
+                          <p className="text-yellow-600 text-sm">{t('cancellationPending')}</p>
                         )}
                       </div>
                     ))}
@@ -872,33 +1110,42 @@ export default function LivingGroupPage() {
                           value={proposalForm.date}
                           onChange={(e) => setProposalForm({ ...proposalForm, date: e.target.value })}
                           InputLabelProps={{ shrink: true }}
+                          inputProps={{ min: new Date().toISOString().split('T')[0] }}
                           required
                           size="small"
                           fullWidth
                           sx={textFieldSx}
                         />
-                        <TextField
-                          type="time"
-                          label={t('proposeTime.startTime')}
-                          value={proposalForm.start_time}
-                          onChange={(e) => setProposalForm({ ...proposalForm, start_time: e.target.value })}
-                          InputLabelProps={{ shrink: true }}
-                          required
-                          size="small"
-                          fullWidth
-                          sx={textFieldSx}
-                        />
-                        <TextField
-                          type="time"
-                          label={t('proposeTime.endTime')}
-                          value={proposalForm.end_time}
-                          onChange={(e) => setProposalForm({ ...proposalForm, end_time: e.target.value })}
-                          InputLabelProps={{ shrink: true }}
-                          required
-                          size="small"
-                          fullWidth
-                          sx={textFieldSx}
-                        />
+                        <FormControl size="small" fullWidth required sx={textFieldSx}>
+                          <InputLabel id="start-time-label">{t('proposeTime.startTime')}</InputLabel>
+                          <Select
+                            labelId="start-time-label"
+                            value={proposalForm.start_time}
+                            label={t('proposeTime.startTime')}
+                            onChange={(e) => setProposalForm({ ...proposalForm, start_time: e.target.value })}
+                          >
+                            {TIME_OPTIONS.map((time) => (
+                              <MenuItem key={time} value={time}>
+                                {formatTimeDisplay(time)}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                        <FormControl size="small" fullWidth required sx={textFieldSx}>
+                          <InputLabel id="end-time-label">{t('proposeTime.endTime')}</InputLabel>
+                          <Select
+                            labelId="end-time-label"
+                            value={proposalForm.end_time}
+                            label={t('proposeTime.endTime')}
+                            onChange={(e) => setProposalForm({ ...proposalForm, end_time: e.target.value })}
+                          >
+                            {TIME_OPTIONS.map((time) => (
+                              <MenuItem key={time} value={time}>
+                                {formatTimeDisplay(time)}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <TextField
@@ -1106,13 +1353,31 @@ export default function LivingGroupPage() {
                                     {member.user?.first_name} {member.user?.last_name}
                                     <span className="text-text-muted ml-2">({member.user?.email})</span>
                                   </div>
-                                  <button
-                                    onClick={() => handleRemoveMember(member.id)}
-                                    disabled={removingMemberId === member.id}
-                                    className="text-sm text-red-600 hover:text-red-700"
-                                  >
-                                    {removingMemberId === member.id ? t('members.removing') : t('members.remove')}
-                                  </button>
+                                  <div className="flex gap-2">
+                                    <button
+                                      onClick={() => handleRemoveMember(member.id)}
+                                      disabled={removingMemberId === member.id}
+                                      className={`text-sm ${
+                                        confirmingMemberId === member.id
+                                          ? 'text-red-700 font-medium'
+                                          : 'text-red-600'
+                                      } hover:text-red-700`}
+                                    >
+                                      {removingMemberId === member.id
+                                        ? t('members.removing')
+                                        : confirmingMemberId === member.id
+                                        ? t('members.confirm')
+                                        : t('members.remove')}
+                                    </button>
+                                    {confirmingMemberId === member.id && (
+                                      <button
+                                        onClick={() => cancelRemoveConfirmation()}
+                                        className="text-sm text-text-secondary hover:text-text"
+                                      >
+                                        {t('members.cancel')}
+                                      </button>
+                                    )}
+                                  </div>
                                 </li>
                               ))}
                             </ul>
@@ -1134,13 +1399,31 @@ export default function LivingGroupPage() {
                                   {member.user?.first_name} {member.user?.last_name}
                                   <span className="text-text-muted ml-2">({member.user?.email})</span>
                                 </div>
-                                <button
-                                  onClick={() => handleRemoveMember(member.id)}
-                                  disabled={removingMemberId === member.id}
-                                  className="text-sm text-red-600 hover:text-red-700"
-                                >
-                                  {removingMemberId === member.id ? t('members.removing') : t('members.remove')}
-                                </button>
+                                <div className="flex gap-2">
+                                  <button
+                                    onClick={() => handleRemoveMember(member.id)}
+                                    disabled={removingMemberId === member.id}
+                                    className={`text-sm ${
+                                      confirmingMemberId === member.id
+                                        ? 'text-red-700 font-medium'
+                                        : 'text-red-600'
+                                    } hover:text-red-700`}
+                                  >
+                                    {removingMemberId === member.id
+                                      ? t('members.removing')
+                                      : confirmingMemberId === member.id
+                                      ? t('members.confirm')
+                                      : t('members.remove')}
+                                  </button>
+                                  {confirmingMemberId === member.id && (
+                                    <button
+                                      onClick={() => cancelRemoveConfirmation()}
+                                      className="text-sm text-text-secondary hover:text-text"
+                                    >
+                                      {t('members.cancel')}
+                                    </button>
+                                  )}
+                                </div>
                               </li>
                             ))}
                           </ul>
@@ -1161,7 +1444,36 @@ export default function LivingGroupPage() {
           {activeTab === 'assign' && livingGroup?.living_group_type === 'dorm' && sections.length > 1 && (
             <div>
               <h2 className="text-lg font-medium mb-4">{t('assign.title')}</h2>
-              <p className="text-text-secondary text-sm mb-6">{t('assign.description')}</p>
+              <p className="text-text-secondary text-sm mb-4">{t('assign.description')}</p>
+
+              {/* Sections waiting to be assigned (shown after description) */}
+              {bookedTimes.length > 0 && !assignmentsLoading && (() => {
+                // Get all sections that haven't been assigned to any slot in any booked time
+                const allAssignedSections = new Set();
+                bookedTimes.forEach(bt => {
+                  const assignments = timeAssignments[bt.id] || {};
+                  Object.values(assignments).forEach(sectionName => {
+                    if (sectionName) allAssignedSections.add(sectionName);
+                  });
+                });
+                const unassigned = sections.filter(s => !allAssignedSections.has(s.name));
+
+                if (unassigned.length > 0) {
+                  return (
+                    <div className="mb-6 p-3 bg-yellow-50 border border-yellow-200 rounded">
+                      <p className="text-sm text-yellow-800 pb-0">
+                        <span className="font-medium">{t('assign.unassignedSections')}</span>{' '}
+                        {unassigned.map(s => s.name).join(', ')}
+                      </p>
+                    </div>
+                  );
+                }
+                return (
+                  <div className="mb-6 p-3 bg-green-50 border border-green-200 rounded">
+                    <p className="text-sm font-medium text-green-800">{t('assign.allAssigned')}</p>
+                  </div>
+                );
+              })()}
 
               {bookedTimes.length === 0 ? (
                 <p className="text-text-secondary">{t('assign.noBooking')}</p>
@@ -1183,7 +1495,43 @@ export default function LivingGroupPage() {
                         </p>
                       </div>
 
-                      <p className="text-text-muted text-xs mb-4">{t('assign.comingSoon')}</p>
+                      {assignmentsLoading ? (
+                        <p className="text-text-muted text-sm">Loading...</p>
+                      ) : (
+                        <div className="space-y-2">
+                          <div className="grid grid-cols-[100px_1fr] gap-2 text-xs font-medium text-text-muted uppercase mb-2">
+                            <span>{t('assign.slot')}</span>
+                            <span>{t('assign.section')}</span>
+                          </div>
+                          {generateSlots(bookedTime.start_time, bookedTime.end_time).map((slot) => {
+                            const slotKey = `${slot.start}-${slot.end}`;
+                            const currentAssignment = timeAssignments[bookedTime.id]?.[slotKey] || '';
+                            const isSaving = savingSlot === `${bookedTime.id}-${slotKey}`;
+
+                            return (
+                              <div key={slotKey} className="grid grid-cols-[100px_1fr] gap-2 items-center">
+                                <span className="text-sm font-medium">
+                                  {formatTime(slot.start)} - {formatTime(slot.end)}
+                                </span>
+                                <div className="flex items-center gap-2">
+                                  <select
+                                    value={currentAssignment}
+                                    onChange={(e) => handleAssignSection(bookedTime.id, slot.start, slot.end, e.target.value)}
+                                    disabled={isSaving || isFrozen}
+                                    className="flex-1 px-3 py-1.5 border border-border rounded text-sm disabled:opacity-50"
+                                  >
+                                    <option value="">{t('assign.notAssigned')}</option>
+                                    {sections.map((section) => (
+                                      <option key={section.name} value={section.name}>{section.name}</option>
+                                    ))}
+                                  </select>
+                                  {isSaving && <span className="text-xs text-text-muted">{t('assign.saving')}</span>}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -1221,7 +1569,7 @@ export default function LivingGroupPage() {
                               <p className="text-text-muted text-xs">{leader.email}</p>
                             </div>
                             <button
-                              onClick={() => handleRemoveLeader(leader.id)}
+                              onClick={() => handleRemoveLeaderClick(leader.id, `${leader.firstName} ${leader.lastName}`)}
                               className="text-sm text-red-600 hover:text-red-700"
                             >
                               {t('groupLeaders.remove')}
@@ -1340,6 +1688,19 @@ export default function LivingGroupPage() {
           )}
         </section>
       </main>
+
+      {/* Remove Leader Confirmation Modal */}
+      <ConfirmationModal
+        open={confirmationModal.open}
+        title={t('groupLeaders.confirmRemoveTitle')}
+        message={t('groupLeaders.confirmRemoveMessage', { name: confirmationModal.leaderName })}
+        confirmText={t('groupLeaders.removeConfirm')}
+        cancelText={t('groupLeaders.cancel')}
+        onConfirm={handleConfirmRemoveLeader}
+        onCancel={handleCancelRemoveLeader}
+        isDangerous={true}
+      />
+
       <Footer />
     </>
   );

@@ -1131,6 +1131,8 @@
       "addError": "添加成员失败",
       "remove": "移除",
       "removing": "移除中...",
+      "confirm": "确认",
+      "cancel": "取消",
       "removeSuccess": "成员移除成功",
       "removeError": "移除成员失败",
       "confirmRemove": "确认移除此成员？"
@@ -1160,6 +1162,8 @@
       "submitSuccess": "时间提议已成功提交",
       "submitError": "提交提议失败",
       "fieldsRequired": "日期、开始时间和结束时间为必填项",
+      "startBeforeEnd": "开始时间必须早于结束时间",
+      "noPastDates": "不能安排过去的时间",
       "yourProposals": "您的提议",
       "noProposals": "暂无提议",
       "cancel": "取消",
@@ -1195,7 +1199,8 @@
       "saving": "保存中...",
       "saved": "分配已保存",
       "saveError": "保存分配失败",
-      "comingSoon": "分区分配功能即将推出"
+      "unassignedSections": "等待分配的分区：",
+      "allAssigned": "所有分区已分配到时间段"
     },
     "groupLeaders": {
       "title": "组长管理",
@@ -1213,6 +1218,9 @@
       "remove": "移除",
       "removing": "移除中...",
       "confirmRemove": "确定移除{name}的组长身份？",
+      "confirmRemoveTitle": "移除组长",
+      "confirmRemoveMessage": "确定要移除{name}的组长身份吗？他们将无法再管理您的住宿组。",
+      "removeConfirm": "移除",
       "removed": "组长已移除",
       "removeError": "移除组长失败",
       "cancel": "取消",

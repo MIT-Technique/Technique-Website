@@ -1130,6 +1130,8 @@
       "addError": "Failed to add member",
       "remove": "Remove",
       "removing": "Removing...",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
       "removeSuccess": "Member removed successfully",
       "removeError": "Failed to remove member",
       "confirmRemove": "Remove this member?"
@@ -1159,6 +1161,8 @@
       "submitSuccess": "Time proposal submitted successfully",
       "submitError": "Failed to submit proposal",
       "fieldsRequired": "Date, start time, and end time are required",
+      "startBeforeEnd": "Start time must be before end time",
+      "noPastDates": "Cannot schedule in the past",
       "yourProposals": "Your Proposals",
       "noProposals": "No proposals yet",
       "cancel": "Cancel",
@@ -1194,7 +1198,8 @@
       "saving": "Saving...",
       "saved": "Assignment saved",
       "saveError": "Failed to save assignment",
-      "comingSoon": "Section assignment coming soon"
+      "unassignedSections": "Sections waiting to be assigned:",
+      "allAssigned": "All sections have been assigned to time slots"
     },
     "groupLeaders": {
       "title": "Group Leaders",
@@ -1212,6 +1217,9 @@
       "remove": "Remove",
       "removing": "Removing...",
       "confirmRemove": "Remove {name} as a leader?",
+      "confirmRemoveTitle": "Remove Leader",
+      "confirmRemoveMessage": "Are you sure you want to remove {name} as a leader? They will no longer be able to manage your living group.",
+      "removeConfirm": "Remove",
       "removed": "Leader removed",
       "removeError": "Failed to remove leader",
       "cancel": "Cancel",

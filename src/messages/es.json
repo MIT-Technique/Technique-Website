@@ -1131,6 +1131,8 @@
       "addError": "Error al añadir miembro",
       "remove": "Eliminar",
       "removing": "Eliminando...",
+      "confirm": "Confirmar",
+      "cancel": "Cancelar",
       "removeSuccess": "Miembro eliminado exitosamente",
       "removeError": "Error al eliminar miembro",
       "confirmRemove": "¿Eliminar este miembro?"
@@ -1160,6 +1162,8 @@
       "submitSuccess": "Propuesta enviada exitosamente",
       "submitError": "Error al enviar propuesta",
       "fieldsRequired": "Fecha, hora de inicio y hora de fin son requeridos",
+      "startBeforeEnd": "La hora de inicio debe ser anterior a la hora de fin",
+      "noPastDates": "No se puede programar en el pasado",
       "yourProposals": "Tus Propuestas",
       "noProposals": "Sin propuestas aún",
       "cancel": "Cancelar",
@@ -1195,7 +1199,8 @@
       "saving": "Guardando...",
       "saved": "Asignación guardada",
       "saveError": "Error al guardar asignación",
-      "comingSoon": "Asignación de secciones próximamente"
+      "unassignedSections": "Secciones esperando asignación:",
+      "allAssigned": "Todas las secciones han sido asignadas a horarios"
     },
     "groupLeaders": {
       "title": "Líderes del Grupo",
@@ -1213,6 +1218,9 @@
       "remove": "Remover",
       "removing": "Removiendo...",
       "confirmRemove": "¿Remover a {name} como líder?",
+      "confirmRemoveTitle": "Remover Líder",
+      "confirmRemoveMessage": "¿Está seguro de que desea remover a {name} como líder? Ya no podrán gestionar su grupo de vivienda.",
+      "removeConfirm": "Remover",
       "removed": "Líder removido",
       "removeError": "Error al remover líder",
       "cancel": "Cancelar",

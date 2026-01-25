@@ -190,10 +190,10 @@ export default function ProfilePage() {
   async function handleLGInvitationResponse(invitationId, action) {
     setProcessingLGInvitationId(invitationId);
     try {
-      const res = await fetch('/api/living-groups/leaders', {
+      const res = await fetch('/api/living-groups/leader-invitations', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ invitation_id: invitationId, action }),
+        body: JSON.stringify({ invitationId, action }),
       });
       if (res.ok) {
         // Refresh LG leader status
@@ -729,32 +729,32 @@ export default function ProfilePage() {
                   <div className="space-y-3">
                     {pendingLGInvitations.map((invitation) => (
                       <div
-                        key={invitation.id}
+                        key={invitation.permissionId}
                         className="p-4 border border-blue-200 bg-blue-50 rounded-lg"
                       >
                         <div className="flex justify-between items-start">
                           <div>
-                            <p className="font-medium">{invitation.living_group?.name || 'Unknown Living Group'}</p>
+                            <p className="font-medium">{invitation.name || 'Unknown Living Group'}</p>
                             <p className="text-text-muted text-xs mt-1">
                               {t('lgLeaderInvitations.invitedOn', {
-                                date: new Date(invitation.invited_at).toLocaleDateString(locale),
+                                date: invitation.invitedAt ? new Date(invitation.invitedAt).toLocaleDateString(locale) : '-',
                               })}
                             </p>
                           </div>
                           <div className="flex gap-2">
                             <button
-                              onClick={() => handleLGInvitationResponse(invitation.id, 'accept')}
-                              disabled={processingLGInvitationId === invitation.id}
+                              onClick={() => handleLGInvitationResponse(invitation.permissionId, 'accept')}
+                              disabled={processingLGInvitationId === invitation.permissionId}
                               className="text-sm px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
                             >
-                              {processingLGInvitationId === invitation.id ? '...' : t('lgLeaderInvitations.accept')}
+                              {processingLGInvitationId === invitation.permissionId ? '...' : t('lgLeaderInvitations.accept')}
                             </button>
                             <button
-                              onClick={() => handleLGInvitationResponse(invitation.id, 'decline')}
-                              disabled={processingLGInvitationId === invitation.id}
+                              onClick={() => handleLGInvitationResponse(invitation.permissionId, 'decline')}
+                              disabled={processingLGInvitationId === invitation.permissionId}
                               className="text-sm px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700"
                             >
-                              {processingLGInvitationId === invitation.id ? '...' : t('lgLeaderInvitations.decline')}
+                              {processingLGInvitationId === invitation.permissionId ? '...' : t('lgLeaderInvitations.decline')}
                             </button>
                           </div>
                         </div>
