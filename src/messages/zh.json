@@ -286,6 +286,14 @@
       "backToLogin": "← 返回学生登录"
     },
 
+    "logout": {
+      "title": "需要学生权限",
+      "message": "请以学生身份登录以访问毕业生简介表单。",
+      "signOut": "退出登录",
+      "signingOut": "正在退出...",
+      "studentNote": "请使用您的MIT学生账户登录以继续。"
+    },
+
     "portfolio": {
       "title": "作品集",
       "metaTitle": "作品集 - MIT Technique摄影",
@@ -945,7 +953,6 @@
     },
     "form": {
       "name": "社团名称",
-      "nameCannotChange": "注册后无法更改社团名称",
       "description": "描述",
       "memberList": "成员名单",
       "memberListPlaceholder": "输入成员姓名，每行一个或用逗号分隔",

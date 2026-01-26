@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
 
     const supabase = createAdminClient();
 
-    // Search approved clubs with leaders (discoverable clubs only)
+    // Search clubs with leaders (discoverable clubs only)
     let queryBuilder = supabase
       .from('clubs')
       .select('id, name, description')

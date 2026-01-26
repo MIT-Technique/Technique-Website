@@ -945,7 +945,6 @@
     },
     "form": {
       "name": "Nombre del Club",
-      "nameCannotChange": "El nombre del club no se puede cambiar después del registro",
       "description": "Descripción",
       "memberList": "Lista de Miembros",
       "memberListPlaceholder": "Ingrese nombres de miembros, uno por línea o separados por comas",

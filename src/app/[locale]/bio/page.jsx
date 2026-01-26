@@ -35,7 +35,7 @@ const selectSx = {
 export default function BioPage() {
   const locale = useLocale();
   const t = useTranslations('pages.bio');
-  const { isLoggedIn, loading: userLoading } = useUser();
+  const { isLoggedIn, user, loading: userLoading } = useUser();
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -51,15 +51,21 @@ export default function BioPage() {
   const vertical = "top";
   const horizontal = "center";
 
-  // Redirect to student login if not logged in
+  // Redirect to student login if not logged in, or to logout page if not a student
   useEffect(() => {
     // Ensure locale is valid before redirecting
-    if (!userLoading && !isLoggedIn && !isRedirecting && locale) {
-      setIsRedirecting(true);
-      // Use window.location for full page redirect to avoid MUI portal DOM conflicts
-      window.location.href = `/${locale}/login/student?returnUrl=${encodeURIComponent(`/${locale}/bio`)}`;
+    if (!userLoading && !isRedirecting && locale) {
+      if (!isLoggedIn) {
+        // Not logged in - redirect to login
+        setIsRedirecting(true);
+        window.location.href = `/${locale}/login/student?returnUrl=${encodeURIComponent(`/${locale}/bio`)}`;
+      } else if (user && user.role !== 'student') {
+        // Logged in but not a student - redirect to logout page
+        setIsRedirecting(true);
+        window.location.href = `/${locale}/logout`;
+      }
     }
-  }, [userLoading, isLoggedIn, locale, isRedirecting]);
+  }, [userLoading, isLoggedIn, user, locale, isRedirecting]);
 
   useEffect(() => {
     if (!isLoggedIn) return;

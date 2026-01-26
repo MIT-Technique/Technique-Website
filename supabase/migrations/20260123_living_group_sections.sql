@@ -133,11 +133,18 @@ USING (EXISTS (
 
 -- Baker House (5 floors)
 INSERT INTO dorm_sections (dorm_name, section_name, display_order) VALUES
-('Baker House', 'Floor 1', 1),
-('Baker House', 'Floor 2', 2),
-('Baker House', 'Floor 3', 3),
-('Baker House', 'Floor 4', 4),
-('Baker House', 'Floor 5', 5)
+('Baker House', 'First West', 1),
+('Baker House', 'Second West', 2),
+('Baker House', 'Third West', 3),
+('Baker House', 'Fourth West', 4),
+('Baker House', 'Fifth West', 5),
+('Baker House', 'Sixth West', 6),
+('Baker House', 'First East', 7),
+('Baker House', 'Second East', 8),
+('Baker House', 'Third East', 9),
+('Baker House', 'Fourth East', 10),
+('Baker House', 'Fifth East', 11),
+('Baker House', 'Sixth East', 12)
 ON CONFLICT (dorm_name, section_name) DO NOTHING;
 
 -- Burton-Conner House (9 sections: Burton 1-5, Conner 2-5, no Conner 1)
@@ -155,16 +162,16 @@ ON CONFLICT (dorm_name, section_name) DO NOTHING;
 
 -- East Campus (10 halls: 5 floors × 2 sides)
 INSERT INTO dorm_sections (dorm_name, section_name, display_order) VALUES
-('East Campus', '1st East', 1),
-('East Campus', '1st West', 2),
-('East Campus', '2nd East', 3),
-('East Campus', '2nd West', 4),
-('East Campus', '3rd East', 5),
-('East Campus', '3rd West', 6),
-('East Campus', '4th East', 7),
-('East Campus', '4th West', 8),
-('East Campus', '5th East', 9),
-('East Campus', '5th West', 10)
+('East Campus', 'First West', 1),
+('East Campus', 'Second West', 2),
+('East Campus', 'Third West', 3),
+('East Campus', 'Fourth (Forty-one) West', 4),
+('East Campus', 'Fifth West', 5),
+('East Campus', 'First East', 6),
+('East Campus', 'Second East', 7),
+('East Campus', 'Third East', 8),
+('East Campus', 'Fourth East', 9),
+('East Campus', 'Fifth East', 10)
 ON CONFLICT (dorm_name, section_name) DO NOTHING;
 
 -- MacGregor House (9 entries: A-H, J - no I)
@@ -182,13 +189,13 @@ ON CONFLICT (dorm_name, section_name) DO NOTHING;
 
 -- Maseeh Hall (8 floors)
 INSERT INTO dorm_sections (dorm_name, section_name, display_order) VALUES
-('Maseeh Hall', 'Floor 1', 1),
-('Maseeh Hall', 'Floor 2', 2),
-('Maseeh Hall', 'Floor 3', 3),
-('Maseeh Hall', 'Floor 4', 4),
-('Maseeh Hall', 'Floor 5', 5),
-('Maseeh Hall', 'Floor 6', 6),
-('Maseeh Hall', 'Floor 7', 7)
+('Maseeh Hall', '1', 1),
+('Maseeh Hall', '2', 2),
+('Maseeh Hall', '3', 3),
+('Maseeh Hall', '4', 4),
+('Maseeh Hall', '5', 5),
+('Maseeh Hall', '6', 6),
+('Maseeh Hall', '7', 7)
 ON CONFLICT (dorm_name, section_name) DO NOTHING;
 
 -- McCormick Hall (East Tower floors 1-8, West Tower floors 1-8)
@@ -200,15 +207,14 @@ INSERT INTO dorm_sections (dorm_name, section_name, display_order) VALUES
 ('McCormick Hall', 'East Tower 5', 5),
 ('McCormick Hall', 'East Tower 6', 6),
 ('McCormick Hall', 'East Tower 7', 7),
-('McCormick Hall', 'East Tower 8', 8),
-('McCormick Hall', 'West Tower 1', 9),
-('McCormick Hall', 'West Tower 2', 10),
-('McCormick Hall', 'West Tower 3', 11),
-('McCormick Hall', 'West Tower 4', 12),
-('McCormick Hall', 'West Tower 5', 13),
-('McCormick Hall', 'West Tower 6', 14),
-('McCormick Hall', 'West Tower 7', 15),
-('McCormick Hall', 'West Tower 8', 16)
+('McCormick Hall', 'West Tower 1', 8),
+('McCormick Hall', 'West Tower 2', 9),
+('McCormick Hall', 'West Tower 3', 10),
+('McCormick Hall', 'West Tower 4', 11),
+('McCormick Hall', 'West Tower 5', 12),
+('McCormick Hall', 'West Tower 6', 13),
+('McCormick Hall', 'West Tower 7', 14),
+('McCormick Hall', 'The Annex', 15)
 ON CONFLICT (dorm_name, section_name) DO NOTHING;
 
 -- New House (9 Houses)
@@ -226,30 +232,30 @@ ON CONFLICT (dorm_name, section_name) DO NOTHING;
 
 -- New Vassar (4 floors × 3 sections: A, B, C)
 INSERT INTO dorm_sections (dorm_name, section_name, display_order) VALUES
-('New Vassar', 'Floor 1 Section A', 1),
-('New Vassar', 'Floor 1 Section B', 2),
-('New Vassar', 'Floor 1 Section C', 3),
-('New Vassar', 'Floor 2 Section A', 4),
-('New Vassar', 'Floor 2 Section B', 5),
-('New Vassar', 'Floor 2 Section C', 6),
-('New Vassar', 'Floor 3 Section A', 7),
-('New Vassar', 'Floor 3 Section B', 8),
-('New Vassar', 'Floor 3 Section C', 9),
-('New Vassar', 'Floor 4 Section A', 10),
-('New Vassar', 'Floor 4 Section B', 11),
-('New Vassar', 'Floor 4 Section C', 12)
+('New Vassar', '1A', 1),
+('New Vassar', '1B', 2),
+('New Vassar', '1C', 3),
+('New Vassar', '2A', 4),
+('New Vassar', '2B', 5),
+('New Vassar', '2C', 6),
+('New Vassar', '3A', 7),
+('New Vassar', '3B', 8),
+('New Vassar', '3C', 9),
+('New Vassar', '4A', 10),
+('New Vassar', '4B', 11),
+('New Vassar', '4C', 12)
 ON CONFLICT (dorm_name, section_name) DO NOTHING;
 
 -- Next House (4 wings)
 INSERT INTO dorm_sections (dorm_name, section_name, display_order) VALUES
-('Next House', 'Floor 2 West', 1),
-('Next House', 'Floor 2 East', 2),
-('Next House', 'Floor 3 West', 3),
-('Next House', 'Floor 3 East', 4),
-('Next House', 'Floor 4 West', 5),
-('Next House', 'Floor 4 East', 6),
-('Next House', 'Floor 5 West', 7),
-('Next House', 'Floor 5 East', 8)
+('Next House', '2 West', 1),
+('Next House', '2 East', 2),
+('Next House', '3 West', 3),
+('Next House', '3 East', 4),
+('Next House', '4 West', 5),
+('Next House', '4 East', 6),
+('Next House', '5 West', 7),
+('Next House', '5 East', 8)
 ON CONFLICT (dorm_name, section_name) DO NOTHING;
 
 -- Random Hall (3 floors)
@@ -266,9 +272,9 @@ ON CONFLICT (dorm_name, section_name) DO NOTHING;
 
 -- Simmons Hall (3 Towers)
 INSERT INTO dorm_sections (dorm_name, section_name, display_order) VALUES
-('Simmons Hall', 'Floor 1', 1),
-('Simmons Hall', 'Floor 2', 2),
-('Simmons Hall', 'Floor 3', 3)
+('Simmons Hall', '1', 1),
+('Simmons Hall', '2', 2),
+('Simmons Hall', '3', 3)
 ON CONFLICT (dorm_name, section_name) DO NOTHING;
 
 -- ============================================================

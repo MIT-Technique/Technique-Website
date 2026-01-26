@@ -944,7 +944,6 @@
     },
     "form": {
       "name": "Club Name",
-      "nameCannotChange": "Club name cannot be changed after registration",
       "description": "Description",
       "memberList": "Member List",
       "memberListPlaceholder": "Enter member names, one per line or separated by commas",

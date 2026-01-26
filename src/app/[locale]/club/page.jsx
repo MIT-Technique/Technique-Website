@@ -734,7 +734,7 @@ export default function ClubPage() {
 
               {club && (
                 <div className="mb-6 p-3 bg-gray-50 border border-gray-200 rounded-lg">
-                  <p className="text-sm text-text-secondary">
+                  <p className="text-sm text-text-secondary pb-0">
                     {t('clubId')}: <span className="font-mono">{club.club_id}</span>
                   </p>
                 </div>
@@ -750,7 +750,6 @@ export default function ClubPage() {
                     disabled
                     readOnly
                   />
-                  <p className="text-xs text-text-muted mt-1">{t('form.nameCannotChange')}</p>
                 </div>
 
                 <div>
@@ -872,10 +871,10 @@ export default function ClubPage() {
                         return (
                           <div
                             key={student.id}
-                            className="p-3 border-b last:border-b-0 flex justify-between items-center hover:bg-gray-50"
+                            className="p-3 border-b last:border-b-0 flex justify-between items-center"
                           >
                             <div>
-                              <p className="font-medium">
+                              <p className="font-medium p-0">
                                 {student.first_name} {student.last_name}
                                 <span className="ml-2 text-text-secondary font-normal">({kerb})</span>
                               </p>
@@ -935,24 +934,6 @@ export default function ClubPage() {
               <div>
                 <h2 className="text-lg font-medium mb-4">{t('members.manuallyAddedMembers')}</h2>
 
-                {/* Add manual member form */}
-                <form onSubmit={handleAddManualMember} className="mb-4 flex gap-2">
-                  <input
-                    type="text"
-                    value={newManualMember}
-                    onChange={(e) => setNewManualMember(e.target.value)}
-                    placeholder={t('members.addPlaceholder')}
-                    className="flex-1 border border-border rounded px-4 py-2"
-                  />
-                  <button
-                    type="submit"
-                    disabled={addingMember || !newManualMember.trim()}
-                    className="btn-primary"
-                  >
-                    {addingMember ? t('members.adding') : t('members.add')}
-                  </button>
-                </form>
-
                 {manualMembers.length === 0 ? (
                   <p className="text-text-secondary">{t('members.noManualMembers')}</p>
                 ) : (
@@ -974,6 +955,25 @@ export default function ClubPage() {
                     ))}
                   </div>
                 )}
+
+
+                {/* Add manual member form */}
+                <form onSubmit={handleAddManualMember} className="mb-4 flex gap-2">
+                  <input
+                    type="text"
+                    value={newManualMember}
+                    onChange={(e) => setNewManualMember(e.target.value)}
+                    placeholder={t('members.addPlaceholder')}
+                    className="flex-1 border border-border rounded px-4 py-2"
+                  />
+                  <button
+                    type="submit"
+                    disabled={addingMember || !newManualMember.trim()}
+                    className="btn-primary"
+                  >
+                    {addingMember ? t('members.adding') : t('members.add')}
+                  </button>
+                </form>
               </div>
             </div>
           )}
@@ -981,7 +981,6 @@ export default function ClubPage() {
           {/* Join Requests Tab */}
           {activeTab === 'requests' && (
             <div>
-              <h2 className="text-lg font-medium mb-4">{t('requests.title')}</h2>
               {requestsLoading ? (
                 <p className="text-text-secondary">Loading...</p>
               ) : joinRequests.length === 0 ? (
@@ -1039,8 +1038,8 @@ export default function ClubPage() {
                 </div>
               )}
 
-              <div className="mb-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-                <p className="text-sm text-text-secondary">
+              <div className="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                <p className="text-sm p-0 text-text-secondary">
                   {t('leaders.info', { count: leaderCount, max: 2 })}
                 </p>
               </div>
@@ -1126,7 +1125,7 @@ export default function ClubPage() {
                       value={mgmtLeaderSearch}
                       onChange={(e) => setMgmtLeaderSearch(e.target.value)}
                       placeholder={t('leaders.searchAddLeader')}
-                      className="w-full border border-border rounded px-4 py-2 mb-2"
+                      className="w-full border border-border rounded px-3 py-2 mb-2"
                     />
 
                     {mgmtLeaderSearchLoading && (
