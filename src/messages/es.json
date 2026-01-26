@@ -49,6 +49,8 @@
 
   "account": {
     "login": "INICIAR SESIÓN",
+    "student": "ESTUDIANTE",
+    "organization": "ORGANIZACIÓN",
     "dashboard": "PANEL",
     "profile": "PERFIL",
     "signOut": "CERRAR SESIÓN"

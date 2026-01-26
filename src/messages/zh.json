@@ -49,6 +49,8 @@
 
   "account": {
     "login": "登录",
+    "student": "学生",
+    "organization": "组织",
     "dashboard": "控制台",
     "profile": "个人资料",
     "signOut": "退出登录"

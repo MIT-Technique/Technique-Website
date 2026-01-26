@@ -49,6 +49,8 @@
 
   "account": {
     "login": "SIGN IN",
+    "student": "STUDENT",
+    "organization": "ORGANIZATION",
     "dashboard": "DASHBOARD",
     "profile": "PROFILE",
     "signOut": "SIGN OUT"

@@ -4,13 +4,17 @@ import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { useUser } from '../../hooks/useUser';
+import OrganizationAuthModal from '../OrganizationAuthModal/OrganizationAuthModal';
 
 function AccountButton({ isHomePage = false }) {
   const locale = useLocale();
   const t = useTranslations('account');
   const { isLoggedIn, user, loading, logout } = useUser();
   const [isOpen, setIsOpen] = useState(false);
+  const [loginDropdownOpen, setLoginDropdownOpen] = useState(false);
+  const [orgModalOpen, setOrgModalOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const loginDropdownRef = useRef(null);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -38,18 +42,79 @@ function AccountButton({ isHomePage = false }) {
     );
   }
 
+  function handleStudentLogin() {
+    // Trigger MIT SSO login
+    window.location.href = "/api/login";
+  }
+
+  function handleOrganizationLogin() {
+    setLoginDropdownOpen(false);
+    setOrgModalOpen(true);
+  }
+
   if (!isLoggedIn) {
     return (
-      <Link
-        href={`/${locale}/login`}
-        className={`px-4 py-2 text-xs uppercase tracking-widest font-medium border rounded transition-colors ${
-          isHomePage
-            ? 'border-white/50 text-white/70 hover:border-white hover:text-white'
-            : 'border-border text-text-secondary hover:border-accent hover:text-accent'
-        }`}
-      >
-        {t('login')}
-      </Link>
+      <>
+        <div
+          className="relative"
+          ref={loginDropdownRef}
+          onMouseEnter={() => setLoginDropdownOpen(true)}
+          onMouseLeave={() => setLoginDropdownOpen(false)}
+        >
+          <button
+            className={`px-4 py-2 text-xs uppercase tracking-widest font-medium border rounded transition-colors ${
+              isHomePage
+                ? 'border-white/50 text-white/70 hover:border-white hover:text-white'
+                : 'border-border text-text-secondary hover:border-accent hover:text-accent'
+            }`}
+          >
+            {t('login')}
+          </button>
+
+          {/* Login Dropdown Menu */}
+          <div
+            className={`absolute top-full right-0 mt-2 transition-all duration-200 z-50 ${
+              loginDropdownOpen
+                ? 'opacity-100 visible translate-y-0'
+                : 'opacity-0 invisible -translate-y-2'
+            }`}
+          >
+            <div
+              className={`min-w-[160px] py-2 rounded shadow-lg ${
+                isHomePage
+                  ? 'bg-black/90 backdrop-blur-sm'
+                  : 'bg-white border border-border'
+              }`}
+            >
+              <button
+                onClick={handleStudentLogin}
+                className={`block w-full text-left px-4 py-2 text-xs uppercase tracking-wider transition-colors ${
+                  isHomePage
+                    ? 'text-white/70 hover:text-white hover:bg-white/10'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-bg-secondary'
+                }`}
+              >
+                {t('student')}
+              </button>
+              <button
+                onClick={handleOrganizationLogin}
+                className={`block w-full text-left px-4 py-2 text-xs uppercase tracking-wider transition-colors ${
+                  isHomePage
+                    ? 'text-white/70 hover:text-white hover:bg-white/10'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-bg-secondary'
+                }`}
+              >
+                {t('organization')}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <OrganizationAuthModal
+          open={orgModalOpen}
+          onClose={() => setOrgModalOpen(false)}
+        />
+      </>
     );
   }
 
