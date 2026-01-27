@@ -28,47 +28,13 @@ export default function ClubPage() {
   const [clubEmail, setClubEmail] = useState('');
   const [savingEmail, setSavingEmail] = useState(false);
 
-  // Members state
-  const [activeMembers, setActiveMembers] = useState([]);
+  // Members state (manual members only)
   const [manualMembers, setManualMembers] = useState([]);
-  const [leaderCount, setLeaderCount] = useState(0);
   const [membersLoading, setMembersLoading] = useState(true);
   const [membersMessage, setMembersMessage] = useState({ type: '', text: '' });
   const [newManualMember, setNewManualMember] = useState('');
   const [addingMember, setAddingMember] = useState(false);
   const [removingMemberId, setRemovingMemberId] = useState(null);
-  const [promotingMemberId, setPromotingMemberId] = useState(null);
-  const [demotingMemberId, setDemotingMemberId] = useState(null);
-
-  // Join requests state
-  const [joinRequests, setJoinRequests] = useState([]);
-  const [requestsLoading, setRequestsLoading] = useState(true);
-  const [processingRequestId, setProcessingRequestId] = useState(null);
-
-  // Leader requests state
-  const [pendingLeaderRequests, setPendingLeaderRequests] = useState([]);
-  const [cancellingLeaderRequestId, setCancellingLeaderRequestId] = useState(null);
-
-  // Onboarding state (for adding first leader)
-  const [leaderSearch, setLeaderSearch] = useState('');
-  const [leaderSearchResults, setLeaderSearchResults] = useState([]);
-  const [leaderSearchLoading, setLeaderSearchLoading] = useState(false);
-  const [addingLeader, setAddingLeader] = useState(false);
-  const [onboardingMessage, setOnboardingMessage] = useState({ type: '', text: '' });
-
-  // Invitation state
-  const [inviteSearch, setInviteSearch] = useState('');
-  const [inviteSearchResults, setInviteSearchResults] = useState([]);
-  const [inviteSearchLoading, setInviteSearchLoading] = useState(false);
-  const [invitingUserId, setInvitingUserId] = useState(null);
-  const [pendingInvitations, setPendingInvitations] = useState([]);
-  const [cancellingInvitationId, setCancellingInvitationId] = useState(null);
-
-  // Management tab leader search state
-  const [mgmtLeaderSearch, setMgmtLeaderSearch] = useState('');
-  const [mgmtLeaderSearchResults, setMgmtLeaderSearchResults] = useState([]);
-  const [mgmtLeaderSearchLoading, setMgmtLeaderSearchLoading] = useState(false);
-  const [addingMgmtLeader, setAddingMgmtLeader] = useState(false);
 
   // Documents state
   const [documents, setDocuments] = useState({
@@ -79,15 +45,6 @@ export default function ClubPage() {
   const [documentsMessage, setDocumentsMessage] = useState({ type: '', text: '' });
   const [documentsLoading, setDocumentsLoading] = useState(true);
 
-  // Password change state
-  const [passwordData, setPasswordData] = useState({
-    oldPassword: '',
-    newPassword: '',
-    confirmPassword: '',
-  });
-  const [passwordErrors, setPasswordErrors] = useState({});
-  const [savingPassword, setSavingPassword] = useState(false);
-  const [passwordMessage, setPasswordMessage] = useState({ type: '', text: '' });
 
   useEffect(() => {
     if (!userLoading && (!isLoggedIn || user?.role !== 'club')) {
@@ -118,13 +75,10 @@ export default function ClubPage() {
     checkFrozen();
   }, []);
 
-  // Fetch members data
+  // Fetch data when logged in
   useEffect(() => {
     if (isLoggedIn && user?.role === 'club') {
       fetchMembers();
-      fetchJoinRequests();
-      fetchLeaderRequests();
-      fetchPendingInvitations();
       fetchDocuments();
       fetchClubEmail();
     }
@@ -166,138 +120,17 @@ export default function ClubPage() {
     }
   }
 
-  // Password validation
-  function validatePassword(password) {
-    const errors = [];
-    if (password.length < 8) errors.push(t('password.minLength'));
-    if (!/[A-Z]/.test(password)) errors.push(t('password.uppercase'));
-    if (!/[a-z]/.test(password)) errors.push(t('password.lowercase'));
-    if (!/[0-9]/.test(password)) errors.push(t('password.number'));
-    if (!/[!@#$%^&*(),.?":{}|<>_\-+=\[\]\\\/`~;']/.test(password)) errors.push(t('password.symbol'));
-    return errors;
-  }
-
-  async function handleChangePassword(e) {
-    e.preventDefault();
-    setPasswordMessage({ type: '', text: '' });
-    setPasswordErrors({});
-
-    // Validate new password
-    const validationErrors = validatePassword(passwordData.newPassword);
-    if (validationErrors.length > 0) {
-      setPasswordErrors({ newPassword: validationErrors });
-      return;
-    }
-
-    // Check passwords match
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setPasswordErrors({ confirmPassword: [t('password.mismatch')] });
-      return;
-    }
-
-    setSavingPassword(true);
-    try {
-      const res = await fetch('/api/auth/change-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          oldPassword: passwordData.oldPassword,
-          newPassword: passwordData.newPassword,
-          orgType: 'club',
-        }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        setPasswordMessage({ type: 'success', text: t('password.changed') });
-        setPasswordData({ oldPassword: '', newPassword: '', confirmPassword: '' });
-      } else {
-        if (data.code === 'INVALID_OLD_PASSWORD') {
-          setPasswordMessage({ type: 'error', text: t('password.wrongOldPassword') });
-        } else {
-          setPasswordMessage({ type: 'error', text: data.error || t('password.error') });
-        }
-      }
-    } catch (error) {
-      setPasswordMessage({ type: 'error', text: t('password.error') });
-    } finally {
-      setSavingPassword(false);
-    }
-  }
-
-  // Debounced search for leader onboarding
-  useEffect(() => {
-    if (!club || club.has_leader) return;
-    const timer = setTimeout(() => {
-      searchStudentsForLeader(leaderSearch);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [leaderSearch, club]);
-
-  // Debounced search for invitations
-  useEffect(() => {
-    if (!club?.has_leader) return;
-    const timer = setTimeout(() => {
-      searchStudentsForInvite(inviteSearch);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [inviteSearch, club]);
-
-  // Debounced search for management tab leader search
-  useEffect(() => {
-    if (!club?.has_leader) return;
-    const timer = setTimeout(() => {
-      searchStudentsForMgmtLeader(mgmtLeaderSearch);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [mgmtLeaderSearch, club]);
 
   async function fetchMembers() {
     try {
       setMembersLoading(true);
-      const res = await fetch('/api/clubs/members');
+      const res = await fetch('/api/clubs/manual-members');
       const data = await res.json();
-      setActiveMembers(data.activeMembers || []);
-      setManualMembers(data.manualMembers || []);
-      setLeaderCount(data.leaderCount || 0);
+      setManualMembers(data.members || []);
     } catch (error) {
       console.error('Error fetching members:', error);
     } finally {
       setMembersLoading(false);
-    }
-  }
-
-  async function fetchJoinRequests() {
-    try {
-      setRequestsLoading(true);
-      const res = await fetch('/api/clubs/join-requests');
-      const data = await res.json();
-      setJoinRequests(data.requests || []);
-    } catch (error) {
-      console.error('Error fetching join requests:', error);
-    } finally {
-      setRequestsLoading(false);
-    }
-  }
-
-  async function fetchLeaderRequests() {
-    try {
-      const res = await fetch('/api/clubs/leader-request');
-      const data = await res.json();
-      setPendingLeaderRequests(data.requests || []);
-    } catch (error) {
-      console.error('Error fetching leader requests:', error);
-    }
-  }
-
-  async function fetchPendingInvitations() {
-    try {
-      const res = await fetch('/api/clubs/invite');
-      const data = await res.json();
-      setPendingInvitations(data.invitations || []);
-    } catch (error) {
-      console.error('Error fetching pending invitations:', error);
     }
   }
 
@@ -341,164 +174,6 @@ export default function ClubPage() {
       setDocumentsMessage({ type: 'error', text: t('documents.saveError') });
     } finally {
       setSavingDocuments(false);
-    }
-  }
-
-  async function searchStudentsForLeader(query) {
-    if (!query || query.length < 2) {
-      setLeaderSearchResults([]);
-      return;
-    }
-    try {
-      setLeaderSearchLoading(true);
-      const res = await fetch(`/api/clubs/search-students?q=${encodeURIComponent(query)}`);
-      const data = await res.json();
-      setLeaderSearchResults(data.students || []);
-    } catch (error) {
-      console.error('Error searching students:', error);
-    } finally {
-      setLeaderSearchLoading(false);
-    }
-  }
-
-  async function searchStudentsForInvite(query) {
-    if (!query || query.length < 2) {
-      setInviteSearchResults([]);
-      return;
-    }
-    try {
-      setInviteSearchLoading(true);
-      const res = await fetch(`/api/clubs/search-students?q=${encodeURIComponent(query)}`);
-      const data = await res.json();
-      setInviteSearchResults(data.students || []);
-    } catch (error) {
-      console.error('Error searching students:', error);
-    } finally {
-      setInviteSearchLoading(false);
-    }
-  }
-
-  async function searchStudentsForMgmtLeader(query) {
-    if (!query || query.length < 2) {
-      setMgmtLeaderSearchResults([]);
-      return;
-    }
-    try {
-      setMgmtLeaderSearchLoading(true);
-      const res = await fetch(`/api/clubs/search-students?q=${encodeURIComponent(query)}`);
-      const data = await res.json();
-      setMgmtLeaderSearchResults(data.students || []);
-    } catch (error) {
-      console.error('Error searching students:', error);
-    } finally {
-      setMgmtLeaderSearchLoading(false);
-    }
-  }
-
-  async function handleAddMgmtLeader(userId) {
-    setAddingMgmtLeader(true);
-    setMembersMessage({ type: '', text: '' });
-
-    try {
-      const res = await fetch('/api/clubs/add-first-leader', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        setMembersMessage({ type: 'success', text: t('onboarding.leaderAdded') });
-        setMgmtLeaderSearch('');
-        setMgmtLeaderSearchResults([]);
-        fetchMembers();
-      } else {
-        setMembersMessage({ type: 'error', text: data.error || t('onboarding.leaderError') });
-      }
-    } catch (error) {
-      setMembersMessage({ type: 'error', text: t('onboarding.leaderError') });
-    } finally {
-      setAddingMgmtLeader(false);
-    }
-  }
-
-  async function handleAddFirstLeader(userId) {
-    setAddingLeader(true);
-    setOnboardingMessage({ type: '', text: '' });
-
-    try {
-      const res = await fetch('/api/clubs/add-first-leader', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        setOnboardingMessage({ type: 'success', text: t('onboarding.leaderAdded') });
-        setLeaderSearch('');
-        setLeaderSearchResults([]);
-        refetch(); // Refresh club data to update has_leader
-        fetchMembers();
-      } else {
-        setOnboardingMessage({ type: 'error', text: data.error || t('onboarding.leaderError') });
-      }
-    } catch (error) {
-      setOnboardingMessage({ type: 'error', text: t('onboarding.leaderError') });
-    } finally {
-      setAddingLeader(false);
-    }
-  }
-
-  async function handleInviteStudent(userId) {
-    setInvitingUserId(userId);
-    setMembersMessage({ type: '', text: '' });
-
-    try {
-      const res = await fetch('/api/clubs/invite', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        setMembersMessage({ type: 'success', text: t('invitations.inviteSent') });
-        setInviteSearch('');
-        setInviteSearchResults([]);
-        fetchPendingInvitations();
-      } else {
-        setMembersMessage({ type: 'error', text: data.error || t('invitations.inviteError') });
-      }
-    } catch (error) {
-      setMembersMessage({ type: 'error', text: t('invitations.inviteError') });
-    } finally {
-      setInvitingUserId(null);
-    }
-  }
-
-  async function handleCancelInvitation(invitationId) {
-    setCancellingInvitationId(invitationId);
-    setMembersMessage({ type: '', text: '' });
-
-    try {
-      const res = await fetch(`/api/clubs/invite?id=${invitationId}`, {
-        method: 'DELETE',
-      });
-
-      if (res.ok) {
-        fetchPendingInvitations();
-      } else {
-        const data = await res.json();
-        setMembersMessage({ type: 'error', text: data.error || t('invitations.cancelError') });
-      }
-    } catch (error) {
-      setMembersMessage({ type: 'error', text: t('invitations.cancelError') });
-    } finally {
-      setCancellingInvitationId(null);
     }
   }
 
@@ -583,133 +258,6 @@ export default function ClubPage() {
     }
   }
 
-  async function handleRemoveActiveMember(membershipId) {
-    setRemovingMemberId(membershipId);
-    setMembersMessage({ type: '', text: '' });
-
-    try {
-      const res = await fetch(`/api/clubs/members?id=${membershipId}`, {
-        method: 'DELETE',
-      });
-
-      if (res.ok) {
-        setMembersMessage({ type: 'success', text: t('members.removeSuccess') });
-        fetchMembers();
-      } else {
-        const data = await res.json();
-        setMembersMessage({ type: 'error', text: data.error || t('members.removeError') });
-      }
-    } catch (error) {
-      setMembersMessage({ type: 'error', text: t('members.removeError') });
-    } finally {
-      setRemovingMemberId(null);
-    }
-  }
-
-  async function handleRequestPromotion(userId) {
-    setPromotingMemberId(userId);
-    setMembersMessage({ type: '', text: '' });
-
-    try {
-      const res = await fetch('/api/clubs/leader-request', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId }),
-      });
-
-      if (res.ok) {
-        setMembersMessage({ type: 'success', text: t('members.promotionRequested') });
-        fetchLeaderRequests();
-      } else {
-        const data = await res.json();
-        setMembersMessage({ type: 'error', text: data.error || t('members.promotionError') });
-      }
-    } catch (error) {
-      setMembersMessage({ type: 'error', text: t('members.promotionError') });
-    } finally {
-      setPromotingMemberId(null);
-    }
-  }
-
-  async function handleCancelLeaderRequest(requestId) {
-    setCancellingLeaderRequestId(requestId);
-    setMembersMessage({ type: '', text: '' });
-
-    try {
-      const res = await fetch(`/api/clubs/leader-request?id=${requestId}`, {
-        method: 'DELETE',
-      });
-
-      if (res.ok) {
-        setMembersMessage({ type: 'success', text: t('members.requestCancelled') });
-        fetchLeaderRequests();
-      } else {
-        const data = await res.json();
-        setMembersMessage({ type: 'error', text: data.error || t('members.cancelError') });
-      }
-    } catch (error) {
-      setMembersMessage({ type: 'error', text: t('members.cancelError') });
-    } finally {
-      setCancellingLeaderRequestId(null);
-    }
-  }
-
-  async function handleDemoteLeader(membershipId) {
-    setDemotingMemberId(membershipId);
-    setMembersMessage({ type: '', text: '' });
-
-    try {
-      const res = await fetch('/api/clubs/demote-leader', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ membership_id: membershipId }),
-      });
-
-      if (res.ok) {
-        setMembersMessage({ type: 'success', text: t('members.demoteSuccess') });
-        fetchMembers();
-      } else {
-        const data = await res.json();
-        setMembersMessage({ type: 'error', text: data.error || t('members.demoteError') });
-      }
-    } catch (error) {
-      setMembersMessage({ type: 'error', text: t('members.demoteError') });
-    } finally {
-      setDemotingMemberId(null);
-    }
-  }
-
-  async function handleProcessJoinRequest(requestId, action) {
-    setProcessingRequestId(requestId);
-
-    try {
-      const res = await fetch('/api/clubs/join-requests', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ request_id: requestId, action }),
-      });
-
-      if (res.ok) {
-        fetchJoinRequests();
-        if (action === 'approve') {
-          fetchMembers();
-        }
-      } else {
-        const data = await res.json();
-        console.error('Error processing request:', data.error);
-      }
-    } catch (error) {
-      console.error('Error processing request:', error);
-    } finally {
-      setProcessingRequestId(null);
-    }
-  }
-
-  // Check if a member has a pending leader request
-  function hasPendingLeaderRequest(userId) {
-    return pendingLeaderRequests.some(r => r.user_id === userId);
-  }
-
   if (userLoading) {
     return (
       <main className="min-h-screen pt-24 lg:pt-32">
@@ -724,14 +272,10 @@ export default function ClubPage() {
     return null;
   }
 
-  // Tabs are disabled until club has a leader (except profile)
-  const hasLeader = club?.has_leader;
   const tabs = [
-    { id: 'profile', label: t('tabs.profile'), disabled: false },
-    { id: 'leaders', label: t('tabs.leaders'), disabled: !hasLeader },
-    { id: 'members', label: t('tabs.members'), disabled: !hasLeader },
-    { id: 'requests', label: t('tabs.requests'), disabled: !hasLeader },
-    { id: 'documents', label: t('tabs.documents'), disabled: !hasLeader },
+    { id: 'profile', label: t('tabs.profile') },
+    { id: 'members', label: t('tabs.members') },
+    { id: 'documents', label: t('tabs.documents') },
   ];
 
   return (
@@ -743,92 +287,19 @@ export default function ClubPage() {
             {t('welcome', { name: club?.name || '' })}
           </p>
 
-          {/* Leader Required Warning - shown above tabs when no leader */}
-          {club && !club.has_leader && (
-            <div className="mb-6 p-4 bg-gray-50 border border-gray-300 rounded-lg">
-              <h3 className="text-md font-semibold text-gray-800 mb-2">
-                {t('onboarding.profileWarningTitle')}
-              </h3>
-              <p className="text-gray-600 text-sm mb-2">{t('onboarding.addLeaderDescription')}</p>
-              <p className="text-gray-600 text-sm font-medium mb-4">{t('onboarding.tabsBlockedWarning')}</p>
-
-              {onboardingMessage.text && (
-                <div className={`mb-4 p-3 rounded text-sm ${
-                  onboardingMessage.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
-                }`}>
-                  {onboardingMessage.text}
-                </div>
-              )}
-
-              <div className="max-w-md">
-                <input
-                  type="text"
-                  value={leaderSearch}
-                  onChange={(e) => setLeaderSearch(e.target.value)}
-                  placeholder={t('onboarding.searchStudent')}
-                  className="w-full border border-gray-300 rounded px-4 py-2 mb-2 bg-white text-sm"
-                />
-
-                {leaderSearchLoading && (
-                  <p className="text-text-secondary text-sm">Loading...</p>
-                )}
-
-                {leaderSearchResults.length > 0 && (
-                  <div className="border border-border rounded max-h-48 overflow-y-auto bg-white">
-                    {leaderSearchResults.map((student) => {
-                      const kerb = student.email?.split('@')[0] || '';
-                      return (
-                        <div
-                          key={student.id}
-                          className="p-3 border-b last:border-b-0 flex justify-between items-center hover:bg-gray-50"
-                        >
-                          <div>
-                            <p className="font-medium text-sm">
-                              {student.first_name} {student.last_name}
-                              <span className="ml-2 text-text-secondary font-normal">({kerb})</span>
-                            </p>
-                          </div>
-                          <button
-                            onClick={() => handleAddFirstLeader(student.id)}
-                            disabled={addingLeader}
-                            className="text-sm px-3 py-1 bg-accent text-white rounded hover:bg-accent/90"
-                          >
-                            {addingLeader ? t('onboarding.adding') : t('onboarding.addAsLeader')}
-                          </button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-
-                {leaderSearch.length >= 2 && !leaderSearchLoading && leaderSearchResults.length === 0 && (
-                  <p className="text-text-secondary text-sm">{t('onboarding.noResults')}</p>
-                )}
-              </div>
-            </div>
-          )}
-
           {/* Tabs */}
           <div className="flex gap-4 mb-8 border-b border-border overflow-x-auto">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => !tab.disabled && setActiveTab(tab.id)}
-                disabled={tab.disabled}
+                onClick={() => setActiveTab(tab.id)}
                 className={`pb-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                  tab.disabled
-                    ? 'border-transparent text-text-muted cursor-not-allowed'
-                    : activeTab === tab.id
+                  activeTab === tab.id
                     ? 'border-accent text-accent'
                     : 'border-transparent text-text-secondary hover:text-text-primary'
                 }`}
               >
                 {tab.label}
-                {tab.id === 'requests' && joinRequests.length > 0 && !tab.disabled && (
-                  <span className="ml-2 px-2 py-0.5 text-xs bg-accent text-white rounded-full">
-                    {joinRequests.length}
-                  </span>
-                )}
               </button>
             ))}
           </div>
@@ -913,72 +384,6 @@ export default function ClubPage() {
                 </button>
               </form>
 
-              {/* Change Password Section */}
-              <div className="mt-8 pt-8 border-t border-border">
-                <h3 className="text-lg font-medium mb-4">{t('password.title')}</h3>
-
-                {passwordMessage.text && (
-                  <div className={`mb-6 p-4 rounded ${
-                    passwordMessage.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
-                  }`}>
-                    {passwordMessage.text}
-                  </div>
-                )}
-
-                <form onSubmit={handleChangePassword} className="space-y-4 max-w-md">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">{t('password.oldPassword')}</label>
-                    <input
-                      type="password"
-                      value={passwordData.oldPassword}
-                      onChange={(e) => setPasswordData({ ...passwordData, oldPassword: e.target.value })}
-                      className="w-full border border-border rounded px-4 py-2"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-2">{t('password.newPassword')}</label>
-                    <input
-                      type="password"
-                      value={passwordData.newPassword}
-                      onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                      className={`w-full border rounded px-4 py-2 ${passwordErrors.newPassword ? 'border-red-500' : 'border-border'}`}
-                      required
-                    />
-                    {passwordErrors.newPassword && (
-                      <ul className="mt-2 text-sm text-red-600 list-disc list-inside">
-                        {passwordErrors.newPassword.map((err, i) => (
-                          <li key={i}>{err}</li>
-                        ))}
-                      </ul>
-                    )}
-                    <p className="mt-2 text-xs text-text-muted">{t('password.requirements')}</p>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-2">{t('password.confirmPassword')}</label>
-                    <input
-                      type="password"
-                      value={passwordData.confirmPassword}
-                      onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                      className={`w-full border rounded px-4 py-2 ${passwordErrors.confirmPassword ? 'border-red-500' : 'border-border'}`}
-                      required
-                    />
-                    {passwordErrors.confirmPassword && (
-                      <p className="mt-2 text-sm text-red-600">{passwordErrors.confirmPassword[0]}</p>
-                    )}
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={savingPassword}
-                    className="btn-primary"
-                  >
-                    {savingPassword ? t('password.saving') : t('password.changeButton')}
-                  </button>
-                </form>
-              </div>
             </div>
           )}
 
@@ -993,358 +398,48 @@ export default function ClubPage() {
                 </div>
               )}
 
-              {/* Active Members */}
-              <div className="mb-8">
-                <h2 className="text-lg font-medium mb-4">{t('members.activeMembers')}</h2>
-                {membersLoading ? (
-                  <p className="text-text-secondary">Loading...</p>
-                ) : activeMembers.length === 0 ? (
-                  <p className="text-text-secondary">{t('members.noActiveMembers')}</p>
-                ) : (
-                  <div className="space-y-2">
-                    {activeMembers.map((member) => {
-                      const kerb = member.user?.email?.split('@')[0] || '';
-                      return (
-                        <div
-                          key={member.id}
-                          className="p-4 border border-border rounded-lg flex justify-between items-center"
-                        >
-                          <div>
-                            <p className="font-medium">
-                              {member.user?.first_name} {member.user?.last_name}
-                              <span className="ml-2 text-text-secondary font-normal">({kerb})</span>
-                            </p>
-                          </div>
-                          <span className={`text-xs px-2 py-1 rounded ${
-                            member.role === 'leader'
-                              ? 'bg-accent text-white'
-                              : 'bg-gray-200 text-gray-700'
-                          }`}>
-                            {member.role === 'leader' ? t('members.leader') : t('members.member')}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
+              <h2 className="text-lg font-medium mb-4">{t('members.title')}</h2>
 
-              {/* Invite Students */}
-              <div className="mb-8">
-                <h2 className="text-lg font-medium mb-4">{t('invitations.title')}</h2>
-                <div className="max-w-md mb-4">
-                  <input
-                    type="text"
-                    value={inviteSearch}
-                    onChange={(e) => setInviteSearch(e.target.value)}
-                    placeholder={t('invitations.searchPlaceholder')}
-                    className="w-full border border-border rounded px-4 py-2"
-                  />
+              {/* Add member form */}
+              <form onSubmit={handleAddManualMember} className="mb-6 flex gap-2">
+                <input
+                  type="text"
+                  value={newManualMember}
+                  onChange={(e) => setNewManualMember(e.target.value)}
+                  placeholder={t('members.addPlaceholder')}
+                  className="flex-1 border border-border rounded px-4 py-2"
+                />
+                <button
+                  type="submit"
+                  disabled={addingMember || !newManualMember.trim()}
+                  className="btn-primary"
+                >
+                  {addingMember ? t('members.adding') : t('members.add')}
+                </button>
+              </form>
 
-                  {inviteSearchLoading && (
-                    <p className="text-text-secondary text-sm mt-2">Loading...</p>
-                  )}
-
-                  {inviteSearchResults.length > 0 && (
-                    <div className="mt-2 border border-border rounded max-h-48 overflow-y-auto">
-                      {inviteSearchResults.map((student) => {
-                        const kerb = student.email?.split('@')[0] || '';
-                        return (
-                          <div
-                            key={student.id}
-                            className="p-3 border-b last:border-b-0 flex justify-between items-center"
-                          >
-                            <div>
-                              <p className="font-medium p-0">
-                                {student.first_name} {student.last_name}
-                                <span className="ml-2 text-text-secondary font-normal">({kerb})</span>
-                              </p>
-                            </div>
-                            <button
-                              onClick={() => handleInviteStudent(student.id)}
-                              disabled={invitingUserId === student.id}
-                              className="text-sm px-3 py-1 bg-accent text-white rounded hover:bg-accent/90"
-                            >
-                              {invitingUserId === student.id ? t('invitations.inviting') : t('invitations.invite')}
-                            </button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-
-                  {inviteSearch.length >= 2 && !inviteSearchLoading && inviteSearchResults.length === 0 && (
-                    <p className="text-text-secondary text-sm mt-2">{t('onboarding.noResults')}</p>
-                  )}
-                </div>
-
-                {/* Pending Invitations */}
-                {pendingInvitations.length > 0 && (
-                  <div>
-                    <h3 className="text-md font-medium mb-2">{t('invitations.pendingInvitations')}</h3>
-                    <div className="space-y-2">
-                      {pendingInvitations.map((invitation) => {
-                        const kerb = invitation.user?.email?.split('@')[0] || '';
-                        return (
-                          <div
-                            key={invitation.id}
-                            className="p-3 border border-yellow-200 bg-yellow-50 rounded-lg flex justify-between items-center"
-                          >
-                            <div>
-                              <p className="font-medium">
-                                {invitation.user?.first_name} {invitation.user?.last_name}
-                                <span className="ml-2 text-text-secondary font-normal">({kerb})</span>
-                              </p>
-                            </div>
-                            <button
-                              onClick={() => handleCancelInvitation(invitation.id)}
-                              disabled={cancellingInvitationId === invitation.id}
-                              className="text-sm text-red-600 hover:text-red-700"
-                            >
-                              {cancellingInvitationId === invitation.id ? '...' : t('invitations.cancel')}
-                            </button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Manually Added Members */}
-              <div>
-                <h2 className="text-lg font-medium mb-4">{t('members.manuallyAddedMembers')}</h2>
-
-                {manualMembers.length === 0 ? (
-                  <p className="text-text-secondary">{t('members.noManualMembers')}</p>
-                ) : (
-                  <div className="space-y-2">
-                    {manualMembers.map((member) => (
-                      <div
-                        key={member.id}
-                        className="p-4 border border-border rounded-lg flex justify-between items-center"
-                      >
-                        <p>{member.name}</p>
-                        <button
-                          onClick={() => handleRemoveManualMember(member.id)}
-                          disabled={removingMemberId === member.id}
-                          className="text-sm text-red-600 hover:text-red-700"
-                        >
-                          {removingMemberId === member.id ? t('members.removing') : t('members.remove')}
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-
-                {/* Add manual member form */}
-                <form onSubmit={handleAddManualMember} className="mb-4 flex gap-2">
-                  <input
-                    type="text"
-                    value={newManualMember}
-                    onChange={(e) => setNewManualMember(e.target.value)}
-                    placeholder={t('members.addPlaceholder')}
-                    className="flex-1 border border-border rounded px-4 py-2"
-                  />
-                  <button
-                    type="submit"
-                    disabled={addingMember || !newManualMember.trim()}
-                    className="btn-primary"
-                  >
-                    {addingMember ? t('members.adding') : t('members.add')}
-                  </button>
-                </form>
-              </div>
-            </div>
-          )}
-
-          {/* Join Requests Tab */}
-          {activeTab === 'requests' && (
-            <div>
-              {requestsLoading ? (
-                <p className="text-text-secondary">Loading...</p>
-              ) : joinRequests.length === 0 ? (
-                <p className="text-text-secondary">{t('requests.noRequests')}</p>
-              ) : (
-                <div className="space-y-2">
-                  {joinRequests.map((request) => {
-                    const kerb = request.user?.email?.split('@')[0] || '';
-                    return (
-                      <div
-                        key={request.id}
-                        className="p-4 border border-border rounded-lg flex justify-between items-center"
-                      >
-                        <div>
-                          <p className="font-medium">
-                            {request.user?.first_name} {request.user?.last_name}
-                            <span className="ml-2 text-text-secondary font-normal">({kerb})</span>
-                          </p>
-                          <p className="text-text-muted text-xs">
-                            {new Date(request.created_at).toLocaleDateString(locale)}
-                          </p>
-                        </div>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleProcessJoinRequest(request.id, 'approve')}
-                            disabled={processingRequestId === request.id}
-                            className="text-sm px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
-                          >
-                            {processingRequestId === request.id ? '...' : t('requests.approve')}
-                          </button>
-                          <button
-                            onClick={() => handleProcessJoinRequest(request.id, 'deny')}
-                            disabled={processingRequestId === request.id}
-                            className="text-sm px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
-                          >
-                            {processingRequestId === request.id ? '...' : t('requests.deny')}
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Leaders Tab */}
-          {activeTab === 'leaders' && (
-            <div>
-              {membersMessage.text && (
-                <div className={`mb-6 p-4 rounded ${
-                  membersMessage.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
-                }`}>
-                  {membersMessage.text}
-                </div>
-              )}
-
-              <div className="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
-                <p className="text-sm p-0 text-text-secondary">
-                  {t('leaders.info', { count: leaderCount, max: 2 })}
-                </p>
-              </div>
-
-              {/* Current Leaders */}
+              {/* Members List */}
               {membersLoading ? (
                 <p className="text-text-secondary">Loading...</p>
+              ) : manualMembers.length === 0 ? (
+                <p className="text-text-secondary">{t('members.noMembers')}</p>
               ) : (
-                <div className="space-y-2 mb-4">
-                  {activeMembers.filter(m => m.role === 'leader').map((member) => {
-                    const kerb = member.user?.email?.split('@')[0] || '';
-                    return (
-                      <div
-                        key={member.id}
-                        className="p-4 border border-border rounded-lg flex justify-between items-center"
+                <div className="space-y-2">
+                  {manualMembers.map((member) => (
+                    <div
+                      key={member.id}
+                      className="p-4 border border-border rounded-lg flex justify-between items-center"
+                    >
+                      <p>{member.name}</p>
+                      <button
+                        onClick={() => handleRemoveManualMember(member.id)}
+                        disabled={removingMemberId === member.id}
+                        className="text-sm text-red-600 hover:text-red-700"
                       >
-                        <div>
-                          <p className="font-medium">
-                            {member.user?.first_name} {member.user?.last_name}
-                            <span className="ml-2 text-text-secondary font-normal">({kerb})</span>
-                          </p>
-                        </div>
-                        <div className="flex gap-2 items-center">
-                          <span className="text-xs px-2 py-1 rounded bg-accent text-white">
-                            {t('members.leader')}
-                          </span>
-                          <button
-                            onClick={() => handleDemoteLeader(member.id)}
-                            disabled={demotingMemberId === member.id}
-                            className="text-sm px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700"
-                          >
-                            {demotingMemberId === member.id ? '...' : t('leaders.demoteToMember')}
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                  {activeMembers.filter(m => m.role === 'leader').length === 0 && (
-                    <p className="text-text-secondary text-sm">{t('leaders.noLeaders')}</p>
-                  )}
-                </div>
-              )}
-
-              {/* Pending Leader Requests */}
-              {pendingLeaderRequests.length > 0 && (
-                <div className="mb-4">
-                  <h3 className="text-md font-medium mb-2">{t('leaders.pendingPromotions')}</h3>
-                  <div className="space-y-2">
-                    {pendingLeaderRequests.map((request) => {
-                      const kerb = request.user?.email?.split('@')[0] || '';
-                      return (
-                        <div
-                          key={request.id}
-                          className="p-3 border border-yellow-200 bg-yellow-50 rounded-lg flex justify-between items-center"
-                        >
-                          <div>
-                            <p className="font-medium text-sm">
-                              {request.user?.first_name} {request.user?.last_name}
-                              <span className="ml-2 text-text-secondary font-normal">({kerb})</span>
-                            </p>
-                            <p className="text-text-secondary text-xs">{t('leaders.awaitingApproval')}</p>
-                          </div>
-                          <button
-                            onClick={() => handleCancelLeaderRequest(request.id)}
-                            disabled={cancellingLeaderRequestId === request.id}
-                            className="text-sm text-red-600 hover:text-red-700"
-                          >
-                            {cancellingLeaderRequestId === request.id ? '...' : t('leaders.cancelRequest')}
-                          </button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* Add Leader Search */}
-              {leaderCount < 2 && (
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <div className="max-w-md">
-                    <input
-                      type="text"
-                      value={mgmtLeaderSearch}
-                      onChange={(e) => setMgmtLeaderSearch(e.target.value)}
-                      placeholder={t('leaders.searchAddLeader')}
-                      className="w-full border border-border rounded px-3 py-2 mb-2"
-                    />
-
-                    {mgmtLeaderSearchLoading && (
-                      <p className="text-text-secondary text-sm">Loading...</p>
-                    )}
-
-                    {mgmtLeaderSearchResults.length > 0 && (
-                      <div className="border border-border rounded max-h-48 overflow-y-auto">
-                        {mgmtLeaderSearchResults.map((student) => {
-                          const kerb = student.email?.split('@')[0] || '';
-                          return (
-                            <div
-                              key={student.id}
-                              className="p-3 border-b last:border-b-0 flex justify-between items-center hover:bg-gray-50"
-                            >
-                              <div>
-                                <p className="font-medium text-sm">
-                                  {student.first_name} {student.last_name}
-                                  <span className="ml-2 text-text-secondary font-normal">({kerb})</span>
-                                </p>
-                              </div>
-                              <button
-                                onClick={() => handleAddMgmtLeader(student.id)}
-                                disabled={addingMgmtLeader}
-                                className="text-sm px-3 py-1 bg-accent text-white rounded hover:bg-accent/90"
-                              >
-                                {addingMgmtLeader ? t('onboarding.adding') : t('onboarding.addAsLeader')}
-                              </button>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-
-                    {mgmtLeaderSearch.length >= 2 && !mgmtLeaderSearchLoading && mgmtLeaderSearchResults.length === 0 && (
-                      <p className="text-text-secondary text-sm">{t('onboarding.noResults')}</p>
-                    )}
-                  </div>
+                        {removingMemberId === member.id ? t('members.removing') : t('members.remove')}
+                      </button>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>

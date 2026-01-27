@@ -9,6 +9,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Only living group accounts can access this
+    if (user.role !== "living_group") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const { searchParams } = new URL(request.url);
     const livingGroupId = searchParams.get("livingGroupId");
 
@@ -18,11 +23,12 @@ export async function GET(request: NextRequest) {
 
     const supabaseAdmin = createAdminClient();
 
-    // Get the living group's user email
+    // Get the living group's user email - verify ownership
     const { data: livingGroup, error } = await supabaseAdmin
       .from("living_groups")
       .select("user_id, users!living_groups_user_id_fkey(email)")
       .eq("id", livingGroupId)
+      .eq("user_id", user.id)
       .single();
 
     if (error || !livingGroup) {
@@ -45,6 +51,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Only living group accounts can update email
+    if (user.role !== "living_group") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const body = await request.json();
     const { livingGroupId, email } = body;
 
@@ -54,11 +65,12 @@ export async function POST(request: NextRequest) {
 
     const supabaseAdmin = createAdminClient();
 
-    // Get the living group to find its user_id
+    // Get the living group - verify ownership
     const { data: livingGroup, error: lgError } = await supabaseAdmin
       .from("living_groups")
       .select("user_id")
       .eq("id", livingGroupId)
+      .eq("user_id", user.id)
       .single();
 
     if (lgError || !livingGroup) {

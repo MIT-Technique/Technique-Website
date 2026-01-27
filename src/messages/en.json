@@ -323,56 +323,9 @@
         "seniorBio": "Senior Bio",
         "clubInfo": "Club Info",
         "scheduling": "Scheduling",
-        "myClubs": "My Clubs",
-        "myLivingGroups": "My Living Groups",
         "photographerTools": "Staph Tools"
       },
-      "myClubs": {
-        "title": "My Clubs",
-        "searchTitle": "Search Clubs",
-        "description": "Join your club(s) to be included in the yearbook photos.",
-        "memberships": "Memberships",
-        "noMemberships": "You are not a member of any clubs yet.",
-        "pendingRequests": "Pending Requests",
-        "noPendingRequests": "No pending join requests.",
-        "cancelRequest": "Cancel",
-        "cancel": "Cancel",
-        "cancelling": "...",
-        "searchClubs": "Search Clubs",
-        "searchPlaceholder": "Search for a club to join...",
-        "searchHint": "Find and request to join MIT clubs",
-        "noResults": "No verified clubs found",
-        "joinClub": "Join",
-        "requestJoin": "Join",
-        "joining": "...",
-        "requesting": "...",
-        "requestSent": "Request sent!",
-        "requestedOn": "Requested on {date}",
-        "joinedOn": "Joined on {date}",
-        "alreadyMember": "Member",
-        "alreadyRequested": "Requested",
-        "leader": "Leader",
-        "member": "Member",
-        "role": {
-          "member": "Member",
-          "leader": "Leader"
-        },
-        "invitations": {
-          "title": "Club Invitations",
-          "noInvitations": "No pending club invitations",
-          "accept": "Accept",
-          "decline": "Decline",
-          "accepting": "Accepting...",
-          "declining": "Declining...",
-          "accepted": "Invitation accepted!",
-          "declined": "Invitation declined",
-          "invitedBy": "Invited by {name}",
-          "invitedOn": "{date}",
-          "error": "Failed to process invitation"
-        },
-        "manageDashboard": "Manage Club"
-      },
-      "profile": {
+"profile": {
         "title": "Account Information",
         "email": "Email",
         "role": "Role",
@@ -382,12 +335,6 @@
         "title": "Need different access?",
         "description": "Request a role change if you represent a club or living group.",
         "requestButton": "Request Role Change"
-      },
-      "lgLeaderInvitations": {
-        "title": "Living Group Leader Invitations",
-        "invitedOn": "Invited on {date}",
-        "accept": "Accept",
-        "decline": "Decline"
       },
       "adminTools": {
         "title": "Admin Tools",
@@ -921,9 +868,7 @@
     "frozen": "This form is currently frozen. You cannot make changes at this time.",
     "tabs": {
       "profile": "Profile",
-      "leaders": "Leaders",
       "members": "Members",
-      "requests": "Join Requests",
       "documents": "Documents"
     },
     "password": {
@@ -993,74 +938,6 @@
         "leader": "Leader"
       }
     },
-    "leaders": {
-      "title": "Leaders",
-      "info": "Current leaders: {count}/{max}",
-      "noLeaders": "No leaders assigned",
-      "demoteToMember": "Demote to Member",
-      "pendingPromotions": "Pending Leader Promotions",
-      "awaitingApproval": "Awaiting admin approval",
-      "cancelRequest": "Cancel Request",
-      "searchAddLeader": "Search to add a leader..."
-    },
-    "requests": {
-      "title": "Join Requests",
-      "pending": "Pending Requests",
-      "noPending": "No pending join requests.",
-      "noRequests": "No pending join requests.",
-      "approve": "Approve",
-      "deny": "Deny",
-      "processing": "..."
-    },
-    "management": {
-      "title": "User Management",
-      "leadersTitle": "Leaders",
-      "membersTitle": "Members",
-      "noLeaders": "No leaders assigned",
-      "addLeader": "Add Leader",
-      "description": "Manage club members and leaders. You can have up to 2 leaders per club.",
-      "noMembers": "No members to manage.",
-      "removeMember": "Remove",
-      "promoteToLeader": "Promote to Leader",
-      "demoteToMember": "Demote to Member",
-      "processing": "...",
-      "leaderLimit": "Maximum 2 leaders allowed",
-      "leaderInfo": "Current leaders: {count}/{max}",
-      "pendingPromotions": "Pending Leader Promotions",
-      "awaitingApproval": "Awaiting admin approval",
-      "cancelling": "Cancelling...",
-      "cancelRequest": "Cancel Request",
-      "promotionPending": "Promotion pending",
-      "requestLeader": "Request Leader Promotion",
-      "requestLeaderHint": "Admin approval required to promote members to leader",
-      "pendingLeaderRequest": "Promotion pending admin approval",
-      "searchAddLeader": "Search to add a leader..."
-    },
-    "onboarding": {
-      "addLeaderRequired": "Add a leader to continue",
-      "addLeaderDescription": "Your club needs at least one MIT student leader before you can manage members and be discoverable to students.",
-      "searchStudent": "Search MIT students...",
-      "addAsLeader": "Add as Leader",
-      "adding": "Adding...",
-      "leaderAdded": "Leader added successfully!",
-      "leaderError": "Failed to add leader",
-      "tabsBlockedWarning": "The Members, Join Requests, and User Management tabs are blocked until you add a club leader.",
-      "profileWarningTitle": "Action Required: Add a Club Leader",
-      "noResults": "No students found"
-    },
-    "invitations": {
-      "title": "Invite Students",
-      "searchPlaceholder": "Search by name or email...",
-      "invite": "Invite",
-      "inviting": "Inviting...",
-      "inviteSent": "Invitation sent!",
-      "inviteError": "Failed to send invitation",
-      "pendingInvitations": "Pending Invitations",
-      "noPendingInvitations": "No pending invitations",
-      "invitedOn": "Invited on {date}",
-      "cancel": "Cancel",
-      "cancelling": "Cancelling..."
-    },
     "documents": {
       "title": "Club Documents",
       "description": "Store important links and notes for your club. This information is private to club leaders.",
@@ -1088,9 +965,9 @@
     "tabs": {
       "profile": "Profile",
       "book": "Book",
-      "assign": "Assign",
+      "assign": "Sections",
       "members": "Members",
-      "joinRequests": "Join Requests"
+      "documents": "Documents"
     },
     "email": {
       "title": "Display Email",
@@ -1142,6 +1019,21 @@
     "bookError": "Failed to book time slot",
     "postedBy": "Posted by {name}",
     "unknownCreator": "Unknown",
+    "assign": {
+      "title": "Manage Sections",
+      "description": "Create sections to organize members (e.g., floors, wings, buildings). Members can then be assigned to sections.",
+      "addPlaceholder": "Enter section name (e.g., 1st Floor)",
+      "addSection": "Add Section",
+      "adding": "Adding...",
+      "addSectionSuccess": "Section added successfully",
+      "addSectionError": "Failed to add section",
+      "noSections": "No sections created yet",
+      "memberCount": "{count} member(s)",
+      "removeSection": "Remove",
+      "removing": "Removing...",
+      "removeSectionSuccess": "Section removed successfully",
+      "removeSectionError": "Failed to remove section"
+    },
     "members": {
       "title": "Members",
       "totalMembers": "Total Members: {count}",
@@ -1153,10 +1045,13 @@
       "updateExpected": "Update",
       "expectedPlaceholder": "Expected count",
       "updateSuccess": "Expected count updated",
-      "updateError": "Failed to update expected count",
+      "updateError": "Failed to update member",
       "addMember": "Add Member",
+      "addPlaceholder": "Enter member name",
       "searchPlaceholder": "Search by email...",
-      "selectSection": "Select section",
+      "selectSection": "Assign to section",
+      "noSection": "No section",
+      "unassigned": "Unassigned",
       "allSections": "All Sections",
       "noResults": "No students found",
       "add": "Add",
@@ -1171,16 +1066,19 @@
       "removeError": "Failed to remove member",
       "confirmRemove": "Remove this member?"
     },
-    "joinRequests": {
-      "title": "Join Requests",
-      "noRequests": "No pending requests",
-      "approve": "Approve",
-      "deny": "Deny",
-      "approving": "Approving...",
-      "denying": "Denying...",
-      "approveSuccess": "Member approved",
-      "denySuccess": "Request denied",
-      "actionError": "Failed to process request"
+    "documents": {
+      "title": "Organization Documents",
+      "description": "Store important links and notes for your living group. This information is private.",
+      "linksLabel": "Important Links",
+      "linksPlaceholder": "Add important links (one per line)\nExample:\nhttps://drive.google.com/your-folder\nhttps://docs.google.com/your-doc",
+      "linksHint": "Add URLs to Google Drive folders, shared documents, etc.",
+      "notesLabel": "Notes",
+      "notesPlaceholder": "Add any important notes...",
+      "notesHint": "Private notes visible only to living group account",
+      "save": "Save Documents",
+      "saving": "Saving...",
+      "saveSuccess": "Documents saved successfully",
+      "saveError": "Failed to save documents"
     },
     "proposeTime": {
       "title": "Propose a Time",
@@ -1210,94 +1108,6 @@
         "declined": "Declined",
         "cancelled": "Cancelled"
       }
-    },
-    "onboarding": {
-      "title": "Add a Living Group Leader",
-      "description": "Before you can access scheduling and member features, you need to add at least one MIT student as a Living Group Leader. They will receive password reset emails and help manage your group.",
-      "studentEmailPlaceholder": "Student's MIT email (e.g., student@mit.edu)",
-      "addLeader": "Add Leader",
-      "addingLeader": "Adding...",
-      "leaderAdded": "Leader added successfully!",
-      "emailRequired": "Please enter a student email",
-      "addLeaderError": "Failed to add leader"
-    },
-    "assign": {
-      "title": "Assign Sections to Time Slots",
-      "description": "Assign different sections of your living group to 30-minute time slots during your booked photoshoot.",
-      "selectDate": "Select a booked date",
-      "noBooking": "No booked time slots available. Book a photoshoot time first.",
-      "slot": "Slot",
-      "section": "Section",
-      "notAssigned": "Not assigned",
-      "save": "Save",
-      "saving": "Saving...",
-      "saved": "Assignment saved",
-      "saveError": "Failed to save assignment",
-      "unassignedSections": "Sections waiting to be assigned:",
-      "allAssigned": "All sections have been assigned to time slots"
-    },
-    "groupLeaders": {
-      "title": "Group Leaders",
-      "description": "Manage leaders who can help manage your living group's photoshoot scheduling and members.",
-      "currentLeaders": "Current Leaders",
-      "noLeaders": "No leaders assigned yet",
-      "pendingInvitations": "Pending Invitations",
-      "noPending": "No pending invitations",
-      "inviteLeader": "Invite New Leader",
-      "searchPlaceholder": "Search by MIT email",
-      "invite": "Invite",
-      "inviting": "Inviting...",
-      "inviteSent": "Invitation sent successfully",
-      "inviteError": "Failed to send invitation",
-      "remove": "Remove",
-      "removing": "Removing...",
-      "confirmRemove": "Remove {name} as a leader?",
-      "confirmRemoveTitle": "Remove Leader",
-      "confirmRemoveMessage": "Are you sure you want to remove {name} as a leader? They will no longer be able to manage your living group.",
-      "removeConfirm": "Remove",
-      "removed": "Leader removed",
-      "removeError": "Failed to remove leader",
-      "cancel": "Cancel",
-      "cancelling": "Cancelling...",
-      "invitationCancelled": "Invitation cancelled",
-      "cancelError": "Failed to cancel invitation",
-      "emailRequired": "Please enter a student email",
-      "invitedBy": "Invited by {name}",
-      "acceptedAt": "Accepted {date}"
-    }
-  },
-
-  "joinLivingGroup": {
-    "title": "Search Living Groups",
-    "description": "Join your dorm or FSILG to be included in the yearbook photos.",
-    "searchPlaceholder": "Search by name...",
-    "searchHint": "e.g., Baker House, East Campus, Alpha Delta Phi...",
-    "filterAll": "All",
-    "filterDorms": "Dorms",
-    "filterFSILGs": "FSILGs",
-    "noResults": "No living groups found",
-    "selectSection": "Select your section",
-    "sectionRequired": "Please select a section",
-    "join": "Join",
-    "joining": "Joining...",
-    "requestToJoin": "Request to Join",
-    "joinSuccess": "Successfully joined!",
-    "requestSuccess": "Request submitted. Waiting for approval.",
-    "joinError": "Failed to join living group",
-    "alreadyMember": "You are already a member of this living group",
-    "currentMemberships": {
-      "title": "Memberships",
-      "dorm": "Dorm",
-      "fsilg": "FSILG",
-      "section": "Section: {section}",
-      "pending": "Pending Approval",
-      "active": "Active",
-      "leave": "Leave",
-      "cancelRequest": "Cancel Request",
-      "leaving": "Leaving...",
-      "leaveSuccess": "Left successfully",
-      "leaveError": "Failed to leave",
-      "noMemberships": "You haven't joined any living groups yet"
     }
   },
 
@@ -1345,13 +1155,9 @@
       "accounts": {
         "title": "Accounts & Login",
         "q1": "How do I create an account?",
-        "a1": "MIT students can log in using MIT SSO (Touchstone). Clubs can register by clicking 'Club Login' and selecting 'Sign Up' to create a new club account with their official club email.",
-        "q2": "What's the difference between student and club accounts?",
-        "a2": "Student accounts are for MIT students to manage their senior bio and join clubs. Club accounts are for MIT organizations to manage their yearbook profile, member lists, and candid photos.",
-        "q3": "I'm a club - how do I get started after signing up?",
-        "a3": "After signing up, you'll need to add at least one MIT student as a leader before your club becomes discoverable. Search for the student by name or email in the onboarding section.",
-        "q4": "How do club invitations work?",
-        "a4": "Clubs can invite MIT students to join. Students will see pending invitations in their profile's 'My Clubs' tab and can accept or decline. Accepted invitations automatically add the student as a member."
+        "a1": "MIT students can log in using MIT SSO (Touchstone) to manage their senior bio. Clubs and living groups can log in with their organization credentials.",
+        "q2": "What's the difference between student and organization accounts?",
+        "a2": "Student accounts are for MIT students to manage their senior bio. Organization accounts (clubs and living groups) are used to manage yearbook profiles, member lists, and photoshoot scheduling."
       },
       "yearbook": {
         "title": "Yearbook & Ordering",
@@ -1365,11 +1171,9 @@
       "clubs": {
         "title": "Clubs & Organizations",
         "q1": "How do I add my club to the yearbook?",
-        "a1": "Register a club account, add a leader, then fill out your club profile with a description, member list, and candid photos. Your submission will be reviewed by the Technique staff.",
+        "a1": "Log in with your club account and fill out your club profile with a description, member list, and candid photos. Your submission will be reviewed by the Technique staff.",
         "q2": "What photos should clubs submit?",
-        "a2": "Submit high-quality candid photos that represent your club's activities. You can upload up to 3 photos. Avoid posed group shots - we want to capture your club in action!",
-        "q3": "Who can manage the club profile?",
-        "a3": "The club account owner and designated leaders can edit the club profile. Leaders must be MIT students and are added through the club dashboard."
+        "a2": "Submit high-quality candid photos that represent your club's activities. You can upload up to 3 photos. Avoid posed group shots - we want to capture your club in action!"
       },
       "contact": {
         "title": "Still have questions?",

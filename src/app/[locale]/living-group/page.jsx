@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { useUser } from '../../../hooks/useUser';
 import Footer from '../../../components/Footer/Footer';
-import ConfirmationModal from '../../../components/ConfirmationModal/ConfirmationModal';
 import TextField from "@mui/material/TextField";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
@@ -99,15 +98,6 @@ export default function LivingGroupPage() {
   const [livingGroupEmail, setLivingGroupEmail] = useState('');
   const [savingEmail, setSavingEmail] = useState(false);
 
-  // Password change state
-  const [passwordData, setPasswordData] = useState({
-    oldPassword: '',
-    newPassword: '',
-    confirmPassword: '',
-  });
-  const [passwordErrors, setPasswordErrors] = useState({});
-  const [savingPassword, setSavingPassword] = useState(false);
-  const [passwordMessage, setPasswordMessage] = useState({ type: '', text: '' });
 
   // Scheduling state
   const [availableTimes, setAvailableTimes] = useState([]);
@@ -118,23 +108,32 @@ export default function LivingGroupPage() {
   const [message, setMessage] = useState({ type: '', text: '' });
   const [isFrozen, setIsFrozen] = useState(false);
 
-  // Members state
-  const [membersData, setMembersData] = useState(null);
+  // Manual members state
+  const [manualMembers, setManualMembers] = useState([]);
   const [membersLoading, setMembersLoading] = useState(true);
-
-  // Member search state
-  const [memberSearchQuery, setMemberSearchQuery] = useState('');
-  const [memberSearchResults, setMemberSearchResults] = useState([]);
-  const [memberSearching, setMemberSearching] = useState(false);
-  const [selectedSection, setSelectedSection] = useState('');
-  const [addingMemberId, setAddingMemberId] = useState(null);
+  const [membersMessage, setMembersMessage] = useState({ type: '', text: '' });
+  const [newManualMember, setNewManualMember] = useState('');
+  const [newMemberSection, setNewMemberSection] = useState('');
+  const [addingMember, setAddingMember] = useState(false);
   const [removingMemberId, setRemovingMemberId] = useState(null);
-  const [confirmingMemberId, setConfirmingMemberId] = useState(null);
+  const [updatingMemberId, setUpdatingMemberId] = useState(null);
 
-  // Join requests state (FSILGs only)
-  const [joinRequests, setJoinRequests] = useState([]);
-  const [requestsLoading, setRequestsLoading] = useState(true);
-  const [processingRequestId, setProcessingRequestId] = useState(null);
+  // Sections state
+  const [sections, setSections] = useState([]);
+  const [sectionsLoading, setSectionsLoading] = useState(true);
+  const [newSectionName, setNewSectionName] = useState('');
+  const [addingSection, setAddingSection] = useState(false);
+  const [removingSectionName, setRemovingSectionName] = useState(null);
+  const [sectionsMessage, setSectionsMessage] = useState({ type: '', text: '' });
+
+  // Documents state
+  const [documents, setDocuments] = useState({
+    links: '',
+    notes: '',
+  });
+  const [savingDocuments, setSavingDocuments] = useState(false);
+  const [documentsMessage, setDocumentsMessage] = useState({ type: '', text: '' });
+  const [documentsLoading, setDocumentsLoading] = useState(true);
 
   // Time proposal state
   const [proposals, setProposals] = useState([]);
@@ -148,20 +147,6 @@ export default function LivingGroupPage() {
   });
   const [submittingProposal, setSubmittingProposal] = useState(false);
   const [cancellingProposalId, setCancellingProposalId] = useState(null);
-
-  // FSILG onboarding state (for adding first leader)
-  const [leaderEmail, setLeaderEmail] = useState('');
-  const [addingLeader, setAddingLeader] = useState(false);
-
-  // Time assignment state (for dorms with multiple sections)
-  const [timeAssignments, setTimeAssignments] = useState({}); // { photoshootTimeId: { 'HH:mm-HH:mm': sectionName } }
-  const [assignmentsLoading, setAssignmentsLoading] = useState(false);
-  const [savingSlot, setSavingSlot] = useState(null); // 'photoshootTimeId-slotKey' being saved
-
-  // Group Leaders state
-  const [inviteLeaderEmail, setInviteLeaderEmail] = useState('');
-  const [invitingLeader, setInvitingLeader] = useState(false);
-  const [removingLeaderId, setRemovingLeaderId] = useState(null);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(0);
@@ -203,9 +188,8 @@ export default function LivingGroupPage() {
       checkFrozen();
       fetchMembers();
       fetchProposals();
-      if (livingGroup?.living_group_type === 'fsilg') {
-        fetchJoinRequests();
-      }
+      fetchSections();
+      fetchDocuments();
     }
   }, [isLoggedIn, user, livingGroup]);
 
@@ -308,11 +292,12 @@ export default function LivingGroupPage() {
   }
 
   async function fetchMembers() {
+    if (!livingGroup?.id) return;
     try {
       setMembersLoading(true);
-      const res = await fetch('/api/living-groups/members');
+      const res = await fetch(`/api/living-groups/manual-members?livingGroupId=${livingGroup.id}`);
       const data = await res.json();
-      setMembersData(data);
+      setManualMembers(data.members || []);
     } catch (error) {
       console.error('Error fetching members:', error);
     } finally {
@@ -320,105 +305,200 @@ export default function LivingGroupPage() {
     }
   }
 
-  async function searchStudents(query) {
-    if (!query || query.length < 2) {
-      setMemberSearchResults([]);
-      return;
-    }
+  async function handleAddManualMember(e) {
+    e.preventDefault();
+    if (!newManualMember.trim() || !livingGroup?.id) return;
 
-    setMemberSearching(true);
-    try {
-      const res = await fetch(
-        `/api/living-groups/search-students?q=${encodeURIComponent(query)}&livingGroupId=${livingGroup?.id}&excludeMembers=true`
-      );
-      const data = await res.json();
-      setMemberSearchResults(data.students || []);
-    } catch (error) {
-      console.error('Error searching students:', error);
-      setMemberSearchResults([]);
-    } finally {
-      setMemberSearching(false);
-    }
-  }
-
-  async function handleAddMember(userId) {
-    setAddingMemberId(userId);
-    setMessage({ type: '', text: '' });
+    setAddingMember(true);
+    setMembersMessage({ type: '', text: '' });
 
     try {
-      const res = await fetch('/api/living-groups/members', {
+      const res = await fetch('/api/living-groups/manual-members', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          livingGroupId: livingGroup?.id,
-          userId,
-          sectionName: livingGroup?.living_group_type === 'dorm' ? selectedSection : null,
+          livingGroupId: livingGroup.id,
+          name: newManualMember.trim(),
+          section_name: newMemberSection || null,
         }),
       });
 
-      const data = await res.json();
-
       if (res.ok) {
-        setMessage({ type: 'success', text: t('members.addSuccess') });
-        setMemberSearchQuery('');
-        setMemberSearchResults([]);
+        setNewManualMember('');
+        setNewMemberSection('');
+        setMembersMessage({ type: 'success', text: t('members.addSuccess') });
         fetchMembers();
       } else {
-        setMessage({ type: 'error', text: data.error || t('members.addError') });
+        const data = await res.json();
+        setMembersMessage({ type: 'error', text: data.error || t('members.addError') });
       }
     } catch (error) {
-      setMessage({ type: 'error', text: t('members.addError') });
+      setMembersMessage({ type: 'error', text: t('members.addError') });
     } finally {
-      setAddingMemberId(null);
+      setAddingMember(false);
     }
   }
 
-  async function handleRemoveMember(membershipId) {
-    // First click: Show confirmation state
-    if (confirmingMemberId !== membershipId) {
-      setConfirmingMemberId(membershipId);
-      return;
-    }
-
-    // Second click: Perform deletion
-    setRemovingMemberId(membershipId);
-    setMessage({ type: '', text: '' });
+  async function handleRemoveManualMember(memberId) {
+    setRemovingMemberId(memberId);
+    setMembersMessage({ type: '', text: '' });
 
     try {
-      const res = await fetch(`/api/living-groups/members?membershipId=${membershipId}`, {
+      const res = await fetch(`/api/living-groups/manual-members?id=${memberId}`, {
         method: 'DELETE',
       });
 
       if (res.ok) {
-        setMessage({ type: 'success', text: t('members.removeSuccess') });
+        setMembersMessage({ type: 'success', text: t('members.removeSuccess') });
         fetchMembers();
       } else {
         const data = await res.json();
-        setMessage({ type: 'error', text: data.error || t('members.removeError') });
+        setMembersMessage({ type: 'error', text: data.error || t('members.removeError') });
       }
     } catch (error) {
-      setMessage({ type: 'error', text: t('members.removeError') });
+      setMembersMessage({ type: 'error', text: t('members.removeError') });
     } finally {
       setRemovingMemberId(null);
-      setConfirmingMemberId(null);
     }
   }
 
-  // Reset confirmation when clicking away (optional)
-  function cancelRemoveConfirmation() {
-    setConfirmingMemberId(null);
+  async function handleUpdateMemberSection(memberId, sectionName) {
+    setUpdatingMemberId(memberId);
+    setMembersMessage({ type: '', text: '' });
+
+    try {
+      const res = await fetch('/api/living-groups/manual-members', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: memberId,
+          section_name: sectionName || null,
+        }),
+      });
+
+      if (res.ok) {
+        fetchMembers();
+      } else {
+        const data = await res.json();
+        setMembersMessage({ type: 'error', text: data.error || t('members.updateError') });
+      }
+    } catch (error) {
+      setMembersMessage({ type: 'error', text: t('members.updateError') });
+    } finally {
+      setUpdatingMemberId(null);
+    }
   }
 
-  async function fetchJoinRequests() {
+  // Sections functions
+  async function fetchSections() {
     try {
-      setRequestsLoading(true);
-      const res = await fetch('/api/living-groups/join-requests');
+      setSectionsLoading(true);
+      const res = await fetch('/api/living-groups/sections');
       const data = await res.json();
-      setJoinRequests(data.joinRequests || []);
+      setSections(data.sections || []);
     } catch (error) {
-      console.error('Error fetching join requests:', error);
+      console.error('Error fetching sections:', error);
     } finally {
-      setRequestsLoading(false);
+      setSectionsLoading(false);
+    }
+  }
+
+  async function handleAddSection(e) {
+    e.preventDefault();
+    if (!newSectionName.trim()) return;
+
+    setAddingSection(true);
+    setSectionsMessage({ type: '', text: '' });
+
+    try {
+      const res = await fetch('/api/living-groups/sections', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ section_name: newSectionName.trim() }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setSections(data.sections || []);
+        setNewSectionName('');
+        setSectionsMessage({ type: 'success', text: t('assign.addSectionSuccess') });
+      } else {
+        const data = await res.json();
+        setSectionsMessage({ type: 'error', text: data.error || t('assign.addSectionError') });
+      }
+    } catch (error) {
+      setSectionsMessage({ type: 'error', text: t('assign.addSectionError') });
+    } finally {
+      setAddingSection(false);
+    }
+  }
+
+  async function handleRemoveSection(sectionName) {
+    setRemovingSectionName(sectionName);
+    setSectionsMessage({ type: '', text: '' });
+
+    try {
+      const res = await fetch(`/api/living-groups/sections?name=${encodeURIComponent(sectionName)}`, {
+        method: 'DELETE',
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setSections(data.sections || []);
+        setSectionsMessage({ type: 'success', text: t('assign.removeSectionSuccess') });
+        fetchMembers(); // Refresh members since their sections might have been cleared
+      } else {
+        const data = await res.json();
+        setSectionsMessage({ type: 'error', text: data.error || t('assign.removeSectionError') });
+      }
+    } catch (error) {
+      setSectionsMessage({ type: 'error', text: t('assign.removeSectionError') });
+    } finally {
+      setRemovingSectionName(null);
+    }
+  }
+
+  // Documents functions
+  async function fetchDocuments() {
+    try {
+      setDocumentsLoading(true);
+      const res = await fetch('/api/living-groups/documents');
+      const data = await res.json();
+      if (res.ok && data.documents) {
+        setDocuments({
+          links: data.documents.links || '',
+          notes: data.documents.notes || '',
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching documents:', error);
+    } finally {
+      setDocumentsLoading(false);
+    }
+  }
+
+  async function handleSaveDocuments(e) {
+    e.preventDefault();
+    setSavingDocuments(true);
+    setDocumentsMessage({ type: '', text: '' });
+
+    try {
+      const res = await fetch('/api/living-groups/documents', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(documents),
+      });
+
+      if (res.ok) {
+        setDocumentsMessage({ type: 'success', text: t('documents.saveSuccess') });
+      } else {
+        const data = await res.json();
+        setDocumentsMessage({ type: 'error', text: data.error || t('documents.saveError') });
+      }
+    } catch (error) {
+      setDocumentsMessage({ type: 'error', text: t('documents.saveError') });
+    } finally {
+      setSavingDocuments(false);
     }
   }
 
@@ -439,296 +519,8 @@ export default function LivingGroupPage() {
     }
   }
 
-  async function fetchTimeAssignments() {
-    if (!livingGroup?.id) return;
-    try {
-      setAssignmentsLoading(true);
-      const res = await fetch(`/api/living-groups/time-assignments?livingGroupId=${livingGroup.id}`);
-      const data = await res.json();
-
-      // Convert array to map: { photoshootTimeId: { 'slotStart-slotEnd': sectionName } }
-      const assignmentsMap = {};
-      (data.assignments || []).forEach(a => {
-        if (!assignmentsMap[a.photoshootTimeId]) {
-          assignmentsMap[a.photoshootTimeId] = {};
-        }
-        const slotKey = `${a.slotStart}-${a.slotEnd}`;
-        assignmentsMap[a.photoshootTimeId][slotKey] = a.sectionName || '';
-      });
-      setTimeAssignments(assignmentsMap);
-    } catch (error) {
-      console.error('Error fetching time assignments:', error);
-    } finally {
-      setAssignmentsLoading(false);
-    }
-  }
-
-  // Generate 30-minute slots for a time range
-  function generateSlots(startTime, endTime) {
-    const slots = [];
-    const [startH, startM] = startTime.split(':').map(Number);
-    const [endH, endM] = endTime.split(':').map(Number);
-
-    let h = startH;
-    let m = startM;
-
-    // Round to nearest 30-min boundary
-    if (m !== 0 && m !== 30) {
-      m = m < 30 ? 30 : 0;
-      if (m === 0) h++;
-    }
-
-    while (h < endH || (h === endH && m < endM)) {
-      const slotStart = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-      m += 30;
-      if (m >= 60) { m = 0; h++; }
-      const slotEnd = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-      slots.push({ start: slotStart, end: slotEnd });
-    }
-    return slots;
-  }
-
-  async function handleAssignSection(photoshootTimeId, slotStart, slotEnd, sectionName) {
-    const slotKey = `${slotStart}-${slotEnd}`;
-    setSavingSlot(`${photoshootTimeId}-${slotKey}`);
-
-    try {
-      const res = await fetch('/api/living-groups/time-assignments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          photoshootTimeId,
-          livingGroupId: livingGroup?.id,
-          sectionName: sectionName || null,
-          slotStart,
-          slotEnd,
-        }),
-      });
-
-      if (res.ok) {
-        // Update local state
-        setTimeAssignments(prev => ({
-          ...prev,
-          [photoshootTimeId]: {
-            ...(prev[photoshootTimeId] || {}),
-            [slotKey]: sectionName || '',
-          },
-        }));
-        setMessage({ type: 'success', text: t('assign.saved') });
-      } else {
-        const data = await res.json();
-        setMessage({ type: 'error', text: data.error || t('assign.saveError') });
-      }
-    } catch (error) {
-      setMessage({ type: 'error', text: t('assign.saveError') });
-    } finally {
-      setSavingSlot(null);
-    }
-  }
-
-  // Get sections that haven't been assigned to any slot for a specific booked time
-  function getUnassignedSections(photoshootTimeId) {
-    const assignments = timeAssignments[photoshootTimeId] || {};
-    const assignedSections = new Set(Object.values(assignments).filter(Boolean));
-    return sections.filter(s => !assignedSections.has(s.name));
-  }
-
-  async function handleSubmitProposal(e) {
-    e.preventDefault();
-    if (!proposalForm.date || !proposalForm.start_time || !proposalForm.end_time) {
-      setMessage({ type: 'error', text: t('proposeTime.fieldsRequired') });
-      return;
-    }
-
-    // Validate start time is before end time
-    const startMins = parseInt(proposalForm.start_time.split(':')[0]) * 60 + parseInt(proposalForm.start_time.split(':')[1]);
-    const endMins = parseInt(proposalForm.end_time.split(':')[0]) * 60 + parseInt(proposalForm.end_time.split(':')[1]);
-    if (startMins >= endMins) {
-      setMessage({ type: 'error', text: t('proposeTime.startBeforeEnd') });
-      return;
-    }
-
-    // Validate date is not in the past
-    const today = new Date().toISOString().split('T')[0];
-    if (proposalForm.date < today) {
-      setMessage({ type: 'error', text: t('proposeTime.noPastDates') });
-      return;
-    }
-
-    setSubmittingProposal(true);
-    setMessage({ type: '', text: '' });
-
-    try {
-      const res = await fetch('/api/living-groups/propose-time', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(proposalForm),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        setMessage({ type: 'success', text: t('proposeTime.submitSuccess') });
-        // Optimistically add the new proposal to the list
-        if (data.proposal) {
-          setProposals(prev => [data.proposal, ...prev]);
-        }
-        setProposalForm({
-          date: '',
-          start_time: '',
-          end_time: '',
-          location: '',
-          notes: '',
-        });
-      } else {
-        setMessage({ type: 'error', text: data.error || t('proposeTime.submitError') });
-      }
-    } catch (error) {
-      setMessage({ type: 'error', text: t('proposeTime.submitError') });
-    } finally {
-      setSubmittingProposal(false);
-    }
-  }
-
-  async function handleCancelProposal(proposalId) {
-    setCancellingProposalId(proposalId);
-    setMessage({ type: '', text: '' });
-
-    try {
-      const res = await fetch(`/api/living-groups/propose-time?id=${proposalId}`, {
-        method: 'DELETE',
-      });
-
-      if (res.ok) {
-        setMessage({ type: 'success', text: t('proposeTime.cancelSuccess') });
-        // Optimistically update the proposal status
-        setProposals(prev => prev.map(p =>
-          p.id === proposalId ? { ...p, status: 'cancelled' } : p
-        ));
-      } else {
-        const data = await res.json();
-        setMessage({ type: 'error', text: data.error || t('proposeTime.cancelError') });
-      }
-    } catch (error) {
-      setMessage({ type: 'error', text: t('proposeTime.cancelError') });
-    } finally {
-      setCancellingProposalId(null);
-    }
-  }
-
-  async function handleJoinRequestAction(requestId, action) {
-    setProcessingRequestId(requestId);
-    setMessage({ type: '', text: '' });
-
-    try {
-      const res = await fetch('/api/living-groups/approve-join', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ membershipId: requestId, action }),
-      });
-
-      if (res.ok) {
-        setMessage({
-          type: 'success',
-          text: action === 'approve' ? t('joinRequests.approveSuccess') : t('joinRequests.denySuccess'),
-        });
-        fetchJoinRequests();
-        fetchMembers();
-      } else {
-        const data = await res.json();
-        setMessage({ type: 'error', text: data.error || t('joinRequests.actionError') });
-      }
-    } catch (error) {
-      setMessage({ type: 'error', text: t('joinRequests.actionError') });
-    } finally {
-      setProcessingRequestId(null);
-    }
-  }
-
-  // Handle adding first leader for FSILG onboarding
-  async function handleAddFirstLeader() {
-    if (!leaderEmail.trim()) {
-      setMessage({ type: 'error', text: t('onboarding.emailRequired') });
-      return;
-    }
-
-    setAddingLeader(true);
-    setMessage({ type: '', text: '' });
-
-    try {
-      const res = await fetch('/api/living-groups/add-first-leader', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ studentEmail: leaderEmail.trim() }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        setMessage({ type: 'success', text: t('onboarding.leaderAdded') });
-        setLeaderEmail('');
-        // Refetch user data to update livingGroup.has_leader
-        refetch();
-      } else {
-        setMessage({ type: 'error', text: data.error || t('onboarding.addLeaderError') });
-      }
-    } catch (error) {
-      setMessage({ type: 'error', text: t('onboarding.addLeaderError') });
-    } finally {
-      setAddingLeader(false);
-    }
-  }
-
-  // Sections state (for assign tab)
-  const [sections, setSections] = useState([]);
-  const [sectionsLoading, setSectionsLoading] = useState(false);
-
-  // Leaders state
-  const [leaders, setLeaders] = useState({ activeLeaders: [], pendingInvitations: [] });
-  const [leadersLoading, setLeadersLoading] = useState(false);
-  const [confirmationModal, setConfirmationModal] = useState({ open: false, leaderName: '', leaderId: '' });
-
-  // Fetch sections for dorms
-  useEffect(() => {
-    if (livingGroup?.living_group_type === 'dorm') {
-      fetchSections();
-    }
-  }, [livingGroup]);
-
-  async function fetchSections() {
-    try {
-      setSectionsLoading(true);
-      const res = await fetch(`/api/living-groups/sections?livingGroupId=${livingGroup.id}`);
-      const data = await res.json();
-      setSections(data.sections || []);
-    } catch (error) {
-      console.error('Error fetching sections:', error);
-    } finally {
-      setSectionsLoading(false);
-    }
-  }
-
-  async function fetchLeaders() {
-    if (!livingGroup?.id) return;
-    try {
-      setLeadersLoading(true);
-      const res = await fetch(`/api/living-groups/leaders?livingGroupId=${livingGroup.id}`);
-      const data = await res.json();
-      setLeaders({
-        activeLeaders: data.activeLeaders || [],
-        pendingInvitations: data.pendingInvitations || [],
-      });
-    } catch (error) {
-      console.error('Error fetching leaders:', error);
-    } finally {
-      setLeadersLoading(false);
-    }
-  }
-
   useEffect(() => {
     if (livingGroup?.id) {
-      fetchLeaders();
-      // Load email from living group
       fetchLivingGroupEmail();
     }
   }, [livingGroup?.id]);
@@ -774,188 +566,86 @@ export default function LivingGroupPage() {
     }
   }
 
-  // Password validation
-  function validatePassword(password) {
-    const errors = [];
-    if (password.length < 8) errors.push(t('password.minLength'));
-    if (!/[A-Z]/.test(password)) errors.push(t('password.uppercase'));
-    if (!/[a-z]/.test(password)) errors.push(t('password.lowercase'));
-    if (!/[0-9]/.test(password)) errors.push(t('password.number'));
-    if (!/[!@#$%^&*(),.?":{}|<>_\-+=\[\]\\\/`~;']/.test(password)) errors.push(t('password.symbol'));
-    return errors;
-  }
 
-  async function handleChangePassword(e) {
+  async function handleSubmitProposal(e) {
     e.preventDefault();
-    setPasswordMessage({ type: '', text: '' });
-    setPasswordErrors({});
-
-    // Validate new password
-    const validationErrors = validatePassword(passwordData.newPassword);
-    if (validationErrors.length > 0) {
-      setPasswordErrors({ newPassword: validationErrors });
+    if (!proposalForm.date || !proposalForm.start_time || !proposalForm.end_time) {
+      setMessage({ type: 'error', text: t('proposeTime.fieldsRequired') });
       return;
     }
 
-    // Check passwords match
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setPasswordErrors({ confirmPassword: [t('password.mismatch')] });
+    // Validate start time is before end time
+    const startMins = parseInt(proposalForm.start_time.split(':')[0]) * 60 + parseInt(proposalForm.start_time.split(':')[1]);
+    const endMins = parseInt(proposalForm.end_time.split(':')[0]) * 60 + parseInt(proposalForm.end_time.split(':')[1]);
+    if (startMins >= endMins) {
+      setMessage({ type: 'error', text: t('proposeTime.startBeforeEnd') });
       return;
     }
 
-    setSavingPassword(true);
+    // Validate date is not in the past
+    const today = new Date().toISOString().split('T')[0];
+    if (proposalForm.date < today) {
+      setMessage({ type: 'error', text: t('proposeTime.noPastDates') });
+      return;
+    }
+
+    setSubmittingProposal(true);
+    setMessage({ type: '', text: '' });
+
     try {
-      const res = await fetch('/api/auth/change-password', {
+      const res = await fetch('/api/living-groups/propose-time', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          oldPassword: passwordData.oldPassword,
-          newPassword: passwordData.newPassword,
-          orgType: 'living_group',
-          livingGroupId: livingGroup?.id,
-        }),
+        body: JSON.stringify(proposalForm),
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        setPasswordMessage({ type: 'success', text: t('password.changed') });
-        setPasswordData({ oldPassword: '', newPassword: '', confirmPassword: '' });
-      } else {
-        if (data.code === 'INVALID_OLD_PASSWORD') {
-          setPasswordMessage({ type: 'error', text: t('password.wrongOldPassword') });
-        } else {
-          setPasswordMessage({ type: 'error', text: data.error || t('password.error') });
+        setMessage({ type: 'success', text: t('proposeTime.submitSuccess') });
+        if (data.proposal) {
+          setProposals(prev => [data.proposal, ...prev]);
         }
-      }
-    } catch (error) {
-      setPasswordMessage({ type: 'error', text: t('password.error') });
-    } finally {
-      setSavingPassword(false);
-    }
-  }
-
-  // Fetch time assignments when Assign tab is active
-  useEffect(() => {
-    if (activeTab === 'assign' && livingGroup?.id && livingGroup?.living_group_type === 'dorm' && sections.length > 1) {
-      fetchTimeAssignments();
-    }
-  }, [activeTab, livingGroup?.id, sections.length]);
-
-  // Handle inviting a new leader
-  async function handleInviteLeader() {
-    if (!inviteLeaderEmail.trim() || !livingGroup?.id) return;
-
-    setInvitingLeader(true);
-    setMessage({ type: '', text: '' });
-
-    try {
-      const res = await fetch('/api/living-groups/leaders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          livingGroupId: livingGroup.id,
-          studentEmail: inviteLeaderEmail.trim(),
-        }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        setMessage({ type: 'success', text: t('groupLeaders.inviteSent') });
-        setInviteLeaderEmail('');
-        fetchLeaders();
+        setProposalForm({
+          date: '',
+          start_time: '',
+          end_time: '',
+          location: '',
+          notes: '',
+        });
       } else {
-        setMessage({ type: 'error', text: data.error || t('groupLeaders.inviteError') });
+        setMessage({ type: 'error', text: data.error || t('proposeTime.submitError') });
       }
     } catch (error) {
-      setMessage({ type: 'error', text: t('groupLeaders.inviteError') });
+      setMessage({ type: 'error', text: t('proposeTime.submitError') });
     } finally {
-      setInvitingLeader(false);
+      setSubmittingProposal(false);
     }
   }
 
-  // Handle opening the remove leader confirmation modal
-  function handleRemoveLeaderClick(permissionId, leaderName) {
-    setConfirmationModal({
-      open: true,
-      leaderName,
-      leaderId: permissionId,
-    });
-  }
-
-  // Handle confirming leader removal
-  async function handleConfirmRemoveLeader() {
-    const { leaderId } = confirmationModal;
-    setConfirmationModal({ open: false, leaderName: '', leaderId: '' });
-    setRemovingLeaderId(leaderId);
+  async function handleCancelProposal(proposalId) {
+    setCancellingProposalId(proposalId);
     setMessage({ type: '', text: '' });
 
     try {
-      const res = await fetch(`/api/living-groups/leaders?permissionId=${leaderId}`, {
+      const res = await fetch(`/api/living-groups/propose-time?id=${proposalId}`, {
         method: 'DELETE',
       });
 
       if (res.ok) {
-        setMessage({ type: 'success', text: t('groupLeaders.removed') });
-        fetchLeaders();
+        setMessage({ type: 'success', text: t('proposeTime.cancelSuccess') });
+        setProposals(prev => prev.map(p =>
+          p.id === proposalId ? { ...p, status: 'cancelled' } : p
+        ));
       } else {
         const data = await res.json();
-        setMessage({ type: 'error', text: data.error || t('groupLeaders.removeError') });
+        setMessage({ type: 'error', text: data.error || t('proposeTime.cancelError') });
       }
     } catch (error) {
-      setMessage({ type: 'error', text: t('groupLeaders.removeError') });
+      setMessage({ type: 'error', text: t('proposeTime.cancelError') });
     } finally {
-      setRemovingLeaderId(null);
+      setCancellingProposalId(null);
     }
-  }
-
-  // Handle canceling leader removal
-  function handleCancelRemoveLeader() {
-    setConfirmationModal({ open: false, leaderName: '', leaderId: '' });
-  }
-
-  // Handle canceling a leader invitation
-  async function handleCancelLeaderInvitation(permissionId) {
-    setMessage({ type: '', text: '' });
-
-    try {
-      const res = await fetch(`/api/living-groups/leaders?permissionId=${permissionId}`, {
-        method: 'DELETE',
-      });
-
-      if (res.ok) {
-        setMessage({ type: 'success', text: t('groupLeaders.invitationCancelled') });
-        fetchLeaders();
-      } else {
-        const data = await res.json();
-        setMessage({ type: 'error', text: data.error || t('groupLeaders.cancelError') });
-      }
-    } catch (error) {
-      setMessage({ type: 'error', text: t('groupLeaders.cancelError') });
-    }
-  }
-
-  // Get available tabs based on living group type
-  function getTabs() {
-    // Profile tab first (formerly Settings)
-    const tabs = [
-      { id: 'profile', label: t('tabs.profile') },
-    ];
-
-    tabs.push({ id: 'book', label: t('tabs.book') });
-
-    // Only show Assign tab for dorms with multiple sections
-    if (livingGroup?.living_group_type === 'dorm' && sections.length > 1) {
-      tabs.push({ id: 'assign', label: t('tabs.assign') });
-    }
-
-    tabs.push({ id: 'members', label: t('tabs.members') });
-
-    if (livingGroup?.living_group_type === 'fsilg') {
-      tabs.push({ id: 'joinRequests', label: t('tabs.joinRequests') });
-    }
-    return tabs;
   }
 
   if (userLoading) {
@@ -974,10 +664,14 @@ export default function LivingGroupPage() {
 
   // Check if disabled
   const isDisabled = livingGroup?.status === 'disabled';
-  const tabs = getTabs();
 
-  // Check if FSILG needs onboarding (no leader yet)
-  const needsOnboarding = livingGroup?.living_group_type === 'fsilg' && !livingGroup?.has_leader;
+  const tabs = [
+    { id: 'profile', label: t('tabs.profile') },
+    { id: 'book', label: t('tabs.book') },
+    { id: 'assign', label: t('tabs.assign') },
+    { id: 'members', label: t('tabs.members') },
+    { id: 'documents', label: t('tabs.documents') },
+  ];
 
   return (
     <>
@@ -996,45 +690,8 @@ export default function LivingGroupPage() {
             </div>
           )}
 
-          {/* FSILG Onboarding - Add First Leader */}
-          {needsOnboarding && !isDisabled && (
-            <div className="mb-6 p-6 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <h3 className="text-lg font-semibold text-yellow-800">
-                {t('onboarding.title')}
-              </h3>
-              <p className="text-yellow-700 mt-2">
-                {t('onboarding.description')}
-              </p>
-              <div className="mt-4 flex flex-col sm:flex-row gap-2">
-                <TextField
-                  type="email"
-                  placeholder={t('onboarding.studentEmailPlaceholder')}
-                  value={leaderEmail}
-                  onChange={(e) => setLeaderEmail(e.target.value)}
-                  size="small"
-                  fullWidth
-                  sx={{
-                    ...textFieldSx,
-                    flex: 1,
-                    "& .MuiOutlinedInput-root": {
-                      ...textFieldSx["& .MuiOutlinedInput-root"],
-                      backgroundColor: "white",
-                    },
-                  }}
-                />
-                <button
-                  onClick={handleAddFirstLeader}
-                  disabled={addingLeader}
-                  className="px-4 py-2 bg-[#750014] text-white rounded hover:bg-[#5C0010] disabled:opacity-50 whitespace-nowrap"
-                >
-                  {addingLeader ? t('onboarding.addingLeader') : t('onboarding.addLeader')}
-                </button>
-              </div>
-            </div>
-          )}
-
           {/* Frozen Notice */}
-          {isFrozen && !isDisabled && !needsOnboarding && activeTab === 'scheduling' && (
+          {isFrozen && !isDisabled && activeTab === 'book' && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
               <p className="text-red-600 font-medium">{t('frozen')}</p>
             </div>
@@ -1048,28 +705,50 @@ export default function LivingGroupPage() {
             </div>
           )}
 
-          {/* Tabs - Hidden during onboarding */}
-          {!needsOnboarding && (
-            <div className="flex gap-4 mb-8 border-b border-border">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
-                    activeTab === tab.id
-                      ? 'border-accent text-accent'
-                      : 'border-transparent text-text-secondary hover:text-text-primary'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
+          {/* Tabs */}
+          <div className="flex gap-4 mb-8 border-b border-border">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
+                  activeTab === tab.id
+                    ? 'border-accent text-accent'
+                    : 'border-transparent text-text-secondary hover:text-text-primary'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Profile Tab */}
+          {activeTab === 'profile' && (
+            <div>
+              {/* Email Section */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium mb-2">{t('email.title')}</label>
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    value={livingGroupEmail}
+                    onChange={(e) => setLivingGroupEmail(e.target.value)}
+                    placeholder={t('email.placeholder')}
+                    className="flex-1 border border-border rounded px-4 py-2"
+                  />
+                  <button
+                    onClick={handleSaveEmail}
+                    disabled={savingEmail}
+                    className="px-4 py-2 bg-[#750014] text-white rounded hover:bg-[#5C0010] disabled:opacity-50 whitespace-nowrap"
+                  >
+                    {savingEmail ? '...' : t('email.save')}
+                  </button>
+                </div>
+              </div>
+
             </div>
           )}
 
-          {/* Tab Content - Hidden during onboarding */}
-          {!needsOnboarding && (
-            <>
           {/* Book Tab */}
           {activeTab === 'book' && (
             <>
@@ -1377,283 +1056,227 @@ export default function LivingGroupPage() {
             </>
           )}
 
-          {/* Members Tab */}
-          {activeTab === 'members' && (
+          {/* Assign Tab - Section Management */}
+          {activeTab === 'assign' && (
             <div>
-              <h2 className="text-lg font-medium mb-4">{t('members.title')}</h2>
+              {sectionsMessage.text && (
+                <div className={`mb-6 p-4 rounded ${
+                  sectionsMessage.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
+                }`}>
+                  {sectionsMessage.text}
+                </div>
+              )}
 
-              {membersLoading ? (
+              <h2 className="text-lg font-medium mb-2">{t('assign.title')}</h2>
+              <p className="text-text-secondary text-sm mb-6">{t('assign.description')}</p>
+
+              {/* Add section form */}
+              <form onSubmit={handleAddSection} className="mb-6 flex gap-2">
+                <input
+                  type="text"
+                  value={newSectionName}
+                  onChange={(e) => setNewSectionName(e.target.value)}
+                  placeholder={t('assign.addPlaceholder')}
+                  className="flex-1 border border-border rounded px-4 py-2"
+                />
+                <button
+                  type="submit"
+                  disabled={addingSection || !newSectionName.trim()}
+                  className="btn-primary"
+                >
+                  {addingSection ? t('assign.adding') : t('assign.addSection')}
+                </button>
+              </form>
+
+              {/* Sections List */}
+              {sectionsLoading ? (
                 <p className="text-text-secondary">Loading...</p>
+              ) : sections.length === 0 ? (
+                <p className="text-text-secondary">{t('assign.noSections')}</p>
               ) : (
-                <div className="space-y-6">
-                  {/* Total Members */}
-                  <div className="text-sm text-text-secondary">
-                    <span>{t('members.totalMembers', { count: membersData?.totalMembers || 0 })}</span>
-                  </div>
-
-                  {/* Add Member Section */}
-                  <div className="bg-white border border-border rounded-lg p-4">
-                    <h3 className="text-sm font-medium mb-3">{t('members.addMember')}</h3>
-                    <div className="flex gap-2 flex-wrap">
-                      {/* Section dropdown (dorms only) */}
-                      {livingGroup?.living_group_type === 'dorm' && sections.length > 0 && (
-                        <select
-                          value={selectedSection}
-                          onChange={(e) => setSelectedSection(e.target.value)}
-                          className="px-3 py-2 border border-border rounded text-sm"
+                <div className="space-y-2">
+                  {sections.map((section) => {
+                    const memberCount = manualMembers.filter(m => m.section_name === section).length;
+                    return (
+                      <div
+                        key={section}
+                        className="p-4 border border-border rounded-lg flex justify-between items-center"
+                      >
+                        <div>
+                          <p className="font-medium">{section}</p>
+                          <p className="text-sm text-text-muted">
+                            {t('assign.memberCount', { count: memberCount })}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => handleRemoveSection(section)}
+                          disabled={removingSectionName === section}
+                          className="text-sm text-red-600 hover:text-red-700"
                         >
-                          <option value="">{t('members.selectSection')}</option>
-                          {sections.map((section) => (
-                            <option key={section.name} value={section.name}>{section.name}</option>
-                          ))}
-                        </select>
-                      )}
-                      {/* Search input */}
-                      <div className="flex-1 min-w-[200px]">
-                        <TextField
-                          type="text"
-                          placeholder={t('members.searchPlaceholder')}
-                          value={memberSearchQuery}
-                          onChange={(e) => {
-                            setMemberSearchQuery(e.target.value);
-                            searchStudents(e.target.value);
-                          }}
-                          size="small"
-                          fullWidth
-                          sx={textFieldSx}
-                        />
+                          {removingSectionName === section ? t('assign.removing') : t('assign.removeSection')}
+                        </button>
                       </div>
-                    </div>
-
-                    {/* Search results */}
-                    {memberSearchQuery.length >= 2 && (
-                      <div className="mt-3">
-                        {memberSearching ? (
-                          <p className="text-sm text-text-muted">Loading...</p>
-                        ) : memberSearchResults.length > 0 ? (
-                          <ul className="border border-border rounded divide-y divide-border max-h-48 overflow-y-auto">
-                            {memberSearchResults.map((student) => (
-                              <li key={student.id} className="px-3 py-2 flex justify-between items-center text-sm hover:bg-bg-secondary">
-                                <div>
-                                  <span className="font-medium">{student.displayName}</span>
-                                  <span className="text-text-muted ml-2">({student.email})</span>
-                                </div>
-                                <button
-                                  onClick={() => handleAddMember(student.id)}
-                                  disabled={addingMemberId === student.id || (livingGroup?.living_group_type === 'dorm' && !selectedSection)}
-                                  className="px-3 py-1 text-sm bg-[#750014] text-white rounded hover:bg-[#5C0010] disabled:opacity-50"
-                                >
-                                  {addingMemberId === student.id ? t('members.adding') : t('members.add')}
-                                </button>
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <p className="text-sm text-text-muted">{t('members.noResults')}</p>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Member List */}
-                  {membersData?.membersBySection ? (
-                    // Dorm view - grouped by section
-                    <div className="space-y-4">
-                      {membersData.membersBySection.map((sectionData) => (
-                        <div key={sectionData.section.name} className="border border-border rounded-lg overflow-hidden">
-                          <div className="bg-bg-secondary px-4 py-3">
-                            <h3 className="font-medium">{sectionData.section.name}</h3>
-                            <p className="text-sm text-text-secondary">
-                              {t('members.memberCount', { count: sectionData.memberCount })}
-                            </p>
-                          </div>
-                          {sectionData.members.length > 0 ? (
-                            <ul className="divide-y divide-border">
-                              {sectionData.members.map((member) => (
-                                <li key={member.id} className="px-4 py-2 text-sm flex justify-between items-center">
-                                  <div>
-                                    {member.user?.first_name} {member.user?.last_name}
-                                    <span className="text-text-muted ml-2">({member.user?.email})</span>
-                                  </div>
-                                  <div className="flex gap-2">
-                                    <button
-                                      onClick={() => handleRemoveMember(member.id)}
-                                      disabled={removingMemberId === member.id}
-                                      className={`text-sm ${
-                                        confirmingMemberId === member.id
-                                          ? 'text-red-700 font-medium'
-                                          : 'text-red-600'
-                                      } hover:text-red-700`}
-                                    >
-                                      {removingMemberId === member.id
-                                        ? t('members.removing')
-                                        : confirmingMemberId === member.id
-                                        ? t('members.confirm')
-                                        : t('members.remove')}
-                                    </button>
-                                    {confirmingMemberId === member.id && (
-                                      <button
-                                        onClick={() => cancelRemoveConfirmation()}
-                                        className="text-sm text-text-secondary hover:text-text"
-                                      >
-                                        {t('members.cancel')}
-                                      </button>
-                                    )}
-                                  </div>
-                                </li>
-                              ))}
-                            </ul>
-                          ) : (
-                            <p className="px-4 py-3 text-sm text-text-muted">{t('members.noMembers')}</p>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  ) : membersData?.members ? (
-                    // FSILG view - flat list
-                    <div>
-                      {membersData.members.length > 0 ? (
-                        <div className="border border-border rounded-lg overflow-hidden">
-                          <ul className="divide-y divide-border">
-                            {membersData.members.map((member) => (
-                              <li key={member.id} className="px-4 py-3 text-sm flex justify-between items-center">
-                                <div>
-                                  {member.user?.first_name} {member.user?.last_name}
-                                  <span className="text-text-muted ml-2">({member.user?.email})</span>
-                                </div>
-                                <div className="flex gap-2">
-                                  <button
-                                    onClick={() => handleRemoveMember(member.id)}
-                                    disabled={removingMemberId === member.id}
-                                    className={`text-sm ${
-                                      confirmingMemberId === member.id
-                                        ? 'text-red-700 font-medium'
-                                        : 'text-red-600'
-                                    } hover:text-red-700`}
-                                  >
-                                    {removingMemberId === member.id
-                                      ? t('members.removing')
-                                      : confirmingMemberId === member.id
-                                      ? t('members.confirm')
-                                      : t('members.remove')}
-                                  </button>
-                                  {confirmingMemberId === member.id && (
-                                    <button
-                                      onClick={() => cancelRemoveConfirmation()}
-                                      className="text-sm text-text-secondary hover:text-text"
-                                    >
-                                      {t('members.cancel')}
-                                    </button>
-                                  )}
-                                </div>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      ) : (
-                        <p className="text-text-secondary">{t('members.noMembers')}</p>
-                      )}
-                    </div>
-                  ) : (
-                    <p className="text-text-secondary">{t('members.noMembers')}</p>
-                  )}
+                    );
+                  })}
                 </div>
               )}
             </div>
           )}
 
-          {/* Assign Tab (Dorms with multiple sections only) */}
-          {activeTab === 'assign' && livingGroup?.living_group_type === 'dorm' && sections.length > 1 && (
+          {/* Members Tab */}
+          {activeTab === 'members' && (
             <div>
-              <h2 className="text-lg font-medium mb-4">{t('assign.title')}</h2>
-              <p className="text-text-secondary text-sm mb-4">{t('assign.description')}</p>
+              {membersMessage.text && (
+                <div className={`mb-6 p-4 rounded ${
+                  membersMessage.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
+                }`}>
+                  {membersMessage.text}
+                </div>
+              )}
 
-              {/* Sections waiting to be assigned (shown after description) */}
-              {bookedTimes.length > 0 && !assignmentsLoading && (() => {
-                // Get all sections that haven't been assigned to any slot in any booked time
-                const allAssignedSections = new Set();
-                bookedTimes.forEach(bt => {
-                  const assignments = timeAssignments[bt.id] || {};
-                  Object.values(assignments).forEach(sectionName => {
-                    if (sectionName) allAssignedSections.add(sectionName);
-                  });
-                });
-                const unassigned = sections.filter(s => !allAssignedSections.has(s.name));
+              <h2 className="text-lg font-medium mb-2">{t('members.title')}</h2>
+              <p className="text-text-secondary text-sm mb-6">
+                {t('members.totalMembers', { count: manualMembers.length })}
+              </p>
 
-                if (unassigned.length > 0) {
-                  return (
-                    <div className="mb-6 p-3 bg-yellow-50 border border-yellow-200 rounded">
-                      <p className="text-sm text-yellow-800 pb-0">
-                        <span className="font-medium">{t('assign.unassignedSections')}</span>{' '}
-                        {unassigned.map(s => s.name).join(', ')}
-                      </p>
-                    </div>
-                  );
-                }
-                return (
-                  <div className="mb-6 p-3 bg-green-50 border border-green-200 rounded">
-                    <p className="text-sm font-medium text-green-800">{t('assign.allAssigned')}</p>
-                  </div>
-                );
-              })()}
+              {/* Add member form */}
+              <form onSubmit={handleAddManualMember} className="mb-6">
+                <div className="flex gap-2 flex-wrap">
+                  <input
+                    type="text"
+                    value={newManualMember}
+                    onChange={(e) => setNewManualMember(e.target.value)}
+                    placeholder={t('members.addPlaceholder')}
+                    className="flex-1 min-w-[200px] border border-border rounded px-4 py-2"
+                  />
+                  {sections.length > 0 && (
+                    <select
+                      value={newMemberSection}
+                      onChange={(e) => setNewMemberSection(e.target.value)}
+                      className="border border-border rounded px-4 py-2"
+                    >
+                      <option value="">{t('members.noSection')}</option>
+                      {sections.map((section) => (
+                        <option key={section} value={section}>{section}</option>
+                      ))}
+                    </select>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={addingMember || !newManualMember.trim()}
+                    className="btn-primary"
+                  >
+                    {addingMember ? t('members.adding') : t('members.add')}
+                  </button>
+                </div>
+              </form>
 
-              {bookedTimes.length === 0 ? (
-                <p className="text-text-secondary">{t('assign.noBooking')}</p>
-              ) : (
-                <div className="space-y-4">
-                  {bookedTimes.map((bookedTime) => (
-                    <div key={bookedTime.id} className="bg-white border border-border rounded-lg p-6">
-                      <div className="mb-4">
-                        <p className="font-medium">
-                          {new Date(bookedTime.date).toLocaleDateString(locale, {
-                            weekday: 'long',
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                          })}
-                        </p>
-                        <p className="text-text-secondary text-sm">
-                          {formatTime(bookedTime.start_time)} - {formatTime(bookedTime.end_time)} EST
-                        </p>
-                      </div>
-
-                      {assignmentsLoading ? (
-                        <p className="text-text-muted text-sm">Loading...</p>
-                      ) : (
+              {/* Members List - grouped by section if sections exist */}
+              {membersLoading ? (
+                <p className="text-text-secondary">Loading...</p>
+              ) : manualMembers.length === 0 ? (
+                <p className="text-text-secondary">{t('members.noMembers')}</p>
+              ) : sections.length > 0 ? (
+                // Show members grouped by section
+                <div className="space-y-6">
+                  {/* Members without section */}
+                  {(() => {
+                    const unassigned = manualMembers.filter(m => !m.section_name);
+                    if (unassigned.length === 0) return null;
+                    return (
+                      <div>
+                        <h3 className="text-sm font-medium text-text-muted mb-2">
+                          {t('members.unassigned')} ({unassigned.length})
+                        </h3>
                         <div className="space-y-2">
-                          <div className="grid grid-cols-[100px_1fr] gap-2 text-xs font-medium text-text-muted uppercase mb-2">
-                            <span>{t('assign.slot')}</span>
-                            <span>{t('assign.section')}</span>
-                          </div>
-                          {generateSlots(bookedTime.start_time, bookedTime.end_time).map((slot) => {
-                            const slotKey = `${slot.start}-${slot.end}`;
-                            const currentAssignment = timeAssignments[bookedTime.id]?.[slotKey] || '';
-                            const isSaving = savingSlot === `${bookedTime.id}-${slotKey}`;
-
-                            return (
-                              <div key={slotKey} className="grid grid-cols-[100px_1fr] gap-2 items-center">
-                                <span className="text-sm font-medium">
-                                  {formatTime(slot.start)} - {formatTime(slot.end)}
-                                </span>
-                                <div className="flex items-center gap-2">
-                                  <select
-                                    value={currentAssignment}
-                                    onChange={(e) => handleAssignSection(bookedTime.id, slot.start, slot.end, e.target.value)}
-                                    disabled={isSaving || isFrozen}
-                                    className="flex-1 px-3 py-1.5 border border-border rounded text-sm disabled:opacity-50"
-                                  >
-                                    <option value="">{t('assign.notAssigned')}</option>
-                                    {sections.map((section) => (
-                                      <option key={section.name} value={section.name}>{section.name}</option>
-                                    ))}
-                                  </select>
-                                  {isSaving && <span className="text-xs text-text-muted">{t('assign.saving')}</span>}
-                                </div>
-                              </div>
-                            );
-                          })}
+                          {unassigned.map((member) => (
+                            <div
+                              key={member.id}
+                              className="p-3 border border-border rounded-lg flex justify-between items-center gap-2"
+                            >
+                              <p className="flex-1">{member.name}</p>
+                              <select
+                                value={member.section_name || ''}
+                                onChange={(e) => handleUpdateMemberSection(member.id, e.target.value)}
+                                disabled={updatingMemberId === member.id}
+                                className="text-sm border border-border rounded px-2 py-1"
+                              >
+                                <option value="">{t('members.selectSection')}</option>
+                                {sections.map((section) => (
+                                  <option key={section} value={section}>{section}</option>
+                                ))}
+                              </select>
+                              <button
+                                onClick={() => handleRemoveManualMember(member.id)}
+                                disabled={removingMemberId === member.id}
+                                className="text-sm text-red-600 hover:text-red-700"
+                              >
+                                {removingMemberId === member.id ? '...' : t('members.remove')}
+                              </button>
+                            </div>
+                          ))}
                         </div>
-                      )}
+                      </div>
+                    );
+                  })()}
+
+                  {/* Members by section */}
+                  {sections.map((section) => {
+                    const sectionMembers = manualMembers.filter(m => m.section_name === section);
+                    if (sectionMembers.length === 0) return null;
+                    return (
+                      <div key={section}>
+                        <h3 className="text-sm font-medium text-text-muted mb-2">
+                          {section} ({sectionMembers.length})
+                        </h3>
+                        <div className="space-y-2">
+                          {sectionMembers.map((member) => (
+                            <div
+                              key={member.id}
+                              className="p-3 border border-border rounded-lg flex justify-between items-center gap-2"
+                            >
+                              <p className="flex-1">{member.name}</p>
+                              <select
+                                value={member.section_name || ''}
+                                onChange={(e) => handleUpdateMemberSection(member.id, e.target.value)}
+                                disabled={updatingMemberId === member.id}
+                                className="text-sm border border-border rounded px-2 py-1"
+                              >
+                                <option value="">{t('members.noSection')}</option>
+                                {sections.map((s) => (
+                                  <option key={s} value={s}>{s}</option>
+                                ))}
+                              </select>
+                              <button
+                                onClick={() => handleRemoveManualMember(member.id)}
+                                disabled={removingMemberId === member.id}
+                                className="text-sm text-red-600 hover:text-red-700"
+                              >
+                                {removingMemberId === member.id ? '...' : t('members.remove')}
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                // No sections - simple list
+                <div className="space-y-2">
+                  {manualMembers.map((member) => (
+                    <div
+                      key={member.id}
+                      className="p-4 border border-border rounded-lg flex justify-between items-center"
+                    >
+                      <p>{member.name}</p>
+                      <button
+                        onClick={() => handleRemoveManualMember(member.id)}
+                        disabled={removingMemberId === member.id}
+                        className="text-sm text-red-600 hover:text-red-700"
+                      >
+                        {removingMemberId === member.id ? t('members.removing') : t('members.remove')}
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -1661,257 +1284,65 @@ export default function LivingGroupPage() {
             </div>
           )}
 
-          {/* Profile Tab (formerly Settings) */}
-          {activeTab === 'profile' && (
+          {/* Documents Tab */}
+          {activeTab === 'documents' && (
             <div>
-              {/* Email Section - matches Club style */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium mb-2">{t('email.title')}</label>
-                <div className="flex gap-2">
-                  <input
-                    type="email"
-                    value={livingGroupEmail}
-                    onChange={(e) => setLivingGroupEmail(e.target.value)}
-                    placeholder={t('email.placeholder')}
-                    className="flex-1 border border-border rounded px-4 py-2"
-                  />
-                  <button
-                    onClick={handleSaveEmail}
-                    disabled={savingEmail}
-                    className="px-4 py-2 bg-[#750014] text-white rounded hover:bg-[#5C0010] disabled:opacity-50 whitespace-nowrap"
-                  >
-                    {savingEmail ? '...' : t('email.save')}
-                  </button>
+              <h2 className="text-lg font-medium mb-2">{t('documents.title')}</h2>
+              <p className="text-text-secondary text-sm mb-6">{t('documents.description')}</p>
+
+              {documentsMessage.text && (
+                <div className={`mb-6 p-4 rounded ${
+                  documentsMessage.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
+                }`}>
+                  {documentsMessage.text}
                 </div>
-              </div>
-
-              {/* Group Leaders Section */}
-              <h3 className="text-lg font-medium mb-4">{t('groupLeaders.title')}</h3>
-
-              {leadersLoading ? (
-                <p className="text-text-secondary">Loading...</p>
-              ) : (
-                <>
-                  {/* Current Leaders */}
-                  <div className="mb-6">
-                    <h3 className="text-sm font-medium text-text-secondary mb-3">
-                      {t('groupLeaders.currentLeaders')} ({leaders.activeLeaders.length})
-                    </h3>
-                    {leaders.activeLeaders.length === 0 ? (
-                      <p className="text-text-muted text-sm">{t('groupLeaders.noLeaders')}</p>
-                    ) : (
-                      <div className="space-y-2">
-                        {leaders.activeLeaders.map((leader) => (
-                          <div
-                            key={leader.id}
-                            className="p-3 border border-border rounded-lg flex justify-between items-center"
-                          >
-                            <div>
-                              <p className="font-medium text-sm">
-                                {leader.firstName} {leader.lastName}
-                              </p>
-                              <p className="text-text-muted text-xs">{leader.email}</p>
-                            </div>
-                            <button
-                              onClick={() => handleRemoveLeaderClick(leader.id, `${leader.firstName} ${leader.lastName}`)}
-                              className="text-sm text-red-600 hover:text-red-700"
-                            >
-                              {t('groupLeaders.remove')}
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Pending Invitations */}
-                  {leaders.pendingInvitations.length > 0 && (
-                    <div className="mb-6">
-                      <h3 className="text-sm font-medium text-text-secondary mb-3">
-                        {t('groupLeaders.pendingInvitations')} ({leaders.pendingInvitations.length})
-                      </h3>
-                      <div className="space-y-2">
-                        {leaders.pendingInvitations.map((invitation) => (
-                          <div
-                            key={invitation.id}
-                            className="p-3 border border-yellow-200 bg-yellow-50 rounded-lg flex justify-between items-center"
-                          >
-                            <div>
-                              <p className="font-medium text-sm">
-                                {invitation.firstName} {invitation.lastName}
-                              </p>
-                              <p className="text-text-muted text-xs">{invitation.email}</p>
-                            </div>
-                            <button
-                              onClick={() => handleCancelLeaderInvitation(invitation.id)}
-                              className="text-sm text-red-600 hover:text-red-700"
-                            >
-                              {t('groupLeaders.cancel')}
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Invite New Leader */}
-                  <div className="bg-white border border-border rounded-lg p-4">
-                    <h3 className="text-sm font-medium mb-3">{t('groupLeaders.inviteLeader')}</h3>
-                    <div className="flex gap-2">
-                      <TextField
-                        type="email"
-                        placeholder={t('groupLeaders.searchPlaceholder')}
-                        value={inviteLeaderEmail}
-                        onChange={(e) => setInviteLeaderEmail(e.target.value)}
-                        size="small"
-                        fullWidth
-                        sx={textFieldSx}
-                      />
-                      <button
-                        onClick={handleInviteLeader}
-                        disabled={invitingLeader || !inviteLeaderEmail.trim()}
-                        className="px-4 py-2 bg-[#750014] text-white rounded hover:bg-[#5C0010] disabled:opacity-50 whitespace-nowrap text-sm"
-                      >
-                        {invitingLeader ? '...' : t('groupLeaders.invite')}
-                      </button>
-                    </div>
-                  </div>
-                </>
               )}
 
-              {/* Change Password Section */}
-              <div className="mt-8 pt-8 border-t border-border">
-                <h3 className="text-lg font-medium mb-4">{t('password.title')}</h3>
-
-                {passwordMessage.text && (
-                  <div className={`mb-6 p-4 rounded ${
-                    passwordMessage.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
-                  }`}>
-                    {passwordMessage.text}
-                  </div>
-                )}
-
-                <form onSubmit={handleChangePassword} className="space-y-4 max-w-md">
+              {documentsLoading ? (
+                <p className="text-text-secondary">Loading...</p>
+              ) : (
+                <form onSubmit={handleSaveDocuments} className="space-y-6">
                   <div>
-                    <label className="block text-sm font-medium mb-2">{t('password.oldPassword')}</label>
-                    <input
-                      type="password"
-                      value={passwordData.oldPassword}
-                      onChange={(e) => setPasswordData({ ...passwordData, oldPassword: e.target.value })}
-                      className="w-full border border-border rounded px-4 py-2"
-                      required
+                    <label className="block text-sm font-medium mb-2">{t('documents.linksLabel')}</label>
+                    <textarea
+                      value={documents.links}
+                      onChange={(e) => setDocuments({ ...documents, links: e.target.value })}
+                      placeholder={t('documents.linksPlaceholder')}
+                      className="w-full border border-border rounded px-4 py-2 min-h-[120px] font-mono text-sm"
+                      maxLength={2000}
                     />
+                    <p className="text-xs text-text-muted mt-1">
+                      {t('documents.linksHint')} ({documents.links.length}/2000)
+                    </p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-2">{t('password.newPassword')}</label>
-                    <input
-                      type="password"
-                      value={passwordData.newPassword}
-                      onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                      className={`w-full border rounded px-4 py-2 ${passwordErrors.newPassword ? 'border-red-500' : 'border-border'}`}
-                      required
+                    <label className="block text-sm font-medium mb-2">{t('documents.notesLabel')}</label>
+                    <textarea
+                      value={documents.notes}
+                      onChange={(e) => setDocuments({ ...documents, notes: e.target.value })}
+                      placeholder={t('documents.notesPlaceholder')}
+                      className="w-full border border-border rounded px-4 py-2 min-h-[150px]"
+                      maxLength={5000}
                     />
-                    {passwordErrors.newPassword && (
-                      <ul className="mt-2 text-sm text-red-600 list-disc list-inside">
-                        {passwordErrors.newPassword.map((err, i) => (
-                          <li key={i}>{err}</li>
-                        ))}
-                      </ul>
-                    )}
-                    <p className="mt-2 text-xs text-text-muted">{t('password.requirements')}</p>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-2">{t('password.confirmPassword')}</label>
-                    <input
-                      type="password"
-                      value={passwordData.confirmPassword}
-                      onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                      className={`w-full border rounded px-4 py-2 ${passwordErrors.confirmPassword ? 'border-red-500' : 'border-border'}`}
-                      required
-                    />
-                    {passwordErrors.confirmPassword && (
-                      <p className="mt-2 text-sm text-red-600">{passwordErrors.confirmPassword[0]}</p>
-                    )}
+                    <p className="text-xs text-text-muted mt-1">
+                      {t('documents.notesHint')} ({documents.notes.length}/5000)
+                    </p>
                   </div>
 
                   <button
                     type="submit"
-                    disabled={savingPassword}
+                    disabled={savingDocuments}
                     className="btn-primary"
                   >
-                    {savingPassword ? t('password.saving') : t('password.changeButton')}
+                    {savingDocuments ? t('documents.saving') : t('documents.save')}
                   </button>
                 </form>
-              </div>
-            </div>
-          )}
-
-          {/* Join Requests Tab (FSILGs only) */}
-          {activeTab === 'joinRequests' && livingGroup?.living_group_type === 'fsilg' && (
-            <div>
-              <h2 className="text-lg font-medium mb-4">{t('joinRequests.title')}</h2>
-
-              {requestsLoading ? (
-                <p className="text-text-secondary">Loading...</p>
-              ) : joinRequests.length === 0 ? (
-                <p className="text-text-secondary">{t('joinRequests.noRequests')}</p>
-              ) : (
-                <div className="space-y-3">
-                  {joinRequests.map((request) => (
-                    <div
-                      key={request.id}
-                      className="p-4 border border-yellow-200 bg-yellow-50 rounded-lg flex justify-between items-center"
-                    >
-                      <div>
-                        <p className="font-medium">
-                          {request.user?.first_name} {request.user?.last_name}
-                        </p>
-                        <p className="text-text-secondary text-sm">{request.user?.email}</p>
-                        <p className="text-text-muted text-xs mt-1">
-                          {new Date(request.joined_at).toLocaleDateString(locale)}
-                        </p>
-                      </div>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleJoinRequestAction(request.id, 'approve')}
-                          disabled={processingRequestId === request.id}
-                          className="text-sm px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
-                        >
-                          {processingRequestId === request.id ? t('joinRequests.approving') : t('joinRequests.approve')}
-                        </button>
-                        <button
-                          onClick={() => handleJoinRequestAction(request.id, 'deny')}
-                          disabled={processingRequestId === request.id}
-                          className="text-sm px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
-                        >
-                          {processingRequestId === request.id ? t('joinRequests.denying') : t('joinRequests.deny')}
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
               )}
             </div>
           )}
-            </>
-          )}
         </section>
       </main>
-
-      {/* Remove Leader Confirmation Modal */}
-      <ConfirmationModal
-        open={confirmationModal.open}
-        title={t('groupLeaders.confirmRemoveTitle')}
-        message={t('groupLeaders.confirmRemoveMessage', { name: confirmationModal.leaderName })}
-        confirmText={t('groupLeaders.removeConfirm')}
-        cancelText={t('groupLeaders.cancel')}
-        onConfirm={handleConfirmRemoveLeader}
-        onCancel={handleCancelRemoveLeader}
-        isDangerous={true}
-      />
-
       <Footer />
     </>
   );

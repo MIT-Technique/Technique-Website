@@ -323,54 +323,7 @@
         "seniorBio": "Bio de Senior",
         "clubInfo": "Info del Club",
         "scheduling": "Programación",
-        "myClubs": "Mis Clubes",
-        "myLivingGroups": "Mis Grupos de Vivienda",
         "photographerTools": "Herramientas de Staph"
-      },
-      "myClubs": {
-        "title": "Mis Clubes",
-        "searchTitle": "Buscar Clubes",
-        "description": "Únete a tu(s) club(es) para aparecer en las fotos del anuario.",
-        "memberships": "Membresías",
-        "noMemberships": "Aún no eres miembro de ningún club.",
-        "pendingRequests": "Solicitudes Pendientes",
-        "noPendingRequests": "No hay solicitudes de unión pendientes.",
-        "cancelRequest": "Cancelar",
-        "cancel": "Cancelar",
-        "cancelling": "...",
-        "searchClubs": "Buscar Clubes",
-        "searchPlaceholder": "Buscar un club para unirse...",
-        "searchHint": "Encuentra y solicita unirte a clubes de MIT",
-        "noResults": "No se encontraron clubes verificados",
-        "joinClub": "Unirse",
-        "requestJoin": "Unirse",
-        "joining": "...",
-        "requesting": "...",
-        "requestSent": "¡Solicitud enviada!",
-        "requestedOn": "Solicitado el {date}",
-        "joinedOn": "Unido el {date}",
-        "alreadyMember": "Miembro",
-        "alreadyRequested": "Solicitado",
-        "leader": "Líder",
-        "member": "Miembro",
-        "role": {
-          "member": "Miembro",
-          "leader": "Líder"
-        },
-        "invitations": {
-          "title": "Invitaciones de Clubes",
-          "noInvitations": "No hay invitaciones pendientes",
-          "accept": "Aceptar",
-          "decline": "Rechazar",
-          "accepting": "Aceptando...",
-          "declining": "Rechazando...",
-          "accepted": "¡Invitación aceptada!",
-          "declined": "Invitación rechazada",
-          "invitedBy": "Invitado por {name}",
-          "invitedOn": "{date}",
-          "error": "Error al procesar invitación"
-        },
-        "manageDashboard": "Administrar Club"
       },
       "profile": {
         "title": "Información de la Cuenta",
@@ -382,12 +335,6 @@
         "title": "¿Necesitas otro acceso?",
         "description": "Solicita un cambio de rol si representas un club o grupo de vivienda.",
         "requestButton": "Solicitar Cambio de Rol"
-      },
-      "lgLeaderInvitations": {
-        "title": "Invitaciones de Líder de Grupo de Vivienda",
-        "invitedOn": "Invitado el {date}",
-        "accept": "Aceptar",
-        "decline": "Rechazar"
       },
       "adminTools": {
         "title": "Herramientas de Admin",
@@ -922,9 +869,7 @@
     "frozen": "Este formulario está congelado. No puede hacer cambios en este momento.",
     "tabs": {
       "profile": "Perfil",
-      "leaders": "Líderes",
       "members": "Miembros",
-      "requests": "Solicitudes",
       "documents": "Documentos"
     },
     "password": {
@@ -994,74 +939,6 @@
         "leader": "Líder"
       }
     },
-    "leaders": {
-      "title": "Líderes",
-      "info": "Líderes actuales: {count}/{max}",
-      "noLeaders": "No hay líderes asignados",
-      "demoteToMember": "Degradar a Miembro",
-      "pendingPromotions": "Promociones Pendientes",
-      "awaitingApproval": "Esperando aprobación del admin",
-      "cancelRequest": "Cancelar Solicitud",
-      "searchAddLeader": "Buscar para añadir un líder..."
-    },
-    "requests": {
-      "title": "Solicitudes de Unión",
-      "pending": "Solicitudes Pendientes",
-      "noPending": "No hay solicitudes pendientes.",
-      "noRequests": "No hay solicitudes pendientes.",
-      "approve": "Aprobar",
-      "deny": "Rechazar",
-      "processing": "..."
-    },
-    "management": {
-      "title": "Gestión de Usuarios",
-      "leadersTitle": "Líderes",
-      "membersTitle": "Miembros",
-      "noLeaders": "No hay líderes asignados",
-      "addLeader": "Añadir Líder",
-      "description": "Gestiona los miembros y líderes del club. Puede tener hasta 2 líderes por club.",
-      "noMembers": "No hay miembros que gestionar.",
-      "removeMember": "Eliminar",
-      "promoteToLeader": "Promover a Líder",
-      "demoteToMember": "Degradar a Miembro",
-      "processing": "...",
-      "leaderLimit": "Máximo 2 líderes permitidos",
-      "leaderInfo": "Líderes actuales: {count}/{max}",
-      "pendingPromotions": "Promociones Pendientes",
-      "awaitingApproval": "Esperando aprobación del admin",
-      "cancelling": "Cancelando...",
-      "cancelRequest": "Cancelar Solicitud",
-      "promotionPending": "Promoción pendiente",
-      "requestLeader": "Solicitar Promoción a Líder",
-      "requestLeaderHint": "Se requiere aprobación del admin para promover a líder",
-      "pendingLeaderRequest": "Promoción pendiente de aprobación",
-      "searchAddLeader": "Buscar para añadir un líder..."
-    },
-    "onboarding": {
-      "addLeaderRequired": "Añadir un líder para continuar",
-      "addLeaderDescription": "Su club necesita al menos un estudiante líder de MIT antes de poder gestionar miembros y ser visible para los estudiantes.",
-      "searchStudent": "Buscar estudiantes de MIT...",
-      "addAsLeader": "Añadir como Líder",
-      "adding": "Añadiendo...",
-      "leaderAdded": "¡Líder añadido exitosamente!",
-      "leaderError": "Error al añadir líder",
-      "tabsBlockedWarning": "Las pestañas de Miembros, Solicitudes de Unión y Gestión de Usuarios están bloqueadas hasta que añada un líder de club.",
-      "profileWarningTitle": "Acción Requerida: Añadir un Líder de Club",
-      "noResults": "No se encontraron estudiantes"
-    },
-    "invitations": {
-      "title": "Invitar Estudiantes",
-      "searchPlaceholder": "Buscar por nombre o email...",
-      "invite": "Invitar",
-      "inviting": "Invitando...",
-      "inviteSent": "¡Invitación enviada!",
-      "inviteError": "Error al enviar invitación",
-      "pendingInvitations": "Invitaciones Pendientes",
-      "noPendingInvitations": "No hay invitaciones pendientes",
-      "invitedOn": "Invitado el {date}",
-      "cancel": "Cancelar",
-      "cancelling": "Cancelando..."
-    },
     "documents": {
       "title": "Documentos del Club",
       "description": "Almacena enlaces y notas importantes para tu club. Esta información es privada para los líderes del club.",
@@ -1089,9 +966,9 @@
     "tabs": {
       "profile": "Perfil",
       "book": "Reservar",
-      "assign": "Asignar",
+      "assign": "Secciones",
       "members": "Miembros",
-      "joinRequests": "Solicitudes"
+      "documents": "Documentos"
     },
     "email": {
       "title": "Email de Visualización",
@@ -1143,6 +1020,21 @@
     "bookError": "Error al reservar horario",
     "postedBy": "Publicado por {name}",
     "unknownCreator": "Desconocido",
+    "assign": {
+      "title": "Gestionar Secciones",
+      "description": "Crea secciones para organizar miembros (ej: pisos, alas, edificios). Los miembros pueden asignarse a secciones.",
+      "addPlaceholder": "Nombre de sección (ej: Piso 1)",
+      "addSection": "Añadir Sección",
+      "adding": "Añadiendo...",
+      "addSectionSuccess": "Sección añadida exitosamente",
+      "addSectionError": "Error al añadir sección",
+      "noSections": "Aún no hay secciones creadas",
+      "memberCount": "{count} miembro(s)",
+      "removeSection": "Eliminar",
+      "removing": "Eliminando...",
+      "removeSectionSuccess": "Sección eliminada exitosamente",
+      "removeSectionError": "Error al eliminar sección"
+    },
     "members": {
       "title": "Miembros",
       "totalMembers": "Total de Miembros: {count}",
@@ -1154,10 +1046,13 @@
       "updateExpected": "Actualizar",
       "expectedPlaceholder": "Cantidad esperada",
       "updateSuccess": "Cantidad esperada actualizada",
-      "updateError": "Error al actualizar cantidad esperada",
+      "updateError": "Error al actualizar miembro",
       "addMember": "Añadir Miembro",
+      "addPlaceholder": "Nombre del miembro",
       "searchPlaceholder": "Buscar por email...",
-      "selectSection": "Seleccionar sección",
+      "selectSection": "Asignar a sección",
+      "noSection": "Sin sección",
+      "unassigned": "Sin asignar",
       "allSections": "Todas las Secciones",
       "noResults": "No se encontraron estudiantes",
       "add": "Añadir",
@@ -1172,16 +1067,19 @@
       "removeError": "Error al eliminar miembro",
       "confirmRemove": "¿Eliminar este miembro?"
     },
-    "joinRequests": {
-      "title": "Solicitudes de Ingreso",
-      "noRequests": "No hay solicitudes pendientes",
-      "approve": "Aprobar",
-      "deny": "Rechazar",
-      "approving": "Aprobando...",
-      "denying": "Rechazando...",
-      "approveSuccess": "Miembro aprobado",
-      "denySuccess": "Solicitud rechazada",
-      "actionError": "Error al procesar solicitud"
+    "documents": {
+      "title": "Documentos de la Organización",
+      "description": "Guarda enlaces y notas importantes para tu grupo de vivienda. Esta información es privada.",
+      "linksLabel": "Enlaces Importantes",
+      "linksPlaceholder": "Añade enlaces importantes (uno por línea)\nEjemplo:\nhttps://drive.google.com/tu-carpeta\nhttps://docs.google.com/tu-documento",
+      "linksHint": "Añade URLs a carpetas de Google Drive, documentos compartidos, etc.",
+      "notesLabel": "Notas",
+      "notesPlaceholder": "Añade notas importantes...",
+      "notesHint": "Notas privadas visibles solo para la cuenta del grupo",
+      "save": "Guardar Documentos",
+      "saving": "Guardando...",
+      "saveSuccess": "Documentos guardados exitosamente",
+      "saveError": "Error al guardar documentos"
     },
     "proposeTime": {
       "title": "Proponer un Horario",
@@ -1211,94 +1109,6 @@
         "declined": "Rechazado",
         "cancelled": "Cancelado"
       }
-    },
-    "onboarding": {
-      "title": "Agregar Líder del Grupo de Vivienda",
-      "description": "Antes de acceder a las funciones de programación y miembros, necesita agregar al menos un estudiante de MIT como Líder del Grupo de Vivienda. Ellos recibirán los correos de restablecimiento de contraseña y ayudarán a administrar su grupo.",
-      "studentEmailPlaceholder": "Email MIT del estudiante (ej., student@mit.edu)",
-      "addLeader": "Agregar Líder",
-      "addingLeader": "Agregando...",
-      "leaderAdded": "¡Líder agregado exitosamente!",
-      "emailRequired": "Por favor ingrese un email de estudiante",
-      "addLeaderError": "Error al agregar líder"
-    },
-    "assign": {
-      "title": "Asignar Secciones a Horarios",
-      "description": "Asigne diferentes secciones de su grupo de vivienda a bloques de 30 minutos durante su sesión de fotos reservada.",
-      "selectDate": "Seleccione una fecha reservada",
-      "noBooking": "No hay horarios reservados disponibles. Reserve un horario primero.",
-      "slot": "Bloque",
-      "section": "Sección",
-      "notAssigned": "Sin asignar",
-      "save": "Guardar",
-      "saving": "Guardando...",
-      "saved": "Asignación guardada",
-      "saveError": "Error al guardar asignación",
-      "unassignedSections": "Secciones esperando asignación:",
-      "allAssigned": "Todas las secciones han sido asignadas a horarios"
-    },
-    "groupLeaders": {
-      "title": "Líderes del Grupo",
-      "description": "Administre los líderes que pueden ayudar a gestionar la programación de sesiones de fotos y los miembros de su grupo de vivienda.",
-      "currentLeaders": "Líderes Actuales",
-      "noLeaders": "Aún no hay líderes asignados",
-      "pendingInvitations": "Invitaciones Pendientes",
-      "noPending": "No hay invitaciones pendientes",
-      "inviteLeader": "Invitar Nuevo Líder",
-      "searchPlaceholder": "Buscar por email MIT",
-      "invite": "Invitar",
-      "inviting": "Invitando...",
-      "inviteSent": "Invitación enviada exitosamente",
-      "inviteError": "Error al enviar invitación",
-      "remove": "Remover",
-      "removing": "Removiendo...",
-      "confirmRemove": "¿Remover a {name} como líder?",
-      "confirmRemoveTitle": "Remover Líder",
-      "confirmRemoveMessage": "¿Está seguro de que desea remover a {name} como líder? Ya no podrán gestionar su grupo de vivienda.",
-      "removeConfirm": "Remover",
-      "removed": "Líder removido",
-      "removeError": "Error al remover líder",
-      "cancel": "Cancelar",
-      "cancelling": "Cancelando...",
-      "invitationCancelled": "Invitación cancelada",
-      "cancelError": "Error al cancelar invitación",
-      "emailRequired": "Por favor ingrese un email de estudiante",
-      "invitedBy": "Invitado por {name}",
-      "acceptedAt": "Aceptado {date}"
-    }
-  },
-
-  "joinLivingGroup": {
-    "title": "Buscar Grupos de Vivienda",
-    "description": "Únete a tu dormitorio o FSILG para aparecer en las fotos del anuario.",
-    "searchPlaceholder": "Buscar por nombre...",
-    "searchHint": "ej. Baker House, East Campus, Alpha Delta Phi...",
-    "filterAll": "Todos",
-    "filterDorms": "Dormitorios",
-    "filterFSILGs": "FSILGs",
-    "noResults": "No se encontraron grupos",
-    "selectSection": "Selecciona tu sección",
-    "sectionRequired": "Por favor selecciona una sección",
-    "join": "Unirse",
-    "joining": "Uniéndose...",
-    "requestToJoin": "Solicitar Ingreso",
-    "joinSuccess": "¡Te uniste exitosamente!",
-    "requestSuccess": "Solicitud enviada. Esperando aprobación.",
-    "joinError": "Error al unirse al grupo",
-    "alreadyMember": "Ya eres miembro de este grupo",
-    "currentMemberships": {
-      "title": "Membresías",
-      "dorm": "Dormitorio",
-      "fsilg": "FSILG",
-      "section": "Sección: {section}",
-      "pending": "Aprobación Pendiente",
-      "active": "Activo",
-      "leave": "Salir",
-      "cancelRequest": "Cancelar Solicitud",
-      "leaving": "Saliendo...",
-      "leaveSuccess": "Saliste exitosamente",
-      "leaveError": "Error al salir",
-      "noMemberships": "Aún no te has unido a ningún grupo"
     }
   },
 
@@ -1346,13 +1156,9 @@
       "accounts": {
         "title": "Cuentas e Inicio de Sesión",
         "q1": "¿Cómo creo una cuenta?",
-        "a1": "Los estudiantes de MIT pueden iniciar sesión usando MIT SSO (Touchstone). Los clubes pueden registrarse haciendo clic en 'Acceso de Club' y seleccionando 'Registrarse' para crear una nueva cuenta de club con su correo oficial.",
-        "q2": "¿Cuál es la diferencia entre cuentas de estudiante y de club?",
-        "a2": "Las cuentas de estudiante son para que los estudiantes de MIT gestionen su biografía de senior y se unan a clubes. Las cuentas de club son para que las organizaciones de MIT gestionen su perfil de anuario, listas de miembros y fotos candidas.",
-        "q3": "Soy un club - ¿cómo empiezo después de registrarme?",
-        "a3": "Después de registrarte, necesitarás agregar al menos un estudiante de MIT como líder antes de que tu club sea visible. Busca al estudiante por nombre o correo en la sección de incorporación.",
-        "q4": "¿Cómo funcionan las invitaciones de club?",
-        "a4": "Los clubes pueden invitar a estudiantes de MIT a unirse. Los estudiantes verán las invitaciones pendientes en la pestaña 'Mis Clubes' de su perfil y pueden aceptar o rechazar. Las invitaciones aceptadas agregan automáticamente al estudiante como miembro."
+        "a1": "Los estudiantes de MIT pueden iniciar sesión usando MIT SSO (Touchstone) para gestionar su biografía de senior. Los clubes y grupos de vivienda pueden iniciar sesión con sus credenciales de organización.",
+        "q2": "¿Cuál es la diferencia entre cuentas de estudiante y de organización?",
+        "a2": "Las cuentas de estudiante son para que los estudiantes de MIT gestionen su biografía de senior. Las cuentas de organización (clubes y grupos de vivienda) se usan para gestionar perfiles de anuario, listas de miembros y programación de sesiones de fotos."
       },
       "yearbook": {
         "title": "Anuario y Pedidos",
@@ -1366,11 +1172,9 @@
       "clubs": {
         "title": "Clubes y Organizaciones",
         "q1": "¿Cómo agrego mi club al anuario?",
-        "a1": "Registra una cuenta de club, agrega un líder, luego completa tu perfil de club con descripción, lista de miembros y fotos candidas. Tu envío será revisado por el personal de Technique.",
+        "a1": "Inicia sesión con tu cuenta de club y completa tu perfil con descripción, lista de miembros y fotos candidas. Tu envío será revisado por el personal de Technique.",
         "q2": "¿Qué fotos deben enviar los clubes?",
-        "a2": "Envía fotos candidas de alta calidad que representen las actividades de tu club. Puedes subir hasta 3 fotos. Evita fotos grupales posadas - ¡queremos capturar a tu club en acción!",
-        "q3": "¿Quién puede gestionar el perfil del club?",
-        "a3": "El propietario de la cuenta del club y los líderes designados pueden editar el perfil del club. Los líderes deben ser estudiantes de MIT y se agregan a través del panel del club."
+        "a2": "Envía fotos candidas de alta calidad que representen las actividades de tu club. Puedes subir hasta 3 fotos. Evita fotos grupales posadas - ¡queremos capturar a tu club en acción!"
       },
       "contact": {
         "title": "¿Todavía tienes preguntas?",

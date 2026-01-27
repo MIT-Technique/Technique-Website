@@ -331,54 +331,7 @@
         "seniorBio": "毕业生简介",
         "clubInfo": "社团信息",
         "scheduling": "预约管理",
-        "myClubs": "我的社团",
-        "myLivingGroups": "我的住宿组",
         "photographerTools": "Staph工具"
-      },
-      "myClubs": {
-        "title": "我的社团",
-        "searchTitle": "搜索社团",
-        "description": "加入您的社团以出现在年鉴照片中。",
-        "memberships": "会员资格",
-        "noMemberships": "您还未加入任何社团。",
-        "pendingRequests": "待处理请求",
-        "noPendingRequests": "没有待处理的加入请求。",
-        "cancelRequest": "取消",
-        "cancel": "取消",
-        "cancelling": "...",
-        "searchClubs": "搜索社团",
-        "searchPlaceholder": "搜索要加入的社团...",
-        "searchHint": "查找并申请加入MIT社团",
-        "noResults": "未找到已验证的社团",
-        "joinClub": "加入",
-        "requestJoin": "加入",
-        "joining": "...",
-        "requesting": "...",
-        "requestSent": "请求已发送！",
-        "requestedOn": "申请日期：{date}",
-        "joinedOn": "加入日期：{date}",
-        "alreadyMember": "已加入",
-        "alreadyRequested": "已申请",
-        "leader": "负责人",
-        "member": "成员",
-        "role": {
-          "member": "成员",
-          "leader": "负责人"
-        },
-        "invitations": {
-          "title": "社团邀请",
-          "noInvitations": "暂无待处理的社团邀请",
-          "accept": "接受",
-          "decline": "拒绝",
-          "accepting": "接受中...",
-          "declining": "拒绝中...",
-          "accepted": "邀请已接受！",
-          "declined": "邀请已拒绝",
-          "invitedBy": "邀请人：{name}",
-          "invitedOn": "{date}",
-          "error": "处理邀请失败"
-        },
-        "manageDashboard": "管理社团"
       },
       "profile": {
         "title": "账户信息",
@@ -390,12 +343,6 @@
         "title": "需要其他权限？",
         "description": "如果您代表社团或宿舍，可以申请角色变更。",
         "requestButton": "申请角色变更"
-      },
-      "lgLeaderInvitations": {
-        "title": "住宿组负责人邀请",
-        "invitedOn": "邀请于 {date}",
-        "accept": "接受",
-        "decline": "拒绝"
       },
       "adminTools": {
         "title": "管理工具",
@@ -930,9 +877,7 @@
     "frozen": "此表单目前已冻结。您暂时无法进行更改。",
     "tabs": {
       "profile": "资料",
-      "leaders": "负责人",
       "members": "成员",
-      "requests": "加入请求",
       "documents": "文档"
     },
     "password": {
@@ -1002,74 +947,6 @@
         "leader": "负责人"
       }
     },
-    "leaders": {
-      "title": "负责人",
-      "info": "当前负责人：{count}/{max}",
-      "noLeaders": "未指定负责人",
-      "demoteToMember": "降为成员",
-      "pendingPromotions": "待处理的提升请求",
-      "awaitingApproval": "等待管理员批准",
-      "cancelRequest": "取消请求",
-      "searchAddLeader": "搜索添加负责人..."
-    },
-    "requests": {
-      "title": "加入请求",
-      "pending": "待处理请求",
-      "noPending": "没有待处理的加入请求。",
-      "noRequests": "没有待处理的加入请求。",
-      "approve": "批准",
-      "deny": "拒绝",
-      "processing": "..."
-    },
-    "management": {
-      "title": "用户管理",
-      "leadersTitle": "负责人",
-      "membersTitle": "成员",
-      "noLeaders": "未指定负责人",
-      "addLeader": "添加负责人",
-      "description": "管理社团成员和负责人。每个社团最多可有2名负责人。",
-      "noMembers": "没有可管理的成员。",
-      "removeMember": "移除",
-      "promoteToLeader": "提升为负责人",
-      "demoteToMember": "降为成员",
-      "processing": "...",
-      "leaderLimit": "最多允许2名负责人",
-      "leaderInfo": "当前负责人：{count}/{max}",
-      "pendingPromotions": "待处理的提升请求",
-      "awaitingApproval": "等待管理员批准",
-      "cancelling": "取消中...",
-      "cancelRequest": "取消请求",
-      "promotionPending": "提升待处理",
-      "requestLeader": "申请负责人提升",
-      "requestLeaderHint": "提升成员为负责人需管理员批准",
-      "pendingLeaderRequest": "提升请求待管理员批准",
-      "searchAddLeader": "搜索添加负责人..."
-    },
-    "onboarding": {
-      "addLeaderRequired": "添加负责人以继续",
-      "addLeaderDescription": "您的社团需要至少一名MIT学生负责人才能管理成员并对学生可见。",
-      "searchStudent": "搜索MIT学生...",
-      "addAsLeader": "添加为负责人",
-      "adding": "添加中...",
-      "leaderAdded": "负责人添加成功！",
-      "leaderError": "添加负责人失败",
-      "tabsBlockedWarning": "在添加社团负责人之前，成员、加入请求和用户管理选项卡将被锁定。",
-      "profileWarningTitle": "需要操作：添加社团负责人",
-      "noResults": "未找到学生"
-    },
-    "invitations": {
-      "title": "邀请学生",
-      "searchPlaceholder": "按姓名或邮箱搜索...",
-      "invite": "邀请",
-      "inviting": "邀请中...",
-      "inviteSent": "邀请已发送！",
-      "inviteError": "发送邀请失败",
-      "pendingInvitations": "待处理邀请",
-      "noPendingInvitations": "暂无待处理邀请",
-      "invitedOn": "邀请日期：{date}",
-      "cancel": "取消",
-      "cancelling": "取消中..."
-    },
     "documents": {
       "title": "社团文档",
       "description": "存储社团重要链接和备注。此信息仅对社团负责人可见。",
@@ -1097,9 +974,9 @@
     "tabs": {
       "profile": "资料",
       "book": "预约",
-      "assign": "分配",
+      "assign": "区域",
       "members": "成员",
-      "joinRequests": "加入请求"
+      "documents": "文档"
     },
     "email": {
       "title": "显示邮箱",
@@ -1151,6 +1028,21 @@
     "bookError": "预约失败",
     "postedBy": "发布者：{name}",
     "unknownCreator": "未知",
+    "assign": {
+      "title": "管理区域",
+      "description": "创建区域以组织成员（例如：楼层、翼楼、建筑）。成员可以被分配到区域。",
+      "addPlaceholder": "输入区域名称（例如：1楼）",
+      "addSection": "添加区域",
+      "adding": "添加中...",
+      "addSectionSuccess": "区域添加成功",
+      "addSectionError": "添加区域失败",
+      "noSections": "尚未创建任何区域",
+      "memberCount": "{count} 名成员",
+      "removeSection": "删除",
+      "removing": "删除中...",
+      "removeSectionSuccess": "区域删除成功",
+      "removeSectionError": "删除区域失败"
+    },
     "members": {
       "title": "成员",
       "totalMembers": "总成员数: {count}",
@@ -1162,10 +1054,13 @@
       "updateExpected": "更新",
       "expectedPlaceholder": "预计人数",
       "updateSuccess": "预计人数已更新",
-      "updateError": "更新预计人数失败",
+      "updateError": "更新成员失败",
       "addMember": "添加成员",
+      "addPlaceholder": "输入成员姓名",
       "searchPlaceholder": "搜索邮箱...",
-      "selectSection": "选择区域",
+      "selectSection": "分配到区域",
+      "noSection": "无区域",
+      "unassigned": "未分配",
       "allSections": "所有区域",
       "noResults": "未找到学生",
       "add": "添加",
@@ -1180,16 +1075,19 @@
       "removeError": "移除成员失败",
       "confirmRemove": "确认移除此成员？"
     },
-    "joinRequests": {
-      "title": "加入申请",
-      "noRequests": "暂无待处理申请",
-      "approve": "批准",
-      "deny": "拒绝",
-      "approving": "批准中...",
-      "denying": "拒绝中...",
-      "approveSuccess": "成员已批准",
-      "denySuccess": "申请已拒绝",
-      "actionError": "处理申请失败"
+    "documents": {
+      "title": "组织文档",
+      "description": "存储住宿组的重要链接和备注。此信息为私密信息。",
+      "linksLabel": "重要链接",
+      "linksPlaceholder": "添加重要链接（每行一个）\n示例：\nhttps://drive.google.com/your-folder\nhttps://docs.google.com/your-doc",
+      "linksHint": "添加Google Drive文件夹、共享文档等的链接",
+      "notesLabel": "备注",
+      "notesPlaceholder": "添加重要备注...",
+      "notesHint": "仅对住宿组账户可见的私密备注",
+      "save": "保存文档",
+      "saving": "保存中...",
+      "saveSuccess": "文档保存成功",
+      "saveError": "保存文档失败"
     },
     "proposeTime": {
       "title": "提议时间",
@@ -1219,94 +1117,6 @@
         "declined": "已拒绝",
         "cancelled": "已取消"
       }
-    },
-    "onboarding": {
-      "title": "添加住宿组负责人",
-      "description": "在访问排程和成员功能之前，您需要添加至少一名MIT学生作为住宿组负责人。他们将接收密码重置邮件并帮助管理您的团体。",
-      "studentEmailPlaceholder": "学生的MIT邮箱 (例如：student@mit.edu)",
-      "addLeader": "添加负责人",
-      "addingLeader": "添加中...",
-      "leaderAdded": "负责人添加成功！",
-      "emailRequired": "请输入学生邮箱",
-      "addLeaderError": "添加负责人失败"
-    },
-    "assign": {
-      "title": "分配时间段",
-      "description": "将住宿组的不同分区分配到预约拍摄期间的30分钟时间段。",
-      "selectDate": "选择已预约的日期",
-      "noBooking": "暂无已预约的时间段。请先预约拍摄时间。",
-      "slot": "时段",
-      "section": "分区",
-      "notAssigned": "未分配",
-      "save": "保存",
-      "saving": "保存中...",
-      "saved": "分配已保存",
-      "saveError": "保存分配失败",
-      "unassignedSections": "等待分配的分区：",
-      "allAssigned": "所有分区已分配到时间段"
-    },
-    "groupLeaders": {
-      "title": "组长管理",
-      "description": "管理可以帮助管理住宿组拍摄排程和成员的负责人。",
-      "currentLeaders": "当前组长",
-      "noLeaders": "暂无组长",
-      "pendingInvitations": "待处理邀请",
-      "noPending": "暂无待处理邀请",
-      "inviteLeader": "邀请新组长",
-      "searchPlaceholder": "按MIT邮箱搜索",
-      "invite": "邀请",
-      "inviting": "邀请中...",
-      "inviteSent": "邀请已发送",
-      "inviteError": "发送邀请失败",
-      "remove": "移除",
-      "removing": "移除中...",
-      "confirmRemove": "确定移除{name}的组长身份？",
-      "confirmRemoveTitle": "移除组长",
-      "confirmRemoveMessage": "确定要移除{name}的组长身份吗？他们将无法再管理您的住宿组。",
-      "removeConfirm": "移除",
-      "removed": "组长已移除",
-      "removeError": "移除组长失败",
-      "cancel": "取消",
-      "cancelling": "取消中...",
-      "invitationCancelled": "邀请已取消",
-      "cancelError": "取消邀请失败",
-      "emailRequired": "请输入学生邮箱",
-      "invitedBy": "由{name}邀请",
-      "acceptedAt": "接受于{date}"
-    }
-  },
-
-  "joinLivingGroup": {
-    "title": "搜索住宿组",
-    "description": "加入您的宿舍或FSILG，以便出现在年鉴照片中。",
-    "searchPlaceholder": "按名称搜索...",
-    "searchHint": "例如：Baker House, East Campus, Alpha Delta Phi...",
-    "filterAll": "全部",
-    "filterDorms": "宿舍",
-    "filterFSILGs": "FSILGs",
-    "noResults": "未找到住宿组",
-    "selectSection": "选择您的区域",
-    "sectionRequired": "请选择一个区域",
-    "join": "加入",
-    "joining": "加入中...",
-    "requestToJoin": "申请加入",
-    "joinSuccess": "加入成功！",
-    "requestSuccess": "申请已提交，等待审批。",
-    "joinError": "加入住宿组失败",
-    "alreadyMember": "您已是此住宿组的成员",
-    "currentMemberships": {
-      "title": "成员资格",
-      "dorm": "宿舍",
-      "fsilg": "FSILG",
-      "section": "区域: {section}",
-      "pending": "待审批",
-      "active": "已激活",
-      "leave": "退出",
-      "cancelRequest": "取消申请",
-      "leaving": "退出中...",
-      "leaveSuccess": "已成功退出",
-      "leaveError": "退出失败",
-      "noMemberships": "您尚未加入任何住宿组"
     }
   },
 
@@ -1354,13 +1164,9 @@
       "accounts": {
         "title": "账户与登录",
         "q1": "如何创建账户？",
-        "a1": "MIT学生可以使用MIT SSO（Touchstone）登录。社团可以点击「社团登录」并选择「注册」，使用官方社团邮箱创建新的社团账户。",
-        "q2": "学生账户和社团账户有什么区别？",
-        "a2": "学生账户用于MIT学生管理毕业生简介和加入社团。社团账户用于MIT组织管理年鉴资料、成员名单和活动照片。",
-        "q3": "我是社团——注册后如何开始？",
-        "a3": "注册后，您需要添加至少一名MIT学生作为负责人，您的社团才能被搜索到。在入门部分按姓名或邮箱搜索学生。",
-        "q4": "社团邀请是如何运作的？",
-        "a4": "社团可以邀请MIT学生加入。学生可以在个人资料的「我的社团」标签中看到待处理的邀请，并可以接受或拒绝。接受邀请后，学生将自动成为成员。"
+        "a1": "MIT学生可以使用MIT SSO（Touchstone）登录管理毕业生简介。社团和住宿组可以使用组织凭证登录。",
+        "q2": "学生账户和组织账户有什么区别？",
+        "a2": "学生账户用于MIT学生管理毕业生简介。组织账户（社团和住宿组）用于管理年鉴资料、成员名单和拍摄预约。"
       },
       "yearbook": {
         "title": "年鉴与订购",
@@ -1374,11 +1180,9 @@
       "clubs": {
         "title": "社团与组织",
         "q1": "如何将我的社团添加到年鉴中？",
-        "a1": "注册社团账户，添加负责人，然后填写社团资料，包括描述、成员名单和活动照片。您的提交将由Technique工作人员审核。",
+        "a1": "使用社团账户登录，填写社团资料，包括描述、成员名单和活动照片。您的提交将由Technique工作人员审核。",
         "q2": "社团应该提交什么照片？",
-        "a2": "提交能代表社团活动的高质量活动照片。您最多可以上传3张照片。避免摆拍的合影——我们想捕捉社团的真实活动！",
-        "q3": "谁可以管理社团资料？",
-        "a3": "社团账户所有者和指定的负责人可以编辑社团资料。负责人必须是MIT学生，通过社团控制台添加。"
+        "a2": "提交能代表社团活动的高质量活动照片。您最多可以上传3张照片。避免摆拍的合影——我们想捕捉社团的真实活动！"
       },
       "contact": {
         "title": "还有问题？",

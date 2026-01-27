@@ -647,6 +647,30 @@ export function generateStaticParams() {
 -- WARNING: This schema is for context only and is not meant to be run.
 -- Table order and constraints may not be valid for execution.
 
+-- NOTE: The membership system has been simplified (Jan 2026).
+-- Tables to be DELETED (no longer used by the application):
+--   - club_invitations
+--   - club_join_requests
+--   - club_leader_requests
+--   - club_memberships
+--   - living_group_leader_permissions
+--   - living_group_memberships
+--   - living_group_time_assignments
+--   - section_expected_counts
+--
+-- Columns to be REMOVED:
+--   - clubs.has_leader (no more leaders)
+--   - clubs.member_list (use club_manual_members table instead)
+--   - living_groups.has_leader (no more leaders)
+--   - living_groups.dorm_sections (no more section tracking)
+--   - users.is_living_group_leader (no more LG leaders)
+--
+-- New table to be ADDED:
+--   - living_group_manual_members (same structure as club_manual_members)
+--
+-- The system now uses simple text lists for members (manual_members tables)
+-- instead of linked accounts. Students only use MIT SSO for senior bio form.
+
 CREATE TABLE public.admin_logs (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 actor_id uuid NOT NULL,
