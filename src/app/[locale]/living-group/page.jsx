@@ -93,7 +93,21 @@ export default function LivingGroupPage() {
   const { isLoggedIn, user, livingGroup, loading: userLoading, refetch } = useUser();
 
   // Tab state
-  const [activeTab, setActiveTab] = useState('book');
+  const [activeTab, setActiveTab] = useState('profile');
+
+  // Settings state (email)
+  const [livingGroupEmail, setLivingGroupEmail] = useState('');
+  const [savingEmail, setSavingEmail] = useState(false);
+
+  // Password change state
+  const [passwordData, setPasswordData] = useState({
+    oldPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+  const [passwordErrors, setPasswordErrors] = useState({});
+  const [savingPassword, setSavingPassword] = useState(false);
+  const [passwordMessage, setPasswordMessage] = useState({ type: '', text: '' });
 
   // Scheduling state
   const [availableTimes, setAvailableTimes] = useState([]);
@@ -714,8 +728,112 @@ export default function LivingGroupPage() {
   useEffect(() => {
     if (livingGroup?.id) {
       fetchLeaders();
+      // Load email from living group
+      fetchLivingGroupEmail();
     }
   }, [livingGroup?.id]);
+
+  async function fetchLivingGroupEmail() {
+    if (!livingGroup?.id) return;
+    try {
+      const res = await fetch(`/api/living-groups/email?livingGroupId=${livingGroup.id}`);
+      const data = await res.json();
+      if (res.ok && data.email) {
+        setLivingGroupEmail(data.email);
+      }
+    } catch (error) {
+      console.error('Error fetching living group email:', error);
+    }
+  }
+
+  async function handleSaveEmail() {
+    if (!livingGroup?.id) return;
+    setSavingEmail(true);
+    setMessage({ type: '', text: '' });
+
+    try {
+      const res = await fetch('/api/living-groups/email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          livingGroupId: livingGroup.id,
+          email: livingGroupEmail.trim(),
+        }),
+      });
+
+      if (res.ok) {
+        setMessage({ type: 'success', text: t('settings.emailSaved') });
+      } else {
+        const data = await res.json();
+        setMessage({ type: 'error', text: data.error || t('settings.emailError') });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: t('settings.emailError') });
+    } finally {
+      setSavingEmail(false);
+    }
+  }
+
+  // Password validation
+  function validatePassword(password) {
+    const errors = [];
+    if (password.length < 8) errors.push(t('password.minLength'));
+    if (!/[A-Z]/.test(password)) errors.push(t('password.uppercase'));
+    if (!/[a-z]/.test(password)) errors.push(t('password.lowercase'));
+    if (!/[0-9]/.test(password)) errors.push(t('password.number'));
+    if (!/[!@#$%^&*(),.?":{}|<>_\-+=\[\]\\\/`~;']/.test(password)) errors.push(t('password.symbol'));
+    return errors;
+  }
+
+  async function handleChangePassword(e) {
+    e.preventDefault();
+    setPasswordMessage({ type: '', text: '' });
+    setPasswordErrors({});
+
+    // Validate new password
+    const validationErrors = validatePassword(passwordData.newPassword);
+    if (validationErrors.length > 0) {
+      setPasswordErrors({ newPassword: validationErrors });
+      return;
+    }
+
+    // Check passwords match
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setPasswordErrors({ confirmPassword: [t('password.mismatch')] });
+      return;
+    }
+
+    setSavingPassword(true);
+    try {
+      const res = await fetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          oldPassword: passwordData.oldPassword,
+          newPassword: passwordData.newPassword,
+          orgType: 'living_group',
+          livingGroupId: livingGroup?.id,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setPasswordMessage({ type: 'success', text: t('password.changed') });
+        setPasswordData({ oldPassword: '', newPassword: '', confirmPassword: '' });
+      } else {
+        if (data.code === 'INVALID_OLD_PASSWORD') {
+          setPasswordMessage({ type: 'error', text: t('password.wrongOldPassword') });
+        } else {
+          setPasswordMessage({ type: 'error', text: data.error || t('password.error') });
+        }
+      }
+    } catch (error) {
+      setPasswordMessage({ type: 'error', text: t('password.error') });
+    } finally {
+      setSavingPassword(false);
+    }
+  }
 
   // Fetch time assignments when Assign tab is active
   useEffect(() => {
@@ -820,7 +938,12 @@ export default function LivingGroupPage() {
 
   // Get available tabs based on living group type
   function getTabs() {
-    const tabs = [{ id: 'book', label: t('tabs.book') }];
+    // Profile tab first (formerly Settings)
+    const tabs = [
+      { id: 'profile', label: t('tabs.profile') },
+    ];
+
+    tabs.push({ id: 'book', label: t('tabs.book') });
 
     // Only show Assign tab for dorms with multiple sections
     if (livingGroup?.living_group_type === 'dorm' && sections.length > 1) {
@@ -828,7 +951,6 @@ export default function LivingGroupPage() {
     }
 
     tabs.push({ id: 'members', label: t('tabs.members') });
-    tabs.push({ id: 'groupLeaders', label: t('tabs.groupLeaders') });
 
     if (livingGroup?.living_group_type === 'fsilg') {
       tabs.push({ id: 'joinRequests', label: t('tabs.joinRequests') });
@@ -1539,10 +1661,32 @@ export default function LivingGroupPage() {
             </div>
           )}
 
-          {/* Group Leaders Tab */}
-          {activeTab === 'groupLeaders' && (
+          {/* Profile Tab (formerly Settings) */}
+          {activeTab === 'profile' && (
             <div>
-              <h2 className="text-lg font-medium mb-4">{t('groupLeaders.title')}</h2>
+              {/* Email Section - matches Club style */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium mb-2">{t('email.title')}</label>
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    value={livingGroupEmail}
+                    onChange={(e) => setLivingGroupEmail(e.target.value)}
+                    placeholder={t('email.placeholder')}
+                    className="flex-1 border border-border rounded px-4 py-2"
+                  />
+                  <button
+                    onClick={handleSaveEmail}
+                    disabled={savingEmail}
+                    className="px-4 py-2 bg-[#750014] text-white rounded hover:bg-[#5C0010] disabled:opacity-50 whitespace-nowrap"
+                  >
+                    {savingEmail ? '...' : t('email.save')}
+                  </button>
+                </div>
+              </div>
+
+              {/* Group Leaders Section */}
+              <h3 className="text-lg font-medium mb-4">{t('groupLeaders.title')}</h3>
 
               {leadersLoading ? (
                 <p className="text-text-secondary">Loading...</p>
@@ -1634,6 +1778,73 @@ export default function LivingGroupPage() {
                   </div>
                 </>
               )}
+
+              {/* Change Password Section */}
+              <div className="mt-8 pt-8 border-t border-border">
+                <h3 className="text-lg font-medium mb-4">{t('password.title')}</h3>
+
+                {passwordMessage.text && (
+                  <div className={`mb-6 p-4 rounded ${
+                    passwordMessage.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
+                  }`}>
+                    {passwordMessage.text}
+                  </div>
+                )}
+
+                <form onSubmit={handleChangePassword} className="space-y-4 max-w-md">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">{t('password.oldPassword')}</label>
+                    <input
+                      type="password"
+                      value={passwordData.oldPassword}
+                      onChange={(e) => setPasswordData({ ...passwordData, oldPassword: e.target.value })}
+                      className="w-full border border-border rounded px-4 py-2"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">{t('password.newPassword')}</label>
+                    <input
+                      type="password"
+                      value={passwordData.newPassword}
+                      onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                      className={`w-full border rounded px-4 py-2 ${passwordErrors.newPassword ? 'border-red-500' : 'border-border'}`}
+                      required
+                    />
+                    {passwordErrors.newPassword && (
+                      <ul className="mt-2 text-sm text-red-600 list-disc list-inside">
+                        {passwordErrors.newPassword.map((err, i) => (
+                          <li key={i}>{err}</li>
+                        ))}
+                      </ul>
+                    )}
+                    <p className="mt-2 text-xs text-text-muted">{t('password.requirements')}</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">{t('password.confirmPassword')}</label>
+                    <input
+                      type="password"
+                      value={passwordData.confirmPassword}
+                      onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                      className={`w-full border rounded px-4 py-2 ${passwordErrors.confirmPassword ? 'border-red-500' : 'border-border'}`}
+                      required
+                    />
+                    {passwordErrors.confirmPassword && (
+                      <p className="mt-2 text-sm text-red-600">{passwordErrors.confirmPassword[0]}</p>
+                    )}
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={savingPassword}
+                    className="btn-primary"
+                  >
+                    {savingPassword ? t('password.saving') : t('password.changeButton')}
+                  </button>
+                </form>
+              </div>
             </div>
           )}
 

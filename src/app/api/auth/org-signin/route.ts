@@ -39,14 +39,47 @@ export async function POST(request: NextRequest) {
 
     // ==================== CLUB SIGNIN ====================
     if (orgType === "club") {
-      if (!email) {
+      // Support both email and name-based login for clubs
+      if (!email && !name) {
         return NextResponse.json(
-          { error: "Email is required", code: "MISSING_EMAIL" },
+          { error: "Email or club name is required", code: "MISSING_EMAIL_OR_NAME" },
           { status: 400 }
         );
       }
 
-      authEmail = email.toLowerCase();
+      if (name && !email) {
+        // Look up club by name to get the email
+        const { data: club, error: clubError } = await supabaseAdmin
+          .from("clubs")
+          .select("id, name, user_id")
+          .ilike("name", name.trim())
+          .single();
+
+        if (clubError || !club) {
+          return NextResponse.json(
+            { error: "Club not found", code: "CLUB_NOT_FOUND" },
+            { status: 404 }
+          );
+        }
+
+        // Get the user record to find the email
+        const { data: clubUser, error: userLookupError } = await supabaseAdmin
+          .from("users")
+          .select("email")
+          .eq("id", club.user_id)
+          .single();
+
+        if (userLookupError || !clubUser) {
+          return NextResponse.json(
+            { error: "Club account not found", code: "CLUB_ACCOUNT_NOT_FOUND" },
+            { status: 404 }
+          );
+        }
+
+        authEmail = clubUser.email;
+      } else {
+        authEmail = email.toLowerCase();
+      }
       expectedRole = "club";
     }
     // ==================== LIVING GROUP SIGNIN ====================

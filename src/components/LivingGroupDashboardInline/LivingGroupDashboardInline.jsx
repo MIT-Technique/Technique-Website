@@ -60,6 +60,12 @@ export default function LivingGroupDashboardInline({ livingGroupId, onBack }) {
   const [removingLeaderId, setRemovingLeaderId] = useState(null);
   const [leadersMessage, setLeadersMessage] = useState({ type: '', text: '' });
 
+  // Time assignment state (for dorms with multiple sections)
+  const [timeAssignments, setTimeAssignments] = useState({}); // { photoshootTimeId: { 'HH:mm-HH:mm': sectionName } }
+  const [assignmentsLoading, setAssignmentsLoading] = useState(false);
+  const [savingSlot, setSavingSlot] = useState(null); // 'photoshootTimeId-slotKey' being saved
+  const [bookedTimes, setBookedTimes] = useState([]);
+
   // Fetch data on mount
   useEffect(() => {
     if (livingGroupId) {
@@ -170,6 +176,111 @@ export default function LivingGroupDashboardInline({ livingGroupId, onBack }) {
       console.error('Error fetching leaders:', error);
     }
   }
+
+  async function fetchBookedTimes() {
+    try {
+      const res = await fetch(`/api/living-groups/times?livingGroupId=${livingGroupId}&status=booked`);
+      const data = await res.json();
+      setBookedTimes(data.times || []);
+    } catch (error) {
+      console.error('Error fetching booked times:', error);
+    }
+  }
+
+  async function fetchTimeAssignments() {
+    if (!livingGroupId) return;
+    try {
+      setAssignmentsLoading(true);
+      const res = await fetch(`/api/living-groups/time-assignments?livingGroupId=${livingGroupId}`);
+      const data = await res.json();
+
+      // Convert array to map: { photoshootTimeId: { 'slotStart-slotEnd': sectionName } }
+      const assignmentsMap = {};
+      (data.assignments || []).forEach(a => {
+        if (!assignmentsMap[a.photoshootTimeId]) {
+          assignmentsMap[a.photoshootTimeId] = {};
+        }
+        const slotKey = `${a.slotStart}-${a.slotEnd}`;
+        assignmentsMap[a.photoshootTimeId][slotKey] = a.sectionName || '';
+      });
+      setTimeAssignments(assignmentsMap);
+    } catch (error) {
+      console.error('Error fetching time assignments:', error);
+    } finally {
+      setAssignmentsLoading(false);
+    }
+  }
+
+  // Generate 30-minute slots for a time range
+  function generateSlots(startTime, endTime) {
+    const slots = [];
+    const [startH, startM] = startTime.split(':').map(Number);
+    const [endH, endM] = endTime.split(':').map(Number);
+
+    let h = startH;
+    let m = startM;
+
+    // Round to nearest 30-min boundary
+    if (m !== 0 && m !== 30) {
+      m = m < 30 ? 30 : 0;
+      if (m === 0) h++;
+    }
+
+    while (h < endH || (h === endH && m < endM)) {
+      const slotStart = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+      m += 30;
+      if (m >= 60) { m = 0; h++; }
+      const slotEnd = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+      slots.push({ start: slotStart, end: slotEnd });
+    }
+    return slots;
+  }
+
+  async function handleAssignSection(photoshootTimeId, slotStart, slotEnd, sectionName) {
+    const slotKey = `${slotStart}-${slotEnd}`;
+    setSavingSlot(`${photoshootTimeId}-${slotKey}`);
+
+    try {
+      const res = await fetch('/api/living-groups/time-assignments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          photoshootTimeId,
+          livingGroupId,
+          sectionName: sectionName || null,
+          slotStart,
+          slotEnd,
+        }),
+      });
+
+      if (res.ok) {
+        // Update local state
+        setTimeAssignments(prev => ({
+          ...prev,
+          [photoshootTimeId]: {
+            ...(prev[photoshootTimeId] || {}),
+            [slotKey]: sectionName || '',
+          },
+        }));
+        setMessage({ type: 'success', text: t('assign.saved') });
+      } else {
+        const data = await res.json();
+        setMessage({ type: 'error', text: data.error || t('assign.saveError') });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: t('assign.saveError') });
+    } finally {
+      setSavingSlot(null);
+    }
+  }
+
+  // Fetch booked times and assignments when Assign tab is active
+  useEffect(() => {
+    if (activeTab === 'assign' && livingGroupId && livingGroup?.living_group_type === 'dorm' && sections.length > 1) {
+      fetchBookedTimes();
+      fetchTimeAssignments();
+    }
+  }, [activeTab, livingGroupId, sections.length, livingGroup?.living_group_type]);
 
   async function handleBookTime(timeId) {
     setBookingTime(timeId);
@@ -424,8 +535,7 @@ export default function LivingGroupDashboardInline({ livingGroupId, onBack }) {
   }
 
   tabs.push(
-    { id: 'members', label: t('tabs.members') },
-    { id: 'groupLeaders', label: t('tabs.groupLeaders') }
+    { id: 'members', label: t('tabs.members') }
   );
 
   // Add join requests tab for FSILGs
@@ -712,15 +822,94 @@ export default function LivingGroupDashboardInline({ livingGroupId, onBack }) {
       )}
 
       {/* Assign Tab */}
-      {activeTab === 'assign' && (
+      {activeTab === 'assign' && livingGroup?.living_group_type === 'dorm' && sections.length > 1 && (
         <div>
           <h3 className="text-lg font-medium mb-4">{t('assign.title')}</h3>
           <p className="text-text-secondary mb-4">{t('assign.description')}</p>
 
-          {/* Placeholder for now - full implementation would show time slots */}
-          <div className="p-4 border border-border rounded-lg bg-gray-50">
-            <p className="text-text-secondary">{t('assign.comingSoon')}</p>
-          </div>
+          {/* Sections waiting to be assigned */}
+          {bookedTimes.length > 0 && !assignmentsLoading && (() => {
+            // Get all sections that haven't been assigned to any slot in any booked time
+            const allAssignedSections = new Set();
+            bookedTimes.forEach(bt => {
+              const assignments = timeAssignments[bt.id] || {};
+              Object.values(assignments).forEach(sectionName => {
+                if (sectionName) allAssignedSections.add(sectionName);
+              });
+            });
+            const unassigned = sections.filter(s => !allAssignedSections.has(s.name));
+
+            if (unassigned.length > 0) {
+              return (
+                <div className="mb-6 p-3 bg-yellow-50 border border-yellow-200 rounded">
+                  <p className="text-sm text-yellow-800 pb-0">
+                    <span className="font-medium">{t('assign.unassignedSections')}</span>{' '}
+                    {unassigned.map(s => s.name).join(', ')}
+                  </p>
+                </div>
+              );
+            }
+            return (
+              <div className="mb-6 p-3 bg-green-50 border border-green-200 rounded">
+                <p className="text-sm font-medium text-green-800">{t('assign.allAssigned')}</p>
+              </div>
+            );
+          })()}
+
+          {bookedTimes.length === 0 ? (
+            <p className="text-text-secondary">{t('assign.noBooking')}</p>
+          ) : (
+            <div className="space-y-4">
+              {bookedTimes.map((bookedTime) => (
+                <div key={bookedTime.id} className="bg-white border border-border rounded-lg p-6">
+                  <div className="mb-4">
+                    <p className="font-medium">{formatDate(bookedTime.date)}</p>
+                    <p className="text-text-secondary text-sm">
+                      {formatTime(bookedTime.start_time)} - {formatTime(bookedTime.end_time)} EST
+                    </p>
+                  </div>
+
+                  {assignmentsLoading ? (
+                    <p className="text-text-muted text-sm">Loading...</p>
+                  ) : (
+                    <div className="space-y-2">
+                      <div className="grid grid-cols-[100px_1fr] gap-2 text-xs font-medium text-text-muted uppercase mb-2">
+                        <span>{t('assign.slot')}</span>
+                        <span>{t('assign.section')}</span>
+                      </div>
+                      {generateSlots(bookedTime.start_time, bookedTime.end_time).map((slot) => {
+                        const slotKey = `${slot.start}-${slot.end}`;
+                        const currentAssignment = timeAssignments[bookedTime.id]?.[slotKey] || '';
+                        const isSaving = savingSlot === `${bookedTime.id}-${slotKey}`;
+
+                        return (
+                          <div key={slotKey} className="grid grid-cols-[100px_1fr] gap-2 items-center">
+                            <span className="text-sm font-medium">
+                              {formatTime(slot.start)} - {formatTime(slot.end)}
+                            </span>
+                            <div className="flex items-center gap-2">
+                              <select
+                                value={currentAssignment}
+                                onChange={(e) => handleAssignSection(bookedTime.id, slot.start, slot.end, e.target.value)}
+                                disabled={isSaving || isFrozen}
+                                className="flex-1 px-3 py-1.5 border border-border rounded text-sm disabled:opacity-50"
+                              >
+                                <option value="">{t('assign.notAssigned')}</option>
+                                {sections.map((section) => (
+                                  <option key={section.name} value={section.name}>{section.name}</option>
+                                ))}
+                              </select>
+                              {isSaving && <span className="text-xs text-text-muted">{t('assign.saving')}</span>}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -785,103 +974,6 @@ export default function LivingGroupDashboardInline({ livingGroupId, onBack }) {
             </div>
           ) : (
             <p className="text-text-secondary">{t('members.noMembers')}</p>
-          )}
-        </div>
-      )}
-
-      {/* Group Leaders Tab */}
-      {activeTab === 'groupLeaders' && (
-        <div>
-          <h3 className="text-lg font-medium mb-2">{t('groupLeaders.title')}</h3>
-          <p className="text-text-secondary mb-6">{t('groupLeaders.description')}</p>
-
-          {leadersMessage.text && (
-            <div className={`mb-6 p-4 rounded ${
-              leadersMessage.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
-            }`}>
-              {leadersMessage.text}
-            </div>
-          )}
-
-          {/* Invite Form */}
-          <div className="mb-8">
-            <h4 className="text-md font-medium mb-3">{t('groupLeaders.inviteLeader')}</h4>
-            <form onSubmit={handleInviteLeader} className="flex gap-2 max-w-md">
-              <input
-                type="email"
-                value={inviteLeaderEmail}
-                onChange={(e) => setInviteLeaderEmail(e.target.value)}
-                placeholder={t('groupLeaders.searchPlaceholder')}
-                className="flex-1 border border-border rounded px-4 py-2"
-              />
-              <button
-                type="submit"
-                disabled={invitingLeader}
-                className="btn-primary"
-              >
-                {invitingLeader ? t('groupLeaders.inviting') : t('groupLeaders.invite')}
-              </button>
-            </form>
-          </div>
-
-          {/* Current Leaders */}
-          <div className="mb-8">
-            <h4 className="text-md font-medium mb-3">{t('groupLeaders.currentLeaders')}</h4>
-            {leaders.activeLeaders.length === 0 ? (
-              <p className="text-text-secondary">{t('groupLeaders.noLeaders')}</p>
-            ) : (
-              <div className="space-y-2">
-                {leaders.activeLeaders.map((leader) => (
-                  <div
-                    key={leader.id}
-                    className="p-4 border border-green-200 bg-green-50 rounded-lg flex justify-between items-center"
-                  >
-                    <div>
-                      <p className="font-medium">
-                        {leader.user?.first_name} {leader.user?.last_name}
-                      </p>
-                      <p className="text-text-secondary text-sm">{leader.user?.email}</p>
-                    </div>
-                    <button
-                      onClick={() => handleRemoveLeader(leader.id)}
-                      disabled={removingLeaderId === leader.id}
-                      className="text-sm text-red-600 hover:text-red-700"
-                    >
-                      {removingLeaderId === leader.id ? t('groupLeaders.removing') : t('groupLeaders.remove')}
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Pending Invitations */}
-          {leaders.pendingInvitations.length > 0 && (
-            <div>
-              <h4 className="text-md font-medium mb-3">{t('groupLeaders.pendingInvitations')}</h4>
-              <div className="space-y-2">
-                {leaders.pendingInvitations.map((invitation) => (
-                  <div
-                    key={invitation.id}
-                    className="p-4 border border-yellow-200 bg-yellow-50 rounded-lg flex justify-between items-center"
-                  >
-                    <div>
-                      <p className="font-medium">
-                        {invitation.user?.first_name} {invitation.user?.last_name}
-                      </p>
-                      <p className="text-text-secondary text-sm">{invitation.user?.email}</p>
-                    </div>
-                    <button
-                      onClick={() => handleCancelLeaderInvitation(invitation.id)}
-                      disabled={removingLeaderId === invitation.id}
-                      className="text-sm text-red-600 hover:text-red-700"
-                    >
-                      {removingLeaderId === invitation.id ? t('groupLeaders.cancelling') : t('groupLeaders.cancel')}
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
           )}
         </div>
       )}

@@ -24,6 +24,10 @@ export default function ClubPage() {
   const [message, setMessage] = useState({ type: '', text: '' });
   const [isFrozen, setIsFrozen] = useState(false);
 
+  // Email state
+  const [clubEmail, setClubEmail] = useState('');
+  const [savingEmail, setSavingEmail] = useState(false);
+
   // Members state
   const [activeMembers, setActiveMembers] = useState([]);
   const [manualMembers, setManualMembers] = useState([]);
@@ -75,6 +79,16 @@ export default function ClubPage() {
   const [documentsMessage, setDocumentsMessage] = useState({ type: '', text: '' });
   const [documentsLoading, setDocumentsLoading] = useState(true);
 
+  // Password change state
+  const [passwordData, setPasswordData] = useState({
+    oldPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+  const [passwordErrors, setPasswordErrors] = useState({});
+  const [savingPassword, setSavingPassword] = useState(false);
+  const [passwordMessage, setPasswordMessage] = useState({ type: '', text: '' });
+
   useEffect(() => {
     if (!userLoading && (!isLoggedIn || user?.role !== 'club')) {
       router.push(`/${locale}/login`);
@@ -112,8 +126,105 @@ export default function ClubPage() {
       fetchLeaderRequests();
       fetchPendingInvitations();
       fetchDocuments();
+      fetchClubEmail();
     }
   }, [isLoggedIn, user]);
+
+  async function fetchClubEmail() {
+    try {
+      const res = await fetch('/api/clubs/email');
+      const data = await res.json();
+      if (res.ok && data.email) {
+        setClubEmail(data.email);
+      }
+    } catch (error) {
+      console.error('Error fetching club email:', error);
+    }
+  }
+
+  async function handleSaveEmail() {
+    setSavingEmail(true);
+    setMessage({ type: '', text: '' });
+
+    try {
+      const res = await fetch('/api/clubs/email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: clubEmail.trim() }),
+      });
+
+      if (res.ok) {
+        setMessage({ type: 'success', text: t('email.saved') });
+      } else {
+        const data = await res.json();
+        setMessage({ type: 'error', text: data.error || t('email.error') });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: t('email.error') });
+    } finally {
+      setSavingEmail(false);
+    }
+  }
+
+  // Password validation
+  function validatePassword(password) {
+    const errors = [];
+    if (password.length < 8) errors.push(t('password.minLength'));
+    if (!/[A-Z]/.test(password)) errors.push(t('password.uppercase'));
+    if (!/[a-z]/.test(password)) errors.push(t('password.lowercase'));
+    if (!/[0-9]/.test(password)) errors.push(t('password.number'));
+    if (!/[!@#$%^&*(),.?":{}|<>_\-+=\[\]\\\/`~;']/.test(password)) errors.push(t('password.symbol'));
+    return errors;
+  }
+
+  async function handleChangePassword(e) {
+    e.preventDefault();
+    setPasswordMessage({ type: '', text: '' });
+    setPasswordErrors({});
+
+    // Validate new password
+    const validationErrors = validatePassword(passwordData.newPassword);
+    if (validationErrors.length > 0) {
+      setPasswordErrors({ newPassword: validationErrors });
+      return;
+    }
+
+    // Check passwords match
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setPasswordErrors({ confirmPassword: [t('password.mismatch')] });
+      return;
+    }
+
+    setSavingPassword(true);
+    try {
+      const res = await fetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          oldPassword: passwordData.oldPassword,
+          newPassword: passwordData.newPassword,
+          orgType: 'club',
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setPasswordMessage({ type: 'success', text: t('password.changed') });
+        setPasswordData({ oldPassword: '', newPassword: '', confirmPassword: '' });
+      } else {
+        if (data.code === 'INVALID_OLD_PASSWORD') {
+          setPasswordMessage({ type: 'error', text: t('password.wrongOldPassword') });
+        } else {
+          setPasswordMessage({ type: 'error', text: data.error || t('password.error') });
+        }
+      }
+    } catch (error) {
+      setPasswordMessage({ type: 'error', text: t('password.error') });
+    } finally {
+      setSavingPassword(false);
+    }
+  }
 
   // Debounced search for leader onboarding
   useEffect(() => {
@@ -627,11 +738,10 @@ export default function ClubPage() {
     <>
       <main className="min-h-screen pt-24 lg:pt-32 pb-12">
         <section className="container-text">
-          <h1 className="mb-4">{t('title')}</h1>
+          <h1 className="mb-2">{t('title')}</h1>
           <p className="text-text-secondary mb-8">
-            {t('welcome', { email: user?.email })}
+            {t('welcome', { name: club?.name || '' })}
           </p>
-
 
           {/* Leader Required Warning - shown above tabs when no leader */}
           {club && !club.has_leader && (
@@ -732,24 +842,28 @@ export default function ClubPage() {
                 </div>
               )}
 
-              {club && (
-                <div className="mb-6 p-3 bg-gray-50 border border-gray-200 rounded-lg">
-                  <p className="text-sm text-text-secondary pb-0">
-                    {t('clubId')}: <span className="font-mono">{club.club_id}</span>
-                  </p>
-                </div>
-              )}
-
               <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Email Section */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">{t('form.name')}</label>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    className="w-full border border-border rounded px-4 py-2 bg-gray-100 text-gray-500 cursor-not-allowed"
-                    disabled
-                    readOnly
-                  />
+                  <label className="block text-sm font-medium mb-2">{t('email.title')}</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="email"
+                      value={clubEmail}
+                      onChange={(e) => setClubEmail(e.target.value)}
+                      placeholder={t('email.placeholder')}
+                      className="flex-1 border border-border rounded px-4 py-2"
+                      disabled={isFrozen}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleSaveEmail}
+                      disabled={savingEmail || isFrozen}
+                      className="px-4 py-2 bg-[#750014] text-white rounded hover:bg-[#5C0010] disabled:opacity-50 whitespace-nowrap"
+                    >
+                      {savingEmail ? '...' : t('email.save')}
+                    </button>
+                  </div>
                 </div>
 
                 <div>
@@ -798,6 +912,73 @@ export default function ClubPage() {
                   {saving ? t('saving') : t('save')}
                 </button>
               </form>
+
+              {/* Change Password Section */}
+              <div className="mt-8 pt-8 border-t border-border">
+                <h3 className="text-lg font-medium mb-4">{t('password.title')}</h3>
+
+                {passwordMessage.text && (
+                  <div className={`mb-6 p-4 rounded ${
+                    passwordMessage.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
+                  }`}>
+                    {passwordMessage.text}
+                  </div>
+                )}
+
+                <form onSubmit={handleChangePassword} className="space-y-4 max-w-md">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">{t('password.oldPassword')}</label>
+                    <input
+                      type="password"
+                      value={passwordData.oldPassword}
+                      onChange={(e) => setPasswordData({ ...passwordData, oldPassword: e.target.value })}
+                      className="w-full border border-border rounded px-4 py-2"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">{t('password.newPassword')}</label>
+                    <input
+                      type="password"
+                      value={passwordData.newPassword}
+                      onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                      className={`w-full border rounded px-4 py-2 ${passwordErrors.newPassword ? 'border-red-500' : 'border-border'}`}
+                      required
+                    />
+                    {passwordErrors.newPassword && (
+                      <ul className="mt-2 text-sm text-red-600 list-disc list-inside">
+                        {passwordErrors.newPassword.map((err, i) => (
+                          <li key={i}>{err}</li>
+                        ))}
+                      </ul>
+                    )}
+                    <p className="mt-2 text-xs text-text-muted">{t('password.requirements')}</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">{t('password.confirmPassword')}</label>
+                    <input
+                      type="password"
+                      value={passwordData.confirmPassword}
+                      onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                      className={`w-full border rounded px-4 py-2 ${passwordErrors.confirmPassword ? 'border-red-500' : 'border-border'}`}
+                      required
+                    />
+                    {passwordErrors.confirmPassword && (
+                      <p className="mt-2 text-sm text-red-600">{passwordErrors.confirmPassword[0]}</p>
+                    )}
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={savingPassword}
+                    className="btn-primary"
+                  >
+                    {savingPassword ? t('password.saving') : t('password.changeButton')}
+                  </button>
+                </form>
+              </div>
             </div>
           )}
 

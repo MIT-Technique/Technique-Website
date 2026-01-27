@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -8,35 +8,18 @@ import {
   Box,
   TextField,
   Button,
-  Tabs,
-  Tab,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Alert,
   CircularProgress,
   IconButton,
   Typography,
-  ToggleButtonGroup,
-  ToggleButton,
+  Autocomplete,
+  Paper,
+  Popper,
+  ClickAwayListener,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { useTranslations, useLocale } from "next-intl";
-
-const DORM_OPTIONS = [
-  "Baker House",
-  "Burton-Conner House",
-  "East Campus",
-  "Macgregor House",
-  "Maseeh Hall",
-  "McCormick Hall",
-  "New House",
-  "New Vassar",
-  "Next House",
-  "Random Hall",
-  "Simmons Hall",
-];
 
 const textFieldSx = {
   "& .MuiOutlinedInput-root": {
@@ -65,56 +48,28 @@ const linkButtonSx = {
   "&:hover": { backgroundColor: "transparent", textDecoration: "underline" },
 };
 
-const toggleButtonGroupSx = {
-  mb: 3,
-  width: "100%",
-  "& .MuiToggleButton-root": {
-    flex: 1,
-    textTransform: "none",
-    fontWeight: 500,
-    borderColor: "#E5E5E5",
-    "&.Mui-selected": {
-      backgroundColor: "#750014",
-      color: "white",
-      "&:hover": {
-        backgroundColor: "#5C0010",
-      },
-    },
-  },
-};
-
 export default function OrganizationAuthModal({ open, onClose }) {
   const t = useTranslations("pages.login.org");
   const locale = useLocale();
 
-  // View state: 'signIn' or 'signUp'
-  const [view, setView] = useState("signIn");
+  // Organizations list
+  const [organizations, setOrganizations] = useState([]);
+  const [loadingOrgs, setLoadingOrgs] = useState(false);
 
-  // Common fields
-  const [email, setEmail] = useState("");
+  // Form fields
+  const [selectedOrg, setSelectedOrg] = useState(null);
+  const [inputValue, setInputValue] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
 
-  // Sign in specific - org type toggle for sign in
-  const [signInOrgType, setSignInOrgType] = useState("club");
-  const [signInName, setSignInName] = useState(""); // For living group sign in
-
-  // Sign up specific fields
-  const [orgType, setOrgType] = useState("club");
-  const [clubName, setClubName] = useState("");
-  const [livingGroupType, setLivingGroupType] = useState("");
-  const [dormName, setDormName] = useState("");
-  const [fsilgName, setFsilgName] = useState("");
-
-  // Dorm availability check
-  const [takenDorms, setTakenDorms] = useState([]);
-  const [loadingAvailability, setLoadingAvailability] = useState(false);
+  // Dropdown state
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [dropdownSearch, setDropdownSearch] = useState("");
+  const dropdownAnchorRef = useRef(null);
 
   // Forgot password state
   const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const [forgotOrgType, setForgotOrgType] = useState("club");
-  const [forgotEmail, setForgotEmail] = useState("");
-  const [forgotName, setForgotName] = useState("");
+  const [forgotSelectedOrg, setForgotSelectedOrg] = useState(null);
+  const [forgotInputValue, setForgotInputValue] = useState("");
 
   // UI state
   const [loading, setLoading] = useState(false);
@@ -125,129 +80,79 @@ export default function OrganizationAuthModal({ open, onClose }) {
   const [fieldErrors, setFieldErrors] = useState({});
   const [touched, setTouched] = useState({});
 
-  // Fetch dorm availability when sign up view opens with living group selected
+  // Fetch organizations when modal opens
   useEffect(() => {
-    if (open && view === "signUp" && orgType === "living_group") {
-      fetchDormAvailability();
+    if (open) {
+      fetchOrganizations();
     }
-  }, [open, view, orgType]);
+  }, [open]);
 
-  const fetchDormAvailability = async () => {
-    setLoadingAvailability(true);
+  const fetchOrganizations = async () => {
+    setLoadingOrgs(true);
     try {
-      const res = await fetch("/api/living-groups/check-availability");
+      const res = await fetch("/api/organizations/list");
       const data = await res.json();
-      if (data.takenDorms) {
-        setTakenDorms(data.takenDorms);
+      if (data.organizations) {
+        setOrganizations(data.organizations);
       }
     } catch (err) {
-      console.error("Failed to check dorm availability:", err);
+      console.error("Failed to fetch organizations:", err);
     } finally {
-      setLoadingAvailability(false);
+      setLoadingOrgs(false);
     }
   };
 
+  // Sort and group organizations - clubs first, then living groups, alphabetically within each group
+  const sortedOrganizations = useMemo(() => {
+    return [...organizations].sort((a, b) => {
+      // First sort by type (clubs before living groups)
+      if (a.type !== b.type) {
+        return a.type === "club" ? -1 : 1;
+      }
+      // Then sort alphabetically by name
+      return a.name.localeCompare(b.name);
+    });
+  }, [organizations]);
+
+  // Get group label for an organization
+  const getGroupLabel = (option) => {
+    return option.type === "club" ? t("clubsGroup") : t("livingGroupsGroup");
+  };
+
   const resetForm = () => {
-    setEmail("");
+    setSelectedOrg(null);
+    setInputValue("");
     setPassword("");
-    setConfirmPassword("");
-    setOrgType("club");
-    setSignInOrgType("club");
-    setSignInName("");
-    setClubName("");
-    setLivingGroupType("");
-    setDormName("");
-    setFsilgName("");
     setError("");
     setSuccess("");
     setShowForgotPassword(false);
-    setForgotOrgType("club");
-    setForgotEmail("");
-    setForgotName("");
+    setForgotSelectedOrg(null);
+    setForgotInputValue("");
     setFieldErrors({});
     setTouched({});
+    setShowDropdown(false);
+    setDropdownSearch("");
   };
 
   const handleClose = () => {
     resetForm();
-    setView("signIn");
     onClose();
   };
 
-  const switchView = (newView) => {
-    setView(newView);
-    setError("");
-    setSuccess("");
-  };
-
-  const validateEmail = (email) => {
-    if (!email) return t("emailRequired");
-    if (!email.toLowerCase().endsWith("@mit.edu")) return t("emailInvalid");
-    return null;
-  };
-
   const validateSignIn = () => {
-    if (signInOrgType === "club") {
-      const emailError = validateEmail(email);
-      if (emailError) return emailError;
-    } else {
-      if (!signInName.trim()) return t("livingGroupNameRequired");
-    }
+    if (!inputValue.trim()) return t("organizationRequired");
     if (!password) return t("passwordRequired");
-    return null;
-  };
-
-  const validateSignUp = () => {
-    if (!password) return t("passwordRequired");
-    const hasNumberOrSymbol = /[0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
-    if (password.length < 8 || !hasNumberOrSymbol) return t("passwordMin");
-    if (password !== confirmPassword) return t("passwordMismatch");
-
-    if (orgType === "club") {
-      const emailError = validateEmail(email);
-      if (emailError) return emailError;
-      if (!clubName.trim()) return t("clubNameRequired");
-    } else {
-      // Living group - no email required
-      if (!livingGroupType) return t("livingGroupTypeRequired");
-      if (livingGroupType === "dorm" && !dormName) return t("dormRequired");
-      if (livingGroupType === "fsilg" && !fsilgName.trim()) return t("fsilgNameRequired");
-    }
     return null;
   };
 
   // Field-level validation
   const validateField = (field, value) => {
     switch (field) {
-      case "email":
-      case "forgotEmail":
-        if (!value) return t("emailRequired");
-        if (!value.toLowerCase().endsWith("@mit.edu")) return t("emailInvalid");
+      case "organization":
+        if (!value || !value.trim()) return t("organizationRequired");
         return null;
       case "password":
         if (!value) return t("passwordRequired");
-        const hasNumberOrSymbol = /[0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value);
-        if (value.length < 8 || !hasNumberOrSymbol) return t("passwordMin");
-        return null;
-      case "confirmPassword":
-        if (!value) return t("passwordRequired");
-        if (value !== password) return t("passwordMismatch");
-        return null;
-      case "clubName":
-        if (!value.trim()) return t("clubNameRequired");
-        return null;
-      case "livingGroupType":
-        if (!value) return t("livingGroupTypeRequired");
-        return null;
-      case "dormName":
-        if (!value) return t("dormRequired");
-        return null;
-      case "fsilgName":
-        if (!value.trim()) return t("fsilgNameRequired");
-        return null;
-      case "signInName":
-      case "forgotName":
-        if (!value.trim()) return t("livingGroupNameRequired");
         return null;
       default:
         return null;
@@ -258,6 +163,24 @@ export default function OrganizationAuthModal({ open, onClose }) {
     setTouched((prev) => ({ ...prev, [field]: true }));
     const error = validateField(field, value);
     setFieldErrors((prev) => ({ ...prev, [field]: error }));
+  };
+
+  // Filter organizations for dropdown based on search
+  const filteredDropdownOrgs = useMemo(() => {
+    if (!dropdownSearch.trim()) return sortedOrganizations;
+    const search = dropdownSearch.toLowerCase();
+    return sortedOrganizations.filter(org =>
+      org.name.toLowerCase().includes(search)
+    );
+  }, [sortedOrganizations, dropdownSearch]);
+
+  // Select organization from dropdown
+  const handleSelectOrg = (org) => {
+    setInputValue(org.name);
+    setSelectedOrg(org);
+    setShowDropdown(false);
+    setDropdownSearch("");
+    setFieldErrors((prev) => ({ ...prev, organization: null }));
   };
 
   const handleSignIn = async (e) => {
@@ -271,18 +194,24 @@ export default function OrganizationAuthModal({ open, onClose }) {
       return;
     }
 
+    // Find org by name if user typed manually (case-insensitive)
+    let orgToUse = selectedOrg;
+    if (!orgToUse || orgToUse.name.toLowerCase() !== inputValue.trim().toLowerCase()) {
+      const foundOrg = organizations.find(
+        org => org.name.toLowerCase() === inputValue.trim().toLowerCase()
+      );
+      if (foundOrg) {
+        orgToUse = foundOrg;
+      }
+    }
+
     setLoading(true);
     try {
       const payload = {
         password,
-        orgType: signInOrgType,
+        orgType: orgToUse?.type || "club", // Default to club, API will handle validation
+        name: inputValue.trim(),
       };
-
-      if (signInOrgType === "club") {
-        payload.email = email;
-      } else {
-        payload.name = signInName.trim();
-      }
 
       const res = await fetch("/api/auth/org-signin", {
         method: "POST",
@@ -297,15 +226,15 @@ export default function OrganizationAuthModal({ open, onClose }) {
           setError(t("emailNotVerified"));
         } else if (data.code === "INVALID_CREDENTIALS") {
           setError(t("invalidCredentials"));
-        } else if (data.code === "LG_NOT_FOUND") {
-          setError(t("livingGroupNotFound"));
+        } else if (data.code === "LG_NOT_FOUND" || data.code === "CLUB_NOT_FOUND") {
+          setError(t("organizationNotFound"));
         } else {
           setError(data.error || t("invalidCredentials"));
         }
         return;
       }
 
-      setSuccess(t("signInSuccess"));
+      setSuccess(t("successRedirecting"));
       setTimeout(() => {
         if (data.redirectUrl) {
           window.location.href = data.redirectUrl;
@@ -318,124 +247,22 @@ export default function OrganizationAuthModal({ open, onClose }) {
     }
   };
 
-  const handleSignUp = async (e) => {
+  const handleForgotPassword = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
 
-    const validationError = validateSignUp();
-    if (validationError) {
-      setError(validationError);
+    if (!forgotSelectedOrg) {
+      setError(t("organizationRequired"));
       return;
     }
 
     setLoading(true);
     try {
       const payload = {
-        password,
-        organizationType: orgType,
+        orgType: forgotSelectedOrg.type,
+        name: forgotSelectedOrg.name,
       };
-
-      if (orgType === "club") {
-        payload.email = email;
-        payload.clubName = clubName.trim();
-      } else {
-        // Living group - no email needed
-        payload.livingGroupType = livingGroupType;
-        if (livingGroupType === "dorm") {
-          payload.dormName = dormName;
-        } else {
-          payload.fsilgName = fsilgName.trim();
-        }
-      }
-
-      const res = await fetch("/api/auth/org-signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        if (data.code === "EMAIL_EXISTS") {
-          setError(t("accountExists"));
-        } else if (data.code === "CLUB_NAME_EXISTS") {
-          setError(t("clubNameExists"));
-        } else if (data.code === "LG_NAME_EXISTS") {
-          setError(t("livingGroupNameExists"));
-        } else {
-          setError(data.error || "Sign up failed");
-        }
-        return;
-      }
-
-      // Different success message and redirect for clubs vs living groups
-      if (orgType === "club") {
-        setSuccess(t("signUpSuccess"));
-        // Clubs need email verification, so don't redirect immediately
-      } else {
-        setSuccess(t("signUpSuccessLivingGroup"));
-        // Living groups don't need email verification, auto-sign in and redirect
-        // Get the name used for signup
-        const lgName = livingGroupType === "dorm" ? dormName : fsilgName.trim();
-        try {
-          const signInRes = await fetch("/api/auth/org-signin", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              password,
-              orgType: "living_group",
-              name: lgName,
-            }),
-          });
-
-          if (signInRes.ok) {
-            setTimeout(() => {
-              window.location.href = `/${locale}/living-group`;
-            }, 1000);
-          }
-        } catch (signInErr) {
-          // If auto-signin fails, they can still sign in manually
-          console.error("Auto sign-in failed:", signInErr);
-        }
-      }
-    } catch (err) {
-      setError("Sign up failed");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleForgotPassword = async (e) => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
-
-    if (forgotOrgType === "club") {
-      const emailError = validateEmail(forgotEmail);
-      if (emailError) {
-        setError(emailError);
-        return;
-      }
-    } else {
-      if (!forgotName.trim()) {
-        setError(t("livingGroupNameRequired"));
-        return;
-      }
-    }
-
-    setLoading(true);
-    try {
-      const payload = {
-        orgType: forgotOrgType,
-      };
-
-      if (forgotOrgType === "club") {
-        payload.email = forgotEmail;
-      } else {
-        payload.name = forgotName.trim();
-      }
 
       const res = await fetch("/api/auth/org-forgot-password", {
         method: "POST",
@@ -451,7 +278,7 @@ export default function OrganizationAuthModal({ open, onClose }) {
       }
 
       // Show success message
-      if (forgotOrgType === "club") {
+      if (forgotSelectedOrg.type === "club") {
         setSuccess(t("resetLinkSent"));
       } else {
         setSuccess(data.message || t("resetSentToLeader"));
@@ -462,6 +289,17 @@ export default function OrganizationAuthModal({ open, onClose }) {
       setLoading(false);
     }
   };
+
+  // Custom Paper component for Autocomplete dropdown with max 3 visible items
+  const CustomPaper = (props) => (
+    <Paper
+      {...props}
+      sx={{
+        maxHeight: 180, // Allow room for group headers + 3 items
+        overflow: "auto",
+      }}
+    />
+  );
 
   // Forgot Password View
   if (showForgotPassword) {
@@ -486,29 +324,6 @@ export default function OrganizationAuthModal({ open, onClose }) {
             {t("forgotPasswordDescription")}
           </Typography>
 
-          {/* Organization Type Toggle */}
-          <ToggleButtonGroup
-            value={forgotOrgType}
-            exclusive
-            onChange={(e, value) => {
-              if (value) {
-                setForgotOrgType(value);
-                setError("");
-                setSuccess("");
-              }
-            }}
-            sx={toggleButtonGroupSx}
-          >
-            <ToggleButton value="club">{t("signInOrgTypeClub")}</ToggleButton>
-            <ToggleButton value="living_group">{t("signInOrgTypeLivingGroup")}</ToggleButton>
-          </ToggleButtonGroup>
-
-          {forgotOrgType === "living_group" && (
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2, fontSize: "0.85rem" }}>
-              {t("forgotPasswordLivingGroupInfo")}
-            </Typography>
-          )}
-
           {error && (
             <Alert severity="error" sx={{ mb: 2 }}>
               {error}
@@ -521,39 +336,79 @@ export default function OrganizationAuthModal({ open, onClose }) {
           )}
 
           <Box component="form" onSubmit={handleForgotPassword}>
-            {forgotOrgType === "club" ? (
-              <TextField
-                fullWidth
-                label={t("email")}
-                placeholder={t("emailPlaceholder")}
-                value={forgotEmail}
-                onChange={(e) => setForgotEmail(e.target.value)}
-                onBlur={() => handleBlur("forgotEmail", forgotEmail)}
-                error={touched.forgotEmail && !!fieldErrors.forgotEmail}
-                helperText={touched.forgotEmail && fieldErrors.forgotEmail}
-                sx={{ ...textFieldSx, mb: 3 }}
-                disabled={loading || success}
-              />
-            ) : (
-              <TextField
-                fullWidth
-                label={t("livingGroupName")}
-                placeholder={t("livingGroupNamePlaceholder")}
-                value={forgotName}
-                onChange={(e) => setForgotName(e.target.value)}
-                onBlur={() => handleBlur("forgotName", forgotName)}
-                error={touched.forgotName && !!fieldErrors.forgotName}
-                helperText={touched.forgotName && fieldErrors.forgotName}
-                sx={{ ...textFieldSx, mb: 3 }}
-                disabled={loading || success}
-              />
+            <Autocomplete
+              options={sortedOrganizations}
+              groupBy={getGroupLabel}
+              getOptionLabel={(option) => option.name || ""}
+              value={forgotSelectedOrg}
+              onChange={(event, newValue) => {
+                setForgotSelectedOrg(newValue);
+              }}
+              inputValue={forgotInputValue}
+              onInputChange={(event, newInputValue) => {
+                setForgotInputValue(newInputValue);
+              }}
+              loading={loadingOrgs}
+              PaperComponent={CustomPaper}
+              renderGroup={(params) => (
+                <li key={params.key}>
+                  <Typography
+                    sx={{
+                      position: "sticky",
+                      top: 0,
+                      padding: "8px 16px",
+                      backgroundColor: "#f5f5f5",
+                      fontWeight: 600,
+                      fontSize: "0.75rem",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.05em",
+                      color: "#666",
+                      borderBottom: "1px solid #e0e0e0",
+                    }}
+                  >
+                    {params.group}
+                  </Typography>
+                  <ul style={{ padding: 0, margin: 0 }}>{params.children}</ul>
+                </li>
+              )}
+              renderOption={(props, option) => (
+                <li {...props} key={option.id} style={{ paddingTop: '10px', paddingBottom: '6px' }}>
+                  <Typography variant="body1">{option.name}</Typography>
+                </li>
+              )}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label={t("selectOrganization")}
+                  placeholder={t("searchOrganization")}
+                  sx={{ ...textFieldSx, mb: 3 }}
+                  disabled={loading || success}
+                  InputProps={{
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {loadingOrgs ? <CircularProgress color="inherit" size={20} /> : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    ),
+                  }}
+                />
+              )}
+              noOptionsText={t("noOrganizationsFound")}
+              disabled={loading || success}
+            />
+
+            {forgotSelectedOrg?.type === "living_group" && (
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2, fontSize: "0.85rem" }}>
+                {t("forgotPasswordLivingGroupInfo")}
+              </Typography>
             )}
 
             <Button
               type="submit"
               fullWidth
               variant="contained"
-              disabled={loading || success}
+              disabled={loading || success || !forgotSelectedOrg}
               sx={buttonSx}
             >
               {loading ? t("sendingResetLink") : t("sendResetLink")}
@@ -563,8 +418,8 @@ export default function OrganizationAuthModal({ open, onClose }) {
               fullWidth
               onClick={() => {
                 setShowForgotPassword(false);
-                setForgotEmail("");
-                setForgotName("");
+                setForgotSelectedOrg(null);
+                setForgotInputValue("");
                 setError("");
                 setSuccess("");
               }}
@@ -589,7 +444,7 @@ export default function OrganizationAuthModal({ open, onClose }) {
       }}
     >
       <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        {view === "signIn" ? t("signInTitle") : t("signUpTitle")}
+        {t("signInTitle")}
         <IconButton onClick={handleClose} size="small">
           <CloseIcon />
         </IconButton>
@@ -606,331 +461,211 @@ export default function OrganizationAuthModal({ open, onClose }) {
           </Alert>
         )}
 
-        {/* Sign In View */}
-        {view === "signIn" && (
-          <Box component="form" onSubmit={handleSignIn}>
-            {/* Organization Type Toggle for Sign In */}
-            <ToggleButtonGroup
-              value={signInOrgType}
-              exclusive
-              onChange={(e, value) => {
-                if (value) {
-                  setSignInOrgType(value);
-                  setError("");
-                }
-              }}
-              sx={toggleButtonGroupSx}
-            >
-              <ToggleButton value="club">{t("signInOrgTypeClub")}</ToggleButton>
-              <ToggleButton value="living_group">{t("signInOrgTypeLivingGroup")}</ToggleButton>
-            </ToggleButtonGroup>
-
-            {signInOrgType === "club" ? (
-              <TextField
-                fullWidth
-                label={t("email")}
-                placeholder={t("emailPlaceholder")}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                onBlur={() => handleBlur("email", email)}
-                error={touched.email && !!fieldErrors.email}
-                helperText={touched.email && fieldErrors.email}
-                sx={{ ...textFieldSx, mb: 2 }}
-                disabled={loading}
-              />
-            ) : (
-              <TextField
-                fullWidth
-                label={t("livingGroupName")}
-                placeholder={t("livingGroupNamePlaceholder")}
-                value={signInName}
-                onChange={(e) => setSignInName(e.target.value)}
-                onBlur={() => handleBlur("signInName", signInName)}
-                error={touched.signInName && !!fieldErrors.signInName}
-                helperText={touched.signInName && fieldErrors.signInName}
-                sx={{ ...textFieldSx, mb: 2 }}
-                disabled={loading}
-              />
-            )}
-
+        <Box component="form" onSubmit={handleSignIn} sx={{ mt: 1 }}>
+          {/* Organization Input with Dropdown Button */}
+          <Box sx={{ display: "flex", gap: 1, alignItems: "flex-start" }} ref={dropdownAnchorRef}>
             <TextField
               fullWidth
-              type="password"
-              label={t("password")}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onBlur={() => handleBlur("password", password)}
-              error={touched.password && !!fieldErrors.password}
-              helperText={touched.password && fieldErrors.password}
-              sx={{ ...textFieldSx, mb: 3 }}
+              label={t("selectOrganization")}
+              placeholder={t("searchOrganization")}
+              value={inputValue}
+              onChange={(e) => {
+                setInputValue(e.target.value);
+                // Clear selectedOrg if user manually edits
+                if (selectedOrg && e.target.value !== selectedOrg.name) {
+                  setSelectedOrg(null);
+                }
+                setFieldErrors((prev) => ({ ...prev, organization: null }));
+              }}
+              onBlur={() => handleBlur("organization", inputValue)}
+              error={touched.organization && !!fieldErrors.organization}
+              sx={textFieldSx}
               disabled={loading}
+              autoComplete="organization"
+              name="organization"
             />
-
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              disabled={loading}
-              sx={buttonSx}
-            >
-              {loading ? (
-                <CircularProgress size={24} sx={{ color: "white" }} />
-              ) : (
-                t("signInButton")
-              )}
-            </Button>
-
-            {/* Switch to Sign Up */}
-            <Box sx={{ textAlign: "center", mt: 2 }}>
-              <Typography variant="body2" component="span" color="text.secondary">
-                {t("needAccount")}{" "}
-              </Typography>
-              <Button
-                size="small"
-                onClick={() => switchView("signUp")}
-                sx={linkButtonSx}
-              >
-                {t("signUp")}
-              </Button>
-            </Box>
-
-            {/* Forgot Password */}
-            <Box sx={{ textAlign: "center", mt: 1 }}>
-              <Button
-                size="small"
-                onClick={() => setShowForgotPassword(true)}
-                sx={linkButtonSx}
-              >
-                {t("forgotPassword")}
-              </Button>
-            </Box>
-          </Box>
-        )}
-
-        {/* Sign Up View */}
-        {view === "signUp" && (
-          <Box component="form" onSubmit={handleSignUp}>
-            {/* Organization Type Tabs */}
-            <Tabs
-              value={orgType === "club" ? 0 : 1}
-              onChange={(e, value) => {
-                setOrgType(value === 0 ? "club" : "living_group");
-                setError("");
+            <IconButton
+              onClick={() => {
+                setShowDropdown(!showDropdown);
+                setDropdownSearch("");
               }}
-              variant="fullWidth"
+              disabled={loading || loadingOrgs}
               sx={{
-                mb: 3,
-                "& .MuiTab-root": {
-                  textTransform: "none",
-                  fontWeight: 500,
-                },
-                "& .MuiTab-root.Mui-selected": {
-                  color: "#750014",
-                },
-                "& .MuiTabs-indicator": {
-                  backgroundColor: "#750014",
-                },
+                border: "1px solid #E5E5E5",
+                borderRadius: 1,
+                width: 56,
+                height: 56,
+                flexShrink: 0,
+                "&:hover": { borderColor: "#D0D0D0", backgroundColor: "#f5f5f5" },
               }}
             >
-              <Tab label={t("club")} />
-              <Tab label={t("livingGroup")} />
-            </Tabs>
+              {loadingOrgs ? (
+                <CircularProgress size={20} />
+              ) : (
+                <ArrowDropDownIcon />
+              )}
+            </IconButton>
+          </Box>
+          {/* Error message outside the flexbox */}
+          {touched.organization && fieldErrors.organization && (
+            <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.75, display: "block" }}>
+              {fieldErrors.organization}
+            </Typography>
+          )}
+          <Box sx={{ mb: 2 }} />
 
-            {/* Club-specific fields */}
-            {orgType === "club" && (
-              <>
-                <TextField
-                  fullWidth
-                  label={t("email")}
-                  placeholder={t("emailPlaceholder")}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  onBlur={() => handleBlur("email", email)}
-                  error={touched.email && !!fieldErrors.email}
-                  helperText={touched.email && fieldErrors.email}
-                  sx={{ ...textFieldSx, mb: 2 }}
-                  disabled={loading}
-                />
-                <TextField
-                  fullWidth
-                  type="password"
-                  label={t("password")}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  onBlur={() => handleBlur("password", password)}
-                  error={touched.password && !!fieldErrors.password}
-                  helperText={touched.password && fieldErrors.password}
-                  sx={{ ...textFieldSx, mb: 2 }}
-                  disabled={loading}
-                />
-                <TextField
-                  fullWidth
-                  type="password"
-                  label={t("confirmPassword")}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  onBlur={() => handleBlur("confirmPassword", confirmPassword)}
-                  error={touched.confirmPassword && !!fieldErrors.confirmPassword}
-                  helperText={touched.confirmPassword && fieldErrors.confirmPassword}
-                  sx={{ ...textFieldSx, mb: 2 }}
-                  disabled={loading}
-                />
-                <TextField
-                  fullWidth
-                  label={t("clubName")}
-                  placeholder={t("clubNamePlaceholder")}
-                  value={clubName}
-                  onChange={(e) => setClubName(e.target.value)}
-                  onBlur={() => handleBlur("clubName", clubName)}
-                  error={touched.clubName && !!fieldErrors.clubName}
-                  helperText={(touched.clubName && fieldErrors.clubName) || t("clubNameCannotChange")}
-                  sx={{ ...textFieldSx, mb: 3 }}
-                  disabled={loading}
-                />
-              </>
-            )}
-
-            {/* Living Group-specific fields - NO EMAIL */}
-            {orgType === "living_group" && (
-              <>
-                {/* Living Group Type FIRST */}
-                <FormControl
-                  fullWidth
-                  sx={{ ...textFieldSx, mb: 2 }}
-                  error={touched.livingGroupType && !!fieldErrors.livingGroupType}
-                >
-                  <InputLabel>{t("livingGroupType")}</InputLabel>
-                  <Select
-                    value={livingGroupType}
-                    label={t("livingGroupType")}
-                    onChange={(e) => {
-                      setLivingGroupType(e.target.value);
-                      setDormName("");
-                      setFsilgName("");
-                    }}
-                    onBlur={() => handleBlur("livingGroupType", livingGroupType)}
-                    disabled={loading}
-                  >
-                    <MenuItem value="dorm">{t("dorm")}</MenuItem>
-                    <MenuItem value="fsilg">{t("fsilg")}</MenuItem>
-                  </Select>
-                  {touched.livingGroupType && fieldErrors.livingGroupType && (
-                    <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.75 }}>
-                      {fieldErrors.livingGroupType}
-                    </Typography>
-                  )}
-                </FormControl>
-
-                {/* Dorm dropdown with availability check */}
-                {livingGroupType === "dorm" && (
-                  <FormControl
-                    fullWidth
-                    sx={{ ...textFieldSx, mb: 2 }}
-                    error={touched.dormName && !!fieldErrors.dormName}
-                  >
-                    <InputLabel>{t("selectDorm")}</InputLabel>
-                    <Select
-                      value={dormName}
-                      label={t("selectDorm")}
-                      onChange={(e) => setDormName(e.target.value)}
-                      onBlur={() => handleBlur("dormName", dormName)}
-                      disabled={loading || loadingAvailability}
-                    >
-                      {DORM_OPTIONS.map((dorm) => {
-                        const isTaken = takenDorms.includes(dorm);
-                        return (
-                          <MenuItem
-                            key={dorm}
-                            value={dorm}
-                            disabled={isTaken}
-                            sx={isTaken ? { color: "text.disabled" } : {}}
-                          >
-                            {dorm}{isTaken ? ` ${t("dormTaken")}` : ""}
-                          </MenuItem>
-                        );
-                      })}
-                    </Select>
-                    {touched.dormName && fieldErrors.dormName && (
-                      <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.75 }}>
-                        {fieldErrors.dormName}
-                      </Typography>
-                    )}
-                  </FormControl>
-                )}
-
-                {/* FSILG name input */}
-                {livingGroupType === "fsilg" && (
+          {/* Dropdown Popper */}
+          <Popper
+            open={showDropdown}
+            anchorEl={dropdownAnchorRef.current}
+            placement="bottom-start"
+            style={{ zIndex: 1301, width: dropdownAnchorRef.current?.offsetWidth || 300 }}
+          >
+            <ClickAwayListener onClickAway={() => setShowDropdown(false)}>
+              <Paper sx={{ maxHeight: 300, overflow: "auto", boxShadow: 3 }}>
+                {/* Search within dropdown */}
+                <Box sx={{ p: 1, borderBottom: "1px solid #e0e0e0" }}>
                   <TextField
                     fullWidth
-                    label={t("fsilgName")}
-                    placeholder={t("fsilgNamePlaceholder")}
-                    value={fsilgName}
-                    onChange={(e) => setFsilgName(e.target.value)}
-                    onBlur={() => handleBlur("fsilgName", fsilgName)}
-                    error={touched.fsilgName && !!fieldErrors.fsilgName}
-                    helperText={touched.fsilgName && fieldErrors.fsilgName}
-                    sx={{ ...textFieldSx, mb: 2 }}
-                    disabled={loading}
+                    size="small"
+                    placeholder={t("searchOrganization")}
+                    value={dropdownSearch}
+                    onChange={(e) => setDropdownSearch(e.target.value)}
+                    autoFocus
+                    sx={textFieldSx}
                   />
+                </Box>
+
+                {/* Grouped organizations list */}
+                {filteredDropdownOrgs.length === 0 ? (
+                  <Typography sx={{ p: 2, color: "#666" }}>
+                    {t("noOrganizationsFound")}
+                  </Typography>
+                ) : (
+                  <>
+                    {/* Clubs */}
+                    {filteredDropdownOrgs.filter(o => o.type === "club").length > 0 && (
+                      <>
+                        <Typography
+                          sx={{
+                            position: "sticky",
+                            top: 0,
+                            padding: "8px 16px",
+                            backgroundColor: "#f5f5f5",
+                            fontWeight: 600,
+                            fontSize: "0.75rem",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.05em",
+                            color: "#666",
+                            borderBottom: "1px solid #e0e0e0",
+                          }}
+                        >
+                          {t("clubsGroup")}
+                        </Typography>
+                        {filteredDropdownOrgs
+                          .filter(o => o.type === "club")
+                          .map((org) => (
+                            <Box
+                              key={org.id}
+                              onClick={() => handleSelectOrg(org)}
+                              sx={{
+                                px: 2,
+                                pt: 1.25,
+                                pb: 0.75,
+                                cursor: "pointer",
+                                "&:hover": { backgroundColor: "#f5f5f5" },
+                                backgroundColor: selectedOrg?.id === org.id ? "#e3f2fd" : "transparent",
+                              }}
+                            >
+                              <Typography variant="body1">{org.name}</Typography>
+                            </Box>
+                          ))}
+                      </>
+                    )}
+
+                    {/* Living Groups */}
+                    {filteredDropdownOrgs.filter(o => o.type === "living_group").length > 0 && (
+                      <>
+                        <Typography
+                          sx={{
+                            position: "sticky",
+                            top: 0,
+                            padding: "8px 16px",
+                            backgroundColor: "#f5f5f5",
+                            fontWeight: 600,
+                            fontSize: "0.75rem",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.05em",
+                            color: "#666",
+                            borderBottom: "1px solid #e0e0e0",
+                          }}
+                        >
+                          {t("livingGroupsGroup")}
+                        </Typography>
+                        {filteredDropdownOrgs
+                          .filter(o => o.type === "living_group")
+                          .map((org) => (
+                            <Box
+                              key={org.id}
+                              onClick={() => handleSelectOrg(org)}
+                              sx={{
+                                px: 2,
+                                pt: 1.25,
+                                pb: 0.75,
+                                cursor: "pointer",
+                                "&:hover": { backgroundColor: "#f5f5f5" },
+                                backgroundColor: selectedOrg?.id === org.id ? "#e3f2fd" : "transparent",
+                              }}
+                            >
+                              <Typography variant="body1">{org.name}</Typography>
+                            </Box>
+                          ))}
+                      </>
+                    )}
+                  </>
                 )}
+              </Paper>
+            </ClickAwayListener>
+          </Popper>
 
-                {/* Password fields AFTER name selection */}
-                <TextField
-                  fullWidth
-                  type="password"
-                  label={t("password")}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  onBlur={() => handleBlur("password", password)}
-                  error={touched.password && !!fieldErrors.password}
-                  helperText={touched.password && fieldErrors.password}
-                  sx={{ ...textFieldSx, mb: 2 }}
-                  disabled={loading}
-                />
-                <TextField
-                  fullWidth
-                  type="password"
-                  label={t("confirmPassword")}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  onBlur={() => handleBlur("confirmPassword", confirmPassword)}
-                  error={touched.confirmPassword && !!fieldErrors.confirmPassword}
-                  helperText={touched.confirmPassword && fieldErrors.confirmPassword}
-                  sx={{ ...textFieldSx, mb: 3 }}
-                  disabled={loading}
-                />
-              </>
+          <TextField
+            fullWidth
+            type="password"
+            label={t("password")}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            onBlur={() => handleBlur("password", password)}
+            error={touched.password && !!fieldErrors.password}
+            helperText={touched.password && fieldErrors.password}
+            sx={{ ...textFieldSx, mb: 3 }}
+            disabled={loading}
+          />
+
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            disabled={loading}
+            sx={buttonSx}
+          >
+            {loading ? (
+              <CircularProgress size={24} sx={{ color: "white" }} />
+            ) : (
+              t("signInButton")
             )}
+          </Button>
 
+          {/* Forgot Password */}
+          <Box sx={{ textAlign: "center", mt: 2 }}>
             <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              disabled={loading}
-              sx={buttonSx}
+              size="small"
+              onClick={() => setShowForgotPassword(true)}
+              sx={linkButtonSx}
             >
-              {loading ? (
-                <CircularProgress size={24} sx={{ color: "white" }} />
-              ) : (
-                t("signUpButton")
-              )}
+              {t("forgotPassword")}
             </Button>
-
-            {/* Switch to Sign In */}
-            <Box sx={{ textAlign: "center", mt: 2 }}>
-              <Typography variant="body2" component="span" color="text.secondary">
-                {t("haveAccount")}{" "}
-              </Typography>
-              <Button
-                size="small"
-                onClick={() => switchView("signIn")}
-                sx={linkButtonSx}
-              >
-                {t("signIn")}
-              </Button>
-            </Box>
           </Box>
-        )}
+        </Box>
       </DialogContent>
     </Dialog>
   );

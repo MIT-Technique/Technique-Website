@@ -19,11 +19,10 @@ export async function GET(request: NextRequest) {
 
     const supabase = createAdminClient();
 
-    // Search clubs with leaders (discoverable clubs only)
+    // Search all clubs (has_leader only restricts dashboard access, not discoverability)
     let queryBuilder = supabase
       .from('clubs')
-      .select('id, name, description')
-      .eq('has_leader', true)
+      .select('id, name, description, has_leader')
       .order('name');
 
     if (query) {

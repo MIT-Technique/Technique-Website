@@ -1284,40 +1284,6 @@ export default function ProfilePage() {
                 <h2 className="text-lg font-medium mb-4">{tLg('title')}</h2>
                 <p className="text-text-secondary text-sm mb-4">{tLg('description')}</p>
 
-                {/* Type filter */}
-                <div className="flex gap-2 mb-4">
-                  <button
-                    onClick={() => setLgTypeFilter('all')}
-                    className={`px-3 py-1 text-sm rounded ${
-                      lgTypeFilter === 'all'
-                        ? 'bg-accent text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    {tLg('filterAll')}
-                  </button>
-                  <button
-                    onClick={() => setLgTypeFilter('dorm')}
-                    className={`px-3 py-1 text-sm rounded ${
-                      lgTypeFilter === 'dorm'
-                        ? 'bg-accent text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    {tLg('filterDorms')}
-                  </button>
-                  <button
-                    onClick={() => setLgTypeFilter('fsilg')}
-                    className={`px-3 py-1 text-sm rounded ${
-                      lgTypeFilter === 'fsilg'
-                        ? 'bg-accent text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    {tLg('filterFSILGs')}
-                  </button>
-                </div>
-
                 <TextField
                   label={tLg('searchPlaceholder')}
                   placeholder={tLg('searchHint')}
