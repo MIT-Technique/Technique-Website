@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "../../../../lib/auth/session";
 import { createAdminClient } from "../../../../lib/supabase/admin";
+import { parseBulkNames } from "../../../../lib/utils/nameParser";
 
 // GET - Get all manual members for a living group
 export async function GET(request: NextRequest) {
@@ -37,10 +38,11 @@ export async function GET(request: NextRequest) {
     // Get all manual members
     const { data: members, error } = await supabase
       .from("living_group_manual_members")
-      .select("id, name, section_name, added_at")
+      .select("id, first_name, last_name, section_name, added_at")
       .eq("living_group_id", livingGroup.id)
       .order("section_name")
-      .order("name");
+      .order("last_name")
+      .order("first_name");
 
     if (error) {
       console.error("Get manual members error:", error);
@@ -60,7 +62,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST - Add a manual member name
+// POST - Add a manual member name (single or bulk)
 export async function POST(request: NextRequest) {
   try {
     const user = await getCurrentUser();
@@ -77,31 +79,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, section_name } = body;
-
-    if (!name || typeof name !== "string" || name.trim().length === 0) {
-      return NextResponse.json(
-        { error: "Member name is required" },
-        { status: 400 }
-      );
-    }
-
-    const trimmedName = name.trim();
-    const trimmedSection = section_name ? section_name.trim() : null;
-
-    if (trimmedName.length > 100) {
-      return NextResponse.json(
-        { error: "Name must be 100 characters or less" },
-        { status: 400 }
-      );
-    }
-
-    if (trimmedSection && trimmedSection.length > 100) {
-      return NextResponse.json(
-        { error: "Section name must be 100 characters or less" },
-        { status: 400 }
-      );
-    }
+    const { firstName, lastName, bulkText, section_name } = body;
 
     const supabase = createAdminClient();
 
@@ -119,13 +97,143 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const trimmedSection = section_name ? String(section_name).trim() : null;
+
+    if (trimmedSection && trimmedSection.length > 100) {
+      return NextResponse.json(
+        { error: "Section name must be 100 characters or less" },
+        { status: 400 }
+      );
+    }
+
+    // BULK IMPORT MODE
+    if (bulkText) {
+      const parseResult = parseBulkNames(bulkText);
+
+      if (parseResult.errors.length > 0 && parseResult.success.length === 0) {
+        return NextResponse.json(
+          {
+            error: "All names failed to parse",
+            parseErrors: parseResult.errors,
+          },
+          { status: 400 }
+        );
+      }
+
+      // Check for duplicates against existing members
+      const { data: existingMembers } = await supabase
+        .from("living_group_manual_members")
+        .select("first_name, last_name")
+        .eq("living_group_id", livingGroup.id);
+
+      const duplicates: string[] = [];
+      const toInsert = parseResult.success.filter((parsed) => {
+        const isDuplicate = existingMembers?.some(
+          (existing) =>
+            existing.first_name.toLowerCase() === parsed.firstName.toLowerCase() &&
+            existing.last_name.toLowerCase() === parsed.lastName.toLowerCase()
+        );
+        if (isDuplicate) {
+          duplicates.push(`${parsed.firstName} ${parsed.lastName}`.trim());
+        }
+        return !isDuplicate;
+      });
+
+      if (toInsert.length === 0) {
+        return NextResponse.json(
+          {
+            error: "No new members to add (all duplicates or parse errors)",
+            duplicates,
+            parseErrors: parseResult.errors,
+          },
+          { status: 400 }
+        );
+      }
+
+      // Bulk insert
+      const { data, error } = await supabase
+        .from("living_group_manual_members")
+        .insert(
+          toInsert.map((parsed) => ({
+            living_group_id: livingGroup.id,
+            first_name: parsed.firstName,
+            last_name: parsed.lastName,
+            section_name: trimmedSection,
+            name: parsed.firstName
+              ? `${parsed.lastName}, ${parsed.firstName}`
+              : parsed.lastName,
+          }))
+        )
+        .select();
+
+      if (error) {
+        console.error("Bulk insert error:", error);
+        return NextResponse.json(
+          { error: "Failed to add members" },
+          { status: 500 }
+        );
+      }
+
+      return NextResponse.json({
+        members: data,
+        count: data.length,
+        parseErrors: parseResult.errors,
+        duplicates,
+      });
+    }
+
+    // SINGLE ADD MODE
+    if (firstName === undefined || lastName === undefined) {
+      return NextResponse.json(
+        { error: "First name and last name are required" },
+        { status: 400 }
+      );
+    }
+
+    const trimmedFirst = String(firstName).trim();
+    const trimmedLast = String(lastName).trim();
+
+    if (!trimmedLast || trimmedLast.length === 0) {
+      return NextResponse.json(
+        { error: "Last name is required" },
+        { status: 400 }
+      );
+    }
+
+    if (trimmedFirst.length > 100 || trimmedLast.length > 100) {
+      return NextResponse.json(
+        { error: "Name fields must be 100 characters or less" },
+        { status: 400 }
+      );
+    }
+
+    // Check for duplicate
+    const { data: duplicate } = await supabase
+      .from("living_group_manual_members")
+      .select("id")
+      .eq("living_group_id", livingGroup.id)
+      .eq("first_name", trimmedFirst)
+      .eq("last_name", trimmedLast)
+      .maybeSingle();
+
+    if (duplicate) {
+      return NextResponse.json(
+        { error: "This member already exists" },
+        { status: 400 }
+      );
+    }
+
     // Add manual member
     const { data, error } = await supabase
       .from("living_group_manual_members")
       .insert({
         living_group_id: livingGroup.id,
-        name: trimmedName,
+        first_name: trimmedFirst,
+        last_name: trimmedLast,
         section_name: trimmedSection,
+        name: trimmedFirst
+          ? `${trimmedLast}, ${trimmedFirst}`
+          : trimmedLast,
       })
       .select()
       .single();

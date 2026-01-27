@@ -92,7 +92,7 @@ export default function LivingGroupPage() {
   const { isLoggedIn, user, livingGroup, loading: userLoading, refetch } = useUser();
 
   // Tab state
-  const [activeTab, setActiveTab] = useState('profile');
+  const [activeTab, setActiveTab] = useState('book');
 
   // Settings state (email)
   const [livingGroupEmail, setLivingGroupEmail] = useState('');
@@ -112,7 +112,11 @@ export default function LivingGroupPage() {
   const [manualMembers, setManualMembers] = useState([]);
   const [membersLoading, setMembersLoading] = useState(true);
   const [membersMessage, setMembersMessage] = useState({ type: '', text: '' });
-  const [newManualMember, setNewManualMember] = useState('');
+  const [inputMode, setInputMode] = useState('single'); // 'single' or 'bulk'
+  const [singleMember, setSingleMember] = useState({ firstName: '', lastName: '' });
+  const [bulkText, setBulkText] = useState('');
+  const [parsePreview, setParsePreview] = useState(null);
+  const [showPreview, setShowPreview] = useState(false);
   const [newMemberSection, setNewMemberSection] = useState('');
   const [addingMember, setAddingMember] = useState(false);
   const [removingMemberId, setRemovingMemberId] = useState(null);
@@ -305,9 +309,9 @@ export default function LivingGroupPage() {
     }
   }
 
-  async function handleAddManualMember(e) {
+  async function handleAddSingleMember(e) {
     e.preventDefault();
-    if (!newManualMember.trim() || !livingGroup?.id) return;
+    if (!singleMember.lastName.trim() || !livingGroup?.id) return;
 
     setAddingMember(true);
     setMembersMessage({ type: '', text: '' });
@@ -317,14 +321,14 @@ export default function LivingGroupPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          livingGroupId: livingGroup.id,
-          name: newManualMember.trim(),
+          firstName: singleMember.firstName.trim(),
+          lastName: singleMember.lastName.trim(),
           section_name: newMemberSection || null,
         }),
       });
 
       if (res.ok) {
-        setNewManualMember('');
+        setSingleMember({ firstName: '', lastName: '' });
         setNewMemberSection('');
         setMembersMessage({ type: 'success', text: t('members.addSuccess') });
         fetchMembers();
@@ -339,9 +343,71 @@ export default function LivingGroupPage() {
     }
   }
 
+  async function handlePreviewBulk() {
+    const { parseBulkNames } = await import('../../../lib/utils/nameParser');
+    const result = parseBulkNames(bulkText);
+    setParsePreview(result);
+    setShowPreview(true);
+  }
+
+  async function handleImportBulk() {
+    if (!livingGroup?.id) return;
+
+    setAddingMember(true);
+    setMembersMessage({ type: '', text: '' });
+
+    try {
+      const res = await fetch('/api/living-groups/manual-members', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          bulkText,
+          section_name: newMemberSection || null,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setBulkText('');
+        setShowPreview(false);
+        setParsePreview(null);
+        setNewMemberSection('');
+
+        let message = t('members.bulkAddSuccess', { count: data.count });
+        if (data.parseErrors?.length > 0) {
+          message += ` ${t('members.withErrors', { count: data.parseErrors.length })}`;
+        }
+        if (data.duplicates?.length > 0) {
+          message += ` ${t('members.withDuplicates', { count: data.duplicates.length })}`;
+        }
+
+        setMembersMessage({ type: 'success', text: message });
+        fetchMembers();
+      } else {
+        setMembersMessage({
+          type: 'error',
+          text: data.error || t('members.bulkAddError'),
+        });
+      }
+    } catch (error) {
+      setMembersMessage({ type: 'error', text: t('members.bulkAddError') });
+    } finally {
+      setAddingMember(false);
+    }
+  }
+
   async function handleRemoveManualMember(memberId) {
     setRemovingMemberId(memberId);
     setMembersMessage({ type: '', text: '' });
+
+    // Find the member to get their name for the success message
+    const memberToRemove = manualMembers.find(m => m.id === memberId);
+    const memberName = memberToRemove
+      ? (memberToRemove.first_name
+          ? `${memberToRemove.last_name}, ${memberToRemove.first_name}`
+          : memberToRemove.last_name)
+      : '';
 
     try {
       const res = await fetch(`/api/living-groups/manual-members?id=${memberId}`, {
@@ -349,8 +415,12 @@ export default function LivingGroupPage() {
       });
 
       if (res.ok) {
-        setMembersMessage({ type: 'success', text: t('members.removeSuccess') });
-        fetchMembers();
+        setMembersMessage({
+          type: 'success',
+          text: memberName ? `${memberName} removed` : t('members.removeSuccess')
+        });
+        // Optimistically update state instead of refetching
+        setManualMembers(prev => prev.filter(m => m.id !== memberId));
       } else {
         const data = await res.json();
         setMembersMessage({ type: 'error', text: data.error || t('members.removeError') });
@@ -377,7 +447,10 @@ export default function LivingGroupPage() {
       });
 
       if (res.ok) {
-        fetchMembers();
+        // Optimistically update state instead of refetching
+        setManualMembers(prev => prev.map(m =>
+          m.id === memberId ? { ...m, section_name: sectionName || null } : m
+        ));
       } else {
         const data = await res.json();
         setMembersMessage({ type: 'error', text: data.error || t('members.updateError') });
@@ -666,11 +739,11 @@ export default function LivingGroupPage() {
   const isDisabled = livingGroup?.status === 'disabled';
 
   const tabs = [
-    { id: 'profile', label: t('tabs.profile') },
     { id: 'book', label: t('tabs.book') },
     { id: 'assign', label: t('tabs.assign') },
     { id: 'members', label: t('tabs.members') },
     { id: 'documents', label: t('tabs.documents') },
+    { id: 'settings', label: t('tabs.settings') },
   ];
 
   return (
@@ -1139,37 +1212,166 @@ export default function LivingGroupPage() {
                 {t('members.totalMembers', { count: manualMembers.length })}
               </p>
 
-              {/* Add member form */}
-              <form onSubmit={handleAddManualMember} className="mb-6">
-                <div className="flex gap-2 flex-wrap">
-                  <input
-                    type="text"
-                    value={newManualMember}
-                    onChange={(e) => setNewManualMember(e.target.value)}
-                    placeholder={t('members.addPlaceholder')}
-                    className="flex-1 min-w-[200px] border border-border rounded px-4 py-2"
-                  />
-                  {sections.length > 0 && (
-                    <select
-                      value={newMemberSection}
-                      onChange={(e) => setNewMemberSection(e.target.value)}
-                      className="border border-border rounded px-4 py-2"
+              {/* Mode Switcher */}
+              <div className="mb-4 flex gap-2">
+                <button
+                  onClick={() => setInputMode('single')}
+                  className={`px-4 py-2 rounded ${
+                    inputMode === 'single'
+                      ? 'bg-[#750014] text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {t('members.addSingle')}
+                </button>
+                <button
+                  onClick={() => setInputMode('bulk')}
+                  className={`px-4 py-2 rounded ${
+                    inputMode === 'bulk'
+                      ? 'bg-[#750014] text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {t('members.bulkImport')}
+                </button>
+              </div>
+
+              {/* Single Add Mode */}
+              {inputMode === 'single' && (
+                <form onSubmit={handleAddSingleMember} className="mb-6">
+                  <div className="flex gap-2 flex-wrap">
+                    <input
+                      type="text"
+                      value={singleMember.firstName}
+                      onChange={(e) => setSingleMember({ ...singleMember, firstName: e.target.value })}
+                      placeholder={t('members.firstNamePlaceholder')}
+                      className="flex-1 min-w-[150px] border border-border rounded px-4 py-2"
+                    />
+                    <input
+                      type="text"
+                      value={singleMember.lastName}
+                      onChange={(e) => setSingleMember({ ...singleMember, lastName: e.target.value })}
+                      placeholder={t('members.lastNamePlaceholder')}
+                      className="flex-1 min-w-[150px] border border-border rounded px-4 py-2"
+                      required
+                    />
+                    {sections.length > 0 && (
+                      <select
+                        value={newMemberSection}
+                        onChange={(e) => setNewMemberSection(e.target.value)}
+                        className="border border-border rounded px-4 py-2"
+                      >
+                        <option value="">{t('members.noSection')}</option>
+                        {sections.map((section) => (
+                          <option key={section} value={section}>{section}</option>
+                        ))}
+                      </select>
+                    )}
+                    <button
+                      type="submit"
+                      disabled={addingMember || !singleMember.lastName.trim()}
+                      className="btn-primary whitespace-nowrap"
                     >
-                      <option value="">{t('members.noSection')}</option>
-                      {sections.map((section) => (
-                        <option key={section} value={section}>{section}</option>
-                      ))}
-                    </select>
+                      {addingMember ? t('members.adding') : t('members.add')}
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {/* Bulk Import Mode */}
+              {inputMode === 'bulk' && (
+                <div className="mb-6">
+                  <div className="mb-2">
+                    <label className="block text-sm font-medium mb-1">
+                      {t('members.bulkInputLabel')}
+                    </label>
+                    <p className="text-xs text-text-muted mb-2">
+                      {t('members.bulkInputHint')}
+                    </p>
+                  </div>
+                  <textarea
+                    value={bulkText}
+                    onChange={(e) => setBulkText(e.target.value)}
+                    placeholder={t('members.bulkPlaceholder')}
+                    className="w-full border border-border rounded px-4 py-2 min-h-[150px] font-mono text-sm"
+                  />
+                  <div className="mt-2 flex gap-2 flex-wrap">
+                    {sections.length > 0 && (
+                      <select
+                        value={newMemberSection}
+                        onChange={(e) => setNewMemberSection(e.target.value)}
+                        className="border border-border rounded px-4 py-2"
+                      >
+                        <option value="">{t('members.assignLater')}</option>
+                        {sections.map((section) => (
+                          <option key={section} value={section}>{section}</option>
+                        ))}
+                      </select>
+                    )}
+                    <button
+                      onClick={handlePreviewBulk}
+                      disabled={!bulkText.trim()}
+                      className="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {t('members.preview')}
+                    </button>
+                    <button
+                      onClick={handleImportBulk}
+                      disabled={addingMember || !bulkText.trim()}
+                      className="btn-primary"
+                    >
+                      {addingMember ? t('members.importing') : t('members.import')}
+                    </button>
+                  </div>
+
+                  {/* Preview Modal */}
+                  {showPreview && parsePreview && (
+                    <div className="mt-4 p-4 border border-border rounded bg-gray-50">
+                      <h3 className="font-medium mb-2">{t('members.previewTitle')}</h3>
+                      <p className="text-sm text-text-secondary mb-3">
+                        {t('members.previewCount', { count: parsePreview.success.length })}
+                      </p>
+
+                      {parsePreview.success.length > 0 && (
+                        <div className="mb-3">
+                          <p className="text-xs font-medium text-green-600 mb-1">
+                            {t('members.successfulParse')} ({parsePreview.success.length})
+                          </p>
+                          <div className="max-h-40 overflow-y-auto bg-white p-2 rounded border text-sm">
+                            {parsePreview.success.map((name, i) => (
+                              <div key={i} className="py-1">
+                                {name.lastName}, {name.firstName || '(no first name)'}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {parsePreview.errors.length > 0 && (
+                        <div className="mb-3">
+                          <p className="text-xs font-medium text-red-600 mb-1">
+                            {t('members.parseErrors')} ({parsePreview.errors.length})
+                          </p>
+                          <div className="max-h-40 overflow-y-auto bg-white p-2 rounded border text-sm">
+                            {parsePreview.errors.map((err, i) => (
+                              <div key={i} className="py-1 text-red-600">
+                                Line {err.line}: &quot;{err.text}&quot; - {err.error}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <button
+                        onClick={() => setShowPreview(false)}
+                        className="text-sm text-text-secondary hover:text-text"
+                      >
+                        {t('members.closePreview')}
+                      </button>
+                    </div>
                   )}
-                  <button
-                    type="submit"
-                    disabled={addingMember || !newManualMember.trim()}
-                    className="btn-primary"
-                  >
-                    {addingMember ? t('members.adding') : t('members.add')}
-                  </button>
                 </div>
-              </form>
+              )}
 
               {/* Members List - grouped by section if sections exist */}
               {membersLoading ? (
@@ -1192,9 +1394,11 @@ export default function LivingGroupPage() {
                           {unassigned.map((member) => (
                             <div
                               key={member.id}
-                              className="p-3 border border-border rounded-lg flex justify-between items-center gap-2"
+                              className="py-2 px-3 border border-border rounded-lg flex justify-between items-center gap-2"
                             >
-                              <p className="flex-1">{member.name}</p>
+                              <p className="flex-1">
+                                {member.last_name}, {member.first_name || '(no first name)'}
+                              </p>
                               <select
                                 value={member.section_name || ''}
                                 onChange={(e) => handleUpdateMemberSection(member.id, e.target.value)}
@@ -1233,9 +1437,11 @@ export default function LivingGroupPage() {
                           {sectionMembers.map((member) => (
                             <div
                               key={member.id}
-                              className="p-3 border border-border rounded-lg flex justify-between items-center gap-2"
+                              className="px-3 border border-border rounded-lg flex justify-between items-center gap-2"
                             >
-                              <p className="flex-1">{member.name}</p>
+                              <p className="flex-1">
+                                {member.last_name}, {member.first_name || '(no first name)'}
+                              </p>
                               <select
                                 value={member.section_name || ''}
                                 onChange={(e) => handleUpdateMemberSection(member.id, e.target.value)}
@@ -1267,9 +1473,11 @@ export default function LivingGroupPage() {
                   {manualMembers.map((member) => (
                     <div
                       key={member.id}
-                      className="p-4 border border-border rounded-lg flex justify-between items-center"
+                      className="px-4 border border-border rounded-lg flex justify-between items-center"
                     >
-                      <p>{member.name}</p>
+                      <p>
+                        {member.last_name}, {member.first_name || '(no first name)'}
+                      </p>
                       <button
                         onClick={() => handleRemoveManualMember(member.id)}
                         disabled={removingMemberId === member.id}

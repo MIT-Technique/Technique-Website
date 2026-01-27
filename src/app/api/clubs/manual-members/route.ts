@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "../../../../lib/auth/session";
 import { createAdminClient } from "../../../../lib/supabase/admin";
+import { parseBulkNames } from "../../../../lib/utils/nameParser";
 
 // Helper to get club ID for either club account or club leader
 async function getClubIdForUser(
@@ -59,8 +60,8 @@ async function getClubIdForUser(
   };
 }
 
-// POST - Add a manual member name
-export async function POST(request: NextRequest) {
+// GET - Fetch all manual members for a club (sorted by last name, first name)
+export async function GET(request: NextRequest) {
   try {
     const user = await getCurrentUser();
 
@@ -68,24 +69,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await request.json();
-    const { name, clubId: clubIdParam } = body;
-
-    if (!name || typeof name !== "string" || name.trim().length === 0) {
-      return NextResponse.json(
-        { error: "Member name is required" },
-        { status: 400 }
-      );
-    }
-
-    const trimmedName = name.trim();
-
-    if (trimmedName.length > 100) {
-      return NextResponse.json(
-        { error: "Name must be 100 characters or less" },
-        { status: 400 }
-      );
-    }
+    const searchParams = request.nextUrl.searchParams;
+    const clubIdParam = searchParams.get("clubId");
 
     const supabase = createAdminClient();
 
@@ -103,12 +88,191 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Fetch members sorted by last name, then first name
+    const { data: members, error } = await supabase
+      .from("club_manual_members")
+      .select("*")
+      .eq("club_id", clubId)
+      .order("last_name")
+      .order("first_name");
+
+    if (error) {
+      console.error("Get members error:", error);
+      return NextResponse.json(
+        { error: "Failed to fetch members" },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ members: members || [] });
+  } catch (error) {
+    console.error("Get members error:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch members" },
+      { status: 500 }
+    );
+  }
+}
+
+// POST - Add a manual member name (single or bulk)
+export async function POST(request: NextRequest) {
+  try {
+    const user = await getCurrentUser();
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const {
+      firstName,
+      lastName,
+      bulkText,
+      clubId: clubIdParam,
+    } = body;
+
+    const supabase = createAdminClient();
+
+    // Get club ID (either from param for leaders, or from user account)
+    const { clubId, error: clubIdError } = await getClubIdForUser(
+      user,
+      supabase,
+      clubIdParam
+    );
+
+    if (!clubId || clubIdError) {
+      return NextResponse.json(
+        { error: clubIdError || "Club not found" },
+        { status: 403 }
+      );
+    }
+
+    // BULK IMPORT MODE
+    if (bulkText) {
+      const parseResult = parseBulkNames(bulkText);
+
+      if (parseResult.errors.length > 0 && parseResult.success.length === 0) {
+        return NextResponse.json(
+          {
+            error: "All names failed to parse",
+            parseErrors: parseResult.errors,
+          },
+          { status: 400 }
+        );
+      }
+
+      // Check for duplicates against existing members
+      const { data: existingMembers } = await supabase
+        .from("club_manual_members")
+        .select("first_name, last_name")
+        .eq("club_id", clubId);
+
+      const duplicates: string[] = [];
+      const toInsert = parseResult.success.filter((parsed) => {
+        const isDuplicate = existingMembers?.some(
+          (existing) =>
+            existing.first_name.toLowerCase() === parsed.firstName.toLowerCase() &&
+            existing.last_name.toLowerCase() === parsed.lastName.toLowerCase()
+        );
+        if (isDuplicate) {
+          duplicates.push(`${parsed.firstName} ${parsed.lastName}`.trim());
+        }
+        return !isDuplicate;
+      });
+
+      if (toInsert.length === 0) {
+        return NextResponse.json(
+          {
+            error: "No new members to add (all duplicates or parse errors)",
+            duplicates,
+            parseErrors: parseResult.errors,
+          },
+          { status: 400 }
+        );
+      }
+
+      // Bulk insert
+      const { data, error } = await supabase
+        .from("club_manual_members")
+        .insert(
+          toInsert.map((parsed) => ({
+            club_id: clubId,
+            first_name: parsed.firstName,
+            last_name: parsed.lastName,
+            name: parsed.firstName
+              ? `${parsed.lastName}, ${parsed.firstName}`
+              : parsed.lastName,
+          }))
+        )
+        .select();
+
+      if (error) {
+        console.error("Bulk insert error:", error);
+        return NextResponse.json(
+          { error: "Failed to add members" },
+          { status: 500 }
+        );
+      }
+
+      return NextResponse.json({
+        members: data,
+        count: data.length,
+        parseErrors: parseResult.errors,
+        duplicates,
+      });
+    }
+
+    // SINGLE ADD MODE
+    if (firstName === undefined || lastName === undefined) {
+      return NextResponse.json(
+        { error: "First name and last name are required" },
+        { status: 400 }
+      );
+    }
+
+    const trimmedFirst = String(firstName).trim();
+    const trimmedLast = String(lastName).trim();
+
+    if (!trimmedLast || trimmedLast.length === 0) {
+      return NextResponse.json(
+        { error: "Last name is required" },
+        { status: 400 }
+      );
+    }
+
+    if (trimmedFirst.length > 100 || trimmedLast.length > 100) {
+      return NextResponse.json(
+        { error: "Name fields must be 100 characters or less" },
+        { status: 400 }
+      );
+    }
+
+    // Check for duplicate
+    const { data: duplicate } = await supabase
+      .from("club_manual_members")
+      .select("id")
+      .eq("club_id", clubId)
+      .eq("first_name", trimmedFirst)
+      .eq("last_name", trimmedLast)
+      .maybeSingle();
+
+    if (duplicate) {
+      return NextResponse.json(
+        { error: "This member already exists" },
+        { status: 400 }
+      );
+    }
+
     // Add manual member
     const { data, error } = await supabase
       .from("club_manual_members")
       .insert({
         club_id: clubId,
-        name: trimmedName,
+        first_name: trimmedFirst,
+        last_name: trimmedLast,
+        name: trimmedFirst
+          ? `${trimmedLast}, ${trimmedFirst}`
+          : trimmedLast,
       })
       .select()
       .single();

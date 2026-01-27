@@ -648,28 +648,12 @@ export function generateStaticParams() {
 -- Table order and constraints may not be valid for execution.
 
 -- NOTE: The membership system has been simplified (Jan 2026).
--- Tables to be DELETED (no longer used by the application):
---   - club_invitations
---   - club_join_requests
---   - club_leader_requests
---   - club_memberships
---   - living_group_leader_permissions
---   - living_group_memberships
---   - living_group_time_assignments
---   - section_expected_counts
---
--- Columns to be REMOVED:
---   - clubs.has_leader (no more leaders)
---   - clubs.member_list (use club_manual_members table instead)
---   - living_groups.has_leader (no more leaders)
---   - living_groups.dorm_sections (no more section tracking)
---   - users.is_living_group_leader (no more LG leaders)
---
--- New table to be ADDED:
---   - living_group_manual_members (same structure as club_manual_members)
---
--- The system now uses simple text lists for members (manual_members tables)
--- instead of linked accounts. Students only use MIT SSO for senior bio form.
+
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
+
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
 
 CREATE TABLE public.admin_logs (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -682,50 +666,13 @@ created_at timestamp with time zone DEFAULT now(),
 CONSTRAINT admin_logs_pkey PRIMARY KEY (id),
 CONSTRAINT admin_logs_actor_id_fkey FOREIGN KEY (actor_id) REFERENCES public.users(id)
 );
-CREATE TABLE public.club_invitations (
-id uuid NOT NULL DEFAULT gen_random_uuid(),
-club_id uuid NOT NULL,
-user_id uuid NOT NULL,
-invited_by uuid NOT NULL,
-status text NOT NULL DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'accepted'::text, 'declined'::text])),
-created_at timestamp with time zone DEFAULT now(),
-resolved_at timestamp with time zone,
-CONSTRAINT club_invitations_pkey PRIMARY KEY (id),
-CONSTRAINT club_invitations_club_id_fkey FOREIGN KEY (club_id) REFERENCES public.clubs(id),
-CONSTRAINT club_invitations_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
-CONSTRAINT club_invitations_invited_by_fkey FOREIGN KEY (invited_by) REFERENCES public.users(id)
-);
-CREATE TABLE public.club_join_requests (
-id uuid NOT NULL DEFAULT gen_random_uuid(),
-club_id uuid NOT NULL,
-user_id uuid NOT NULL,
-status text NOT NULL DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'approved'::text, 'denied'::text])),
-created_at timestamp with time zone DEFAULT now(),
-resolved_at timestamp with time zone,
-CONSTRAINT club_join_requests_pkey PRIMARY KEY (id),
-CONSTRAINT club_join_requests_club_id_fkey FOREIGN KEY (club_id) REFERENCES public.clubs(id),
-CONSTRAINT club_join_requests_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
-);
-CREATE TABLE public.club_leader_requests (
-id uuid NOT NULL DEFAULT gen_random_uuid(),
-club_id uuid NOT NULL,
-user_id uuid NOT NULL,
-requested_by uuid NOT NULL,
-status text NOT NULL DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'approved'::text, 'denied'::text])),
-created_at timestamp with time zone DEFAULT now(),
-resolved_at timestamp with time zone,
-resolved_by uuid,
-CONSTRAINT club_leader_requests_pkey PRIMARY KEY (id),
-CONSTRAINT club_leader_requests_club_id_fkey FOREIGN KEY (club_id) REFERENCES public.clubs(id),
-CONSTRAINT club_leader_requests_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
-CONSTRAINT club_leader_requests_requested_by_fkey FOREIGN KEY (requested_by) REFERENCES public.users(id),
-CONSTRAINT club_leader_requests_resolved_by_fkey FOREIGN KEY (resolved_by) REFERENCES public.users(id)
-);
 CREATE TABLE public.club_manual_members (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 club_id uuid NOT NULL,
 name text NOT NULL,
 added_at timestamp with time zone DEFAULT now(),
+first_name character varying NOT NULL,
+last_name character varying NOT NULL,
 CONSTRAINT club_manual_members_pkey PRIMARY KEY (id),
 CONSTRAINT club_manual_members_club_id_fkey FOREIGN KEY (club_id) REFERENCES public.clubs(id)
 );
@@ -745,7 +692,6 @@ user_id uuid NOT NULL,
 club_id character NOT NULL UNIQUE,
 name character varying NOT NULL,
 description text,
-member_list text,
 candid_image_1 text,
 candid_image_2 text,
 candid_image_3 text,
@@ -755,17 +701,11 @@ approved_by uuid,
 approved_at timestamp with time zone,
 created_at timestamp with time zone DEFAULT now(),
 updated_at timestamp with time zone DEFAULT now(),
-has_leader boolean DEFAULT false,
 document_links text,
 document_notes text,
 CONSTRAINT clubs_pkey PRIMARY KEY (id),
 CONSTRAINT clubs_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
 CONSTRAINT clubs_approved_by_fkey FOREIGN KEY (approved_by) REFERENCES public.users(id)
-);
-CREATE TABLE public.export_club_members (
-club_name text NOT NULL,
-row_index integer NOT NULL,
-member_name text
 );
 CREATE TABLE public.form_settings (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -781,23 +721,16 @@ CONSTRAINT form_settings_pkey PRIMARY KEY (id),
 CONSTRAINT form_settings_frozen_by_fkey FOREIGN KEY (frozen_by) REFERENCES public.users(id),
 CONSTRAINT form_settings_unfrozen_by_fkey FOREIGN KEY (unfrozen_by) REFERENCES public.users(id)
 );
-CREATE TABLE public.living_group_leader_permissions (
+CREATE TABLE public.living_group_manual_members (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
-user_id uuid NOT NULL,
 living_group_id uuid NOT NULL,
-invited_by uuid,
-invited_at timestamp with time zone,
-accepted_at timestamp with time zone,
-status character varying DEFAULT 'pending'::character varying CHECK (status::text = ANY (ARRAY['pending'::character varying, 'active'::character varying, 'declined'::character varying, 'removed'::character varying]::text[])),
-removed_by uuid,
-removed_at timestamp with time zone,
-created_at timestamp with time zone DEFAULT now(),
-updated_at timestamp with time zone DEFAULT now(),
-CONSTRAINT living_group_leader_permissions_pkey PRIMARY KEY (id),
-CONSTRAINT living_group_leader_permissions_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
-CONSTRAINT living_group_leader_permissions_living_group_id_fkey FOREIGN KEY (living_group_id) REFERENCES public.living_groups(id),
-CONSTRAINT living_group_leader_permissions_invited_by_fkey FOREIGN KEY (invited_by) REFERENCES public.users(id),
-CONSTRAINT living_group_leader_permissions_removed_by_fkey FOREIGN KEY (removed_by) REFERENCES public.users(id)
+name text NOT NULL,
+section_name text,
+added_at timestamp with time zone DEFAULT now(),
+first_name character varying NOT NULL,
+last_name character varying NOT NULL,
+CONSTRAINT living_group_manual_members_pkey PRIMARY KEY (id),
+CONSTRAINT living_group_manual_members_living_group_id_fkey FOREIGN KEY (living_group_id) REFERENCES public.living_groups(id)
 );
 CREATE TABLE public.living_group_memberships (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -814,20 +747,6 @@ CONSTRAINT living_group_memberships_living_group_fkey FOREIGN KEY (living_group_
 CONSTRAINT living_group_memberships_user_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
 CONSTRAINT living_group_memberships_approved_by_fkey FOREIGN KEY (approved_by) REFERENCES public.users(id)
 );
-CREATE TABLE public.living_group_time_assignments (
-id uuid NOT NULL DEFAULT gen_random_uuid(),
-photoshoot_time_id uuid NOT NULL,
-living_group_id uuid NOT NULL,
-slot_start time without time zone NOT NULL,
-slot_end time without time zone NOT NULL,
-assigned_by uuid NOT NULL,
-created_at timestamp with time zone DEFAULT now(),
-section_name text,
-CONSTRAINT living_group_time_assignments_pkey PRIMARY KEY (id),
-CONSTRAINT living_group_time_assignments_photoshoot_time_id_fkey FOREIGN KEY (photoshoot_time_id) REFERENCES public.photoshoot_times(id),
-CONSTRAINT living_group_time_assignments_living_group_id_fkey FOREIGN KEY (living_group_id) REFERENCES public.living_groups(id),
-CONSTRAINT living_group_time_assignments_assigned_by_fkey FOREIGN KEY (assigned_by) REFERENCES public.users(id)
-);
 CREATE TABLE public.living_groups (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 user_id uuid NOT NULL,
@@ -838,9 +757,9 @@ disabled_at timestamp with time zone,
 created_at timestamp with time zone DEFAULT now(),
 updated_at timestamp with time zone DEFAULT now(),
 living_group_type character varying DEFAULT 'dorm'::character varying CHECK (living_group_type::text = ANY (ARRAY['dorm'::character varying, 'fsilg'::character varying]::text[])),
-has_leader boolean DEFAULT false,
-dorm_sections ARRAY DEFAULT '{}'::text[],
 affiliation text,
+document_links text,
+document_notes text,
 CONSTRAINT living_groups_pkey PRIMARY KEY (id),
 CONSTRAINT living_groups_disabled_by_fkey FOREIGN KEY (disabled_by) REFERENCES public.users(id),
 CONSTRAINT living_groups_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
@@ -900,17 +819,6 @@ CONSTRAINT promotion_requests_pkey PRIMARY KEY (id),
 CONSTRAINT promotion_requests_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
 CONSTRAINT promotion_requests_reviewed_by_fkey FOREIGN KEY (reviewed_by) REFERENCES public.users(id)
 );
-CREATE TABLE public.section_expected_counts (
-id uuid NOT NULL DEFAULT gen_random_uuid(),
-living_group_id uuid NOT NULL,
-expected_count integer NOT NULL DEFAULT 0,
-updated_at timestamp with time zone DEFAULT now(),
-updated_by uuid,
-section_name text,
-CONSTRAINT section_expected_counts_pkey PRIMARY KEY (id),
-CONSTRAINT section_expected_counts_lg_fkey FOREIGN KEY (living_group_id) REFERENCES public.living_groups(id),
-CONSTRAINT section_expected_counts_updated_by_fkey FOREIGN KEY (updated_by) REFERENCES public.users(id)
-);
 CREATE TABLE public.sessions (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 user_id uuid NOT NULL,
@@ -963,7 +871,6 @@ is_active boolean DEFAULT true,
 created_at timestamp with time zone DEFAULT now(),
 updated_at timestamp with time zone DEFAULT now(),
 is_staph boolean DEFAULT false,
-is_living_group_leader boolean DEFAULT false,
 CONSTRAINT users_pkey PRIMARY KEY (id),
 CONSTRAINT users_supabase_auth_id_fkey FOREIGN KEY (supabase_auth_id) REFERENCES auth.users(id)
 );
