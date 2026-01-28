@@ -988,7 +988,8 @@
       "book": "Reservar",
       "assign": "Secciones",
       "members": "Miembros",
-      "documents": "Documentos"
+      "documents": "Documentos",
+      "settings": "Configuración"
     },
     "email": {
       "title": "Email de Visualización",
@@ -1053,7 +1054,21 @@
       "removeSection": "Eliminar",
       "removing": "Eliminando...",
       "removeSectionSuccess": "Sección eliminada exitosamente",
-      "removeSectionError": "Error al eliminar sección"
+      "removeSectionError": "Error al eliminar sección",
+      "confirmRemoveTitle": "¿Eliminar Sección?",
+      "confirmRemoveMessage": "¿Está seguro de que desea eliminar '{section}'? Todos los miembros en esta sección se moverán a 'Sin asignar'.",
+      "saved": "Asignación guardada",
+      "saveError": "Error al guardar asignación",
+      "timeSlots": {
+        "title": "Asignar Secciones a Intervalos de Tiempo",
+        "description": "Asigna cada sección a un intervalo de 30 minutos durante tu sesión de fotos.",
+        "slot": "Intervalo",
+        "section": "Sección",
+        "notAssigned": "No asignado",
+        "saving": "Guardando...",
+        "unassignedSections": "Secciones aún no asignadas",
+        "allAssigned": "¡Todas las secciones asignadas!"
+      }
     },
     "members": {
       "title": "Miembros",
@@ -1092,7 +1107,7 @@
       "assignAllToSection": "Asignar todos a la sección:",
       "searchPlaceholder": "Buscar por email...",
       "selectSection": "Asignar a sección",
-      "noSection": "Sin sección",
+      "noSection": "Sin asignar",
       "unassigned": "Sin asignar",
       "allSections": "Todas las Secciones",
       "noResults": "No se encontraron estudiantes",

@@ -1,285 +1,133 @@
 -- ============================================================
--- Living Group Sections & Student Membership Migration
--- Run this in Supabase SQL Editor
+-- Living Group Sections & Membership Migration
+-- ============================================================
+-- Purpose: Set up sections for living groups using text[] arrays
+-- Date: 2026-01-23 (Updated: 2026-01-27)
+-- Schema: Matches CLAUDE.md - uses dorm_sections text[] on living_groups
 -- ============================================================
 
--- 1. Add living_group_type column to living_groups table
+-- 1. Add dorm_sections column to living_groups table (if not exists)
+ALTER TABLE public.living_groups
+ADD COLUMN IF NOT EXISTS dorm_sections text[] DEFAULT '{}';
+
+-- Create index for better query performance
+CREATE INDEX IF NOT EXISTS idx_living_groups_dorm_sections
+  ON public.living_groups USING GIN (dorm_sections);
+
+-- 2. Ensure living_group_type exists (should already exist from schema)
+-- This column distinguishes between dorms and FSILGs
 ALTER TABLE public.living_groups
 ADD COLUMN IF NOT EXISTS living_group_type character varying DEFAULT 'dorm'
 CHECK (living_group_type IN ('dorm', 'fsilg'));
 
--- 2. Create dorm_sections table
-CREATE TABLE IF NOT EXISTS public.dorm_sections (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  dorm_name character varying NOT NULL,
-  section_name character varying NOT NULL,
-  display_order integer DEFAULT 0,
-  created_at timestamp with time zone DEFAULT now(),
-  CONSTRAINT dorm_sections_pkey PRIMARY KEY (id),
-  CONSTRAINT dorm_sections_unique UNIQUE (dorm_name, section_name)
-);
+-- 3. Add section_name to living_group_manual_members (if not exists)
+-- This allows manual members to be assigned to sections
+ALTER TABLE public.living_group_manual_members
+ADD COLUMN IF NOT EXISTS section_name text;
 
--- Index for fast lookups by dorm
-CREATE INDEX IF NOT EXISTS idx_dorm_sections_dorm_name ON public.dorm_sections(dorm_name);
-
--- 3. Create living_group_memberships table
-CREATE TABLE IF NOT EXISTS public.living_group_memberships (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  living_group_id uuid NOT NULL,
-  user_id uuid NOT NULL,
-  section_id uuid,
-  membership_type character varying NOT NULL CHECK (membership_type IN ('dorm', 'fsilg')),
-  status character varying NOT NULL DEFAULT 'active' CHECK (status IN ('pending', 'active', 'removed')),
-  joined_at timestamp with time zone DEFAULT now(),
-  approved_by uuid,
-  approved_at timestamp with time zone,
-  CONSTRAINT living_group_memberships_pkey PRIMARY KEY (id),
-  CONSTRAINT living_group_memberships_living_group_fkey FOREIGN KEY (living_group_id) REFERENCES public.living_groups(id) ON DELETE CASCADE,
-  CONSTRAINT living_group_memberships_user_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE,
-  CONSTRAINT living_group_memberships_section_fkey FOREIGN KEY (section_id) REFERENCES public.dorm_sections(id),
-  CONSTRAINT living_group_memberships_approved_by_fkey FOREIGN KEY (approved_by) REFERENCES public.users(id)
-);
-
--- Indexes for living_group_memberships
-CREATE INDEX IF NOT EXISTS idx_lgm_living_group ON public.living_group_memberships(living_group_id);
-CREATE INDEX IF NOT EXISTS idx_lgm_user ON public.living_group_memberships(user_id);
-CREATE INDEX IF NOT EXISTS idx_lgm_section ON public.living_group_memberships(section_id);
-CREATE INDEX IF NOT EXISTS idx_lgm_status ON public.living_group_memberships(status);
-
--- Unique constraint: One dorm membership per user
-CREATE UNIQUE INDEX IF NOT EXISTS idx_one_dorm_per_user
-ON public.living_group_memberships(user_id)
-WHERE membership_type = 'dorm' AND status = 'active';
-
--- Unique constraint: One FSILG membership per user
-CREATE UNIQUE INDEX IF NOT EXISTS idx_one_fsilg_per_user
-ON public.living_group_memberships(user_id)
-WHERE membership_type = 'fsilg' AND status = 'active';
-
--- 4. Create section_expected_counts table
-CREATE TABLE IF NOT EXISTS public.section_expected_counts (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  living_group_id uuid NOT NULL,
-  section_id uuid,
-  expected_count integer NOT NULL DEFAULT 0,
-  updated_at timestamp with time zone DEFAULT now(),
-  updated_by uuid,
-  CONSTRAINT section_expected_counts_pkey PRIMARY KEY (id),
-  CONSTRAINT section_expected_counts_lg_fkey FOREIGN KEY (living_group_id) REFERENCES public.living_groups(id) ON DELETE CASCADE,
-  CONSTRAINT section_expected_counts_section_fkey FOREIGN KEY (section_id) REFERENCES public.dorm_sections(id),
-  CONSTRAINT section_expected_counts_updated_by_fkey FOREIGN KEY (updated_by) REFERENCES public.users(id),
-  CONSTRAINT section_expected_counts_unique UNIQUE (living_group_id, section_id)
-);
-
--- 5. Enable RLS on new tables
-ALTER TABLE public.dorm_sections ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.living_group_memberships ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.section_expected_counts ENABLE ROW LEVEL SECURITY;
-
--- 6. RLS Policies for dorm_sections (read-only for everyone)
-CREATE POLICY "Anyone can view dorm sections"
-ON public.dorm_sections FOR SELECT
-TO authenticated
-USING (true);
-
--- 7. RLS Policies for living_group_memberships
-CREATE POLICY "Users can view their own memberships"
-ON public.living_group_memberships FOR SELECT
-TO authenticated
-USING (user_id = auth.uid() OR EXISTS (
-  SELECT 1 FROM public.users u
-  WHERE u.supabase_auth_id = auth.uid()
-  AND u.id = living_group_memberships.user_id
-));
-
-CREATE POLICY "Living group leaders can view their members"
-ON public.living_group_memberships FOR SELECT
-TO authenticated
-USING (EXISTS (
-  SELECT 1 FROM public.living_groups lg
-  JOIN public.users u ON u.id = lg.user_id
-  WHERE lg.id = living_group_memberships.living_group_id
-  AND u.supabase_auth_id = auth.uid()
-));
-
-CREATE POLICY "Admins can view all memberships"
-ON public.living_group_memberships FOR SELECT
-TO authenticated
-USING (EXISTS (
-  SELECT 1 FROM public.users u
-  WHERE u.supabase_auth_id = auth.uid()
-  AND u.role IN ('admin', 'staph')
-));
-
--- 8. RLS Policies for section_expected_counts
-CREATE POLICY "Anyone authenticated can view expected counts"
-ON public.section_expected_counts FOR SELECT
-TO authenticated
-USING (true);
-
-CREATE POLICY "Living group leaders can update their expected counts"
-ON public.section_expected_counts FOR ALL
-TO authenticated
-USING (EXISTS (
-  SELECT 1 FROM public.living_groups lg
-  JOIN public.users u ON u.id = lg.user_id
-  WHERE lg.id = section_expected_counts.living_group_id
-  AND u.supabase_auth_id = auth.uid()
-));
+-- 4. Update living_group_memberships to include section_name (if not exists)
+-- This allows registered users to be assigned to sections
+ALTER TABLE public.living_group_memberships
+ADD COLUMN IF NOT EXISTS section_name text;
 
 -- ============================================================
--- SEED DATA: Dorm Sections
+-- SEED DATA: Living Group Sections (as text arrays)
 -- ============================================================
 
--- Baker House (5 floors)
-INSERT INTO dorm_sections (dorm_name, section_name, display_order) VALUES
-('Baker House', 'First West', 1),
-('Baker House', 'Second West', 2),
-('Baker House', 'Third West', 3),
-('Baker House', 'Fourth West', 4),
-('Baker House', 'Fifth West', 5),
-('Baker House', 'Sixth West', 6),
-('Baker House', 'First East', 7),
-('Baker House', 'Second East', 8),
-('Baker House', 'Third East', 9),
-('Baker House', 'Fourth East', 10),
-('Baker House', 'Fifth East', 11),
-('Baker House', 'Sixth East', 12)
-ON CONFLICT (dorm_name, section_name) DO NOTHING;
+-- Baker House (12 sections: 6 floors × 2 sides)
+UPDATE public.living_groups
+SET dorm_sections = ARRAY[
+  'First West', 'Second West', 'Third West', 'Fourth West', 'Fifth West', 'Sixth West',
+  'First East', 'Second East', 'Third East', 'Fourth East', 'Fifth East', 'Sixth East'
+]
+WHERE name = 'Baker House';
 
--- Burton-Conner House (9 sections: Burton 1-5, Conner 2-5, no Conner 1)
-INSERT INTO dorm_sections (dorm_name, section_name, display_order) VALUES
-('Burton-Conner House', 'Burton 1', 1),
-('Burton-Conner House', 'Burton 2', 2),
-('Burton-Conner House', 'Burton 3', 3),
-('Burton-Conner House', 'Burton 4', 4),
-('Burton-Conner House', 'Burton 5', 5),
-('Burton-Conner House', 'Conner 2', 6),
-('Burton-Conner House', 'Conner 3', 7),
-('Burton-Conner House', 'Conner 4', 8),
-('Burton-Conner House', 'Conner 5', 9)
-ON CONFLICT (dorm_name, section_name) DO NOTHING;
+-- Burton-Conner House (9 sections: Burton 1-5, Conner 2-5)
+UPDATE public.living_groups
+SET dorm_sections = ARRAY[
+  'Burton 1', 'Burton 2', 'Burton 3', 'Burton 4', 'Burton 5',
+  'Conner 2', 'Conner 3', 'Conner 4', 'Conner 5'
+]
+WHERE name = 'Burton-Conner House';
 
 -- East Campus (10 halls: 5 floors × 2 sides)
-INSERT INTO dorm_sections (dorm_name, section_name, display_order) VALUES
-('East Campus', 'First West', 1),
-('East Campus', 'Second West', 2),
-('East Campus', 'Third West', 3),
-('East Campus', 'Fourth (Forty-one) West', 4),
-('East Campus', 'Fifth West', 5),
-('East Campus', 'First East', 6),
-('East Campus', 'Second East', 7),
-('East Campus', 'Third East', 8),
-('East Campus', 'Fourth East', 9),
-('East Campus', 'Fifth East', 10)
-ON CONFLICT (dorm_name, section_name) DO NOTHING;
+UPDATE public.living_groups
+SET dorm_sections = ARRAY[
+  'First West', 'Second West', 'Third West', 'Fourth (Forty-one) West', 'Fifth West',
+  'First East', 'Second East', 'Third East', 'Fourth East', 'Fifth East'
+]
+WHERE name = 'East Campus';
 
--- MacGregor House (9 entries: A-H, J - no I)
-INSERT INTO dorm_sections (dorm_name, section_name, display_order) VALUES
-('Macgregor House', 'A Entry', 1),
-('Macgregor House', 'B Entry', 2),
-('Macgregor House', 'C Entry', 3),
-('Macgregor House', 'D Entry', 4),
-('Macgregor House', 'E Entry', 5),
-('Macgregor House', 'F Entry', 6),
-('Macgregor House', 'G Entry', 7),
-('Macgregor House', 'H Entry', 8),
-('Macgregor House', 'J Entry', 9)
-ON CONFLICT (dorm_name, section_name) DO NOTHING;
+-- MacGregor House (9 entries: A-H, J)
+UPDATE public.living_groups
+SET dorm_sections = ARRAY[
+  'A Entry', 'B Entry', 'C Entry', 'D Entry', 'E Entry',
+  'F Entry', 'G Entry', 'H Entry', 'J Entry'
+]
+WHERE name = 'MacGregor House' OR name = 'Macgregor House';
 
--- Maseeh Hall (8 floors)
-INSERT INTO dorm_sections (dorm_name, section_name, display_order) VALUES
-('Maseeh Hall', '1', 1),
-('Maseeh Hall', '2', 2),
-('Maseeh Hall', '3', 3),
-('Maseeh Hall', '4', 4),
-('Maseeh Hall', '5', 5),
-('Maseeh Hall', '6', 6),
-('Maseeh Hall', '7', 7)
-ON CONFLICT (dorm_name, section_name) DO NOTHING;
+-- Maseeh Hall (7 floors)
+UPDATE public.living_groups
+SET dorm_sections = ARRAY['1', '2', '3', '4', '5', '6', '7']
+WHERE name = 'Maseeh Hall';
 
--- McCormick Hall (East Tower floors 1-8, West Tower floors 1-8)
-INSERT INTO dorm_sections (dorm_name, section_name, display_order) VALUES
-('McCormick Hall', 'East Tower 1', 1),
-('McCormick Hall', 'East Tower 2', 2),
-('McCormick Hall', 'East Tower 3', 3),
-('McCormick Hall', 'East Tower 4', 4),
-('McCormick Hall', 'East Tower 5', 5),
-('McCormick Hall', 'East Tower 6', 6),
-('McCormick Hall', 'East Tower 7', 7),
-('McCormick Hall', 'West Tower 1', 8),
-('McCormick Hall', 'West Tower 2', 9),
-('McCormick Hall', 'West Tower 3', 10),
-('McCormick Hall', 'West Tower 4', 11),
-('McCormick Hall', 'West Tower 5', 12),
-('McCormick Hall', 'West Tower 6', 13),
-('McCormick Hall', 'West Tower 7', 14),
-('McCormick Hall', 'The Annex', 15)
-ON CONFLICT (dorm_name, section_name) DO NOTHING;
+-- McCormick Hall (15 sections: East Tower 1-7, West Tower 1-7, The Annex)
+UPDATE public.living_groups
+SET dorm_sections = ARRAY[
+  'East Tower 1', 'East Tower 2', 'East Tower 3', 'East Tower 4',
+  'East Tower 5', 'East Tower 6', 'East Tower 7',
+  'West Tower 1', 'West Tower 2', 'West Tower 3', 'West Tower 4',
+  'West Tower 5', 'West Tower 6', 'West Tower 7',
+  'The Annex'
+]
+WHERE name = 'McCormick Hall';
 
--- New House (9 Houses)
-INSERT INTO dorm_sections (dorm_name, section_name, display_order) VALUES
-('New House', 'Chocolate City', 1),
-('New House', 'French House', 2),
-('New House', 'German House', 3),
-('New House', 'House 3', 4),
-('New House', 'House 4', 5),
-('New House', 'House 5 (Desmond)', 6),
-('New House', 'iHouse', 7),
-('New House', 'Juniper', 8),
-('New House', 'La Casa', 9)
-ON CONFLICT (dorm_name, section_name) DO NOTHING;
+-- New House (9 houses)
+UPDATE public.living_groups
+SET dorm_sections = ARRAY[
+  'Chocolate City', 'French House', 'German House',
+  'House 3', 'House 4', 'House 5 (Desmond)',
+  'iHouse', 'Juniper', 'La Casa'
+]
+WHERE name = 'New House';
 
--- New Vassar (4 floors × 3 sections: A, B, C)
-INSERT INTO dorm_sections (dorm_name, section_name, display_order) VALUES
-('New Vassar', '1A', 1),
-('New Vassar', '1B', 2),
-('New Vassar', '1C', 3),
-('New Vassar', '2A', 4),
-('New Vassar', '2B', 5),
-('New Vassar', '2C', 6),
-('New Vassar', '3A', 7),
-('New Vassar', '3B', 8),
-('New Vassar', '3C', 9),
-('New Vassar', '4A', 10),
-('New Vassar', '4B', 11),
-('New Vassar', '4C', 12)
-ON CONFLICT (dorm_name, section_name) DO NOTHING;
+-- New Vassar (12 sections: 4 floors × 3 sections A/B/C)
+UPDATE public.living_groups
+SET dorm_sections = ARRAY[
+  '1A', '1B', '1C', '2A', '2B', '2C',
+  '3A', '3B', '3C', '4A', '4B', '4C'
+]
+WHERE name = 'New Vassar';
 
--- Next House (4 wings)
-INSERT INTO dorm_sections (dorm_name, section_name, display_order) VALUES
-('Next House', '2 West', 1),
-('Next House', '2 East', 2),
-('Next House', '3 West', 3),
-('Next House', '3 East', 4),
-('Next House', '4 West', 5),
-('Next House', '4 East', 6),
-('Next House', '5 West', 7),
-('Next House', '5 East', 8)
-ON CONFLICT (dorm_name, section_name) DO NOTHING;
+-- Next House (8 wings: 4 floors × 2 sides)
+UPDATE public.living_groups
+SET dorm_sections = ARRAY[
+  '2 West', '2 East', '3 West', '3 East',
+  '4 West', '4 East', '5 West', '5 East'
+]
+WHERE name = 'Next House';
 
--- Random Hall (3 floors)
-INSERT INTO dorm_sections (dorm_name, section_name, display_order) VALUES
-('Random Hall', 'Foo', 1),
-('Random Hall', 'Destiny', 2),
-('Random Hall', 'Black Hole', 3),
-('Random Hall', 'Loop', 4),
-('Random Hall', 'BMF', 5),
-('Random Hall', 'Clam', 6),
-('Random Hall', 'Pecker', 7),
-('Random Hall', 'Bonfire', 8)
-ON CONFLICT (dorm_name, section_name) DO NOTHING;
+-- Random Hall (8 unique sections)
+UPDATE public.living_groups
+SET dorm_sections = ARRAY[
+  'Foo', 'Destiny', 'Black Hole', 'Loop',
+  'BMF', 'Clam', 'Pecker', 'Bonfire'
+]
+WHERE name = 'Random Hall';
 
--- Simmons Hall (3 Towers)
-INSERT INTO dorm_sections (dorm_name, section_name, display_order) VALUES
-('Simmons Hall', '1', 1),
-('Simmons Hall', '2', 2),
-('Simmons Hall', '3', 3)
-ON CONFLICT (dorm_name, section_name) DO NOTHING;
+-- Simmons Hall (18 sections: various towers/floors)
+UPDATE public.living_groups
+SET dorm_sections = ARRAY[
+  '2A', '2B', '3A', '3B', '3C', '4A', '4B', '4C',
+  '5A', '5B', '5C', '6A', '6B', '6C', '7A', '7B', '7C', '8B'
+]
+WHERE name = 'Simmons Hall';
 
 -- ============================================================
--- Verification: Check created tables
+-- Verification Queries
 -- ============================================================
--- Run these to verify:
--- SELECT * FROM dorm_sections ORDER BY dorm_name, display_order;
--- SELECT COUNT(*) FROM dorm_sections; -- Should be ~80 sections
+-- Run these to check the migration:
+-- SELECT name, dorm_sections, array_length(dorm_sections, 1) as section_count
+-- FROM public.living_groups
+-- WHERE dorm_sections IS NOT NULL AND array_length(dorm_sections, 1) > 0
+-- ORDER BY name;

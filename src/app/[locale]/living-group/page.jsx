@@ -10,6 +10,7 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
+import { generateTimeSlots, formatTimeDisplay as formatTimeUtil } from '../../../lib/utils/time';
 
 // Generate 30-minute time slot options (06:00 to 23:30)
 function generateTimeOptions() {
@@ -121,6 +122,7 @@ export default function LivingGroupPage() {
   const [addingMember, setAddingMember] = useState(false);
   const [removingMemberId, setRemovingMemberId] = useState(null);
   const [updatingMemberId, setUpdatingMemberId] = useState(null);
+  const [memberToRemove, setMemberToRemove] = useState(null);
 
   // Sections state
   const [sections, setSections] = useState([]);
@@ -129,6 +131,12 @@ export default function LivingGroupPage() {
   const [addingSection, setAddingSection] = useState(false);
   const [removingSectionName, setRemovingSectionName] = useState(null);
   const [sectionsMessage, setSectionsMessage] = useState({ type: '', text: '' });
+  const [sectionToRemove, setSectionToRemove] = useState(null);
+
+  // Time assignments state
+  const [timeAssignments, setTimeAssignments] = useState({});
+  const [assignmentsLoading, setAssignmentsLoading] = useState(false);
+  const [savingSlot, setSavingSlot] = useState(null);
 
   // Documents state
   const [documents, setDocuments] = useState({
@@ -186,6 +194,43 @@ export default function LivingGroupPage() {
     }
   }, [isLoggedIn, user, userLoading, router, locale]);
 
+  // Auto-fade success messages after 3 seconds
+  useEffect(() => {
+    if (message.type === 'success' && message.text) {
+      const timer = setTimeout(() => {
+        setMessage({ type: '', text: '' });
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
+  useEffect(() => {
+    if (membersMessage.type === 'success' && membersMessage.text) {
+      const timer = setTimeout(() => {
+        setMembersMessage({ type: '', text: '' });
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [membersMessage]);
+
+  useEffect(() => {
+    if (sectionsMessage.type === 'success' && sectionsMessage.text) {
+      const timer = setTimeout(() => {
+        setSectionsMessage({ type: '', text: '' });
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [sectionsMessage]);
+
+  useEffect(() => {
+    if (documentsMessage.type === 'success' && documentsMessage.text) {
+      const timer = setTimeout(() => {
+        setDocumentsMessage({ type: '', text: '' });
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [documentsMessage]);
+
   useEffect(() => {
     if (isLoggedIn && user?.role === 'living_group') {
       fetchTimes();
@@ -194,6 +239,9 @@ export default function LivingGroupPage() {
       fetchProposals();
       fetchSections();
       fetchDocuments();
+      if (livingGroup?.id) {
+        fetchTimeAssignments(livingGroup.id);
+      }
     }
   }, [isLoggedIn, user, livingGroup]);
 
@@ -397,30 +445,32 @@ export default function LivingGroupPage() {
     }
   }
 
-  async function handleRemoveManualMember(memberId) {
-    setRemovingMemberId(memberId);
+  function handleRemoveManualMember(member) {
+    setMemberToRemove(member);
+  }
+
+  async function confirmRemoveMember() {
+    if (!memberToRemove) return;
+
+    setRemovingMemberId(memberToRemove.id);
     setMembersMessage({ type: '', text: '' });
 
-    // Find the member to get their name for the success message
-    const memberToRemove = manualMembers.find(m => m.id === memberId);
-    const memberName = memberToRemove
-      ? (memberToRemove.first_name
-          ? `${memberToRemove.last_name}, ${memberToRemove.first_name}`
-          : memberToRemove.last_name)
-      : '';
+    const memberName = memberToRemove.first_name
+      ? `${memberToRemove.last_name}, ${memberToRemove.first_name}`
+      : memberToRemove.last_name;
 
     try {
-      const res = await fetch(`/api/living-groups/manual-members?id=${memberId}`, {
+      const res = await fetch(`/api/living-groups/manual-members?id=${memberToRemove.id}`, {
         method: 'DELETE',
       });
 
       if (res.ok) {
         setMembersMessage({
           type: 'success',
-          text: memberName ? `${memberName} removed` : t('members.removeSuccess')
+          text: `${memberName} removed`
         });
         // Optimistically update state instead of refetching
-        setManualMembers(prev => prev.filter(m => m.id !== memberId));
+        setManualMembers(prev => prev.filter(m => m.id !== memberToRemove.id));
       } else {
         const data = await res.json();
         setMembersMessage({ type: 'error', text: data.error || t('members.removeError') });
@@ -429,6 +479,7 @@ export default function LivingGroupPage() {
       setMembersMessage({ type: 'error', text: t('members.removeError') });
     } finally {
       setRemovingMemberId(null);
+      setMemberToRemove(null);
     }
   }
 
@@ -506,12 +557,18 @@ export default function LivingGroupPage() {
     }
   }
 
-  async function handleRemoveSection(sectionName) {
-    setRemovingSectionName(sectionName);
+  function handleRemoveSection(sectionName) {
+    setSectionToRemove(sectionName);
+  }
+
+  async function confirmRemoveSection() {
+    if (!sectionToRemove) return;
+
+    setRemovingSectionName(sectionToRemove);
     setSectionsMessage({ type: '', text: '' });
 
     try {
-      const res = await fetch(`/api/living-groups/sections?name=${encodeURIComponent(sectionName)}`, {
+      const res = await fetch(`/api/living-groups/sections?name=${encodeURIComponent(sectionToRemove)}`, {
         method: 'DELETE',
       });
 
@@ -528,6 +585,82 @@ export default function LivingGroupPage() {
       setSectionsMessage({ type: 'error', text: t('assign.removeSectionError') });
     } finally {
       setRemovingSectionName(null);
+      setSectionToRemove(null);
+    }
+  }
+
+  // Time assignment functions
+  async function fetchTimeAssignments(livingGroupId) {
+    if (!livingGroupId) return;
+    try {
+      setAssignmentsLoading(true);
+      const res = await fetch(`/api/living-groups/time-assignments?livingGroupId=${livingGroupId}`);
+
+      // If table doesn't exist (migration not run), silently fail
+      if (!res.ok) {
+        console.warn('Time assignments feature not available (migration may not be run yet)');
+        setTimeAssignments({});
+        return;
+      }
+
+      const data = await res.json();
+
+      // Transform array to map: { photoshootTimeId: { 'slotStart-slotEnd': sectionName } }
+      const assignmentsMap = {};
+      (data.assignments || []).forEach(a => {
+        if (!assignmentsMap[a.photoshootTimeId]) {
+          assignmentsMap[a.photoshootTimeId] = {};
+        }
+        const slotKey = `${a.slotStart}-${a.slotEnd}`;
+        assignmentsMap[a.photoshootTimeId][slotKey] = a.sectionName || '';
+      });
+      setTimeAssignments(assignmentsMap);
+    } catch (error) {
+      console.error('Error fetching time assignments:', error);
+      setTimeAssignments({});
+    } finally {
+      setAssignmentsLoading(false);
+    }
+  }
+
+  async function handleAssignSection(photoshootTimeId, slotStart, slotEnd, sectionName) {
+    if (!livingGroup?.id) return;
+
+    const slotKey = `${slotStart}-${slotEnd}`;
+    setSavingSlot(`${photoshootTimeId}-${slotKey}`);
+    setSectionsMessage({ type: '', text: '' });
+
+    try {
+      const res = await fetch('/api/living-groups/time-assignments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          photoshootTimeId,
+          livingGroupId: livingGroup.id,
+          sectionName: sectionName || null,
+          slotStart,
+          slotEnd,
+        }),
+      });
+
+      if (res.ok) {
+        // Optimistic update
+        setTimeAssignments(prev => ({
+          ...prev,
+          [photoshootTimeId]: {
+            ...(prev[photoshootTimeId] || {}),
+            [slotKey]: sectionName || '',
+          },
+        }));
+        setSectionsMessage({ type: 'success', text: t('assign.saved') });
+      } else {
+        const data = await res.json();
+        setSectionsMessage({ type: 'error', text: data.error || t('assign.saveError') });
+      }
+    } catch (error) {
+      setSectionsMessage({ type: 'error', text: t('assign.saveError') });
+    } finally {
+      setSavingSlot(null);
     }
   }
 
@@ -1132,65 +1265,203 @@ export default function LivingGroupPage() {
           {/* Assign Tab - Section Management */}
           {activeTab === 'assign' && (
             <div>
-              {sectionsMessage.text && (
-                <div className={`mb-6 p-4 rounded ${
-                  sectionsMessage.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
-                }`}>
-                  {sectionsMessage.text}
+              {/* Time Slot Assignment UI - Above Section Management */}
+              {sections.length > 0 && bookedTimes.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-lg font-medium mb-2">{t('assign.timeSlots.title')}</h3>
+                  <p className="text-text-secondary text-sm mb-4">
+                    {t('assign.timeSlots.description')}
+                  </p>
+
+                  {/* Unassigned sections warning */}
+                  {(() => {
+                    const allAssignedSections = new Set();
+                    bookedTimes.forEach(bt => {
+                      const assignments = timeAssignments[bt.id] || {};
+                      Object.values(assignments).forEach(sectionName => {
+                        if (sectionName) allAssignedSections.add(sectionName);
+                      });
+                    });
+                    const unassigned = sections.filter(s => !allAssignedSections.has(s));
+
+                    if (unassigned.length > 0) {
+                      return (
+                        <div className="mb-6 p-3 bg-yellow-50 border border-yellow-200 rounded">
+                          <p className="text-sm text-yellow-800">
+                            <span className="font-medium">{t('assign.timeSlots.unassignedSections')}:</span>{' '}
+                            {unassigned.join(', ')}
+                          </p>
+                        </div>
+                      );
+                    }
+                    return (
+                      <div className="mb-6 p-3 bg-green-50 border border-green-200 rounded">
+                        <p className="text-sm p-0 font-medium text-green-800">{t('assign.timeSlots.allAssigned')}</p>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Assignment grid for each booked time */}
+                  <div className="space-y-4">
+                    {bookedTimes.map((bookedTime) => (
+                      <div key={bookedTime.id} className="bg-white border border-border rounded-lg p-6">
+                        {/* Date/Time header with assignment message */}
+                        <div className="mb-4 flex justify-between items-start gap-4">
+                          <div>
+                            <p className="font-medium">
+                              {new Date(bookedTime.date).toLocaleDateString(locale, {
+                                weekday: 'long',
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                              })}
+                            </p>
+                            <p className="text-text-secondary text-sm">
+                              {formatTime(bookedTime.start_time)} - {formatTime(bookedTime.end_time)} EST
+                            </p>
+                          </div>
+                          {/* Assignment saved message - right of date */}
+                          {sectionsMessage.text && (
+                            <span className={`text-xs px-2 py-1 rounded whitespace-nowrap ${
+                              sectionsMessage.type === 'success'
+                                ? 'text-green-700 bg-green-50'
+                                : 'text-red-700 bg-red-50'
+                            }`}>
+                              {sectionsMessage.text}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Slot grid */}
+                        {assignmentsLoading ? (
+                          <p className="text-text-muted text-sm">Loading...</p>
+                        ) : (
+                          <div className="space-y-2">
+                            {/* Header row */}
+                            <div className="grid grid-cols-[120px_1fr] gap-2 text-xs font-medium text-text-muted uppercase mb-2">
+                              <span>{t('assign.timeSlots.slot')}</span>
+                              <span>{t('assign.timeSlots.section')}</span>
+                            </div>
+
+                            {/* Slot rows */}
+                            {generateTimeSlots(bookedTime.start_time, bookedTime.end_time).map((slot) => {
+                              const slotKey = `${slot.start}-${slot.end}`;
+                              const currentAssignment = timeAssignments[bookedTime.id]?.[slotKey] || '';
+                              const isSaving = savingSlot === `${bookedTime.id}-${slotKey}`;
+
+                              return (
+                                <div key={slotKey} className="grid grid-cols-[120px_1fr] gap-2 items-center">
+                                  <span className="text-sm font-medium">
+                                    {formatTimeUtil(slot.start)} - {formatTimeUtil(slot.end)}
+                                  </span>
+                                  <div className="flex items-center gap-2">
+                                    <select
+                                      value={currentAssignment}
+                                      onChange={(e) => handleAssignSection(
+                                        bookedTime.id,
+                                        slot.start,
+                                        slot.end,
+                                        e.target.value
+                                      )}
+                                      disabled={isSaving}
+                                      className="flex-1 px-3 py-1.5 border border-border rounded text-sm disabled:opacity-50"
+                                    >
+                                      <option value="">{t('assign.timeSlots.notAssigned')}</option>
+                                      {sections.map((section) => (
+                                        <option key={section} value={section}>{section}</option>
+                                      ))}
+                                    </select>
+                                    {isSaving && <span className="text-xs text-text-muted">{t('assign.timeSlots.saving')}</span>}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
-              <h2 className="text-lg font-medium mb-2">{t('assign.title')}</h2>
-              <p className="text-text-secondary text-sm mb-6">{t('assign.description')}</p>
+              {/* Section Management - Below Time Slot Assignment */}
+              <div className={sections.length > 0 && bookedTimes.length > 0 ? 'mt-8' : ''}>
+                <p className="text-text-secondary text-sm mb-4">{t('assign.description')}</p>
 
-              {/* Add section form */}
-              <form onSubmit={handleAddSection} className="mb-6 flex gap-2">
-                <input
-                  type="text"
-                  value={newSectionName}
-                  onChange={(e) => setNewSectionName(e.target.value)}
-                  placeholder={t('assign.addPlaceholder')}
-                  className="flex-1 border border-border rounded px-4 py-2"
-                />
-                <button
-                  type="submit"
-                  disabled={addingSection || !newSectionName.trim()}
-                  className="btn-primary"
-                >
-                  {addingSection ? t('assign.adding') : t('assign.addSection')}
-                </button>
-              </form>
+                {/* Add section form */}
+                <form onSubmit={handleAddSection} className="mb-4 flex gap-2">
+                  <input
+                    type="text"
+                    value={newSectionName}
+                    onChange={(e) => setNewSectionName(e.target.value)}
+                    placeholder={t('assign.addPlaceholder')}
+                    className="flex-1 border border-border rounded px-4 py-2"
+                  />
+                  <button
+                    type="submit"
+                    disabled={addingSection || !newSectionName.trim()}
+                    className="btn-primary"
+                  >
+                    {addingSection ? t('assign.adding') : t('assign.addSection')}
+                  </button>
+                </form>
 
-              {/* Sections List */}
-              {sectionsLoading ? (
-                <p className="text-text-secondary">Loading...</p>
-              ) : sections.length === 0 ? (
-                <p className="text-text-secondary">{t('assign.noSections')}</p>
-              ) : (
-                <div className="space-y-2">
-                  {sections.map((section) => {
-                    const memberCount = manualMembers.filter(m => m.section_name === section).length;
-                    return (
-                      <div
-                        key={section}
-                        className="p-4 border border-border rounded-lg flex justify-between items-center"
-                      >
-                        <div>
-                          <p className="font-medium">{section}</p>
-                          <p className="text-sm text-text-muted">
-                            {t('assign.memberCount', { count: memberCount })}
-                          </p>
-                        </div>
-                        <button
-                          onClick={() => handleRemoveSection(section)}
-                          disabled={removingSectionName === section}
-                          className="text-sm text-red-600 hover:text-red-700"
+                {/* Sections List - Compact */}
+                {sectionsLoading ? (
+                  <p className="text-text-secondary">Loading...</p>
+                ) : sections.length === 0 ? (
+                  <p className="text-text-secondary">{t('assign.noSections')}</p>
+                ) : (
+                  <div className="space-y-2">
+                    {sections.map((section) => {
+                      const memberCount = manualMembers.filter(m => m.section_name === section).length;
+                      return (
+                        <div
+                          key={section}
+                          className="px-4 py-2 border border-border rounded-lg flex justify-between items-center gap-4"
                         >
-                          {removingSectionName === section ? t('assign.removing') : t('assign.removeSection')}
-                        </button>
-                      </div>
-                    );
-                  })}
+                          <span className="font-medium">{section}</span>
+                          <span className="text-sm text-text-muted">
+                            {t('assign.memberCount', { count: memberCount })}
+                          </span>
+                          <button
+                            onClick={() => handleRemoveSection(section)}
+                            disabled={removingSectionName === section}
+                            className="text-sm text-red-600 hover:text-red-700 whitespace-nowrap ml-auto"
+                          >
+                            {removingSectionName === section ? t('assign.removing') : t('assign.removeSection')}
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Confirmation Modal for Removing Section */}
+              {sectionToRemove && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                  <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                    <h3 className="text-lg font-medium mb-2">{t('assign.confirmRemoveTitle')}</h3>
+                    <p className="text-text-secondary mb-4">
+                      {t('assign.confirmRemoveMessage', { section: sectionToRemove })}
+                    </p>
+                    <div className="flex gap-2 justify-end">
+                      <button
+                        onClick={() => setSectionToRemove(null)}
+                        className="px-4 py-2 border border-border rounded hover:bg-gray-50"
+                      >
+                        {t('members.cancel')}
+                      </button>
+                      <button
+                        onClick={confirmRemoveSection}
+                        disabled={removingSectionName === sectionToRemove}
+                        className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
+                      >
+                        {removingSectionName === sectionToRemove ? t('assign.removing') : t('members.confirm')}
+                      </button>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
@@ -1206,11 +1477,6 @@ export default function LivingGroupPage() {
                   {membersMessage.text}
                 </div>
               )}
-
-              <h2 className="text-lg font-medium mb-2">{t('members.title')}</h2>
-              <p className="text-text-secondary text-sm mb-6">
-                {t('members.totalMembers', { count: manualMembers.length })}
-              </p>
 
               {/* Mode Switcher */}
               <div className="mb-4 flex gap-2">
@@ -1379,9 +1645,52 @@ export default function LivingGroupPage() {
               ) : manualMembers.length === 0 ? (
                 <p className="text-text-secondary">{t('members.noMembers')}</p>
               ) : sections.length > 0 ? (
-                // Show members grouped by section
+                // Show members grouped by section (sections first, then unassigned)
                 <div className="space-y-6">
-                  {/* Members without section */}
+                  {/* Members by section */}
+                  {sections.map((section) => {
+                    const sectionMembers = manualMembers.filter(m => m.section_name === section);
+                    if (sectionMembers.length === 0) return null;
+                    return (
+                      <div key={section}>
+                        <h3 className="text-sm font-medium text-text-muted mb-2">
+                          {section} ({sectionMembers.length})
+                        </h3>
+                        <div className="space-y-2">
+                          {sectionMembers.map((member) => (
+                            <div
+                              key={member.id}
+                              className="py-2 px-3 border border-border rounded-lg flex justify-between items-center gap-2"
+                            >
+                              <p className="flex-1">
+                                {member.last_name}, {member.first_name || '(no first name)'}
+                              </p>
+                              <select
+                                value={member.section_name || ''}
+                                onChange={(e) => handleUpdateMemberSection(member.id, e.target.value)}
+                                disabled={updatingMemberId === member.id}
+                                className="text-sm border border-border rounded px-2 py-1"
+                              >
+                                <option value="">{t('members.noSection')}</option>
+                                {sections.map((s) => (
+                                  <option key={s} value={s}>{s}</option>
+                                ))}
+                              </select>
+                              <button
+                                onClick={() => handleRemoveManualMember(member)}
+                                disabled={removingMemberId === member.id}
+                                className="text-sm text-red-600 hover:text-red-700"
+                              >
+                                {removingMemberId === member.id ? '...' : t('members.remove')}
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                  {/* Unassigned members - at the bottom */}
                   {(() => {
                     const unassigned = manualMembers.filter(m => !m.section_name);
                     if (unassigned.length === 0) return null;
@@ -1411,7 +1720,7 @@ export default function LivingGroupPage() {
                                 ))}
                               </select>
                               <button
-                                onClick={() => handleRemoveManualMember(member.id)}
+                                onClick={() => handleRemoveManualMember(member)}
                                 disabled={removingMemberId === member.id}
                                 className="text-sm text-red-600 hover:text-red-700"
                               >
@@ -1423,49 +1732,6 @@ export default function LivingGroupPage() {
                       </div>
                     );
                   })()}
-
-                  {/* Members by section */}
-                  {sections.map((section) => {
-                    const sectionMembers = manualMembers.filter(m => m.section_name === section);
-                    if (sectionMembers.length === 0) return null;
-                    return (
-                      <div key={section}>
-                        <h3 className="text-sm font-medium text-text-muted mb-2">
-                          {section} ({sectionMembers.length})
-                        </h3>
-                        <div className="space-y-2">
-                          {sectionMembers.map((member) => (
-                            <div
-                              key={member.id}
-                              className="px-3 border border-border rounded-lg flex justify-between items-center gap-2"
-                            >
-                              <p className="flex-1">
-                                {member.last_name}, {member.first_name || '(no first name)'}
-                              </p>
-                              <select
-                                value={member.section_name || ''}
-                                onChange={(e) => handleUpdateMemberSection(member.id, e.target.value)}
-                                disabled={updatingMemberId === member.id}
-                                className="text-sm border border-border rounded px-2 py-1"
-                              >
-                                <option value="">{t('members.noSection')}</option>
-                                {sections.map((s) => (
-                                  <option key={s} value={s}>{s}</option>
-                                ))}
-                              </select>
-                              <button
-                                onClick={() => handleRemoveManualMember(member.id)}
-                                disabled={removingMemberId === member.id}
-                                className="text-sm text-red-600 hover:text-red-700"
-                              >
-                                {removingMemberId === member.id ? '...' : t('members.remove')}
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
                 </div>
               ) : (
                 // No sections - simple list
@@ -1479,7 +1745,7 @@ export default function LivingGroupPage() {
                         {member.last_name}, {member.first_name || '(no first name)'}
                       </p>
                       <button
-                        onClick={() => handleRemoveManualMember(member.id)}
+                        onClick={() => handleRemoveManualMember(member)}
                         disabled={removingMemberId === member.id}
                         className="text-sm text-red-600 hover:text-red-700"
                       >
@@ -1489,13 +1755,43 @@ export default function LivingGroupPage() {
                   ))}
                 </div>
               )}
+
+              {/* Member Removal Confirmation Modal */}
+              {memberToRemove && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                  <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                    <h3 className="text-lg font-medium mb-2">{t('members.remove')}</h3>
+                    <p className="text-text-secondary mb-4">
+                      {t('members.confirmRemove')}
+                      <br />
+                      <span className="font-medium">
+                        {memberToRemove.last_name}, {memberToRemove.first_name || '(no first name)'}
+                      </span>
+                    </p>
+                    <div className="flex gap-2 justify-end">
+                      <button
+                        onClick={() => setMemberToRemove(null)}
+                        className="px-4 py-2 border border-border rounded hover:bg-gray-50"
+                      >
+                        {t('members.cancel')}
+                      </button>
+                      <button
+                        onClick={confirmRemoveMember}
+                        disabled={removingMemberId === memberToRemove.id}
+                        className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
+                      >
+                        {removingMemberId === memberToRemove.id ? t('members.removing') : t('members.confirm')}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
           {/* Documents Tab */}
           {activeTab === 'documents' && (
             <div>
-              <h2 className="text-lg font-medium mb-2">{t('documents.title')}</h2>
               <p className="text-text-secondary text-sm mb-6">{t('documents.description')}</p>
 
               {documentsMessage.text && (
@@ -1547,6 +1843,33 @@ export default function LivingGroupPage() {
                   </button>
                 </form>
               )}
+            </div>
+          )}
+
+          {/* Settings Tab */}
+          {activeTab === 'settings' && (
+            <div>
+              {/* Email Section */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium mb-2">{t('settings.emailTitle')}</label>
+                <p className="text-text-secondary text-sm mb-3">{t('settings.emailDescription')}</p>
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    value={livingGroupEmail}
+                    onChange={(e) => setLivingGroupEmail(e.target.value)}
+                    placeholder={t('settings.emailPlaceholder')}
+                    className="flex-1 border border-border rounded px-4 py-2"
+                  />
+                  <button
+                    onClick={handleSaveEmail}
+                    disabled={savingEmail}
+                    className="px-4 py-2 bg-[#750014] text-white rounded hover:bg-[#5C0010] disabled:opacity-50 whitespace-nowrap"
+                  >
+                    {savingEmail ? '...' : t('settings.saveEmail')}
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </section>

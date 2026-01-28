@@ -996,7 +996,8 @@
       "book": "预约",
       "assign": "区域",
       "members": "成员",
-      "documents": "文档"
+      "documents": "文档",
+      "settings": "设置"
     },
     "email": {
       "title": "显示邮箱",
@@ -1061,7 +1062,21 @@
       "removeSection": "删除",
       "removing": "删除中...",
       "removeSectionSuccess": "区域删除成功",
-      "removeSectionError": "删除区域失败"
+      "removeSectionError": "删除区域失败",
+      "confirmRemoveTitle": "删除区域？",
+      "confirmRemoveMessage": "您确定要删除'{section}'吗？此区域中的所有成员将被移至'未分配'。",
+      "saved": "分配已保存",
+      "saveError": "保存分配失败",
+      "timeSlots": {
+        "title": "将区域分配到时间段",
+        "description": "将每个区域分配到拍照期间的30分钟时间段。",
+        "slot": "时间段",
+        "section": "区域",
+        "notAssigned": "未分配",
+        "saving": "保存中...",
+        "unassignedSections": "尚未分配的区域",
+        "allAssigned": "所有区域已分配！"
+      }
     },
     "members": {
       "title": "成员",
@@ -1101,7 +1116,7 @@
       "addPlaceholder": "输入成员姓名",
       "searchPlaceholder": "搜索邮箱...",
       "selectSection": "分配到区域",
-      "noSection": "无区域",
+      "noSection": "未分配",
       "unassigned": "未分配",
       "allSections": "所有区域",
       "noResults": "未找到学生",

@@ -22,6 +22,7 @@
     "bootstrap": "^5.3.3",
     "cryptr": "^6.4.0",
     "csv-parse": "^6.1.0",
+    "dotenv": "^17.2.3",
     "framer-motion": "^11.2.10",
     "iron-session": "^8.0.4",
     "mongodb": "^6.17.0",

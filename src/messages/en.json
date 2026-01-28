@@ -987,7 +987,8 @@
       "book": "Book",
       "assign": "Sections",
       "members": "Members",
-      "documents": "Documents"
+      "documents": "Documents",
+      "settings": "Settings"
     },
     "email": {
       "title": "Display Email",
@@ -1052,7 +1053,21 @@
       "removeSection": "Remove",
       "removing": "Removing...",
       "removeSectionSuccess": "Section removed successfully",
-      "removeSectionError": "Failed to remove section"
+      "removeSectionError": "Failed to remove section",
+      "confirmRemoveTitle": "Remove Section?",
+      "confirmRemoveMessage": "Are you sure you want to remove '{section}'? All members in this section will be moved to 'Unassigned'.",
+      "saved": "Assignment saved",
+      "saveError": "Failed to save assignment",
+      "timeSlots": {
+        "title": "Assign Sections to Time Slots",
+        "description": "Assign each section to a 30-minute time slot during your photoshoot.",
+        "slot": "Slot",
+        "section": "Section",
+        "notAssigned": "Not assigned",
+        "saving": "Saving...",
+        "unassignedSections": "Sections not yet assigned",
+        "allAssigned": "All sections assigned!"
+      }
     },
     "members": {
       "title": "Members",
@@ -1091,7 +1106,7 @@
       "assignAllToSection": "Assign all to section:",
       "searchPlaceholder": "Search by email...",
       "selectSection": "Assign to section",
-      "noSection": "No section",
+      "noSection": "Unassigned",
       "unassigned": "Unassigned",
       "allSections": "All Sections",
       "noResults": "No students found",

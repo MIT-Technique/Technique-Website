@@ -647,14 +647,6 @@ export function generateStaticParams() {
 -- WARNING: This schema is for context only and is not meant to be run.
 -- Table order and constraints may not be valid for execution.
 
--- NOTE: The membership system has been simplified (Jan 2026).
-
--- WARNING: This schema is for context only and is not meant to be run.
--- Table order and constraints may not be valid for execution.
-
--- WARNING: This schema is for context only and is not meant to be run.
--- Table order and constraints may not be valid for execution.
-
 CREATE TABLE public.admin_logs (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 actor_id uuid NOT NULL,
@@ -673,6 +665,7 @@ name text NOT NULL,
 added_at timestamp with time zone DEFAULT now(),
 first_name character varying NOT NULL,
 last_name character varying NOT NULL,
+section_name text,
 CONSTRAINT club_manual_members_pkey PRIMARY KEY (id),
 CONSTRAINT club_manual_members_club_id_fkey FOREIGN KEY (club_id) REFERENCES public.clubs(id)
 );
@@ -703,6 +696,7 @@ created_at timestamp with time zone DEFAULT now(),
 updated_at timestamp with time zone DEFAULT now(),
 document_links text,
 document_notes text,
+club_sections ARRAY DEFAULT '{}'::text[],
 CONSTRAINT clubs_pkey PRIMARY KEY (id),
 CONSTRAINT clubs_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
 CONSTRAINT clubs_approved_by_fkey FOREIGN KEY (approved_by) REFERENCES public.users(id)
@@ -747,6 +741,20 @@ CONSTRAINT living_group_memberships_living_group_fkey FOREIGN KEY (living_group_
 CONSTRAINT living_group_memberships_user_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
 CONSTRAINT living_group_memberships_approved_by_fkey FOREIGN KEY (approved_by) REFERENCES public.users(id)
 );
+CREATE TABLE public.living_group_time_assignments (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+photoshoot_time_id uuid NOT NULL,
+living_group_id uuid NOT NULL,
+section_name text,
+slot_start time without time zone NOT NULL,
+slot_end time without time zone NOT NULL,
+assigned_by uuid NOT NULL,
+created_at timestamp with time zone DEFAULT now(),
+CONSTRAINT living_group_time_assignments_pkey PRIMARY KEY (id),
+CONSTRAINT living_group_time_assignments_photoshoot_fkey FOREIGN KEY (photoshoot_time_id) REFERENCES public.photoshoot_times(id),
+CONSTRAINT living_group_time_assignments_living_group_fkey FOREIGN KEY (living_group_id) REFERENCES public.living_groups(id),
+CONSTRAINT living_group_time_assignments_assigned_by_fkey FOREIGN KEY (assigned_by) REFERENCES public.users(id)
+);
 CREATE TABLE public.living_groups (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 user_id uuid NOT NULL,
@@ -760,6 +768,7 @@ living_group_type character varying DEFAULT 'dorm'::character varying CHECK (liv
 affiliation text,
 document_links text,
 document_notes text,
+dorm_sections ARRAY DEFAULT '{}'::text[],
 CONSTRAINT living_groups_pkey PRIMARY KEY (id),
 CONSTRAINT living_groups_disabled_by_fkey FOREIGN KEY (disabled_by) REFERENCES public.users(id),
 CONSTRAINT living_groups_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)

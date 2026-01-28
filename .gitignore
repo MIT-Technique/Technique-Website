@@ -40,3 +40,6 @@ next-env.d.ts
 
 /src/lib/testscript.ts
 /src/lib/Technique2.xlsx - Technique.csv
+
+# Script output (credentials)
+/scripts/output/
