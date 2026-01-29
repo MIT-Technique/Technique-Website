@@ -896,8 +896,10 @@
       "memberListPlaceholder": "Enter member names, one per line or separated by commas",
       "memberListHint": "List the names of members who should appear in the yearbook",
       "images": "Candid Images",
-      "imagesHint": "Upload up to 3 candid images of your club (coming soon)",
-      "uploadNote": "Image upload functionality coming soon"
+      "imagesHint": "Upload up to 3 candid images of your club (1 main + 2 optional). Max 5MB each.",
+      "mainImage": "Main Image",
+      "additionalImage": "Additional (Optional)",
+      "fileNaming": "Please name files as: {name}_Candid (main), {name}_Candid_2, {name}_Candid_3 (additional)"
     },
     "members": {
       "title": "Club Members",
@@ -1050,6 +1052,8 @@
       "addSectionError": "Failed to add section",
       "noSections": "No sections created yet",
       "memberCount": "{count} member(s)",
+      "sectionImage": "Section Image",
+      "sectionFileNaming": "Please name the file as: Organization_Name_Section_Name_Candid",
       "removeSection": "Remove",
       "removing": "Removing...",
       "removeSectionSuccess": "Section removed successfully",

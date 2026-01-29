@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { useUser } from '../../../hooks/useUser';
 import Footer from '../../../components/Footer/Footer';
+import ImageUpload from '../../../components/ImageUpload/ImageUpload';
 
 export default function ClubPage() {
   const router = useRouter();
@@ -420,20 +421,35 @@ export default function ClubPage() {
                 <div>
                   <label className="block text-sm font-medium mb-2">{t('form.images')}</label>
                   <p className="text-sm text-text-muted mb-4">{t('form.imagesHint')}</p>
-                  <div className="flex gap-4">
-                    {[club?.candid_image_1, club?.candid_image_2, club?.candid_image_3]
-                      .filter(Boolean)
-                      .map((img, i) => (
-                        <div key={i} className="relative">
-                          <img
-                            src={img}
-                            alt={`Club image ${i + 1}`}
-                            className="w-24 h-24 object-cover rounded"
-                          />
-                        </div>
-                      ))}
+                  <div className="flex gap-4 flex-wrap">
+                    {[1, 2, 3].map((slot) => {
+                      const clubName = (club?.name || '').replace(/\s+/g, '_');
+                      const nameSuffix = slot === 1 ? '' : `_${slot}`;
+                      return (
+                        <ImageUpload
+                          key={slot}
+                          imageUrl={club?.[`candid_image_${slot}`]}
+                          label={slot === 1 ? t('form.mainImage') : t('form.additionalImage')}
+                          fileName={`${clubName}_Candid${nameSuffix}`}
+                          disabled={isFrozen}
+                          onUpload={async (file) => {
+                            const fd = new FormData();
+                            fd.append('file', file);
+                            fd.append('slot', String(slot));
+                            const res = await fetch('/api/clubs/images', { method: 'POST', body: fd });
+                            const data = await res.json();
+                            if (!res.ok) throw new Error(data.error || 'Upload failed');
+                            return data.url;
+                          }}
+                          onDelete={async () => {
+                            const res = await fetch(`/api/clubs/images?slot=${slot}`, { method: 'DELETE' });
+                            const data = await res.json();
+                            if (!res.ok) throw new Error(data.error || 'Delete failed');
+                          }}
+                        />
+                      );
+                    })}
                   </div>
-                  <p className="text-sm text-text-muted mt-2">{t('form.uploadNote')}</p>
                 </div>
 
                 {message.text && (

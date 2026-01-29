@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "../../../../lib/auth/session";
 import { createAdminClient } from "../../../../lib/supabase/admin";
 
-// POST - Upload a candid image
+// POST - Upload a section image
 export async function POST(request: NextRequest) {
   try {
     const user = await getCurrentUser();
@@ -14,16 +14,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (user.role !== 'club') {
+    if (user.role !== 'living_group') {
       return NextResponse.json(
-        { error: "Only club accounts can upload images" },
+        { error: "Only living group accounts can upload images" },
         { status: 403 }
       );
     }
 
     const formData = await request.formData();
     const file = formData.get('file') as File;
-    const slot = formData.get('slot') as string; // '1', '2', or '3'
+    const sectionName = formData.get('section_name') as string;
 
     if (!file) {
       return NextResponse.json(
@@ -32,9 +32,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!['1', '2', '3'].includes(slot)) {
+    if (!sectionName) {
       return NextResponse.json(
-        { error: "Invalid slot. Must be 1, 2, or 3" },
+        { error: "No section name provided" },
         { status: 400 }
       );
     }
@@ -58,28 +58,36 @@ export async function POST(request: NextRequest) {
 
     const supabase = createAdminClient();
 
-    // Get club
-    const { data: club } = await supabase
-      .from('clubs')
-      .select('id, club_id, name')
+    // Get living group
+    const { data: livingGroup } = await supabase
+      .from('living_groups')
+      .select('id, name, living_group_type, section_images')
       .eq('user_id', user.id)
       .single();
 
-    if (!club) {
+    if (!livingGroup) {
       return NextResponse.json(
-        { error: "Club not found" },
+        { error: "Living group not found" },
         { status: 404 }
       );
     }
 
     // Upload to Supabase Storage
     const fileExt = file.name.split('.').pop();
-    const safeName = (club.name || club.club_id).replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '');
-    const suffix = slot === '1' ? '' : `_${slot}`;
-    const fileName = `clubs/${safeName}_Candid${suffix}.${fileExt}`;
+    const safeOrgName = (livingGroup.name || livingGroup.id).replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '');
+    const safeSectionName = sectionName.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '');
+    const bucketName = 'living-group-images';
+    const subfolder = livingGroup.living_group_type === 'fsilg' ? 'fsilgs' : 'dorms';
+    const fileName = `${subfolder}/${safeOrgName}_${safeSectionName}_Candid.${fileExt}`;
 
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('club-images')
+    // Ensure bucket exists
+    const { data: buckets } = await supabase.storage.listBuckets();
+    if (!buckets?.find((b: { name: string }) => b.name === bucketName)) {
+      await supabase.storage.createBucket(bucketName, { public: true, fileSizeLimit: 5 * 1024 * 1024 });
+    }
+
+    const { error: uploadError } = await supabase.storage
+      .from(bucketName)
       .upload(fileName, file, {
         cacheControl: '3600',
         upsert: true,
@@ -95,23 +103,25 @@ export async function POST(request: NextRequest) {
 
     // Get public URL
     const { data: urlData } = supabase.storage
-      .from('club-images')
+      .from(bucketName)
       .getPublicUrl(fileName);
 
-    // Update club record
-    const imageField = `candid_image_${slot}`;
+    // Update section_images JSONB
+    const sectionImages = livingGroup.section_images || {};
+    sectionImages[sectionName] = urlData.publicUrl;
+
     const { error: updateError } = await supabase
-      .from('clubs')
+      .from('living_groups')
       .update({
-        [imageField]: urlData.publicUrl,
+        section_images: sectionImages,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', club.id);
+      .eq('id', livingGroup.id);
 
     if (updateError) {
-      console.error("Update club error:", updateError);
+      console.error("Update living group error:", updateError);
       return NextResponse.json(
-        { error: "Failed to update club with image URL" },
+        { error: "Failed to update living group with image URL" },
         { status: 500 }
       );
     }
@@ -119,7 +129,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       url: urlData.publicUrl,
-      slot,
+      section_name: sectionName,
     });
   } catch (error) {
     console.error("Upload image error:", error);
@@ -130,7 +140,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// DELETE - Remove a candid image
+// DELETE - Remove a section image
 export async function DELETE(request: NextRequest) {
   try {
     const user = await getCurrentUser();
@@ -142,60 +152,62 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    if (user.role !== 'club') {
+    if (user.role !== 'living_group') {
       return NextResponse.json(
-        { error: "Only club accounts can delete images" },
+        { error: "Only living group accounts can delete images" },
         { status: 403 }
       );
     }
 
     const { searchParams } = new URL(request.url);
-    const slot = searchParams.get('slot');
+    const sectionName = searchParams.get('section_name');
 
-    if (!slot || !['1', '2', '3'].includes(slot)) {
+    if (!sectionName) {
       return NextResponse.json(
-        { error: "Invalid slot. Must be 1, 2, or 3" },
+        { error: "No section name provided" },
         { status: 400 }
       );
     }
 
     const supabase = createAdminClient();
 
-    // Get club with current image URL
-    const imageField = `candid_image_${slot}`;
-    const { data: club } = await supabase
-      .from('clubs')
-      .select(`id, ${imageField}`)
+    // Get living group
+    const { data: livingGroup } = await supabase
+      .from('living_groups')
+      .select('id, section_images')
       .eq('user_id', user.id)
       .single();
 
-    if (!club) {
+    if (!livingGroup) {
       return NextResponse.json(
-        { error: "Club not found" },
+        { error: "Living group not found" },
         { status: 404 }
       );
     }
 
     // Delete file from storage
-    const imageUrl = club[imageField];
+    const sectionImages = livingGroup.section_images || {};
+    const imageUrl = sectionImages[sectionName];
     if (imageUrl) {
-      const match = imageUrl.match(/\/club-images\/(.+)$/);
+      const match = imageUrl.match(/\/living-group-images\/(.+)$/);
       if (match) {
-        await supabase.storage.from('club-images').remove([decodeURIComponent(match[1])]);
+        await supabase.storage.from('living-group-images').remove([decodeURIComponent(match[1])]);
       }
     }
 
-    // Clear the image URL in database
+    // Remove section from JSONB
+    delete sectionImages[sectionName];
+
     const { error: updateError } = await supabase
-      .from('clubs')
+      .from('living_groups')
       .update({
-        [imageField]: null,
+        section_images: sectionImages,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', club.id);
+      .eq('id', livingGroup.id);
 
     if (updateError) {
-      console.error("Update club error:", updateError);
+      console.error("Update living group error:", updateError);
       return NextResponse.json(
         { error: "Failed to remove image" },
         { status: 500 }
@@ -204,7 +216,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      slot,
+      section_name: sectionName,
     });
   } catch (error) {
     console.error("Delete image error:", error);

@@ -905,8 +905,10 @@
       "memberListPlaceholder": "输入成员姓名，每行一个或用逗号分隔",
       "memberListHint": "列出应出现在年鉴中的成员姓名",
       "images": "活动照片",
-      "imagesHint": "上传最多3张社团活动照片（即将推出）",
-      "uploadNote": "图片上传功能即将推出"
+      "imagesHint": "上传最多3张社团活动照片（1张主图 + 2张可选）。每张最大5MB。",
+      "mainImage": "主图",
+      "additionalImage": "附加（可选）",
+      "fileNaming": "请将文件命名为：{name}_Candid（主图）、{name}_Candid_2、{name}_Candid_3（附加）"
     },
     "members": {
       "title": "社团成员",
@@ -1059,6 +1061,8 @@
       "addSectionError": "添加区域失败",
       "noSections": "尚未创建任何区域",
       "memberCount": "{count} 名成员",
+      "sectionImage": "分区照片",
+      "sectionFileNaming": "请将文件命名为：组织名称_分区名称_Candid",
       "removeSection": "删除",
       "removing": "删除中...",
       "removeSectionSuccess": "区域删除成功",

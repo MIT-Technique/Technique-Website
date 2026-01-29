@@ -897,8 +897,10 @@
       "memberListPlaceholder": "Ingrese nombres de miembros, uno por línea o separados por comas",
       "memberListHint": "Liste los nombres de los miembros que deben aparecer en el anuario",
       "images": "Imágenes Candid",
-      "imagesHint": "Suba hasta 3 imágenes candid de su club (próximamente)",
-      "uploadNote": "Función de carga de imágenes próximamente"
+      "imagesHint": "Suba hasta 3 imágenes candid de su club (1 principal + 2 opcionales). Máx. 5MB cada una.",
+      "mainImage": "Imagen Principal",
+      "additionalImage": "Adicional (Opcional)",
+      "fileNaming": "Nombre de archivos: {name}_Candid (principal), {name}_Candid_2, {name}_Candid_3 (adicionales)"
     },
     "members": {
       "title": "Miembros del Club",
@@ -1051,6 +1053,8 @@
       "addSectionError": "Error al añadir sección",
       "noSections": "Aún no hay secciones creadas",
       "memberCount": "{count} miembro(s)",
+      "sectionImage": "Imagen de Sección",
+      "sectionFileNaming": "Nombre del archivo: Nombre_Organización_Nombre_Sección_Candid",
       "removeSection": "Eliminar",
       "removing": "Eliminando...",
       "removeSectionSuccess": "Sección eliminada exitosamente",

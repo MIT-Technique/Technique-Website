@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { useUser } from '../../../hooks/useUser';
 import Footer from '../../../components/Footer/Footer';
+import ImageUpload from '../../../components/ImageUpload/ImageUpload';
 import TextField from "@mui/material/TextField";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
@@ -1412,25 +1413,47 @@ export default function LivingGroupPage() {
                 ) : sections.length === 0 ? (
                   <p className="text-text-secondary">{t('assign.noSections')}</p>
                 ) : (
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {sections.map((section) => {
                       const memberCount = manualMembers.filter(m => m.section_name === section).length;
                       return (
                         <div
                           key={section}
-                          className="px-4 py-2 border border-border rounded-lg flex justify-between items-center gap-4"
+                          className="px-4 py-3 border border-border rounded-lg space-y-2"
                         >
-                          <span className="font-medium">{section}</span>
-                          <span className="text-sm text-text-muted">
-                            {t('assign.memberCount', { count: memberCount })}
-                          </span>
-                          <button
-                            onClick={() => handleRemoveSection(section)}
-                            disabled={removingSectionName === section}
-                            className="text-sm text-red-600 hover:text-red-700 whitespace-nowrap ml-auto"
-                          >
-                            {removingSectionName === section ? t('assign.removing') : t('assign.removeSection')}
-                          </button>
+                          <div className="flex justify-between items-center gap-4">
+                            <span className="font-medium">{section}</span>
+                            <span className="text-sm text-text-muted">
+                              {t('assign.memberCount', { count: memberCount })}
+                            </span>
+                            <button
+                              onClick={() => handleRemoveSection(section)}
+                              disabled={removingSectionName === section}
+                              className="text-sm text-red-600 hover:text-red-700 whitespace-nowrap ml-auto"
+                            >
+                              {removingSectionName === section ? t('assign.removing') : t('assign.removeSection')}
+                            </button>
+                          </div>
+                          <ImageUpload
+                            imageUrl={livingGroup?.section_images?.[section] || null}
+                            label={t('assign.sectionImage')}
+                            fileName={`${(livingGroup?.name || '').replace(/\s+/g, '_')}_${section.replace(/\s+/g, '_')}_Candid`}
+                            disabled={isFrozen}
+                            onUpload={async (file) => {
+                              const fd = new FormData();
+                              fd.append('file', file);
+                              fd.append('section_name', section);
+                              const res = await fetch('/api/living-groups/images', { method: 'POST', body: fd });
+                              const data = await res.json();
+                              if (!res.ok) throw new Error(data.error || 'Upload failed');
+                              return data.url;
+                            }}
+                            onDelete={async () => {
+                              const res = await fetch(`/api/living-groups/images?section_name=${encodeURIComponent(section)}`, { method: 'DELETE' });
+                              const data = await res.json();
+                              if (!res.ok) throw new Error(data.error || 'Delete failed');
+                            }}
+                          />
                         </div>
                       );
                     })}
