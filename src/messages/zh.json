@@ -589,11 +589,30 @@
       "title": "学生作品展示",
       "metaTitle": "学生作品展示 - MIT Technique",
       "metaDescription": "在年鉴中展示您的学术项目、研究或创意作品。",
-      "description": "在年鉴中展示您的学术项目、研究或创意作品。",
-      "cta": {
-        "button": "提交作品",
-        "hint": "填写表格提交您的作品以供考虑"
-      }
+      "emailLabel": "MIT邮箱",
+      "emailHelper": "提交或更新您的作品",
+      "emailRequired": "邮箱为必填项",
+      "emailMitOnly": "必须是有效的@mit.edu邮箱",
+      "membersLabel": "成员",
+      "memberLabel": "成员 {n}",
+      "addMember": "添加成员",
+      "additionalCreditsLabel": "其他致谢",
+      "projectTitleLabel": "项目名称",
+      "projectDescriptionLabel": "项目描述",
+      "projectDescriptionHint": "请保持在150字以内",
+      "linksLabel": "链接",
+      "linksHint": "产品网站、Figma预览等。必须与项目相关。",
+      "imagesLabel": "图片（可选）",
+      "imageHint": "最多5张图片，每张最大10MB。支持JPEG、PNG、WebP或GIF。",
+      "member1Required": "至少需要一个成员姓名",
+      "titleRequired": "项目名称为必填项",
+      "descriptionRequired": "项目描述为必填项",
+      "invalidType": "仅允许JPEG、PNG、WebP和GIF格式的图片",
+      "tooLarge": "文件太大，最大为10MB",
+      "submit": "提交作品",
+      "submitting": "提交中...",
+      "success": "您的作品已成功提交！",
+      "error": "出现错误，请重试。"
     },
 
     "privacy": {

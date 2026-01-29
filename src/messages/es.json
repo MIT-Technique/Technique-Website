@@ -589,11 +589,30 @@
       "title": "Trabajo Estudiantil",
       "metaTitle": "Trabajo Estudiantil - MIT Technique",
       "metaDescription": "Envíe su trabajo estudiantil para aparecer en el anuario.",
-      "description": "Muestra tus proyectos académicos, investigación o trabajos creativos en el anuario.",
-      "cta": {
-        "button": "Enviar Trabajo",
-        "hint": "Complete el formulario para enviar su trabajo para consideración"
-      }
+      "emailLabel": "Correo MIT",
+      "emailHelper": "Envíe o actualice su trabajo",
+      "emailRequired": "El correo electrónico es obligatorio",
+      "emailMitOnly": "Debe ser un correo @mit.edu válido",
+      "membersLabel": "Miembros",
+      "memberLabel": "Miembro {n}",
+      "addMember": "Agregar Miembro",
+      "additionalCreditsLabel": "Créditos adicionales",
+      "projectTitleLabel": "Título del proyecto",
+      "projectDescriptionLabel": "Descripción del proyecto",
+      "projectDescriptionHint": "Por favor mantenga menos de 150 palabras",
+      "linksLabel": "Enlace(s)",
+      "linksHint": "Sitios web del proyecto, vistas previas de Figma, etc. Debe estar relacionado con el proyecto.",
+      "imagesLabel": "Imágenes (opcional)",
+      "imageHint": "Hasta 5 imágenes, máximo 10MB cada una. JPEG, PNG, WebP o GIF.",
+      "member1Required": "Se requiere al menos un nombre de miembro",
+      "titleRequired": "El título del proyecto es obligatorio",
+      "descriptionRequired": "La descripción del proyecto es obligatoria",
+      "invalidType": "Solo se permiten imágenes JPEG, PNG, WebP y GIF",
+      "tooLarge": "Archivo demasiado grande. El tamaño máximo es 10MB",
+      "submit": "Enviar Trabajo",
+      "submitting": "Enviando...",
+      "success": "¡Su trabajo ha sido enviado exitosamente!",
+      "error": "Algo salió mal. Por favor intente de nuevo."
     },
 
     "privacy": {

@@ -588,11 +588,30 @@
       "title": "Student Work Feature",
       "metaTitle": "Student Work Feature - MIT Technique",
       "metaDescription": "Submit your student work for a chance to be featured in the yearbook.",
-      "description": "Showcase your academic projects, research, or creative work in the yearbook.",
-      "cta": {
-        "button": "Submit Work",
-        "hint": "Complete the form to submit your work for consideration"
-      }
+      "emailLabel": "MIT Email",
+      "emailHelper": "Submit or update your work",
+      "emailRequired": "Email is required",
+      "emailMitOnly": "Must be a valid @mit.edu email",
+      "membersLabel": "Members",
+      "memberLabel": "Member {n}",
+      "addMember": "Add Member",
+      "additionalCreditsLabel": "Additional Credits",
+      "projectTitleLabel": "Project Title",
+      "projectDescriptionLabel": "Project Description",
+      "projectDescriptionHint": "Please keep below 150 words",
+      "linksLabel": "Link(s)",
+      "linksHint": "Product websites, Figma previews, etc. Must be project related.",
+      "imagesLabel": "Images (optional)",
+      "imageHint": "Up to 5 images, max 10MB each. JPEG, PNG, WebP, or GIF.",
+      "member1Required": "At least one member name is required",
+      "titleRequired": "Project title is required",
+      "descriptionRequired": "Project description is required",
+      "invalidType": "Only JPEG, PNG, WebP, and GIF images are allowed",
+      "tooLarge": "File too large. Maximum size is 10MB",
+      "submit": "Submit Work",
+      "submitting": "Submitting...",
+      "success": "Your work has been submitted successfully!",
+      "error": "Something went wrong. Please try again."
     },
 
     "privacy": {
