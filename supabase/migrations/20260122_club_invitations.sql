@@ -1,4 +1,4 @@
--- Migration: Club Invitations System
+-- Migration: Club Invitations System -
 -- Date: 2026-01-22
 -- Description: Adds has_leader column to clubs and creates club_invitations table
 
