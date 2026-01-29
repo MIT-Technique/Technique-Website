@@ -18,7 +18,7 @@ function Sidebar({ pathname }) {
   const t = useTranslations('nav');
   const tCommon = useTranslations('common');
   const tAccount = useTranslations('account');
-  const { isLoggedIn, user, loading, logout } = useUser();
+  const { isLoggedIn, user, club, sports, livingGroup, loading, logout } = useUser();
   const [isOpen, setIsOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [purchaseOpen, setPurchaseOpen] = useState(false);
@@ -463,7 +463,7 @@ function Sidebar({ pathname }) {
                       sx={{ px: 3, py: 1.5 }}
                     >
                       <ListItemText
-                        primary={user?.first_name || user?.email?.split('@')[0] || tAccount('login')}
+                        primary={sports?.name || club?.name || livingGroup?.name || user?.first_name || user?.email?.split('@')[0] || tAccount('login')}
                         primaryTypographyProps={{
                           sx: {
                             fontSize: "0.75rem",

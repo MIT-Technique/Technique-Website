@@ -35,6 +35,20 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Fetch sports teams
+    const { data: sportsTeams, error: sportsError } = await supabaseAdmin
+      .from("sports")
+      .select("id, name")
+      .order("name");
+
+    if (sportsError) {
+      console.error("Error fetching sports teams:", sportsError);
+      return NextResponse.json(
+        { error: "Failed to fetch sports teams" },
+        { status: 500 }
+      );
+    }
+
     // Combine and format the organizations
     const organizations = [
       ...clubs.map((club) => ({
@@ -47,6 +61,11 @@ export async function GET(request: NextRequest) {
         name: lg.name,
         type: "living_group" as const,
         livingGroupType: lg.living_group_type,
+      })),
+      ...(sportsTeams || []).map((sport) => ({
+        id: sport.id,
+        name: sport.name,
+        type: "sports" as const,
       })),
     ].sort((a, b) => a.name.localeCompare(b.name));
 

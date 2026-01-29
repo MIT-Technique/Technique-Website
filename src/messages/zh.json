@@ -191,6 +191,7 @@
         "organizationNotFound": "未找到组织",
         "clubsGroup": "社团",
         "livingGroupsGroup": "宿舍",
+        "sportsGroup": "体育",
         "email": "邮箱",
         "emailOptional": "邮箱（可选）",
         "emailPlaceholder": "your-org@mit.edu",
@@ -207,6 +208,7 @@
         "signInSuccess": "登录成功！",
         "successRedirecting": "成功！正在跳转\u2026",
         "forgotPassword": "忘记密码？",
+        "unexpectedIssues": "遇到问题？",
         "forgotPasswordTitle": "重置密码",
         "forgotPasswordDescription": "选择您的组织以接收密码重置链接。",
         "sendResetLink": "发送重置链接",
@@ -223,13 +225,13 @@
       "admin": {
         "title": "管理员登录",
         "description": "仅限Technique管理员。",
-        "emailLabel": "管理员邮箱",
-        "emailPlaceholder": "输入邮箱",
-        "sendLinkButton": "发送登录链接",
-        "sending": "发送中...",
-        "success": "登录链接已发送！请查看您的邮箱。",
-        "error": "发送登录链接失败。请重试。",
-        "invalidEmail": "请输入technique@mit.edu"
+        "passwordLabel": "密码",
+        "passwordPlaceholder": "输入管理员密码",
+        "passwordRequired": "密码不能为空",
+        "signInButton": "登录",
+        "signingIn": "登录中...",
+        "success": "登录成功！正在跳转...",
+        "error": "凭据无效。请重试。"
       },
       "sso": {
         "title": "学生和组织登录"
@@ -669,12 +671,17 @@
       "clubs": "社团",
       "livingGroups": "宿舍",
       "users": "用户",
+      "sports": "体育",
       "settings": "设置"
     },
     "stats": {
-      "pendingClubs": "未验证社团",
-      "pendingRequests": "待处理请求",
-      "upcomingPhotoshoots": "已预约拍摄",
+      "clubs": "社团",
+      "livingGroups": "宿舍",
+      "sports": "体育",
+      "descriptionsCompleted": "{count}/{total} 描述已填写",
+      "lgCandidsSubmitted": "{count}/{total} 已提交照片",
+      "totalImages": "总图片数",
+      "bookedPhotoshoots": "已预约拍摄",
       "cancellationRequests": "取消请求"
     },
     "overview": {
@@ -684,8 +691,8 @@
     "actions": {
       "managePhotoshoots": "管理拍摄时间",
       "managePhotoshootsDesc": "添加、编辑或删除拍摄时间段",
-      "reviewClubs": "审核晋升",
-      "reviewClubsDesc": "审核和批准晋升请求",
+      "manageUsers": "管理用户",
+      "manageUsersDesc": "查看和管理用户账户与角色",
       "formSettings": "表单设置",
       "formSettingsDesc": "冻结或解冻表单"
     },
@@ -753,6 +760,7 @@
     },
     "livingGroups": {
       "title": "宿舍管理",
+      "searchPlaceholder": "搜索宿舍...",
       "promoteUser": "提升用户",
       "cancel": "取消",
       "promoteTitle": "将用户提升为宿舍负责人",
@@ -785,6 +793,12 @@
       "expectedCount": "预期: {count}",
       "showMemberCounts": "显示成员人数"
     },
+    "sports": {
+      "searchPlaceholder": "搜索体育...",
+      "noSports": "未找到体育项目",
+      "genderTeams": "男女分队",
+      "memberCount": "{count} 名成员"
+    },
     "users": {
       "title": "用户管理",
       "allUsers": "所有用户",
@@ -795,7 +809,8 @@
         "student": "学生",
         "staph": "工作人员",
         "club": "社团",
-        "lgl": "宿舍负责人",
+        "livingGroup": "宿舍",
+        "sports": "体育队",
         "admin": "管理员"
       },
       "noUsers": "未找到用户",
@@ -970,14 +985,14 @@
       }
     },
     "documents": {
-      "title": "社团文档",
-      "description": "存储社团重要链接和备注。此信息仅对社团负责人可见。",
-      "linksLabel": "重要链接",
-      "linksPlaceholder": "添加重要链接（每行一个）\n示例：\nhttps://drive.google.com/your-folder\nhttps://docs.google.com/your-doc",
+      "title": "内部文档",
+      "description": "存储组织的内部链接和备注。此信息仅对您的账户可见。",
+      "linksLabel": "内部链接",
+      "linksPlaceholder": "添加内部链接（每行一个）\n示例：\nhttps://drive.google.com/your-folder\nhttps://docs.google.com/your-doc",
       "linksHint": "添加Google Drive文件夹、共享文档等的链接",
-      "notesLabel": "备注",
-      "notesPlaceholder": "添加社团负责人的重要备注...",
-      "notesHint": "仅对社团负责人可见的私密备注",
+      "notesLabel": "内部备注",
+      "notesPlaceholder": "添加组织的内部备注...",
+      "notesHint": "仅对您的账户可见",
       "save": "保存文档",
       "saveSuccess": "文档保存成功",
       "saveError": "保存文档失败"
@@ -1137,14 +1152,14 @@
       "confirmRemove": "确认移除此成员？"
     },
     "documents": {
-      "title": "组织文档",
-      "description": "存储住宿组的重要链接和备注。此信息为私密信息。",
-      "linksLabel": "重要链接",
-      "linksPlaceholder": "添加重要链接（每行一个）\n示例：\nhttps://drive.google.com/your-folder\nhttps://docs.google.com/your-doc",
+      "title": "内部文档",
+      "description": "存储组织的内部链接和备注。此信息仅对您的账户可见。",
+      "linksLabel": "内部链接",
+      "linksPlaceholder": "添加内部链接（每行一个）\n示例：\nhttps://drive.google.com/your-folder\nhttps://docs.google.com/your-doc",
       "linksHint": "添加Google Drive文件夹、共享文档等的链接",
-      "notesLabel": "备注",
-      "notesPlaceholder": "添加重要备注...",
-      "notesHint": "仅对住宿组账户可见的私密备注",
+      "notesLabel": "内部备注",
+      "notesPlaceholder": "添加组织的内部备注...",
+      "notesHint": "仅对您的账户可见",
       "save": "保存文档",
       "saving": "保存中...",
       "saveSuccess": "文档保存成功",
@@ -1250,6 +1265,114 @@
         "description": "我们随时为您提供帮助。直接联系我们。",
         "button": "联系我们"
       }
+    }
+  },
+
+  "sportsPage": {
+    "title": "运动队管理面板",
+    "welcome": "欢迎，{name}",
+    "frozen": "此表单已冻结，无法进行更改。",
+    "success": "更改已保存",
+    "error": "保存失败",
+    "save": "保存更改",
+    "saving": "保存中...",
+    "tabs": {
+      "profile": "简介",
+      "coaches": "教练",
+      "members": "成员",
+      "photos": "照片",
+      "achievements": "成就",
+      "documents": "文档"
+    },
+    "profile": {
+      "email": "联系邮箱",
+      "description": "描述",
+      "hasGenderTeams": "设有男队和女队",
+      "genderToggleTitle": "更改队伍结构",
+      "genderToggleWarning": "更改此设置将影响成员、照片和成就的组织方式。当前结构的特定信息可能会丢失。请记得保存更改以确认。",
+      "genderToggleConfirm": "继续",
+      "genderToggleCancel": "取消"
+    },
+    "email": {
+      "placeholder": "team@mit.edu",
+      "save": "保存",
+      "saved": "邮箱已保存",
+      "error": "保存邮箱失败"
+    },
+    "coaches": {
+      "title": "教练团队",
+      "addCoach": "添加教练",
+      "namePlaceholder": "教练姓名",
+      "rolePlaceholder": "职位（如主教练）",
+      "headCoach": "主教练",
+      "assistantCoach": "助理教练",
+      "director": "主任",
+      "noCoaches": "尚未添加教练",
+      "remove": "删除",
+      "addSuccess": "教练已添加",
+      "addError": "添加教练失败",
+      "removeSuccess": "教练已删除",
+      "removeError": "删除教练失败"
+    },
+    "members": {
+      "mensTeam": "男队",
+      "womensTeam": "女队",
+      "unifiedTeam": "队员",
+      "addSingle": "单个添加",
+      "bulkImport": "批量导入",
+      "firstNamePlaceholder": "名",
+      "lastNamePlaceholder": "姓",
+      "add": "添加",
+      "adding": "添加中...",
+      "remove": "删除",
+      "removing": "删除中...",
+      "noMembers": "尚未添加成员",
+      "listTitle": "成员",
+      "addSuccess": "成员已添加",
+      "addError": "添加成员失败",
+      "removeSuccess": "成员已删除",
+      "removeError": "删除成员失败",
+      "bulkInputLabel": "粘贴姓名",
+      "bulkInputHint": "每行一个姓名：名 姓 或 姓, 名",
+      "bulkPlaceholder": "张三\n李, 四\n...",
+      "preview": "预览",
+      "import": "全部导入",
+      "importing": "导入中...",
+      "previewTitle": "导入预览",
+      "previewCount": "成功解析 {count} 个姓名",
+      "successfulParse": "成功",
+      "parseErrors": "错误",
+      "closePreview": "关闭预览",
+      "bulkAddSuccess": "已添加 {count} 名成员",
+      "bulkAddError": "导入成员失败",
+      "withErrors": "（{count} 个解析错误）",
+      "withDuplicates": "（{count} 个重复已跳过）"
+    },
+    "photos": {
+      "mainImage": "主照片",
+      "additionalImage": "附加照片",
+      "mensPhotos": "男队照片",
+      "womensPhotos": "女队照片",
+      "teamPhotos": "团队照片"
+    },
+    "achievements": {
+      "title": "成就总结",
+      "mensAchievements": "男队成就",
+      "womensAchievements": "女队成就",
+      "placeholder": "输入团队成就、奖项、记录..."
+    },
+    "documents": {
+      "title": "内部文档",
+      "description": "存储组织的内部链接和备注。此信息仅对您的账户可见。",
+      "linksLabel": "内部链接",
+      "linksPlaceholder": "添加内部链接（每行一个）\n示例：\nhttps://drive.google.com/your-folder\nhttps://docs.google.com/your-doc",
+      "linksHint": "添加Google Drive文件夹、共享文档等的链接",
+      "notesLabel": "内部备注",
+      "notesPlaceholder": "添加组织的内部备注...",
+      "notesHint": "仅对您的账户可见",
+      "save": "保存文档",
+      "saveSuccess": "文档已保存",
+      "saveError": "保存文档失败"
     }
   }
 }

@@ -54,8 +54,6 @@ export default function SettingsPage() {
 
   return (
     <div>
-      <h2 className="text-lg font-medium mb-6">{t('title')}</h2>
-
       <div className="mb-8">
         <h3 className="text-md font-medium mb-4">{t('formFreeze.title')}</h3>
         <p className="text-sm text-text-secondary mb-4">{t('formFreeze.description')}</p>

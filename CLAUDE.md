@@ -1,8 +1,8 @@
 # MIT Technique Website - Project Documentation
 
-**Last Updated:** January 22, 2026
-**Tech Stack:** Next.js 14.2.3 (App Router) + next-intl 4.7.0
-**Internationalization:** 3 languages supported
+**Last Updated:** January 29, 2026
+**Tech Stack:** Next.js 14.2.3 (App Router) + next-intl 4.7.0 + Supabase
+**Internationalization:** 3 active languages (en, es, zh)
 
 ---
 
@@ -11,12 +11,15 @@
 1. [Project Overview](#project-overview)
 2. [Directory Structure](#directory-structure)
 3. [Internationalization (i18n)](#internationalization-i18n)
-4. [Translation Files](#translation-files)
-5. [Page Routes](#page-routes)
-6. [Components](#components)
-7. [API Routes](#api-routes)
-8. [Configuration Files](#configuration-files)
-9. [Development Workflow](#development-workflow)
+4. [Page Routes](#page-routes)
+5. [Components](#components)
+6. [API Routes](#api-routes)
+7. [Hooks & Utilities](#hooks--utilities)
+8. [Database & Types](#database--types)
+9. [Authentication System](#authentication-system)
+10. [Configuration Files](#configuration-files)
+11. [Development Workflow](#development-workflow)
+12. [Notes for AI Assistants](#notes-for-ai-assistants)
 
 ---
 
@@ -26,8 +29,10 @@ The MIT Technique website is a multilingual Next.js application serving as the o
 
 - **3 Language Support:** English, Spanish, Chinese (Simplified)
 - **Dynamic Locale Routing:** URL-based language selection (`/en/about`, `/es/about`, etc.)
-- **Static Site Generation:** All pages pre-rendered for optimal performance
-- **Authentication:** MIT SSO integration for senior bio management
+- **Dual Auth:** MIT SSO for students + Supabase Auth for organizations (clubs, living groups, sports)
+- **Organization Dashboards:** Clubs, living groups, and sports teams each have management pages
+- **Admin Dashboard:** Full admin panel for managing users, organizations, photoshoots, and settings
+- **Supabase Backend:** PostgreSQL database with storage buckets for images
 
 ---
 
@@ -44,52 +49,93 @@ Technique-Website/
 │   ├── pdfs/                       # PDF documents
 │   └── fonts/                      # Custom fonts
 │
+├── scripts/                         # Utility scripts
+│   ├── create-org-accounts.js      # Create club/LG accounts
+│   ├── create-living-group-accounts.js
+│   ├── create-sports-accounts.js   # Create sports team accounts
+│   └── download-images.js          # Image downloader
+│
 ├── src/
 │   ├── app/
-│   │   ├── [locale]/               # Localized pages (dynamic routing)
+│   │   ├── [locale]/               # Localized pages (27 pages)
 │   │   │   ├── page.js            # Homepage
 │   │   │   ├── layout.js          # Root layout with locale support
 │   │   │   ├── about/             # About page
+│   │   │   ├── alumni/            # Alumni information
+│   │   │   ├── alumni-inquiry/    # Alumni inquiry form
 │   │   │   ├── archives/          # Yearbook archives (1885-present)
-│   │   │   ├── bio/               # Senior bio form
+│   │   │   ├── bio/               # Senior bio form (requires login)
+│   │   │   ├── club/              # Club dashboard (role: club)
+│   │   │   ├── clubs/             # Clubs listing (public)
 │   │   │   ├── contact/           # Contact information
+│   │   │   ├── dashboard/         # Admin dashboard (role: admin)
 │   │   │   ├── hire/              # Event photography services
 │   │   │   ├── invoice/           # Photographer invoice submission
-│   │   │   ├── login/             # MIT SSO login
+│   │   │   ├── join/              # Join/signup page
+│   │   │   ├── living-group/      # Living group dashboard (role: living_group)
+│   │   │   ├── login/             # Login pages (main, student, admin)
+│   │   │   ├── logout/            # Logout page
+│   │   │   ├── parent-inquiry/    # Parent inquiry form
+│   │   │   ├── parents/           # Parent information
 │   │   │   ├── portfolio/         # Photography portfolio
+│   │   │   ├── privacy/           # Privacy policy
+│   │   │   ├── profile/           # User profile
+│   │   │   ├── resources/         # Resources page
 │   │   │   ├── seniors/           # Senior portrait information
+│   │   │   ├── sports/            # Sports team dashboard (role: sports)
+│   │   │   ├── student-work-feature/ # Student work showcase
 │   │   │   └── yearbook/          # Yearbook information & ordering
 │   │   │
-│   │   ├── api/                    # API routes (locale-agnostic)
-│   │   │   ├── getUserData/       # Fetch user data from MongoDB
-│   │   │   ├── updateBio/         # Update senior bio
-│   │   │   ├── sendInvoice/       # Submit photographer invoice
-│   │   │   ├── login/             # SSO login handler
-│   │   │   ├── logout/            # Logout handler
-│   │   │   ├── session/           # Session management
-│   │   │   └── userSignIn/        # User authentication
-│   │   │
+│   │   ├── api/                    # API routes (see API Routes section)
 │   │   ├── common/                 # Shared utilities
 │   │   └── globals.css            # Global styles
 │   │
 │   ├── components/
-│   │   ├── LanguageSwitcher/      # Language dropdown selector
-│   │   ├── Navbar_and_Sidebar/    # Navigation components
-│   │   ├── Footer/                # Site footer
-│   │   ├── SimpleCarousel/        # Image carousel
-│   │   └── CoverCard/             # Yearbook cover card
+│   │   ├── AccountButton/          # Account/user button
+│   │   ├── ConfirmationModal/      # MUI confirmation dialog (isDangerous mode)
+│   │   ├── CookieConsent/          # Cookie consent banner
+│   │   ├── CoverCard/              # Yearbook cover card
+│   │   ├── Footer/                 # Site footer
+│   │   ├── ImageUpload/            # Drag-and-drop image upload (5MB, JPEG/PNG/WebP/GIF)
+│   │   ├── LanguageSwitcher/       # Language dropdown selector
+│   │   ├── Navbar_and_Sidebar/     # Navigation (Navbar_new.jsx, Sidebar.jsx)
+│   │   ├── OrganizationAuthModal/  # Organization login modal (clubs, LGs, sports)
+│   │   └── PhotographerTimesSection/ # Photographer booking section
+│   │
+│   ├── hooks/
+│   │   ├── useSession.ts           # Session management hook
+│   │   └── useUser.ts              # User data hook (returns isLoggedIn, user, club, sports, livingGroup, frozenForms)
 │   │
 │   ├── i18n/
-│   │   ├── config.js              # i18n configuration (locales, RTL)
-│   │   └── request.js             # Server-side locale handler
+│   │   ├── config.js               # i18n configuration (locales: en, es, zh)
+│   │   └── request.js              # Server-side locale handler
 │   │
-│   ├── messages/                   # Translation files (see below)
-│   │   ├── en.json                # English (default)
-│   │   ├── es.json                # Spanish
-│   │   └── zh.json                # Chinese (Simplified)
+│   ├── lib/
+│   │   ├── admin-logs.ts           # Admin action logging
+│   │   ├── db.ts                   # Database utilities
+│   │   ├── lib.ts                  # General utilities + next_js_session config
+│   │   ├── studentSchema.ts        # Zod validation for student data
+│   │   ├── auth/
+│   │   │   └── session.ts          # technique_session config
+│   │   ├── supabase/
+│   │   │   ├── admin.ts            # Supabase admin client (service role)
+│   │   │   ├── client.ts           # Supabase browser client
+│   │   │   ├── server.ts           # Supabase server client
+│   │   │   └── types.ts            # TypeScript types for all entities
+│   │   └── utils/
+│   │       ├── nameParser.ts       # Bulk name parsing (parseBulkNames)
+│   │       └── time.ts             # Time/date utilities (EST formatting)
 │   │
-│   ├── hooks/                      # Custom React hooks
-│   └── lib/                        # Utility libraries
+│   └── messages/                    # Translation files
+│       ├── en.json                 # English (default, active)
+│       ├── es.json                 # Spanish (active)
+│       ├── zh.json                 # Chinese Simplified (active)
+│       ├── ar.json                 # Arabic (inactive)
+│       ├── fr.json                 # French (inactive)
+│       ├── hi.json                 # Hindi (inactive)
+│       ├── ja.json                 # Japanese (inactive)
+│       ├── ko.json                 # Korean (inactive)
+│       └── pt.json                 # Portuguese (inactive)
 │
 ├── middleware.js                   # Next.js middleware for locale routing
 ├── next.config.mjs                 # Next.js configuration
@@ -102,279 +148,108 @@ Technique-Website/
 
 ## Internationalization (i18n)
 
-### Configuration Files
+### Active Locales
 
-#### `/src/i18n/config.js`
+Only 3 locales are active (configured in `/src/i18n/config.js`):
+- `en` - English (default)
+- `es` - Spanish
+- `zh` - Chinese (Simplified)
 
-Centralized i18n configuration:
-
-```javascript
-export const locales = ["en", "es", "zh"];
-export const defaultLocale = "en";
-
-export const localeNames = {
-  en: "English",
-  es: "Español",
-  zh: "中文",
-};
-
-export const localeDirection = {
-  // All locales use left-to-right
-};
-```
-
-#### `/middleware.js`
-
-Handles locale detection and routing:
-
-- Detects locale from URL, cookie, or browser Accept-Language header
-- Redirects `/about` → `/en/about` (or user's preferred locale)
-- Stores locale preference in cookie
-- Excludes API routes and static files
-
-#### `/src/i18n/request.js`
-
-Server-side locale handler for next-intl:
-
-- Validates incoming locale parameter
-- Loads appropriate translation file
-- Provides fallback to English if invalid locale
+6 additional translation files exist (`ar`, `fr`, `hi`, `ja`, `ko`, `pt`) but are not in the active locale list.
 
 ### How Locale Routing Works
 
 1. **URL Pattern:** `/{locale}/{page}` (e.g., `/en/about`, `/es/yearbook`)
 2. **Dynamic Segment:** `[locale]` directory handles all language variants
-3. **Static Generation:** All 33 pages (11 pages × 3 locales) pre-rendered at build time
-4. **SEO-Friendly:** Each locale has its own URL for proper indexing
-
----
-
-## Translation Files
-
-All translation files are located in `/src/messages/` and follow the same JSON structure.
-
-### File List
-
-| File      | Language             | Direction | Size   | Characters   |
-| --------- | -------------------- | --------- | ------ | ------------ |
-| `en.json` | English              | LTR       | ~19 KB | ~1,200 words |
-| `es.json` | Spanish              | LTR       | ~21 KB | ~1,200 words |
-| `zh.json` | Chinese (Simplified) | LTR       | ~18 KB | ~1,200 words |
+3. **Middleware:** Detects locale from URL/cookie/Accept-Language, redirects to add locale prefix
+4. **SEO-Friendly:** Each locale has its own URL
 
 ### Translation File Structure
 
-Each JSON file follows this hierarchical structure:
-
-```json
-{
-  "common": {
-    "siteTitle": "...",
-    "siteDescription": "...",
-    "siteName": "...",
-    "tagline": "..."
-  },
-
-  "nav": {
-    "about": "...",
-    "archive": "...",
-    "yearbook": "...",
-    "dropdown": {
-      "ourHistory": "...",
-      "portfolio": "...",
-      "contact": "..."
-    }
-  },
-
-  "footer": {
-    "copyright": "...",
-    "emailLabel": "...",
-    "instagramLabel": "..."
-  },
-
-  "languageSwitcher": {
-    "selectLanguage": "..."
-  },
-
-  "carousel": {
-    "photoCredit": "Photo Credits: {photographer}"
-  },
-
-  "pages": {
-    "home": {
-      /* homepage translations */
-    },
-    "about": {
-      /* about page translations */
-    },
-    "yearbook": {
-      /* yearbook page translations */
-    },
-    "contact": {
-      /* contact page translations */
-    },
-    "hire": {
-      /* hire page translations */
-    },
-    "invoice": {
-      /* invoice page translations */
-    },
-    "login": {
-      /* login page translations */
-    },
-    "portfolio": {
-      /* portfolio page translations */
-    },
-    "seniors": {
-      /* seniors page translations */
-    },
-    "bio": {
-      /* bio page translations */
-    },
-    "archives": {
-      /* archives page translations */
-    }
-  }
-}
-```
-
-### Translation Keys by Namespace
-
-#### Common Keys (8 keys)
-
-- Site metadata, branding, taglines
-
-#### Navigation Keys (12 keys)
-
-- Main nav items, dropdown menus
-
-#### Footer Keys (3 keys)
-
-- Copyright, social media labels
-
-#### Page-Specific Keys (varies by page)
-
-- **Home:** 4 keys (hero, subtitle, tagline, photo credit)
-- **About:** ~350 words (hero, sections, cards)
-- **Archives:** 3 keys (uses template for 130+ yearbooks)
-- **Bio:** ~40 keys + 60 MIT major names
-- **Contact:** ~50 words (addresses, headings)
-- **Hire:** ~80 words (hero, CTA, descriptions)
-- **Invoice:** ~60 words (form labels, notifications)
-- **Login:** ~30 words (instructions, buttons)
-- **Portfolio:** ~100 words (with photographer credits)
-- **Seniors:** ~120 words (dress code, discount info)
-- **Yearbook:** ~150 words (hero, info cards)
+Top-level namespaces in each JSON file:
+- `common` - Site metadata, branding
+- `nav` - Navigation items, dropdown menus
+- `footer` - Copyright, social links
+- `languageSwitcher` - Language selector label
+- `carousel` - Photo credits
+- `pages.*` - Page-specific translations (home, about, yearbook, contact, hire, invoice, login, portfolio, seniors, bio, archives)
+- `clubPage` - Club dashboard translations
+- `livingGroupPage` - Living group dashboard translations
+- `sportsPage` - Sports dashboard translations (profile, coaches, members, achievements, photos, documents tabs)
+- `organizationAuth` - Organization login modal translations
+- `profilePage` - User profile translations
+- `dashboardPage` - Admin dashboard translations
 
 ### Translation Interpolation
 
-Dynamic values use curly brace syntax:
-
-```json
-{
-  "photoCredit": "Photo: {photographer}",
-  "forSeniors": "Email us at {email} if needed"
-}
-```
-
-Usage in components:
-
 ```javascript
-t("photoCredit", { photographer: "Michelle Xiang" });
+// Translation file: "photoCredit": "Photo: {photographer}"
+t('photoCredit', { photographer: 'Michelle Xiang' })
 ```
 
 ---
 
 ## Page Routes
 
-All pages are located in `/src/app/[locale]/` and support 9 languages.
+### Public Pages
 
-### Primary Pages (11 total)
+| Route                | Description                          |
+| -------------------- | ------------------------------------ |
+| `/`                  | Homepage                             |
+| `/about`             | About Us / organization history      |
+| `/alumni`            | Alumni information                   |
+| `/alumni-inquiry`    | Alumni inquiry form                  |
+| `/archives`          | Yearbook archive (1885-present)      |
+| `/clubs`             | Public clubs listing                 |
+| `/contact`           | Contact information                  |
+| `/hire`              | Event photography services           |
+| `/join`              | Join/signup page                     |
+| `/parent-inquiry`    | Parent inquiry form                  |
+| `/parents`           | Parent information                   |
+| `/portfolio`         | Photography portfolio                |
+| `/privacy`           | Privacy policy                       |
+| `/resources`         | Resources page                       |
+| `/seniors`           | Senior portrait information          |
+| `/student-work-feature` | Student work showcase             |
+| `/yearbook`          | Yearbook information & ordering      |
 
-| Route        | File                 | Description           | Key Features                                        |
-| ------------ | -------------------- | --------------------- | --------------------------------------------------- |
-| `/`          | `page.js`            | Homepage              | Hero image, tagline, photo carousel                 |
-| `/about`     | `about/page.jsx`     | About Us              | Organization history, H.R.H. Grogo, weekly meetings |
-| `/archives`  | `archives/page.jsx`  | Yearbook Archive      | 130+ yearbook covers (1885-present)                 |
-| `/yearbook`  | `yearbook/page.jsx`  | Yearbook Info         | Ordering, preorder, senior info                     |
-| `/seniors`   | `seniors/page.jsx`   | Senior Portraits      | Portrait sessions, dress code, discount             |
-| `/bio`       | `bio/page.jsx`       | Senior Bio Form       | Form to update yearbook bio (requires login)        |
-| `/login`     | `login/page.jsx`     | MIT SSO Login         | Authentication for senior bio access                |
-| `/portfolio` | `portfolio/page.jsx` | Photography Portfolio | Showcase of photographer work                       |
-| `/contact`   | `contact/page.jsx`   | Contact Info          | Office address, mailing address, email              |
-| `/hire`      | `hire/page.jsx`      | Event Photography     | Services for MIT organizations                      |
-| `/invoice`   | `invoice/page.jsx`   | Invoice Submission    | Form for photographer payment                       |
+### Auth Pages
 
-### Generated Routes (33 total)
+| Route            | Description                            |
+| ---------------- | -------------------------------------- |
+| `/login`         | Main login (MIT SSO + org login modal) |
+| `/login/student` | Student-only login (bio form redirect) |
+| `/login/admin`   | Admin-only login (magic link)          |
+| `/logout`        | Logout page                            |
 
-Each of the 11 pages × 3 languages = 33 pre-rendered static pages:
+### Role-Protected Pages
 
-- `/en/about`, `/es/about`, `/zh/about`
+| Route            | Required Role    | Description                          |
+| ---------------- | ---------------- | ------------------------------------ |
+| `/bio`           | `student`        | Senior bio form                      |
+| `/profile`       | any logged-in    | User profile                         |
+| `/club`          | `club`           | Club management dashboard            |
+| `/living-group`  | `living_group`   | Living group management dashboard    |
+| `/sports`        | `sports`         | Sports team management dashboard     |
+| `/dashboard`     | `admin`          | Admin dashboard (users, orgs, photoshoots, settings) |
+| `/invoice`       | any logged-in    | Photographer invoice submission      |
 
 ---
 
 ## Components
 
-### Core Components
-
-#### `/src/components/LanguageSwitcher/LanguageSwitcher.jsx`
-
-- **Purpose:** Dropdown language selector
-- **Features:**
-  - Displays current locale (e.g., "EN")
-  - Lists all 3 available languages with native names
-  - Sets locale cookie on selection
-  - Navigates to new locale path
-- **Usage:** Rendered in Navbar and mobile Sidebar
-
-#### `/src/components/Navbar_and_Sidebar/Navbar_new.jsx`
-
-- **Purpose:** Desktop navigation bar
-- **Features:**
-  - Logo/site name (links to homepage)
-  - Dropdown menus (About, Seniors)
-  - Direct links (Archive, Yearbook, Invoice, Hire Us)
-  - Language switcher
-  - Transparent on homepage, solid on other pages
-  - Locale-aware routing (all links include locale prefix)
-- **Translation Keys:** Uses `nav` namespace
-
-#### `/src/components/Navbar_and_Sidebar/Sidebar.jsx`
-
-- **Purpose:** Mobile navigation drawer
-- **Features:**
-  - Hamburger menu icon (uses react-icons/vsc)
-  - Slide-out drawer with all navigation items
-  - Collapsible dropdowns
-  - Language switcher
-  - Locale-aware routing
-- **Icons:** VscThreeBars, VscClose, VscChevronDown
-- **Translation Keys:** Uses `nav` namespace
-
-#### `/src/components/Footer/Footer.jsx`
-
-- **Purpose:** Site footer
-- **Features:**
-  - Copyright notice (translated)
-  - Social media links (email, Instagram)
-  - Aria-labels for accessibility (translated)
-- **Translation Keys:** Uses `footer` namespace
-
-#### `/src/components/SimpleCarousel/SimpleCarousel.jsx`
-
-- **Purpose:** Image carousel for portfolio/galleries
-- **Features:**
-  - Photo credit display (translated)
-  - Smooth transitions
-- **Translation Keys:** Uses `carousel.photoCredit`
-
-#### `/src/components/CoverCard/CoverCard.jsx`
-
-- **Purpose:** Yearbook cover display cards
-- **Features:**
-  - Image display
-  - Hover effects
-  - Link to PDF
-- **Usage:** Archives page (130+ instances)
+| Component                  | Purpose                                                    |
+| -------------------------- | ---------------------------------------------------------- |
+| `AccountButton`            | Account/user button in navbar                              |
+| `ConfirmationModal`        | MUI Dialog with `isDangerous` mode (red title)             |
+| `CookieConsent`            | Cookie consent banner                                      |
+| `CoverCard`                | Yearbook cover display card (archives page)                |
+| `Footer`                   | Site footer with copyright, email, Instagram               |
+| `ImageUpload`              | Drag-and-drop image upload (5MB max, JPEG/PNG/WebP/GIF)    |
+| `LanguageSwitcher`         | Dropdown language selector                                 |
+| `Navbar_and_Sidebar`       | Desktop navbar (`Navbar_new.jsx`) + mobile sidebar (`Sidebar.jsx`) |
+| `OrganizationAuthModal`    | Login modal for clubs, living groups, and sports teams     |
+| `PhotographerTimesSection` | Photographer booking/scheduling section                    |
 
 ---
 
@@ -382,520 +257,191 @@ Each of the 11 pages × 3 languages = 33 pre-rendered static pages:
 
 Located in `/src/app/api/` - **NOT localized** (language-agnostic).
 
-### Authentication & Session
+### Legacy / Standalone
 
-| Route             | Method | Purpose                               |
-| ----------------- | ------ | ------------------------------------- |
-| `/api/login`      | GET    | Initiates MIT SSO login flow          |
-| `/api/logout`     | GET    | Destroys session and redirects        |
-| `/api/session`    | GET    | Checks current session status         |
-| `/api/userSignIn` | GET    | Handles SSO callback, creates session |
+| Route              | Method | Purpose                                |
+| ------------------ | ------ | -------------------------------------- |
+| `/api/bio`         | GET    | Fetch senior bio data                  |
+| `/api/getUserData` | GET    | Fetch user data from MongoDB           |
+| `/api/login`       | GET    | Initiates MIT SSO login flow           |
+| `/api/logout`      | GET    | Destroys session and redirects         |
+| `/api/sendContactForm` | POST | Send contact form email            |
+| `/api/sendInvoice` | POST   | Sends photographer invoice email       |
+| `/api/session`     | GET    | Checks current session status          |
+| `/api/updateBio`   | POST   | Updates senior bio in database         |
+| `/api/userSignIn`  | GET    | Handles MIT SSO callback               |
 
-### Data Operations
+### Auth (`/api/auth/`)
 
-| Route              | Method | Purpose                                        |
-| ------------------ | ------ | ---------------------------------------------- |
-| `/api/getUserData` | GET    | Fetches user data from MongoDB (requires auth) |
-| `/api/updateBio`   | POST   | Updates senior bio in database (requires auth) |
-| `/api/sendInvoice` | POST   | Sends photographer invoice email               |
+| Route                    | Method | Purpose                              |
+| ------------------------ | ------ | ------------------------------------ |
+| `admin-login`            | POST   | Admin magic link login               |
+| `callback`               | GET    | OAuth callback handler               |
+| `change-password`        | POST   | Organization password change         |
+| `club-login`             | POST   | Club login (legacy)                  |
+| `club-signup`            | POST   | Club signup (legacy)                 |
+| `logout`                 | POST   | Technique session logout             |
+| `org-forgot-password`    | POST   | Organization password reset          |
+| `org-signin`             | POST   | Unified organization login (club, LG, sports) |
+| `org-signup`             | POST   | Organization signup                  |
+| `session`                | GET    | Technique session check (returns user + org data) |
 
-### Database Schema (MongoDB)
+### Admin (`/api/admin/`)
 
-**Collection:** `users`
+| Route                | Method     | Purpose                             |
+| -------------------- | ---------- | ----------------------------------- |
+| `clubs`              | GET/PUT    | Manage clubs (approve/deny)         |
+| `designate-admin`    | POST       | Promote user to admin               |
+| `form-settings`      | GET/PUT    | Freeze/unfreeze organization forms  |
+| `living-groups`      | GET/PUT    | Manage living groups                |
+| `logs`               | GET        | View admin action logs              |
+| `photoshoot-times`   | GET/POST/PUT/DELETE | Manage photoshoot time slots |
+| `promotion-requests` | GET/PUT    | Review staph/photographer requests  |
+| `toggle-staph`       | POST       | Toggle user staph status            |
+| `users`              | GET/PUT    | View and manage users               |
 
-```javascript
-{
-  email: String,
-  firstName: String,
-  lastName: String,
-  major: String,
-  quote: String,
-  // ... other fields
-}
-```
+### Clubs (`/api/clubs/`)
 
----
+| Route            | Method         | Purpose                              |
+| ---------------- | -------------- | ------------------------------------ |
+| `demote-leader`  | POST           | Demote club leader                   |
+| `documents`      | GET/PUT        | Internal document links/notes        |
+| `email`          | GET/POST       | Contact email management             |
+| `export-members` | GET            | Export member list                    |
+| `images`         | POST/DELETE    | Image upload/delete (3 slots)        |
+| `manual-members` | GET/POST/DELETE | Manual member management            |
+| `profile`        | GET/PUT        | Club profile (name, description)     |
+| `search`         | GET            | Search clubs                         |
 
-## Configuration Files
+### Living Groups (`/api/living-groups/`)
 
-### `/next.config.mjs`
+| Route              | Method         | Purpose                              |
+| ------------------ | -------------- | ------------------------------------ |
+| `book`             | POST           | Book a photoshoot time               |
+| `cancel-request`   | POST           | Request photoshoot cancellation      |
+| `check-availability` | GET          | Check time slot availability         |
+| `documents`        | GET/PUT        | Internal document links/notes        |
+| `email`            | GET/POST       | Contact email management             |
+| `images`           | POST/DELETE    | Section image upload/delete          |
+| `manual-members`   | GET/POST/DELETE | Manual member management            |
+| `propose-time`     | POST           | Propose photoshoot time              |
+| `search`           | GET            | Search living groups                 |
+| `sections`         | GET/POST/PUT/DELETE | Manage dorm sections             |
+| `time-assignments` | GET/POST/DELETE | Manage time slot assignments        |
+| `times`            | GET            | View available times                 |
 
-```javascript
-import createNextIntlPlugin from "next-intl/plugin";
+### Sports (`/api/sports/`)
 
-const withNextIntl = createNextIntlPlugin("./src/i18n/request.js");
+| Route            | Method         | Purpose                              |
+| ---------------- | -------------- | ------------------------------------ |
+| `coaches`        | GET/POST/PUT/DELETE | Coach management (name, role, order) |
+| `documents`      | GET/PUT        | Internal document links/notes        |
+| `email`          | GET/POST       | Contact email management             |
+| `images`         | POST/DELETE    | Image upload/delete (3 slots × team) |
+| `manual-members` | GET/POST/DELETE | Manual member management (with team filter) |
+| `profile`        | GET/PUT        | Sports profile (description, gender teams toggle, achievements) |
 
-const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  async redirects() {
-    return [
-      {
-        source: "/",
-        destination: "/en",
-        permanent: false,
-      },
-      {
-        source: "/portrait",
-        destination: "https://seniors.legacystudios.com/...",
-        permanent: false,
-      },
-    ];
-  },
-};
+### Other
 
-export default withNextIntl(nextConfig);
-```
-
-### `/middleware.js`
-
-```javascript
-import createMiddleware from "next-intl/middleware";
-import { locales, defaultLocale } from "./src/i18n/config";
-
-export default createMiddleware({
-  locales,
-  defaultLocale,
-  localePrefix: "always",
-});
-
-export const config = {
-  matcher: [
-    "/((?!api|_next|_vercel|.*\\..*).*)", // Exclude API, Next.js internals, static files
-  ],
-};
-```
-
-### `/package.json` (Key Dependencies)
-
-```json
-{
-  "dependencies": {
-    "next": "14.2.3",
-    "next-intl": "^4.7.0",
-    "react": "^18",
-    "react-dom": "^18",
-    "react-icons": "^5.2.1",
-    "@mui/material": "^5.x",
-    "mongodb": "^6.17.0",
-    "openid-client": "^6.5.0"
-  }
-}
-```
+| Route                    | Method | Purpose                     |
+| ------------------------ | ------ | --------------------------- |
+| `/api/organizations/list` | GET   | List all orgs (clubs, LGs, sports) for login modal |
+| `/api/photographer/proposals` | GET/POST | Photographer time proposals |
+| `/api/photographer/status` | GET   | Photographer permission status |
+| `/api/photographer/times` | GET    | Photographer available times |
+| `/api/user/profile`      | GET/PUT | User profile management     |
+| `/api/user/request-promotion` | POST | Request staph/photographer promotion |
 
 ---
 
-## Development Workflow
+## Hooks & Utilities
 
-### Setup
+### Hooks
 
-```bash
-# Install dependencies
-npm install
+- **`useSession`** - Returns session data from `/api/auth/session`
+- **`useUser`** - Returns `{ isLoggedIn, user, club, sports, livingGroup, frozenForms, loading, logout, refetch }`
 
-# Start development server
-npm run dev
-# Server runs on http://localhost:3000 (or 3001 if port busy)
+### Utility Libraries
 
-# Build for production
-npm run build
-
-# Start production server
-npm start
-```
-
-### Adding a New Translation
-
-1. **Add text to English file** (`/src/messages/en.json`):
-
-   ```json
-   {
-     "pages": {
-       "newPage": {
-         "title": "New Page Title",
-         "description": "Page description"
-       }
-     }
-   }
-   ```
-
-2. **Translate to other 2 languages** (es, zh)
-
-3. **Use in component**:
-
-   ```javascript
-   import { useTranslations } from "next-intl";
-
-   export default function NewPage() {
-     const t = useTranslations("pages.newPage");
-     return <h1>{t("title")}</h1>;
-   }
-   ```
-
-### Adding a New Page
-
-1. **Create page in locale directory**:
-
-   ```bash
-   mkdir -p src/app/[locale]/new-page
-   touch src/app/[locale]/new-page/page.jsx
-   ```
-
-2. **Add translations** to all 3 language files
-
-3. **Update navigation** (Navbar, Sidebar)
-
-4. **Test all locales**:
-   ```bash
-   curl http://localhost:3000/en/new-page
-   curl http://localhost:3000/es/new-page
-   curl http://localhost:3000/zh/new-page
-   ```
-
-### Build Troubleshooting
-
-If you encounter build errors:
-
-1. **Clean build cache**:
-
-   ```bash
-   rm -rf .next node_modules package-lock.json
-   npm cache clean --force
-   npm install
-   npm run build
-   ```
-
-2. **Check for missing translations**:
-   - Ensure all translation keys exist in all 3 language files
-   - Use the same structure across all files
-
-3. **Verify image paths**:
-   - Images must exist in `/public/` directory
-   - Paths are case-sensitive
-
-### Testing Locales
-
-```bash
-# Test all language homepages
-for lang in en es zh; do
-  curl -s -o /dev/null -w "$lang: %{http_code}\n" "http://localhost:3000/$lang"
-done
-
-# Test specific page across languages
-for lang in en es zh; do
-  curl -s "http://localhost:3000/$lang/about" | grep "<h1"
-done
-```
+- **`/src/lib/lib.ts`** - `next_js_session` iron-session config, MIT SSO client config
+- **`/src/lib/auth/session.ts`** - `technique_session` iron-session config
+- **`/src/lib/db.ts`** - MongoDB connection
+- **`/src/lib/admin-logs.ts`** - Admin action logging helper
+- **`/src/lib/studentSchema.ts`** - Zod schema for student bio validation
+- **`/src/lib/supabase/admin.ts`** - Supabase admin client (service role key)
+- **`/src/lib/supabase/client.ts`** - Supabase browser client
+- **`/src/lib/supabase/server.ts`** - Supabase server client
+- **`/src/lib/supabase/types.ts`** - TypeScript types for all entities
+- **`/src/lib/utils/nameParser.ts`** - `parseBulkNames()` for bulk member import
+- **`/src/lib/utils/time.ts`** - Time/date formatting (EST)
 
 ---
 
-## Key Features & Patterns
+## Database & Types
 
-### Locale-Aware Routing
+### User Roles
 
-All navigation uses locale-aware paths:
-
-```javascript
-const locale = useLocale();
-<Link href={`/${locale}/about`}>About</Link>;
+```typescript
+type UserRole = 'admin' | 'staph' | 'club' | 'living_group' | 'sports' | 'student';
 ```
 
-### Locale Direction
+- `admin` - Full dashboard access, user management, org approval
+- `staph` - Staff member access
+- `club` - Club management dashboard
+- `living_group` - Living group management dashboard
+- `sports` - Sports team management dashboard
+- `student` - Default role, profile/bio access
 
-All languages use left-to-right layout:
+### Core Entities (Supabase/PostgreSQL)
 
-```javascript
-const direction = localeDirection[locale] || 'ltr';
-<html lang={locale} dir={direction}>
-```
+| Table                          | Purpose                                      |
+| ------------------------------ | -------------------------------------------- |
+| `users`                        | All users (MIT SSO + org accounts)           |
+| `sessions`                     | OAuth session storage                        |
+| `clubs`                        | Club profiles (name, description, images, documents) |
+| `club_manual_members`          | Manual member entries for clubs              |
+| `living_groups`                | Living group profiles (dorm/FSILG)           |
+| `living_group_manual_members`  | Manual member entries for LGs                |
+| `sports`                       | Sports team profiles (with gender team support) |
+| `sports_coaches`               | Coach entries (name, role, display_order)     |
+| `sports_manual_members`        | Manual member entries (with team filter: mens/womens/null) |
+| `photoshoot_times`             | Photoshoot time slots                        |
+| `time_proposals`               | Bidirectional scheduling proposals           |
+| `living_group_time_assignments`| Time slot assignments for LG sections        |
+| `form_settings`                | Form freeze/unfreeze settings                |
+| `promotion_requests`           | Staph/photographer promotion requests        |
+| `photographer_permissions`     | Photographer access permissions              |
+| `admin_logs`                   | Admin action audit trail                     |
 
-### Translation with Variables
+### Storage Buckets
 
-```javascript
-// Translation file
-"photoCredit": "Photo: {photographer}"
+| Bucket               | Purpose                           | Path Pattern                                    |
+| -------------------- | --------------------------------- | ----------------------------------------------- |
+| `club-images`        | Club candid photos (3 slots)      | `clubs/{safeName}_Candid{suffix}.{ext}`         |
+| `living-group-images`| LG section photos                 | `{dorms\|fsilgs}/{safeName}_{section}_Candid.{ext}` |
+| `sports-images`      | Sports team photos (3 slots × team) | `sports/{safeName}/{mens\|womens\|}/Candid{suffix}.{ext}` |
 
-// Component usage
-t('photoCredit', { photographer: 'Michelle Xiang' })
-```
+### Sports-Specific Schema
 
-### Static Generation
-
-All pages use `generateStaticParams` to pre-render all locales:
-
-```javascript
-export function generateStaticParams() {
-  return locales.map((locale) => ({ locale }));
-}
-```
+The `sports` table supports optional gender teams via `has_gender_teams` boolean:
+- When `false`: uses `candid_image_1-3`, `achievement_summary`, members with `team = NULL`
+- When `true`: uses `mens_candid_image_1-3`, `womens_candid_image_1-3`, `mens_achievement_summary`, `womens_achievement_summary`, members with `team = 'mens'` or `'womens'`
+- Coaches are always shared (not team-specific)
 
 ---
 
-## Contact & Support
+## Authentication System
 
-- **Email:** technique@mit.edu
-- **Instagram:** @mit.tnq
-- **Office:** Walker Memorial, Room 50-320
-- **Meetingse:** Walker Memorial, Room 4-25, Saturday 12-2pm
-- **Mailing:** MIT Technique, 32 Vassar Street, Cambridge, MA 02139
-
----
-
-## Supabase Schema
-
--- WARNING: This schema is for context only and is not meant to be run.
--- Table order and constraints may not be valid for execution.
-
-CREATE TABLE public.admin_logs (
-id uuid NOT NULL DEFAULT gen_random_uuid(),
-actor_id uuid NOT NULL,
-action_type character varying NOT NULL,
-target_type character varying NOT NULL,
-target_id uuid,
-details jsonb DEFAULT '{}'::jsonb,
-created_at timestamp with time zone DEFAULT now(),
-CONSTRAINT admin_logs_pkey PRIMARY KEY (id),
-CONSTRAINT admin_logs_actor_id_fkey FOREIGN KEY (actor_id) REFERENCES public.users(id)
-);
-CREATE TABLE public.club_manual_members (
-id uuid NOT NULL DEFAULT gen_random_uuid(),
-club_id uuid NOT NULL,
-name text NOT NULL,
-added_at timestamp with time zone DEFAULT now(),
-first_name character varying NOT NULL,
-last_name character varying NOT NULL,
-section_name text,
-CONSTRAINT club_manual_members_pkey PRIMARY KEY (id),
-CONSTRAINT club_manual_members_club_id_fkey FOREIGN KEY (club_id) REFERENCES public.clubs(id)
-);
-CREATE TABLE public.club_memberships (
-id uuid NOT NULL DEFAULT gen_random_uuid(),
-club_id uuid NOT NULL,
-user_id uuid NOT NULL,
-role text NOT NULL DEFAULT 'member'::text CHECK (role = ANY (ARRAY['member'::text, 'leader'::text])),
-joined_at timestamp with time zone DEFAULT now(),
-CONSTRAINT club_memberships_pkey PRIMARY KEY (id),
-CONSTRAINT club_memberships_club_id_fkey FOREIGN KEY (club_id) REFERENCES public.clubs(id),
-CONSTRAINT club_memberships_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
-);
-CREATE TABLE public.clubs (
-id uuid NOT NULL DEFAULT gen_random_uuid(),
-user_id uuid NOT NULL,
-club_id character NOT NULL UNIQUE,
-name character varying NOT NULL,
-description text,
-candid_image_1 text,
-candid_image_2 text,
-candid_image_3 text,
-approval_status character varying DEFAULT 'pending'::character varying CHECK (approval_status::text = ANY (ARRAY['pending'::character varying, 'approved'::character varying, 'denied'::character varying]::text[])),
-approval_notes text,
-approved_by uuid,
-approved_at timestamp with time zone,
-created_at timestamp with time zone DEFAULT now(),
-updated_at timestamp with time zone DEFAULT now(),
-document_links text,
-document_notes text,
-club_sections ARRAY DEFAULT '{}'::text[],
-CONSTRAINT clubs_pkey PRIMARY KEY (id),
-CONSTRAINT clubs_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
-CONSTRAINT clubs_approved_by_fkey FOREIGN KEY (approved_by) REFERENCES public.users(id)
-);
-CREATE TABLE public.form_settings (
-id uuid NOT NULL DEFAULT gen_random_uuid(),
-form_name character varying NOT NULL UNIQUE,
-is_frozen boolean DEFAULT false,
-frozen_by uuid,
-frozen_at timestamp with time zone,
-unfrozen_by uuid,
-unfrozen_at timestamp with time zone,
-created_at timestamp with time zone DEFAULT now(),
-updated_at timestamp with time zone DEFAULT now(),
-CONSTRAINT form_settings_pkey PRIMARY KEY (id),
-CONSTRAINT form_settings_frozen_by_fkey FOREIGN KEY (frozen_by) REFERENCES public.users(id),
-CONSTRAINT form_settings_unfrozen_by_fkey FOREIGN KEY (unfrozen_by) REFERENCES public.users(id)
-);
-CREATE TABLE public.living_group_manual_members (
-id uuid NOT NULL DEFAULT gen_random_uuid(),
-living_group_id uuid NOT NULL,
-name text NOT NULL,
-section_name text,
-added_at timestamp with time zone DEFAULT now(),
-first_name character varying NOT NULL,
-last_name character varying NOT NULL,
-CONSTRAINT living_group_manual_members_pkey PRIMARY KEY (id),
-CONSTRAINT living_group_manual_members_living_group_id_fkey FOREIGN KEY (living_group_id) REFERENCES public.living_groups(id)
-);
-CREATE TABLE public.living_group_memberships (
-id uuid NOT NULL DEFAULT gen_random_uuid(),
-living_group_id uuid NOT NULL,
-user_id uuid NOT NULL,
-membership_type character varying NOT NULL CHECK (membership_type::text = ANY (ARRAY['dorm'::character varying, 'fsilg'::character varying]::text[])),
-status character varying NOT NULL DEFAULT 'active'::character varying CHECK (status::text = ANY (ARRAY['pending'::character varying, 'active'::character varying, 'removed'::character varying]::text[])),
-joined_at timestamp with time zone DEFAULT now(),
-approved_by uuid,
-approved_at timestamp with time zone,
-section_name text,
-CONSTRAINT living_group_memberships_pkey PRIMARY KEY (id),
-CONSTRAINT living_group_memberships_living_group_fkey FOREIGN KEY (living_group_id) REFERENCES public.living_groups(id),
-CONSTRAINT living_group_memberships_user_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
-CONSTRAINT living_group_memberships_approved_by_fkey FOREIGN KEY (approved_by) REFERENCES public.users(id)
-);
-CREATE TABLE public.living_group_time_assignments (
-id uuid NOT NULL DEFAULT gen_random_uuid(),
-photoshoot_time_id uuid NOT NULL,
-living_group_id uuid NOT NULL,
-section_name text,
-slot_start time without time zone NOT NULL,
-slot_end time without time zone NOT NULL,
-assigned_by uuid NOT NULL,
-created_at timestamp with time zone DEFAULT now(),
-CONSTRAINT living_group_time_assignments_pkey PRIMARY KEY (id),
-CONSTRAINT living_group_time_assignments_photoshoot_fkey FOREIGN KEY (photoshoot_time_id) REFERENCES public.photoshoot_times(id),
-CONSTRAINT living_group_time_assignments_living_group_fkey FOREIGN KEY (living_group_id) REFERENCES public.living_groups(id),
-CONSTRAINT living_group_time_assignments_assigned_by_fkey FOREIGN KEY (assigned_by) REFERENCES public.users(id)
-);
-CREATE TABLE public.living_groups (
-id uuid NOT NULL DEFAULT gen_random_uuid(),
-user_id uuid NOT NULL,
-name character varying NOT NULL,
-status character varying DEFAULT 'pending'::character varying CHECK (status::text = ANY (ARRAY['active'::character varying, 'disabled'::character varying, 'pending'::character varying]::text[])),
-disabled_by uuid,
-disabled_at timestamp with time zone,
-created_at timestamp with time zone DEFAULT now(),
-updated_at timestamp with time zone DEFAULT now(),
-living_group_type character varying DEFAULT 'dorm'::character varying CHECK (living_group_type::text = ANY (ARRAY['dorm'::character varying, 'fsilg'::character varying]::text[])),
-affiliation text,
-document_links text,
-document_notes text,
-dorm_sections ARRAY DEFAULT '{}'::text[],
-CONSTRAINT living_groups_pkey PRIMARY KEY (id),
-CONSTRAINT living_groups_disabled_by_fkey FOREIGN KEY (disabled_by) REFERENCES public.users(id),
-CONSTRAINT living_groups_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
-);
-CREATE TABLE public.photographer_permissions (
-id uuid NOT NULL DEFAULT gen_random_uuid(),
-user_id uuid NOT NULL UNIQUE,
-approved_by uuid,
-approved_at timestamp with time zone,
-is_active boolean DEFAULT false,
-revoked_by uuid,
-revoked_at timestamp with time zone,
-created_at timestamp with time zone DEFAULT now(),
-updated_at timestamp with time zone DEFAULT now(),
-CONSTRAINT photographer_permissions_pkey PRIMARY KEY (id),
-CONSTRAINT photographer_permissions_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
-CONSTRAINT photographer_permissions_approved_by_fkey FOREIGN KEY (approved_by) REFERENCES public.users(id),
-CONSTRAINT photographer_permissions_revoked_by_fkey FOREIGN KEY (revoked_by) REFERENCES public.users(id)
-);
-CREATE TABLE public.photoshoot_times (
-id uuid NOT NULL DEFAULT gen_random_uuid(),
-date date NOT NULL,
-start_time time without time zone NOT NULL,
-end_time time without time zone NOT NULL,
-living_group_id uuid,
-booked_at timestamp with time zone,
-booked_by uuid,
-cancellation_requested boolean DEFAULT false,
-cancellation_request_reason text,
-cancellation_approved boolean,
-cancelled_at timestamp with time zone,
-cancelled_by uuid,
-created_by uuid NOT NULL,
-notes text,
-created_at timestamp with time zone DEFAULT now(),
-updated_at timestamp with time zone DEFAULT now(),
-location text,
-CONSTRAINT photoshoot_times_pkey PRIMARY KEY (id),
-CONSTRAINT photoshoot_times_living_group_id_fkey FOREIGN KEY (living_group_id) REFERENCES public.living_groups(id),
-CONSTRAINT photoshoot_times_booked_by_fkey FOREIGN KEY (booked_by) REFERENCES public.users(id),
-CONSTRAINT photoshoot_times_cancelled_by_fkey FOREIGN KEY (cancelled_by) REFERENCES public.users(id),
-CONSTRAINT photoshoot_times_created_by_fkey FOREIGN KEY (created_by) REFERENCES public.users(id)
-);
-CREATE TABLE public.promotion_requests (
-id uuid NOT NULL DEFAULT gen_random_uuid(),
-user_id uuid NOT NULL,
-request_type character varying NOT NULL CHECK (request_type::text = ANY (ARRAY['staph_request'::text, 'photographer_request'::text])),
-status character varying DEFAULT 'pending'::character varying CHECK (status::text = ANY (ARRAY['pending'::character varying, 'approved'::character varying, 'denied'::character varying]::text[])),
-request_reason text,
-living_group_name character varying,
-reviewed_by uuid,
-reviewed_at timestamp with time zone,
-review_notes text,
-created_at timestamp with time zone DEFAULT now(),
-updated_at timestamp with time zone DEFAULT now(),
-CONSTRAINT promotion_requests_pkey PRIMARY KEY (id),
-CONSTRAINT promotion_requests_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
-CONSTRAINT promotion_requests_reviewed_by_fkey FOREIGN KEY (reviewed_by) REFERENCES public.users(id)
-);
-CREATE TABLE public.sessions (
-id uuid NOT NULL DEFAULT gen_random_uuid(),
-user_id uuid NOT NULL,
-access_token text,
-expires_at timestamp with time zone NOT NULL,
-code_verifier text,
-state text,
-created_at timestamp with time zone DEFAULT now(),
-updated_at timestamp with time zone DEFAULT now(),
-CONSTRAINT sessions_pkey PRIMARY KEY (id),
-CONSTRAINT sessions_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
-);
-CREATE TABLE public.time_proposals (
-id uuid NOT NULL DEFAULT gen_random_uuid(),
-living_group_id uuid NOT NULL,
-proposed_by uuid NOT NULL,
-date date NOT NULL,
-start_time time without time zone NOT NULL,
-end_time time without time zone NOT NULL,
-location text,
-notes text,
-status character varying DEFAULT 'pending'::character varying CHECK (status::text = ANY (ARRAY['pending'::character varying, 'accepted'::character varying, 'declined'::character varying, 'cancelled'::character varying]::text[])),
-accepted_by uuid,
-accepted_at timestamp with time zone,
-declined_by uuid,
-declined_at timestamp with time zone,
-decline_reason text,
-created_at timestamp with time zone DEFAULT now(),
-updated_at timestamp with time zone DEFAULT now(),
-CONSTRAINT time_proposals_pkey PRIMARY KEY (id),
-CONSTRAINT time_proposals_living_group_id_fkey FOREIGN KEY (living_group_id) REFERENCES public.living_groups(id),
-CONSTRAINT time_proposals_proposed_by_fkey FOREIGN KEY (proposed_by) REFERENCES public.users(id),
-CONSTRAINT time_proposals_accepted_by_fkey FOREIGN KEY (accepted_by) REFERENCES public.users(id),
-CONSTRAINT time_proposals_declined_by_fkey FOREIGN KEY (declined_by) REFERENCES public.users(id)
-);
-CREATE TABLE public.users (
-id uuid NOT NULL DEFAULT gen_random_uuid(),
-email character varying NOT NULL UNIQUE,
-role character varying NOT NULL DEFAULT 'student'::character varying CHECK (role::text = ANY (ARRAY['admin'::text, 'staph'::text, 'club'::text, 'living_group'::text, 'student'::text])),
-first_name character varying,
-last_name character varying,
-major character varying,
-second_major character varying,
-quote text,
-achievements text,
-school_year integer,
-auth_provider character varying NOT NULL DEFAULT 'mit_sso'::character varying CHECK (auth_provider::text = ANY (ARRAY['mit_sso'::character varying, 'supabase_auth'::character varying]::text[])),
-supabase_auth_id uuid,
-is_active boolean DEFAULT true,
-created_at timestamp with time zone DEFAULT now(),
-updated_at timestamp with time zone DEFAULT now(),
-is_staph boolean DEFAULT false,
-CONSTRAINT users_pkey PRIMARY KEY (id),
-CONSTRAINT users_supabase_auth_id_fkey FOREIGN KEY (supabase_auth_id) REFERENCES auth.users(id)
-);
-
-## CRITICAL: Authentication System Rules
+### CRITICAL: Dual Session System
 
 ⚠️ **DO NOT MODIFY WITHOUT EXTREME CARE** ⚠️
 
-This project uses a **dual session system** with two separate iron-session cookies. Mixing them up will break authentication.
-
-### Dual Session Architecture
+This project uses **two separate iron-session cookies**. Mixing them up will break authentication.
 
 | Session             | Cookie Name         | Source File               | Purpose                                         |
 | ------------------- | ------------------- | ------------------------- | ----------------------------------------------- |
 | `next_js_session`   | `next_js_session`   | `src/lib/lib.ts`          | MIT SSO OAuth (stores `state`, `code_verifier`) |
-| `technique_session` | `technique_session` | `src/lib/auth/session.ts` | Admin magic links, club signup, role-based auth |
+| `technique_session` | `technique_session` | `src/lib/auth/session.ts` | Organization login, admin magic links, role-based auth |
 
 ### Critical Import Rules
 
@@ -923,47 +469,400 @@ import { getSession } from "../../../lib/auth/session";
 3. `/api/userSignIn` reads `state` and `code_verifier` from `next_js_session` to validate OAuth response
 4. If step 3 uses wrong `getSession`, you get: `OperationProcessingError: unexpected "state" response parameter`
 
+### Organization Login Flow
+
+1. User clicks "Organization Login" on login page → opens `OrganizationAuthModal`
+2. Modal fetches org list from `/api/organizations/list` (clubs, living groups, sports)
+3. User selects org, enters password → POST to `/api/auth/org-signin`
+4. On success, redirects to org dashboard (`/club`, `/living-group`, or `/sports`)
+5. "Unexpected issues?" link opens mailto to `tnq-exec@mit.edu`
+
 ### Login Page Structure
 
-| Route            | Purpose                                | Auth Method                         |
-| ---------------- | -------------------------------------- | ----------------------------------- |
-| `/login`         | Main login page                        | MIT SSO button + "Admin Login" link |
-| `/login/student` | Student-only login (bio form redirect) | MIT SSO only                        |
-| `/login/admin`   | Admin-only login                       | Magic link form (technique@mit.edu) |
+| Route            | Purpose                                | Auth Method                              |
+| ---------------- | -------------------------------------- | ---------------------------------------- |
+| `/login`         | Main login page                        | MIT SSO button + Organization login modal |
+| `/login/student` | Student-only login (bio form redirect) | MIT SSO only                             |
+| `/login/admin`   | Admin-only login                       | Magic link form (technique@mit.edu)      |
 
-### User Roles
+---
 
-- `admin` - Full dashboard access
-- `club` - Club management
-- `living_group_leader` - Living group management
-- `student` - Default role, profile/bio access
+## Configuration Files
+
+### `/next.config.mjs`
+
+```javascript
+import createNextIntlPlugin from "next-intl/plugin";
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.js");
+const nextConfig = {
+  eslint: { ignoreDuringBuilds: true },
+  async redirects() {
+    return [
+      { source: "/", destination: "/en", permanent: false },
+      { source: "/portrait", destination: "https://seniors.legacystudios.com/...", permanent: false },
+    ];
+  },
+};
+export default withNextIntl(nextConfig);
+```
+
+### Key Dependencies
+
+| Package              | Purpose                         |
+| -------------------- | ------------------------------- |
+| `next` 14.2.3       | App framework                   |
+| `next-intl` ^4.7.0  | Internationalization            |
+| `@supabase/supabase-js` | Supabase client             |
+| `@supabase/ssr`      | Supabase SSR helpers            |
+| `iron-session`       | Encrypted session cookies       |
+| `mongodb`            | MongoDB driver (legacy bio data)|
+| `openid-client`      | MIT SSO OIDC integration        |
+| `nodemailer`         | Email sending                   |
+| `pdf-lib`            | PDF generation                  |
+| `zod`                | Schema validation               |
+| `@mui/material`      | UI components (dialogs, etc.)   |
+| `framer-motion`      | Animations                      |
+| `react-icons`        | Icon library                    |
+
+---
+
+## Development Workflow
+
+### Setup
+
+```bash
+npm install
+npm run dev       # http://localhost:3000
+npm run build     # Production build
+npm start         # Production server
+```
+
+### Adding a New Translation
+
+1. Add keys to `/src/messages/en.json`
+2. Add translated keys to `es.json` and `zh.json`
+3. Use in component: `const t = useTranslations('namespace'); t('key')`
+
+### Adding a New Page
+
+1. Create `src/app/[locale]/new-page/page.jsx`
+2. Add translations to all 3 active language files
+3. Update navigation (Navbar, Sidebar) if needed
+
+### Build Troubleshooting
+
+- **MODULE_NOT_FOUND:** `rm -rf .next node_modules package-lock.json && npm install && npm run build`
+- **404 on locale routes:** Check middleware matcher configuration
+- **Missing translations:** Verify key exists in all 3 JSON files (en, es, zh)
+- **Image 404s:** Verify file exists in `/public/images/` (case-sensitive)
 
 ---
 
 ## Notes for AI Assistants
 
-When working on this project:
-
 1. **Always preserve locale structure** - pages must be in `[locale]` directory
-2. **Update all 3 translation files** when adding new text
-3. **Test all locales** after making changes
-4. **Use locale-aware routing** - include `/${locale}/` prefix in all links
-5. **Keep API routes separate** - they are NOT localized
-6. **Follow existing patterns** - use `useTranslations` hook consistently
-7. **Clean build cache** if encountering module errors
-8. **NEVER change `getSession` imports in `/api/userSignIn`** - must use `lib/lib.ts`
-9. **Understand the dual session system** - see "CRITICAL: Authentication System Rules" above
-10. **Update Times Properly** - All posted times should be in EST, and all times shown should explicitly mention EST.
-
-### Common Issues
-
-- **MODULE_NOT_FOUND errors:** Clean `.next`, `node_modules`, reinstall
-- **404 on locale routes:** Check middleware matcher configuration
-- **Missing translations:** Verify key exists in all 3 JSON files
-- **Image 404s:** Verify file exists in `/public/images/` and path is correct
+2. **Update all 3 active translation files** (en.json, es.json, zh.json) when adding new text
+3. **Use locale-aware routing** - include `/${locale}/` prefix in all links
+4. **Keep API routes separate** - they are NOT localized
+5. **Follow existing patterns** - use `useTranslations` hook consistently
+6. **NEVER change `getSession` imports in `/api/userSignIn`** - must use `lib/lib.ts`
+7. **Understand the dual session system** - see Authentication System section
+8. **Update Times Properly** - All posted times should be in EST, and all times shown should explicitly mention EST
+9. **Organization pattern** - clubs, living groups, and sports all follow similar patterns: profile, email, documents, images, manual-members API routes + a dashboard page
+10. **Sports gender teams** - the `has_gender_teams` toggle affects members, photos, and achievements (coaches are always shared)
 
 ---
 
-**Generated:** January 22, 2026
-**Version:** 1.2
-**Last Build:** 33 static pages successfully generated
+## Supabase Schema
+
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
+
+-- NOTE: The membership system has been simplified (Jan 2026).
+-- The system now uses simple text lists for members (manual_members tables)
+-- instead of linked accounts. Students only use MIT SSO for senior bio form.
+-- Organization accounts (clubs, living groups, sports) use Supabase Auth
+-- with email/password login via the OrganizationAuthModal.
+
+CREATE TABLE public.admin_logs (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+actor_id uuid NOT NULL,
+action_type character varying NOT NULL,
+target_type character varying NOT NULL,
+target_id uuid,
+details jsonb DEFAULT '{}'::jsonb,
+created_at timestamp with time zone DEFAULT now(),
+CONSTRAINT admin_logs_pkey PRIMARY KEY (id),
+CONSTRAINT admin_logs_actor_id_fkey FOREIGN KEY (actor_id) REFERENCES public.users(id)
+);
+
+CREATE TABLE public.club_manual_members (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+club_id uuid NOT NULL,
+name text NOT NULL,
+first_name character varying NOT NULL,
+last_name character varying NOT NULL,
+section_name text,
+added_at timestamp with time zone DEFAULT now(),
+CONSTRAINT club_manual_members_pkey PRIMARY KEY (id),
+CONSTRAINT club_manual_members_club_id_fkey FOREIGN KEY (club_id) REFERENCES public.clubs(id)
+);
+
+CREATE TABLE public.clubs (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+user_id uuid NOT NULL,
+club_id character NOT NULL UNIQUE,
+name character varying NOT NULL,
+description text,
+candid_image_1 text,
+candid_image_2 text,
+candid_image_3 text,
+approval_status character varying DEFAULT 'pending'::character varying CHECK (approval_status::text = ANY (ARRAY['pending'::character varying, 'approved'::character varying, 'denied'::character varying]::text[])),
+approval_notes text,
+approved_by uuid,
+approved_at timestamp with time zone,
+created_at timestamp with time zone DEFAULT now(),
+updated_at timestamp with time zone DEFAULT now(),
+document_links text,
+document_notes text,
+CONSTRAINT clubs_pkey PRIMARY KEY (id),
+CONSTRAINT clubs_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
+CONSTRAINT clubs_approved_by_fkey FOREIGN KEY (approved_by) REFERENCES public.users(id)
+);
+
+CREATE TABLE public.form_settings (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+form_name character varying NOT NULL UNIQUE,
+is_frozen boolean DEFAULT false,
+frozen_by uuid,
+frozen_at timestamp with time zone,
+unfrozen_by uuid,
+unfrozen_at timestamp with time zone,
+created_at timestamp with time zone DEFAULT now(),
+updated_at timestamp with time zone DEFAULT now(),
+CONSTRAINT form_settings_pkey PRIMARY KEY (id),
+CONSTRAINT form_settings_frozen_by_fkey FOREIGN KEY (frozen_by) REFERENCES public.users(id),
+CONSTRAINT form_settings_unfrozen_by_fkey FOREIGN KEY (unfrozen_by) REFERENCES public.users(id)
+);
+
+CREATE TABLE public.living_group_manual_members (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+living_group_id uuid NOT NULL,
+name text NOT NULL,
+section_name text,
+first_name character varying NOT NULL,
+last_name character varying NOT NULL,
+added_at timestamp with time zone DEFAULT now(),
+CONSTRAINT living_group_manual_members_pkey PRIMARY KEY (id),
+CONSTRAINT living_group_manual_members_living_group_id_fkey FOREIGN KEY (living_group_id) REFERENCES public.living_groups(id)
+);
+
+CREATE TABLE public.living_group_time_assignments (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+photoshoot_time_id uuid NOT NULL,
+living_group_id uuid NOT NULL,
+section_name text,
+slot_start time without time zone NOT NULL,
+slot_end time without time zone NOT NULL,
+assigned_by uuid NOT NULL,
+created_at timestamp with time zone DEFAULT now(),
+CONSTRAINT living_group_time_assignments_pkey PRIMARY KEY (id),
+CONSTRAINT living_group_time_assignments_photoshoot_fkey FOREIGN KEY (photoshoot_time_id) REFERENCES public.photoshoot_times(id),
+CONSTRAINT living_group_time_assignments_living_group_fkey FOREIGN KEY (living_group_id) REFERENCES public.living_groups(id),
+CONSTRAINT living_group_time_assignments_assigned_by_fkey FOREIGN KEY (assigned_by) REFERENCES public.users(id)
+);
+
+CREATE TABLE public.living_groups (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+user_id uuid NOT NULL UNIQUE,
+name character varying NOT NULL,
+status character varying DEFAULT 'pending'::character varying CHECK (status::text = ANY (ARRAY['active'::character varying, 'disabled'::character varying, 'pending'::character varying]::text[])),
+disabled_by uuid,
+disabled_at timestamp with time zone,
+created_at timestamp with time zone DEFAULT now(),
+updated_at timestamp with time zone DEFAULT now(),
+living_group_type character varying DEFAULT 'dorm'::character varying CHECK (living_group_type::text = ANY (ARRAY['dorm'::character varying, 'fsilg'::character varying]::text[])),
+affiliation text,
+document_links text,
+document_notes text,
+dorm_sections ARRAY DEFAULT '{}'::text[],
+section_images jsonb DEFAULT '{}'::jsonb,
+CONSTRAINT living_groups_pkey PRIMARY KEY (id),
+CONSTRAINT living_groups_disabled_by_fkey FOREIGN KEY (disabled_by) REFERENCES public.users(id),
+CONSTRAINT living_groups_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
+
+CREATE TABLE public.photographer_permissions (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+user_id uuid NOT NULL UNIQUE,
+approved_by uuid,
+approved_at timestamp with time zone,
+is_active boolean DEFAULT false,
+revoked_by uuid,
+revoked_at timestamp with time zone,
+created_at timestamp with time zone DEFAULT now(),
+updated_at timestamp with time zone DEFAULT now(),
+CONSTRAINT photographer_permissions_pkey PRIMARY KEY (id),
+CONSTRAINT photographer_permissions_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
+CONSTRAINT photographer_permissions_approved_by_fkey FOREIGN KEY (approved_by) REFERENCES public.users(id),
+CONSTRAINT photographer_permissions_revoked_by_fkey FOREIGN KEY (revoked_by) REFERENCES public.users(id)
+);
+
+CREATE TABLE public.photoshoot_times (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+date date NOT NULL,
+start_time time without time zone NOT NULL,
+end_time time without time zone NOT NULL,
+living_group_id uuid,
+booked_at timestamp with time zone,
+booked_by uuid,
+cancellation_requested boolean DEFAULT false,
+cancellation_request_reason text,
+cancellation_approved boolean,
+cancelled_at timestamp with time zone,
+cancelled_by uuid,
+created_by uuid NOT NULL,
+notes text,
+created_at timestamp with time zone DEFAULT now(),
+updated_at timestamp with time zone DEFAULT now(),
+location text,
+CONSTRAINT photoshoot_times_pkey PRIMARY KEY (id),
+CONSTRAINT photoshoot_times_living_group_id_fkey FOREIGN KEY (living_group_id) REFERENCES public.living_groups(id),
+CONSTRAINT photoshoot_times_booked_by_fkey FOREIGN KEY (booked_by) REFERENCES public.users(id),
+CONSTRAINT photoshoot_times_cancelled_by_fkey FOREIGN KEY (cancelled_by) REFERENCES public.users(id),
+CONSTRAINT photoshoot_times_created_by_fkey FOREIGN KEY (created_by) REFERENCES public.users(id)
+);
+
+CREATE TABLE public.promotion_requests (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+user_id uuid NOT NULL,
+request_type character varying NOT NULL CHECK (request_type::text = ANY (ARRAY['staph_request'::text, 'photographer_request'::text])),
+status character varying DEFAULT 'pending'::character varying CHECK (status::text = ANY (ARRAY['pending'::character varying, 'approved'::character varying, 'denied'::character varying]::text[])),
+request_reason text,
+living_group_name character varying,
+reviewed_by uuid,
+reviewed_at timestamp with time zone,
+review_notes text,
+created_at timestamp with time zone DEFAULT now(),
+updated_at timestamp with time zone DEFAULT now(),
+CONSTRAINT promotion_requests_pkey PRIMARY KEY (id),
+CONSTRAINT promotion_requests_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
+CONSTRAINT promotion_requests_reviewed_by_fkey FOREIGN KEY (reviewed_by) REFERENCES public.users(id)
+);
+
+CREATE TABLE public.sessions (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+user_id uuid NOT NULL,
+access_token text,
+expires_at timestamp with time zone NOT NULL,
+code_verifier text,
+state text,
+created_at timestamp with time zone DEFAULT now(),
+updated_at timestamp with time zone DEFAULT now(),
+CONSTRAINT sessions_pkey PRIMARY KEY (id),
+CONSTRAINT sessions_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
+
+CREATE TABLE public.sports (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+user_id uuid NOT NULL,
+name character varying NOT NULL UNIQUE,
+description text,
+has_gender_teams boolean DEFAULT false,
+achievement_summary text,
+candid_image_1 text,
+candid_image_2 text,
+candid_image_3 text,
+mens_achievement_summary text,
+mens_candid_image_1 text,
+mens_candid_image_2 text,
+mens_candid_image_3 text,
+womens_achievement_summary text,
+womens_candid_image_1 text,
+womens_candid_image_2 text,
+womens_candid_image_3 text,
+document_links text,
+document_notes text,
+created_at timestamp with time zone DEFAULT now(),
+updated_at timestamp with time zone DEFAULT now(),
+CONSTRAINT sports_pkey PRIMARY KEY (id),
+CONSTRAINT sports_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
+
+CREATE TABLE public.sports_coaches (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+sports_id uuid NOT NULL,
+name text NOT NULL,
+role text NOT NULL,
+display_order integer DEFAULT 0,
+added_at timestamp with time zone DEFAULT now(),
+CONSTRAINT sports_coaches_pkey PRIMARY KEY (id),
+CONSTRAINT sports_coaches_sports_id_fkey FOREIGN KEY (sports_id) REFERENCES public.sports(id) ON DELETE CASCADE
+);
+
+CREATE TABLE public.sports_manual_members (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+sports_id uuid NOT NULL,
+first_name text NOT NULL,
+last_name text NOT NULL,
+name text NOT NULL,
+team text CHECK (team IS NULL OR team IN ('mens', 'womens')),
+added_at timestamp with time zone DEFAULT now(),
+CONSTRAINT sports_manual_members_pkey PRIMARY KEY (id),
+CONSTRAINT sports_manual_members_sports_id_fkey FOREIGN KEY (sports_id) REFERENCES public.sports(id) ON DELETE CASCADE
+);
+
+CREATE TABLE public.time_proposals (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+living_group_id uuid NOT NULL,
+proposed_by uuid NOT NULL,
+date date NOT NULL,
+start_time time without time zone NOT NULL,
+end_time time without time zone NOT NULL,
+location text,
+notes text,
+status character varying DEFAULT 'pending'::character varying CHECK (status::text = ANY (ARRAY['pending'::character varying, 'accepted'::character varying, 'declined'::character varying, 'cancelled'::character varying]::text[])),
+accepted_by uuid,
+accepted_at timestamp with time zone,
+declined_by uuid,
+declined_at timestamp with time zone,
+decline_reason text,
+created_at timestamp with time zone DEFAULT now(),
+updated_at timestamp with time zone DEFAULT now(),
+CONSTRAINT time_proposals_pkey PRIMARY KEY (id),
+CONSTRAINT time_proposals_living_group_id_fkey FOREIGN KEY (living_group_id) REFERENCES public.living_groups(id),
+CONSTRAINT time_proposals_proposed_by_fkey FOREIGN KEY (proposed_by) REFERENCES public.users(id),
+CONSTRAINT time_proposals_accepted_by_fkey FOREIGN KEY (accepted_by) REFERENCES public.users(id),
+CONSTRAINT time_proposals_declined_by_fkey FOREIGN KEY (declined_by) REFERENCES public.users(id)
+);
+
+CREATE TABLE public.users (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+email character varying NOT NULL UNIQUE,
+role character varying NOT NULL DEFAULT 'student'::character varying CHECK (role::text = ANY (ARRAY['admin'::text, 'staph'::text, 'club'::text, 'living_group'::text, 'student'::text, 'sports'::text])),
+first_name character varying,
+last_name character varying,
+major character varying,
+second_major character varying,
+quote text,
+achievements text,
+school_year integer,
+auth_provider character varying NOT NULL DEFAULT 'mit_sso'::character varying CHECK (auth_provider::text = ANY (ARRAY['mit_sso'::character varying, 'supabase_auth'::character varying]::text[])),
+supabase_auth_id uuid,
+is_active boolean DEFAULT true,
+created_at timestamp with time zone DEFAULT now(),
+updated_at timestamp with time zone DEFAULT now(),
+is_staph boolean DEFAULT false,
+CONSTRAINT users_pkey PRIMARY KEY (id),
+CONSTRAINT users_supabase_auth_id_fkey FOREIGN KEY (supabase_auth_id) REFERENCES auth.users(id)
+);
+
+---
+
+## Contact & Support
+
+- **Email:** technique@mit.edu
+- **Instagram:** @mit.tnq
+- **Office:** Walker Memorial, Room 50-320
+- **Meetings:** Walker Memorial, Room 4-25, Saturday 12-2pm
+- **Mailing:** MIT Technique, 32 Vassar Street, Cambridge, MA 02139

@@ -38,6 +38,7 @@ export default function DashboardLayout({ children }) {
     { id: 'photoshoots', label: t('tabs.photoshoots'), href: `/${locale}/dashboard/photoshoots` },
     { id: 'clubs', label: t('tabs.clubs'), href: `/${locale}/dashboard/clubs` },
     { id: 'living-groups', label: t('tabs.livingGroups'), href: `/${locale}/dashboard/living-groups` },
+    { id: 'sports', label: t('tabs.sports'), href: `/${locale}/dashboard/sports` },
     { id: 'users', label: t('tabs.users'), href: `/${locale}/dashboard/users` },
     { id: 'settings', label: t('tabs.settings'), href: `/${locale}/dashboard/settings` },
   ];

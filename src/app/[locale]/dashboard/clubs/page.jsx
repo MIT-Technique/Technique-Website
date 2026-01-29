@@ -129,8 +129,6 @@ export default function ClubsPage() {
         </div>
       )}
 
-      <h2 className="text-lg font-medium mb-6">{t('title')}</h2>
-
       {/* Search */}
       <div className="mb-4">
         <input

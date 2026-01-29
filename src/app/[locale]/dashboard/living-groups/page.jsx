@@ -1,31 +1,22 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 
 export default function LivingGroupsPage() {
   const t = useTranslations('dashboard.livingGroups');
   const [livingGroups, setLivingGroups] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('all');
-  const [showMemberCounts, setShowMemberCounts] = useState(false);
-  const [showPromoteForm, setShowPromoteForm] = useState(false);
-  const [promoteData, setPromoteData] = useState({ email: '', livingGroupName: '' });
-  const [users, setUsers] = useState([]);
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     fetchLivingGroups();
-  }, [filter, showMemberCounts]);
+  }, []);
 
   async function fetchLivingGroups() {
     try {
       setLoading(true);
-      const params = new URLSearchParams();
-      if (filter !== 'all') params.append('status', filter);
-      if (showMemberCounts) params.append('includeMembers', 'true');
-
-      const url = `/api/admin/living-groups${params.toString() ? `?${params.toString()}` : ''}`;
-      const res = await fetch(url);
+      const res = await fetch('/api/admin/living-groups');
       const data = await res.json();
       setLivingGroups(data.livingGroups || []);
     } catch (error) {
@@ -35,223 +26,54 @@ export default function LivingGroupsPage() {
     }
   }
 
-  async function searchUsers(search) {
-    if (search.length < 3) {
-      setUsers([]);
-      return;
-    }
-    try {
-      const res = await fetch(`/api/admin/users?search=${encodeURIComponent(search)}&role=student`);
-      const data = await res.json();
-      setUsers(data.users || []);
-    } catch (error) {
-      console.error('Error searching users:', error);
-    }
-  }
-
-  async function handlePromote(userId) {
-    if (!promoteData.livingGroupName) {
-      alert(t('enterLivingGroupName'));
-      return;
-    }
-
-    try {
-      const res = await fetch('/api/admin/living-groups', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId,
-          livingGroupName: promoteData.livingGroupName,
-        }),
-      });
-
-      if (res.ok) {
-        setShowPromoteForm(false);
-        setPromoteData({ email: '', livingGroupName: '' });
-        setUsers([]);
-        fetchLivingGroups();
-      } else {
-        const data = await res.json();
-        alert(data.error || t('promoteError'));
-      }
-    } catch (error) {
-      console.error('Error promoting user:', error);
-    }
-  }
-
-  async function handleAction(livingGroupId, action) {
-    try {
-      const res = await fetch('/api/admin/living-groups', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ livingGroupId, action }),
-      });
-
-      if (res.ok) {
-        fetchLivingGroups();
-      }
-    } catch (error) {
-      console.error('Error updating living group:', error);
-    }
-  }
+  const filtered = useMemo(() => {
+    if (!search) return livingGroups;
+    const q = search.toLowerCase();
+    return livingGroups.filter(lg =>
+      lg.name?.toLowerCase().includes(q) ||
+      lg.user?.email?.toLowerCase().includes(q)
+    );
+  }, [livingGroups, search]);
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-lg font-medium">{t('title')}</h2>
-        <button
-          onClick={() => setShowPromoteForm(!showPromoteForm)}
-          className="btn-primary text-sm"
-        >
-          {showPromoteForm ? t('cancel') : t('promoteUser')}
-        </button>
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder={t('searchPlaceholder')}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="px-3 py-2 border border-border rounded-lg w-full max-w-sm text-sm"
+        />
       </div>
 
-      {/* Promote User Form */}
-      {showPromoteForm && (
-        <div className="mb-6 p-4 border border-border rounded-lg">
-          <h3 className="font-medium mb-4">{t('promoteTitle')}</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">{t('form.searchUser')}</label>
-              <input
-                type="text"
-                value={promoteData.email}
-                onChange={(e) => {
-                  setPromoteData({ ...promoteData, email: e.target.value });
-                  searchUsers(e.target.value);
-                }}
-                className="w-full border border-border rounded px-3 py-2 text-sm"
-                placeholder={t('form.searchPlaceholder')}
-              />
-              {users.length > 0 && (
-                <div className="mt-2 border border-border rounded max-h-40 overflow-y-auto">
-                  {users.map((user) => (
-                    <button
-                      key={user.id}
-                      onClick={() => handlePromote(user.id)}
-                      className="w-full text-left px-3 py-2 text-sm hover:bg-bg-secondary border-b border-border last:border-b-0"
-                    >
-                      {user.email} ({user.first_name || 'No name'})
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">{t('form.livingGroupName')}</label>
-              <input
-                type="text"
-                value={promoteData.livingGroupName}
-                onChange={(e) => setPromoteData({ ...promoteData, livingGroupName: e.target.value })}
-                className="w-full border border-border rounded px-3 py-2 text-sm"
-                placeholder={t('form.namePlaceholder')}
-              />
-            </div>
-          </div>
-          <p className="text-sm text-text-muted">{t('form.instructions')}</p>
-        </div>
-      )}
-
-      {/* Filters */}
-      <div className="flex flex-wrap gap-2 mb-4 items-center">
-        {['all', 'active', 'disabled'].map((f) => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`px-3 py-1 text-sm rounded ${
-              filter === f
-                ? 'bg-accent text-white'
-                : 'bg-bg-secondary text-text-secondary hover:bg-bg-secondary/80'
-            }`}
-          >
-            {t(`filters.${f}`)}
-          </button>
-        ))}
-        <span className="mx-2 text-text-muted">|</span>
-        <button
-          onClick={() => setShowMemberCounts(!showMemberCounts)}
-          className={`px-3 py-1 text-sm rounded ${
-            showMemberCounts
-              ? 'bg-blue-600 text-white'
-              : 'bg-bg-secondary text-text-secondary hover:bg-bg-secondary/80'
-          }`}
-        >
-          {t('showMemberCounts')}
-        </button>
-      </div>
-
-      {/* Living Groups List */}
       {loading ? (
         <p className="text-text-secondary">Loading...</p>
-      ) : livingGroups.length === 0 ? (
+      ) : filtered.length === 0 ? (
         <p className="text-text-secondary">{t('noLivingGroups')}</p>
       ) : (
-        <div className="space-y-4">
-          {livingGroups.map((lg) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+          {filtered.map((lg) => (
             <div
               key={lg.id}
-              className={`p-4 border rounded-lg ${
-                lg.status === 'active'
-                  ? 'border-green-200 bg-green-50'
-                  : 'border-red-200 bg-red-50'
-              }`}
+              className="p-3 border border-border rounded-lg bg-white"
             >
-              <div className="flex justify-between items-start">
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <h3 className="font-medium">{lg.name}</h3>
-                    <span className={`text-xs px-2 py-0.5 rounded ${
-                      lg.status === 'active'
-                        ? 'bg-green-200 text-green-800'
-                        : 'bg-red-200 text-red-800'
-                    }`}>
-                      {t(`status.${lg.status}`)}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">{lg.name}</span>
+                  {lg.living_group_type && (
+                    <span className="text-xs px-2 py-0.5 bg-bg-secondary text-text-muted rounded leading-none">
+                      {lg.living_group_type === 'fsilg' ? 'FSILG' : 'Dorm'}
                     </span>
-                  </div>
-                  <p className="text-sm text-text-secondary">
-                    {t('leader')}: {lg.user?.email} ({lg.user?.first_name || 'No name'})
-                  </p>
-                  {lg.photoshoot_time && lg.photoshoot_time.length > 0 && (
-                    <p className="text-sm text-text-muted mt-1">
-                      {t('bookedTime')}: {new Date(lg.photoshoot_time[0].date).toLocaleDateString()} {lg.photoshoot_time[0].start_time}
-                    </p>
-                  )}
-                  {showMemberCounts && (
-                    <div className="mt-2 flex items-center gap-4">
-                      <span className={`text-sm px-2 py-0.5 rounded ${
-                        lg.memberCount >= lg.expectedCount && lg.expectedCount > 0
-                          ? 'bg-green-100 text-green-800'
-                          : lg.expectedCount > 0
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : 'bg-gray-100 text-gray-600'
-                      }`}>
-                        {t('memberCount', { count: lg.memberCount || 0 })}
-                      </span>
-                      <span className="text-sm text-text-muted">
-                        {t('expectedCount', { count: lg.expectedCount || 0 })}
-                      </span>
-                    </div>
                   )}
                 </div>
-                <div className="flex gap-2">
-                  {lg.status === 'active' ? (
-                    <button
-                      onClick={() => handleAction(lg.id, 'disable')}
-                      className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700"
-                    >
-                      {t('disable')}
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => handleAction(lg.id, 'enable')}
-                      className="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700"
-                    >
-                      {t('enable')}
-                    </button>
-                  )}
-                </div>
+                <span className="text-sm text-text-muted">{lg.user?.email}</span>
               </div>
+              {lg.dorm_sections && lg.dorm_sections.length > 0 && (
+                <p className="text-xs text-text-muted mt-1">
+                  {lg.dorm_sections.join(', ')}
+                </p>
+              )}
             </div>
           ))}
         </div>

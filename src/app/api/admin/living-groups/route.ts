@@ -17,22 +17,15 @@ export async function GET(request: NextRequest) {
 
     const supabase = createAdminClient();
     const searchParams = request.nextUrl.searchParams;
-    const status = searchParams.get('status');
     const search = searchParams.get('search');
-    const includeMembers = searchParams.get('includeMembers') === 'true';
 
     let query = supabase
       .from('living_groups')
       .select(`
         *,
-        user:users(id, email, first_name, last_name),
-        photoshoot_time:photoshoot_times(id, date, start_time, end_time)
+        user:users!living_groups_user_id_fkey(id, email, first_name, last_name)
       `)
-      .order('created_at', { ascending: false });
-
-    if (status) {
-      query = query.eq('status', status);
-    }
+      .order('name', { ascending: true });
 
     if (search) {
       query = query.ilike('name', `%${search}%`);
@@ -46,39 +39,6 @@ export async function GET(request: NextRequest) {
         { error: "Failed to fetch living groups" },
         { status: 500 }
       );
-    }
-
-    // If includeMembers flag is set, fetch member counts and expected counts
-    if (includeMembers && livingGroups) {
-      const enrichedLivingGroups = await Promise.all(
-        livingGroups.map(async (lg) => {
-          // Get active member count
-          const { count: memberCount } = await supabase
-            .from('living_group_memberships')
-            .select('*', { count: 'exact', head: true })
-            .eq('living_group_id', lg.id)
-            .eq('status', 'active');
-
-          // Get expected counts
-          const { data: expectedCounts } = await supabase
-            .from('section_expected_counts')
-            .select('expected_count')
-            .eq('living_group_id', lg.id);
-
-          const totalExpected = (expectedCounts || []).reduce(
-            (sum, ec) => sum + (ec.expected_count || 0),
-            0
-          );
-
-          return {
-            ...lg,
-            memberCount: memberCount || 0,
-            expectedCount: totalExpected,
-          };
-        })
-      );
-
-      return NextResponse.json({ livingGroups: enrichedLivingGroups });
     }
 
     return NextResponse.json({ livingGroups });

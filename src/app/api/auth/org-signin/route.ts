@@ -18,7 +18,7 @@ interface OrgSigninRequest {
   // For living groups: name is required
   name?: string;
   password: string;
-  orgType: "club" | "living_group";
+  orgType: "club" | "living_group" | "sports";
 }
 
 export async function POST(request: NextRequest) {
@@ -121,6 +121,46 @@ export async function POST(request: NextRequest) {
 
       authEmail = lgUser.email;
       expectedRole = "living_group";
+    }
+    // ==================== SPORTS SIGNIN ====================
+    else if (orgType === "sports") {
+      if (!name) {
+        return NextResponse.json(
+          { error: "Sports team name is required", code: "MISSING_NAME" },
+          { status: 400 }
+        );
+      }
+
+      // Look up sports team by name
+      const { data: sportsTeam, error: sportsError } = await supabaseAdmin
+        .from("sports")
+        .select("id, name, user_id")
+        .ilike("name", name.trim())
+        .single();
+
+      if (sportsError || !sportsTeam) {
+        return NextResponse.json(
+          { error: "Sports team not found", code: "SPORTS_NOT_FOUND" },
+          { status: 404 }
+        );
+      }
+
+      // Get the user record to find the email
+      const { data: sportsUser, error: userLookupError } = await supabaseAdmin
+        .from("users")
+        .select("email")
+        .eq("id", sportsTeam.user_id)
+        .single();
+
+      if (userLookupError || !sportsUser) {
+        return NextResponse.json(
+          { error: "Sports account not found", code: "SPORTS_ACCOUNT_NOT_FOUND" },
+          { status: 404 }
+        );
+      }
+
+      authEmail = sportsUser.email;
+      expectedRole = "sports";
     } else {
       return NextResponse.json(
         { error: "Invalid organization type", code: "INVALID_ORG_TYPE" },
@@ -203,6 +243,8 @@ export async function POST(request: NextRequest) {
     let redirectUrl: string;
     if (user.role === "club") {
       redirectUrl = `${process.env.NEXT_PUBLIC_APP_URL}/en/club`;
+    } else if (user.role === "sports") {
+      redirectUrl = `${process.env.NEXT_PUBLIC_APP_URL}/en/sports`;
     } else {
       redirectUrl = `${process.env.NEXT_PUBLIC_APP_URL}/en/living-group`;
     }

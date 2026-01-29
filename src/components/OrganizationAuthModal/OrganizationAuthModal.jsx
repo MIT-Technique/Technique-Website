@@ -102,21 +102,22 @@ export default function OrganizationAuthModal({ open, onClose }) {
     }
   };
 
-  // Sort and group organizations - clubs first, then living groups, alphabetically within each group
+  // Sort and group organizations - clubs first, then living groups, then sports, alphabetically within each group
+  const typeOrder = { club: 0, living_group: 1, sports: 2 };
   const sortedOrganizations = useMemo(() => {
     return [...organizations].sort((a, b) => {
-      // First sort by type (clubs before living groups)
-      if (a.type !== b.type) {
-        return a.type === "club" ? -1 : 1;
-      }
-      // Then sort alphabetically by name
+      const orderA = typeOrder[a.type] ?? 99;
+      const orderB = typeOrder[b.type] ?? 99;
+      if (orderA !== orderB) return orderA - orderB;
       return a.name.localeCompare(b.name);
     });
   }, [organizations]);
 
   // Get group label for an organization
   const getGroupLabel = (option) => {
-    return option.type === "club" ? t("clubsGroup") : t("livingGroupsGroup");
+    if (option.type === "club") return t("clubsGroup");
+    if (option.type === "sports") return t("sportsGroup");
+    return t("livingGroupsGroup");
   };
 
   const resetForm = () => {
@@ -226,7 +227,7 @@ export default function OrganizationAuthModal({ open, onClose }) {
           setError(t("emailNotVerified"));
         } else if (data.code === "INVALID_CREDENTIALS") {
           setError(t("invalidCredentials"));
-        } else if (data.code === "LG_NOT_FOUND" || data.code === "CLUB_NOT_FOUND") {
+        } else if (data.code === "LG_NOT_FOUND" || data.code === "CLUB_NOT_FOUND" || data.code === "SPORTS_NOT_FOUND") {
           setError(t("organizationNotFound"));
         } else {
           setError(data.error || t("invalidCredentials"));
@@ -622,6 +623,46 @@ export default function OrganizationAuthModal({ open, onClose }) {
                           ))}
                       </>
                     )}
+
+                    {/* Sports */}
+                    {filteredDropdownOrgs.filter(o => o.type === "sports").length > 0 && (
+                      <>
+                        <Typography
+                          sx={{
+                            position: "sticky",
+                            top: 0,
+                            padding: "8px 16px",
+                            backgroundColor: "#f5f5f5",
+                            fontWeight: 600,
+                            fontSize: "0.75rem",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.05em",
+                            color: "#666",
+                            borderBottom: "1px solid #e0e0e0",
+                          }}
+                        >
+                          {t("sportsGroup")}
+                        </Typography>
+                        {filteredDropdownOrgs
+                          .filter(o => o.type === "sports")
+                          .map((org) => (
+                            <Box
+                              key={org.id}
+                              onClick={() => handleSelectOrg(org)}
+                              sx={{
+                                px: 2,
+                                pt: 2,
+                                pb: 0,
+                                cursor: "pointer",
+                                "&:hover": { backgroundColor: "#f5f5f5" },
+                                backgroundColor: selectedOrg?.id === org.id ? "#e3f2fd" : "transparent",
+                              }}
+                            >
+                              <Typography variant="body1">{org.name}</Typography>
+                            </Box>
+                          ))}
+                      </>
+                    )}
                   </>
                 )}
               </Paper>
@@ -659,10 +700,10 @@ export default function OrganizationAuthModal({ open, onClose }) {
           <Box sx={{ textAlign: "center", mt: 2 }}>
             <Button
               size="small"
-              onClick={() => setShowForgotPassword(true)}
+              onClick={() => window.open('mailto:tnq-exec@mit.edu', '_blank')}
               sx={linkButtonSx}
             >
-              {t("forgotPassword")}
+              {t("unexpectedIssues")}
             </Button>
           </Box>
         </Box>

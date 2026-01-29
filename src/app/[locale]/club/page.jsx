@@ -23,6 +23,7 @@ export default function ClubPage() {
   });
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
+  const [imageMessage, setImageMessage] = useState({ type: '', text: '' });
   const [isFrozen, setIsFrozen] = useState(false);
 
   // Email state
@@ -421,6 +422,13 @@ export default function ClubPage() {
                 <div>
                   <label className="block text-sm font-medium mb-2">{t('form.images')}</label>
                   <p className="text-sm text-text-muted mb-4">{t('form.imagesHint')}</p>
+                  {imageMessage.text && (
+                    <div className={`mb-4 p-4 rounded ${
+                      imageMessage.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
+                    }`}>
+                      {imageMessage.text}
+                    </div>
+                  )}
                   <div className="flex gap-4 flex-wrap">
                     {[1, 2, 3].map((slot) => {
                       const clubName = (club?.name || '').replace(/\s+/g, '_');
@@ -433,18 +441,26 @@ export default function ClubPage() {
                           fileName={`${clubName}_Candid${nameSuffix}`}
                           disabled={isFrozen}
                           onUpload={async (file) => {
+                            setImageMessage({ type: '', text: '' });
                             const fd = new FormData();
                             fd.append('file', file);
                             fd.append('slot', String(slot));
                             const res = await fetch('/api/clubs/images', { method: 'POST', body: fd });
                             const data = await res.json();
-                            if (!res.ok) throw new Error(data.error || 'Upload failed');
+                            if (!res.ok) {
+                              setImageMessage({ type: 'error', text: data.error || 'Upload failed' });
+                              throw new Error(data.error || 'Upload failed');
+                            }
                             return data.url;
                           }}
                           onDelete={async () => {
+                            setImageMessage({ type: '', text: '' });
                             const res = await fetch(`/api/clubs/images?slot=${slot}`, { method: 'DELETE' });
                             const data = await res.json();
-                            if (!res.ok) throw new Error(data.error || 'Delete failed');
+                            if (!res.ok) {
+                              setImageMessage({ type: 'error', text: data.error || 'Delete failed' });
+                              throw new Error(data.error || 'Delete failed');
+                            }
                           }}
                         />
                       );

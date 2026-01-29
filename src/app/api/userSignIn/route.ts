@@ -54,6 +54,9 @@ export async function GET(request: NextRequest, response: NextResponse) {
   if (user?.role === 'living_group') {
     return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/en/living-group`);
   }
+  if (user?.role === 'sports') {
+    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/en/sports`);
+  }
 
   // For students, check for returnUrl from cookie (set by /api/login before OAuth redirect)
   const cookieStore = cookies();
@@ -68,7 +71,11 @@ export async function GET(request: NextRequest, response: NextResponse) {
     return response;
   }
 
-  // Default to profile page for students
-  console.log('[/api/userSignIn] No returnUrl cookie, redirecting to default /en/profile');
-  return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/en/profile`);
+  // Default redirect: staph goes to profile, non-staph students go to bio page
+  if (user?.is_staph) {
+    console.log('[/api/userSignIn] Staph user, redirecting to /en/profile');
+    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/en/profile`);
+  }
+  console.log('[/api/userSignIn] Non-staph student, redirecting to /en/bio');
+  return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/en/bio`);
 }

@@ -132,6 +132,7 @@ export default function LivingGroupPage() {
   const [addingSection, setAddingSection] = useState(false);
   const [removingSectionName, setRemovingSectionName] = useState(null);
   const [sectionsMessage, setSectionsMessage] = useState({ type: '', text: '' });
+  const [imageMessage, setImageMessage] = useState({ type: '', text: '' });
   const [sectionToRemove, setSectionToRemove] = useState(null);
 
   // Time assignments state
@@ -1407,6 +1408,14 @@ export default function LivingGroupPage() {
                   </button>
                 </form>
 
+                {imageMessage.text && (
+                  <div className={`mb-4 p-4 rounded ${
+                    imageMessage.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
+                  }`}>
+                    {imageMessage.text}
+                  </div>
+                )}
+
                 {/* Sections List - Compact */}
                 {sectionsLoading ? (
                   <p className="text-text-secondary">Loading...</p>
@@ -1440,18 +1449,26 @@ export default function LivingGroupPage() {
                             fileName={`${(livingGroup?.name || '').replace(/\s+/g, '_')}_${section.replace(/\s+/g, '_')}_Candid`}
                             disabled={isFrozen}
                             onUpload={async (file) => {
+                              setImageMessage({ type: '', text: '' });
                               const fd = new FormData();
                               fd.append('file', file);
                               fd.append('section_name', section);
                               const res = await fetch('/api/living-groups/images', { method: 'POST', body: fd });
                               const data = await res.json();
-                              if (!res.ok) throw new Error(data.error || 'Upload failed');
+                              if (!res.ok) {
+                                setImageMessage({ type: 'error', text: data.error || 'Upload failed' });
+                                throw new Error(data.error || 'Upload failed');
+                              }
                               return data.url;
                             }}
                             onDelete={async () => {
+                              setImageMessage({ type: '', text: '' });
                               const res = await fetch(`/api/living-groups/images?section_name=${encodeURIComponent(section)}`, { method: 'DELETE' });
                               const data = await res.json();
-                              if (!res.ok) throw new Error(data.error || 'Delete failed');
+                              if (!res.ok) {
+                                setImageMessage({ type: 'error', text: data.error || 'Delete failed' });
+                                throw new Error(data.error || 'Delete failed');
+                              }
                             }}
                           />
                         </div>

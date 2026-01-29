@@ -193,6 +193,7 @@
         "organizationNotFound": "Organization not found",
         "clubsGroup": "Clubs",
         "livingGroupsGroup": "Living Groups",
+        "sportsGroup": "Sports",
         "email": "Email",
         "emailOptional": "Email (Optional)",
         "emailPlaceholder": "your-org@mit.edu",
@@ -209,6 +210,7 @@
         "signInSuccess": "Signed in successfully!",
         "successRedirecting": "Success! Redirecting\u2026",
         "forgotPassword": "Forgot password?",
+        "unexpectedIssues": "Unexpected issues?",
         "forgotPasswordTitle": "Reset Password",
         "forgotPasswordDescription": "Select your organization to receive a password reset link.",
         "sendResetLink": "Send Reset Link",
@@ -223,13 +225,13 @@
       "admin": {
         "title": "Admin Login",
         "description": "For Technique administrators only.",
-        "emailLabel": "Admin Email",
-        "emailPlaceholder": "Enter email",
-        "sendLinkButton": "Send Login Link",
-        "sending": "Sending...",
-        "success": "Login link sent! Check your email.",
-        "error": "Failed to send login link. Please try again.",
-        "invalidEmail": "Please enter technique@mit.edu"
+        "passwordLabel": "Password",
+        "passwordPlaceholder": "Enter admin password",
+        "passwordRequired": "Password is required",
+        "signInButton": "Sign In",
+        "signingIn": "Signing in...",
+        "success": "Login successful! Redirecting...",
+        "error": "Invalid credentials. Please try again."
       },
       "sso": {
         "title": "Student & Organization Login"
@@ -261,6 +263,14 @@
       "clubLinkPrefix": "Representing a club?",
       "clubLink": "Club Login",
       "backToLogin": "← Back to Student login"
+    },
+
+    "logout": {
+      "title": "Student Access Required",
+      "message": "Please log in as a student to access the senior bio form.",
+      "signOut": "Sign Out",
+      "signingOut": "Signing out...",
+      "studentNote": "Please use your MIT student account to log in and continue."
     },
 
     "portfolio": {
@@ -660,12 +670,17 @@
       "clubs": "Clubs",
       "livingGroups": "Living Groups",
       "users": "Users",
+      "sports": "Sports",
       "settings": "Settings"
     },
     "stats": {
-      "pendingClubs": "Unverified Clubs",
-      "pendingRequests": "Pending Requests",
-      "upcomingPhotoshoots": "Booked Photoshoots",
+      "clubs": "Clubs",
+      "livingGroups": "Living Groups",
+      "sports": "Sports",
+      "descriptionsCompleted": "{count}/{total} descriptions",
+      "lgCandidsSubmitted": "{count}/{total} candids submitted",
+      "totalImages": "Total Images",
+      "bookedPhotoshoots": "Booked Photoshoots",
       "cancellationRequests": "Cancellation Requests"
     },
     "overview": {
@@ -675,8 +690,8 @@
     "actions": {
       "managePhotoshoots": "Manage Photoshoots",
       "managePhotoshootsDesc": "Add, edit, or remove photoshoot time slots",
-      "reviewClubs": "Review Promotions",
-      "reviewClubsDesc": "Review and approve promotion requests",
+      "manageUsers": "Manage Users",
+      "manageUsersDesc": "View and manage user accounts and roles",
       "formSettings": "Form Settings",
       "formSettingsDesc": "Freeze or unfreeze forms"
     },
@@ -744,6 +759,7 @@
     },
     "livingGroups": {
       "title": "Living Group Management",
+      "searchPlaceholder": "Search living groups...",
       "promoteUser": "Promote User",
       "cancel": "Cancel",
       "promoteTitle": "Promote User to Living Group Leader",
@@ -776,6 +792,12 @@
       "expectedCount": "Expected: {count}",
       "showMemberCounts": "Show Member Counts"
     },
+    "sports": {
+      "searchPlaceholder": "Search sports...",
+      "noSports": "No sports found",
+      "genderTeams": "Men's & Women's Teams",
+      "memberCount": "{count} members"
+    },
     "users": {
       "title": "User Management",
       "allUsers": "All Users",
@@ -786,7 +808,8 @@
         "student": "Student",
         "staph": "Staph",
         "club": "Club",
-        "lgl": "Living Group Leader",
+        "livingGroup": "Living Group",
+        "sports": "Sports",
         "admin": "Admin"
       },
       "noUsers": "No users found",
@@ -961,14 +984,14 @@
       }
     },
     "documents": {
-      "title": "Club Documents",
-      "description": "Store important links and notes for your club. This information is private to club leaders.",
-      "linksLabel": "Important Links",
-      "linksPlaceholder": "Add important links (one per line)\nExample:\nhttps://drive.google.com/your-folder\nhttps://docs.google.com/your-doc",
+      "title": "Internal Documents",
+      "description": "Store internal links and notes for your organization. This information is only visible to your account.",
+      "linksLabel": "Internal Links",
+      "linksPlaceholder": "Add internal links (one per line)\nExample:\nhttps://drive.google.com/your-folder\nhttps://docs.google.com/your-doc",
       "linksHint": "Add URLs to Google Drive folders, shared documents, etc.",
-      "notesLabel": "Notes",
-      "notesPlaceholder": "Add any important notes for club leaders...",
-      "notesHint": "Private notes visible only to club leaders",
+      "notesLabel": "Internal Notes",
+      "notesPlaceholder": "Add any internal notes for your organization...",
+      "notesHint": "Only visible to your account",
       "save": "Save Documents",
       "saveSuccess": "Documents saved successfully",
       "saveError": "Failed to save documents"
@@ -1127,14 +1150,14 @@
       "confirmRemove": "Remove this member?"
     },
     "documents": {
-      "title": "Organization Documents",
-      "description": "Store important links and notes for your living group. This information is private.",
-      "linksLabel": "Important Links",
-      "linksPlaceholder": "Add important links (one per line)\nExample:\nhttps://drive.google.com/your-folder\nhttps://docs.google.com/your-doc",
+      "title": "Internal Documents",
+      "description": "Store internal links and notes for your organization. This information is only visible to your account.",
+      "linksLabel": "Internal Links",
+      "linksPlaceholder": "Add internal links (one per line)\nExample:\nhttps://drive.google.com/your-folder\nhttps://docs.google.com/your-doc",
       "linksHint": "Add URLs to Google Drive folders, shared documents, etc.",
-      "notesLabel": "Notes",
-      "notesPlaceholder": "Add any important notes...",
-      "notesHint": "Private notes visible only to living group account",
+      "notesLabel": "Internal Notes",
+      "notesPlaceholder": "Add any internal notes for your organization...",
+      "notesHint": "Only visible to your account",
       "save": "Save Documents",
       "saving": "Saving...",
       "saveSuccess": "Documents saved successfully",
@@ -1240,6 +1263,114 @@
         "description": "We're here to help. Reach out to us directly.",
         "button": "Contact Us"
       }
+    }
+  },
+
+  "sportsPage": {
+    "title": "Sports Team Dashboard",
+    "welcome": "Welcome, {name}",
+    "frozen": "This form is currently frozen. Changes cannot be made.",
+    "success": "Changes saved successfully",
+    "error": "Failed to save changes",
+    "save": "Save Changes",
+    "saving": "Saving...",
+    "tabs": {
+      "profile": "Profile",
+      "coaches": "Coaches",
+      "members": "Members",
+      "photos": "Photos",
+      "achievements": "Achievements",
+      "documents": "Documents"
+    },
+    "profile": {
+      "email": "Contact Email",
+      "description": "Description",
+      "hasGenderTeams": "Has Men's and Women's Teams",
+      "genderToggleTitle": "Change Team Structure",
+      "genderToggleWarning": "Changing this setting will affect how members, photos, and achievements are organized. Information specific to the current structure may be lost. Remember to save your changes to confirm.",
+      "genderToggleConfirm": "Proceed",
+      "genderToggleCancel": "Cancel"
+    },
+    "email": {
+      "placeholder": "team@mit.edu",
+      "save": "Save",
+      "saved": "Email saved",
+      "error": "Failed to save email"
+    },
+    "coaches": {
+      "title": "Coaching Staff",
+      "addCoach": "Add Coach",
+      "namePlaceholder": "Coach name",
+      "rolePlaceholder": "Role (e.g. Head Coach)",
+      "headCoach": "Head Coach",
+      "assistantCoach": "Assistant Coach",
+      "director": "Director",
+      "noCoaches": "No coaches added yet",
+      "remove": "Remove",
+      "addSuccess": "Coach added",
+      "addError": "Failed to add coach",
+      "removeSuccess": "Coach removed",
+      "removeError": "Failed to remove coach"
+    },
+    "members": {
+      "mensTeam": "Men's Team",
+      "womensTeam": "Women's Team",
+      "unifiedTeam": "Team Members",
+      "addSingle": "Add Single",
+      "bulkImport": "Bulk Import",
+      "firstNamePlaceholder": "First name",
+      "lastNamePlaceholder": "Last name",
+      "add": "Add",
+      "adding": "Adding...",
+      "remove": "Remove",
+      "removing": "Removing...",
+      "noMembers": "No members added yet",
+      "listTitle": "Members",
+      "addSuccess": "Member added",
+      "addError": "Failed to add member",
+      "removeSuccess": "Member removed",
+      "removeError": "Failed to remove member",
+      "bulkInputLabel": "Paste names",
+      "bulkInputHint": "One name per line: First Last or Last, First",
+      "bulkPlaceholder": "John Smith\nSmith, Jane\n...",
+      "preview": "Preview",
+      "import": "Import All",
+      "importing": "Importing...",
+      "previewTitle": "Import Preview",
+      "previewCount": "{count} names parsed successfully",
+      "successfulParse": "Successful",
+      "parseErrors": "Errors",
+      "closePreview": "Close Preview",
+      "bulkAddSuccess": "{count} members added",
+      "bulkAddError": "Failed to import members",
+      "withErrors": "({count} parse errors)",
+      "withDuplicates": "({count} duplicates skipped)"
+    },
+    "photos": {
+      "mainImage": "Main Photo",
+      "additionalImage": "Additional Photo",
+      "mensPhotos": "Men's Team Photos",
+      "womensPhotos": "Women's Team Photos",
+      "teamPhotos": "Team Photos"
+    },
+    "achievements": {
+      "title": "Achievement Summary",
+      "mensAchievements": "Men's Team Achievements",
+      "womensAchievements": "Women's Team Achievements",
+      "placeholder": "Enter team achievements, awards, records..."
+    },
+    "documents": {
+      "title": "Internal Documents",
+      "description": "Store internal links and notes for your organization. This information is only visible to your account.",
+      "linksLabel": "Internal Links",
+      "linksPlaceholder": "Add internal links (one per line)\nExample:\nhttps://drive.google.com/your-folder\nhttps://docs.google.com/your-doc",
+      "linksHint": "Add URLs to Google Drive folders, shared documents, etc.",
+      "notesLabel": "Internal Notes",
+      "notesPlaceholder": "Add any internal notes for your organization...",
+      "notesHint": "Only visible to your account",
+      "save": "Save Documents",
+      "saveSuccess": "Documents saved",
+      "saveError": "Failed to save documents"
     }
   }
 }

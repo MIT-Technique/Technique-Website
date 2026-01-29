@@ -193,6 +193,7 @@
         "organizationNotFound": "Organización no encontrada",
         "clubsGroup": "Clubes",
         "livingGroupsGroup": "Grupos de Vivienda",
+        "sportsGroup": "Deportes",
         "email": "Email",
         "emailOptional": "Email (Opcional)",
         "emailPlaceholder": "tu-org@mit.edu",
@@ -209,6 +210,7 @@
         "signInSuccess": "¡Sesión iniciada exitosamente!",
         "successRedirecting": "¡Éxito! Redirigiendo\u2026",
         "forgotPassword": "¿Olvidaste tu contraseña?",
+        "unexpectedIssues": "¿Problemas inesperados?",
         "forgotPasswordTitle": "Restablecer Contraseña",
         "forgotPasswordDescription": "Selecciona tu organización para recibir un enlace de restablecimiento.",
         "sendResetLink": "Enviar Enlace",
@@ -223,13 +225,13 @@
       "admin": {
         "title": "Acceso de Administrador",
         "description": "Solo para administradores de Technique.",
-        "emailLabel": "Email de Administrador",
-        "emailPlaceholder": "Ingrese email",
-        "sendLinkButton": "Enviar Enlace de Acceso",
-        "sending": "Enviando...",
-        "success": "¡Enlace de acceso enviado! Revisa tu correo.",
-        "error": "Error al enviar el enlace. Por favor intenta de nuevo.",
-        "invalidEmail": "Por favor ingresa technique@mit.edu"
+        "passwordLabel": "Contraseña",
+        "passwordPlaceholder": "Ingrese contraseña de administrador",
+        "passwordRequired": "La contraseña es obligatoria",
+        "signInButton": "Iniciar Sesión",
+        "signingIn": "Iniciando sesión...",
+        "success": "¡Acceso exitoso! Redirigiendo...",
+        "error": "Credenciales inválidas. Por favor intenta de nuevo."
       },
       "sso": {
         "title": "Acceso para Estudiantes y Organizaciones"
@@ -261,6 +263,14 @@
       "clubLinkPrefix": "¿Representas a un club?",
       "clubLink": "Acceso de Club",
       "backToLogin": "← Volver al inicio de sesión de estudiante"
+    },
+
+    "logout": {
+      "title": "Se Requiere Acceso de Estudiante",
+      "message": "Por favor inicia sesión como estudiante para acceder al formulario de biografía de senior.",
+      "signOut": "Cerrar Sesión",
+      "signingOut": "Cerrando sesión...",
+      "studentNote": "Por favor usa tu cuenta de estudiante de MIT para iniciar sesión y continuar."
     },
 
     "portfolio": {
@@ -661,12 +671,17 @@
       "clubs": "Clubes",
       "livingGroups": "Grupos de Vivienda",
       "users": "Usuarios",
+      "sports": "Deportes",
       "settings": "Configuración"
     },
     "stats": {
-      "pendingClubs": "Clubes No Verificados",
-      "pendingRequests": "Solicitudes Pendientes",
-      "upcomingPhotoshoots": "Sesiones Reservadas",
+      "clubs": "Clubes",
+      "livingGroups": "Grupos de Vivienda",
+      "sports": "Deportes",
+      "descriptionsCompleted": "{count}/{total} descripciones",
+      "lgCandidsSubmitted": "{count}/{total} fotos enviadas",
+      "totalImages": "Total de Imágenes",
+      "bookedPhotoshoots": "Sesiones Reservadas",
       "cancellationRequests": "Solicitudes de Cancelación"
     },
     "overview": {
@@ -676,8 +691,8 @@
     "actions": {
       "managePhotoshoots": "Gestionar Sesiones",
       "managePhotoshootsDesc": "Agregar, editar o eliminar horarios de sesiones",
-      "reviewClubs": "Revisar Promociones",
-      "reviewClubsDesc": "Revisar y aprobar solicitudes de promoción",
+      "manageUsers": "Gestionar Usuarios",
+      "manageUsersDesc": "Ver y gestionar cuentas y roles de usuarios",
       "formSettings": "Configuración de Formularios",
       "formSettingsDesc": "Congelar o descongelar formularios"
     },
@@ -745,6 +760,7 @@
     },
     "livingGroups": {
       "title": "Gestión de Grupos de Vivienda",
+      "searchPlaceholder": "Buscar grupos...",
       "promoteUser": "Promover Usuario",
       "cancel": "Cancelar",
       "promoteTitle": "Promover Usuario a Líder de Grupo",
@@ -777,6 +793,12 @@
       "expectedCount": "Esperados: {count}",
       "showMemberCounts": "Mostrar Conteo de Miembros"
     },
+    "sports": {
+      "searchPlaceholder": "Buscar deportes...",
+      "noSports": "No se encontraron deportes",
+      "genderTeams": "Equipos Masculino y Femenino",
+      "memberCount": "{count} miembros"
+    },
     "users": {
       "title": "Gestión de Usuarios",
       "allUsers": "Todos los Usuarios",
@@ -787,7 +809,8 @@
         "student": "Estudiante",
         "staph": "Staph",
         "club": "Club",
-        "lgl": "Líder de Grupo",
+        "livingGroup": "Grupo de Vivienda",
+        "sports": "Deportes",
         "admin": "Administrador"
       },
       "noUsers": "No se encontraron usuarios",
@@ -962,14 +985,14 @@
       }
     },
     "documents": {
-      "title": "Documentos del Club",
-      "description": "Almacena enlaces y notas importantes para tu club. Esta información es privada para los líderes del club.",
-      "linksLabel": "Enlaces Importantes",
-      "linksPlaceholder": "Añade enlaces importantes (uno por línea)\nEjemplo:\nhttps://drive.google.com/tu-carpeta\nhttps://docs.google.com/tu-documento",
+      "title": "Documentos Internos",
+      "description": "Almacena enlaces y notas internos para tu organización. Esta información solo es visible para tu cuenta.",
+      "linksLabel": "Enlaces Internos",
+      "linksPlaceholder": "Añade enlaces internos (uno por línea)\nEjemplo:\nhttps://drive.google.com/tu-carpeta\nhttps://docs.google.com/tu-documento",
       "linksHint": "Añade URLs a carpetas de Google Drive, documentos compartidos, etc.",
-      "notesLabel": "Notas",
-      "notesPlaceholder": "Añade notas importantes para los líderes del club...",
-      "notesHint": "Notas privadas visibles solo para los líderes del club",
+      "notesLabel": "Notas Internas",
+      "notesPlaceholder": "Añade notas internas para tu organización...",
+      "notesHint": "Solo visible para tu cuenta",
       "save": "Guardar Documentos",
       "saveSuccess": "Documentos guardados exitosamente",
       "saveError": "Error al guardar documentos"
@@ -1128,14 +1151,14 @@
       "confirmRemove": "¿Eliminar este miembro?"
     },
     "documents": {
-      "title": "Documentos de la Organización",
-      "description": "Guarda enlaces y notas importantes para tu grupo de vivienda. Esta información es privada.",
-      "linksLabel": "Enlaces Importantes",
-      "linksPlaceholder": "Añade enlaces importantes (uno por línea)\nEjemplo:\nhttps://drive.google.com/tu-carpeta\nhttps://docs.google.com/tu-documento",
+      "title": "Documentos Internos",
+      "description": "Almacena enlaces y notas internos para tu organización. Esta información solo es visible para tu cuenta.",
+      "linksLabel": "Enlaces Internos",
+      "linksPlaceholder": "Añade enlaces internos (uno por línea)\nEjemplo:\nhttps://drive.google.com/tu-carpeta\nhttps://docs.google.com/tu-documento",
       "linksHint": "Añade URLs a carpetas de Google Drive, documentos compartidos, etc.",
-      "notesLabel": "Notas",
-      "notesPlaceholder": "Añade notas importantes...",
-      "notesHint": "Notas privadas visibles solo para la cuenta del grupo",
+      "notesLabel": "Notas Internas",
+      "notesPlaceholder": "Añade notas internas para tu organización...",
+      "notesHint": "Solo visible para tu cuenta",
       "save": "Guardar Documentos",
       "saving": "Guardando...",
       "saveSuccess": "Documentos guardados exitosamente",
@@ -1241,6 +1264,114 @@
         "description": "Estamos aquí para ayudar. Contáctanos directamente.",
         "button": "Contáctanos"
       }
+    }
+  },
+
+  "sportsPage": {
+    "title": "Panel del Equipo Deportivo",
+    "welcome": "Bienvenido, {name}",
+    "frozen": "Este formulario está congelado. No se pueden hacer cambios.",
+    "success": "Cambios guardados exitosamente",
+    "error": "Error al guardar cambios",
+    "save": "Guardar Cambios",
+    "saving": "Guardando...",
+    "tabs": {
+      "profile": "Perfil",
+      "coaches": "Entrenadores",
+      "members": "Miembros",
+      "photos": "Fotos",
+      "achievements": "Logros",
+      "documents": "Documentos"
+    },
+    "profile": {
+      "email": "Correo de Contacto",
+      "description": "Descripción",
+      "hasGenderTeams": "Tiene equipos masculino y femenino",
+      "genderToggleTitle": "Cambiar estructura del equipo",
+      "genderToggleWarning": "Cambiar esta configuración afectará cómo se organizan los miembros, fotos y logros. La información específica de la estructura actual podría perderse. Recuerde guardar los cambios para confirmar.",
+      "genderToggleConfirm": "Proceder",
+      "genderToggleCancel": "Cancelar"
+    },
+    "email": {
+      "placeholder": "equipo@mit.edu",
+      "save": "Guardar",
+      "saved": "Correo guardado",
+      "error": "Error al guardar correo"
+    },
+    "coaches": {
+      "title": "Cuerpo Técnico",
+      "addCoach": "Agregar Entrenador",
+      "namePlaceholder": "Nombre del entrenador",
+      "rolePlaceholder": "Rol (ej. Entrenador Principal)",
+      "headCoach": "Entrenador Principal",
+      "assistantCoach": "Entrenador Asistente",
+      "director": "Director",
+      "noCoaches": "No hay entrenadores agregados",
+      "remove": "Eliminar",
+      "addSuccess": "Entrenador agregado",
+      "addError": "Error al agregar entrenador",
+      "removeSuccess": "Entrenador eliminado",
+      "removeError": "Error al eliminar entrenador"
+    },
+    "members": {
+      "mensTeam": "Equipo Masculino",
+      "womensTeam": "Equipo Femenino",
+      "unifiedTeam": "Miembros del Equipo",
+      "addSingle": "Agregar Individual",
+      "bulkImport": "Importar en Masa",
+      "firstNamePlaceholder": "Nombre",
+      "lastNamePlaceholder": "Apellido",
+      "add": "Agregar",
+      "adding": "Agregando...",
+      "remove": "Eliminar",
+      "removing": "Eliminando...",
+      "noMembers": "No hay miembros agregados",
+      "listTitle": "Miembros",
+      "addSuccess": "Miembro agregado",
+      "addError": "Error al agregar miembro",
+      "removeSuccess": "Miembro eliminado",
+      "removeError": "Error al eliminar miembro",
+      "bulkInputLabel": "Pegar nombres",
+      "bulkInputHint": "Un nombre por línea: Nombre Apellido o Apellido, Nombre",
+      "bulkPlaceholder": "Juan Pérez\nPérez, María\n...",
+      "preview": "Vista Previa",
+      "import": "Importar Todo",
+      "importing": "Importando...",
+      "previewTitle": "Vista Previa de Importación",
+      "previewCount": "{count} nombres procesados exitosamente",
+      "successfulParse": "Exitosos",
+      "parseErrors": "Errores",
+      "closePreview": "Cerrar Vista Previa",
+      "bulkAddSuccess": "{count} miembros agregados",
+      "bulkAddError": "Error al importar miembros",
+      "withErrors": "({count} errores de análisis)",
+      "withDuplicates": "({count} duplicados omitidos)"
+    },
+    "photos": {
+      "mainImage": "Foto Principal",
+      "additionalImage": "Foto Adicional",
+      "mensPhotos": "Fotos del Equipo Masculino",
+      "womensPhotos": "Fotos del Equipo Femenino",
+      "teamPhotos": "Fotos del Equipo"
+    },
+    "achievements": {
+      "title": "Resumen de Logros",
+      "mensAchievements": "Logros del Equipo Masculino",
+      "womensAchievements": "Logros del Equipo Femenino",
+      "placeholder": "Ingrese logros, premios, récords del equipo..."
+    },
+    "documents": {
+      "title": "Documentos Internos",
+      "description": "Almacena enlaces y notas internos para tu organización. Esta información solo es visible para tu cuenta.",
+      "linksLabel": "Enlaces Internos",
+      "linksPlaceholder": "Añade enlaces internos (uno por línea)\nEjemplo:\nhttps://drive.google.com/tu-carpeta\nhttps://docs.google.com/tu-documento",
+      "linksHint": "Añade URLs a carpetas de Google Drive, documentos compartidos, etc.",
+      "notesLabel": "Notas Internas",
+      "notesPlaceholder": "Añade notas internas para tu organización...",
+      "notesHint": "Solo visible para tu cuenta",
+      "save": "Guardar Documentos",
+      "saveSuccess": "Documentos guardados",
+      "saveError": "Error al guardar documentos"
     }
   }
 }

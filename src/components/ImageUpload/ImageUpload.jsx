@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
@@ -11,6 +11,11 @@ export default function ImageUpload({ imageUrl, onUpload, onDelete, disabled, la
   const [dragOver, setDragOver] = useState(false);
   const [localUrl, setLocalUrl] = useState(null);
   const inputRef = useRef(null);
+
+  // Reset localUrl when the parent's imageUrl changes (e.g., after external refetch)
+  useEffect(() => {
+    setLocalUrl(null);
+  }, [imageUrl]);
 
   function validate(file) {
     if (!ALLOWED_TYPES.includes(file.type)) {

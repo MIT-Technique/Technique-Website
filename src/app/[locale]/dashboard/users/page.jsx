@@ -6,7 +6,6 @@ import { useTranslations } from 'next-intl';
 export default function UsersPage() {
   const t = useTranslations('dashboard.users');
   const [users, setUsers] = useState([]);
-  const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
@@ -30,8 +29,6 @@ export default function UsersPage() {
   useEffect(() => {
     if (activeTab === 'users') {
       fetchUsers();
-    } else if (activeTab === 'requests') {
-      fetchRequests();
     } else if (activeTab === 'logs') {
       fetchLogs();
     }
@@ -73,19 +70,6 @@ export default function UsersPage() {
     }
   }
 
-  async function fetchRequests() {
-    try {
-      setLoading(true);
-      const res = await fetch('/api/admin/promotion-requests?status=pending');
-      const data = await res.json();
-      setRequests(data.requests || []);
-    } catch (error) {
-      console.error('Error fetching requests:', error);
-    } finally {
-      setLoading(false);
-    }
-  }
-
   async function handleRoleChange(userId, newRole) {
     try {
       const res = await fetch('/api/admin/users', {
@@ -99,25 +83,6 @@ export default function UsersPage() {
       }
     } catch (error) {
       console.error('Error updating user:', error);
-    }
-  }
-
-  async function handleRequestAction(requestId, action) {
-    try {
-      const notes = action === 'denied' ? prompt(t('denyReason')) : '';
-      if (action === 'denied' && notes === null) return;
-
-      const res = await fetch('/api/admin/promotion-requests', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ requestId, action, notes }),
-      });
-
-      if (res.ok) {
-        fetchRequests();
-      }
-    } catch (error) {
-      console.error('Error processing request:', error);
     }
   }
 
@@ -231,15 +196,6 @@ export default function UsersPage() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-lg font-medium">{t('title')}</h2>
-        {isSuperAdmin && (
-          <span className="text-sm text-text-secondary">
-            {t('designatedAdmins', { count: adminCount, max: maxAdmins })}
-          </span>
-        )}
-      </div>
-
       {/* Sub-tabs */}
       <div className="flex gap-4 mb-6">
         <button
@@ -251,16 +207,6 @@ export default function UsersPage() {
           }`}
         >
           {t('allUsers')}
-        </button>
-        <button
-          onClick={() => setActiveTab('requests')}
-          className={`text-sm font-medium pb-2 border-b-2 ${
-            activeTab === 'requests'
-              ? 'border-accent text-accent'
-              : 'border-transparent text-text-secondary hover:text-text-primary'
-          }`}
-        >
-          {t('promotionRequests')} {requests.length > 0 && `(${requests.length})`}
         </button>
         <button
           onClick={() => setActiveTab('logs')}
@@ -293,7 +239,8 @@ export default function UsersPage() {
               <option value="all">{t('filters.allRoles')}</option>
               <option value="student">{t('filters.student')}</option>
               <option value="club">{t('filters.club')}</option>
-              <option value="living_group">{t('filters.lgl')}</option>
+              <option value="living_group">{t('filters.livingGroup')}</option>
+              <option value="sports">{t('filters.sports')}</option>
               <option value="admin">{t('filters.admin')}</option>
             </select>
           </div>
@@ -330,6 +277,7 @@ export default function UsersPage() {
                           <option value="student">Student</option>
                           <option value="club">Club</option>
                           <option value="living_group">Living Group</option>
+                          <option value="sports">Sports</option>
                           <option value="admin">Admin</option>
                         </select>
                       </td>
@@ -378,57 +326,6 @@ export default function UsersPage() {
                   ))}
                 </tbody>
               </table>
-            </div>
-          )}
-        </>
-      ) : activeTab === 'requests' ? (
-        <>
-          {/* Promotion Requests */}
-          {loading ? (
-            <p className="text-text-secondary">Loading...</p>
-          ) : requests.length === 0 ? (
-            <p className="text-text-secondary">{t('noRequests')}</p>
-          ) : (
-            <div className="space-y-4">
-              {requests.map((request) => (
-                <div
-                  key={request.id}
-                  className="p-4 border border-yellow-200 bg-yellow-50 rounded-lg"
-                >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="font-medium">
-                        {request.user?.email} ({request.user?.first_name || 'No name'})
-                      </p>
-                      <p className="text-sm text-text-secondary mt-1">
-                        {t('requestType')}: {t('staphRequest')}
-                      </p>
-                      {request.request_reason && (
-                        <p className="text-sm text-text-muted mt-2">
-                          {t('reason')}: {request.request_reason}
-                        </p>
-                      )}
-                      <p className="text-xs text-text-muted mt-2">
-                        {t('submitted')}: {new Date(request.created_at).toLocaleString()}
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleRequestAction(request.id, 'approved')}
-                        className="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700"
-                      >
-                        {t('approve')}
-                      </button>
-                      <button
-                        onClick={() => handleRequestAction(request.id, 'denied')}
-                        className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700"
-                      >
-                        {t('deny')}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
             </div>
           )}
         </>

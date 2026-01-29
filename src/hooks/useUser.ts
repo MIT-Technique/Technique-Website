@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { User, Club, LivingGroup, FormSetting } from '../lib/supabase/types';
+import { User, Club, LivingGroup, Sports, FormSetting } from '../lib/supabase/types';
 
 interface SessionData {
   isLoggedIn: boolean;
   user: User | null;
   club?: Club | null;
   livingGroup?: LivingGroup | null;
+  sports?: Sports | null;
   frozenForms?: FormSetting[];
 }
 
@@ -60,6 +61,7 @@ export function useUser() {
     user: session?.user ?? null,
     club: session?.club ?? null,
     livingGroup: session?.livingGroup ?? null,
+    sports: session?.sports ?? null,
     frozenForms: session?.frozenForms ?? [],
     loading,
     error,

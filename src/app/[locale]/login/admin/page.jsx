@@ -4,10 +4,6 @@ import { useState } from "react";
 import * as React from "react";
 import Box from "@mui/material/Box";
 import { Button, TextField } from "@mui/material";
-import Snackbar from "@mui/material/Snackbar";
-import CloseIcon from "@mui/icons-material/Close";
-import IconButton from "@mui/material/IconButton";
-import Alert from "@mui/material/Alert";
 import { useTranslations } from 'next-intl';
 
 const textFieldSx = {
@@ -21,53 +17,42 @@ const textFieldSx = {
 
 export default function AdminLoginPage() {
   const t = useTranslations('pages.login');
-  const [adminEmail, setAdminEmail] = useState('');
-  const [adminSending, setAdminSending] = useState(false);
-  const [adminMessage, setAdminMessage] = useState({ type: '', text: '' });
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-
-  const vertical = "top";
-  const horizontal = "center";
-
-  function handleSnackbarClose() {
-    setSnackbarOpen(false);
-  }
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState({ type: '', text: '' });
 
   async function handleAdminLogin(e) {
     e.preventDefault();
 
-    // Validate email is technique@mit.edu
-    if (adminEmail.toLowerCase() !== 'technique@mit.edu') {
-      setAdminMessage({ type: 'error', text: t('admin.invalidEmail') });
+    if (!password) {
+      setMessage({ type: 'error', text: t('admin.passwordRequired') });
       return;
     }
 
-    setAdminSending(true);
-    setAdminMessage({ type: '', text: '' });
+    setLoading(true);
+    setMessage({ type: '', text: '' });
 
     try {
       const res = await fetch('/api/auth/admin-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: adminEmail }),
+        body: JSON.stringify({ password }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        setAdminMessage({ type: 'success', text: t('admin.success') });
-        setSnackbarSeverity('success');
-        setSnackbarMessage(t('admin.success'));
-        setSnackbarOpen(true);
+        setMessage({ type: 'success', text: t('admin.success') });
+        setTimeout(() => {
+          window.location.href = data.redirectUrl;
+        }, 500);
       } else {
-        setAdminMessage({ type: 'error', text: data.error || t('admin.error') });
+        setMessage({ type: 'error', text: data.error || t('admin.error') });
       }
     } catch (error) {
-      setAdminMessage({ type: 'error', text: t('admin.error') });
+      setMessage({ type: 'error', text: t('admin.error') });
     } finally {
-      setAdminSending(false);
+      setLoading(false);
     }
   }
 
@@ -82,7 +67,6 @@ export default function AdminLoginPage() {
             </p>
           </div>
 
-          {/* Admin Login Form */}
           <Box
             component="form"
             className="card-elevated"
@@ -95,31 +79,31 @@ export default function AdminLoginPage() {
             onSubmit={handleAdminLogin}
           >
             <TextField
-              type="email"
-              label={t('admin.emailLabel')}
+              type="password"
+              label={t('admin.passwordLabel')}
               variant="outlined"
-              value={adminEmail}
-              onChange={(e) => setAdminEmail(e.target.value)}
-              placeholder={t('admin.emailPlaceholder')}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder={t('admin.passwordPlaceholder')}
               sx={{ ...textFieldSx, mb: 2 }}
               fullWidth
               InputLabelProps={{ shrink: true }}
             />
 
-            {adminMessage.text && (
+            {message.text && (
               <div className={`mb-4 p-3 rounded text-sm ${
-                adminMessage.type === 'success'
+                message.type === 'success'
                   ? 'bg-green-50 text-green-600'
                   : 'bg-red-50 text-red-600'
               }`}>
-                {adminMessage.text}
+                {message.text}
               </div>
             )}
 
             <Button
               type="submit"
               variant="contained"
-              disabled={adminSending || !adminEmail}
+              disabled={loading || !password}
               sx={{
                 backgroundColor: "#750014",
                 "&:hover": {
@@ -135,37 +119,11 @@ export default function AdminLoginPage() {
                 boxShadow: "none",
               }}
             >
-              {adminSending ? t('admin.sending') : t('admin.sendLinkButton')}
+              {loading ? t('admin.signingIn') : t('admin.signInButton')}
             </Button>
           </Box>
         </section>
       </main>
-
-      <Snackbar
-        anchorOrigin={{ vertical, horizontal }}
-        open={snackbarOpen}
-        onClose={handleSnackbarClose}
-        autoHideDuration={4000}
-        action={
-          <IconButton
-            aria-label="close"
-            color="inherit"
-            sx={{ p: 0.5 }}
-            onClick={handleSnackbarClose}
-          >
-            <CloseIcon />
-          </IconButton>
-        }
-      >
-        <Alert
-          onClose={handleSnackbarClose}
-          severity={snackbarSeverity}
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
       <Footer />
     </>
   );

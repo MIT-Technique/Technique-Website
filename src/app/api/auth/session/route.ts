@@ -45,6 +45,7 @@ export async function GET() {
     // Get additional data based on role (at top level for useUser hook)
     let club = null;
     let livingGroup = null;
+    let sports = null;
 
     if (user.role === 'club') {
       const { data } = await supabase
@@ -64,6 +65,15 @@ export async function GET() {
       livingGroup = data;
     }
 
+    if (user.role === 'sports') {
+      const { data } = await supabase
+        .from('sports')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+      sports = data;
+    }
+
     // Get frozen forms status (return full objects for page components)
     const { data: formSettings } = await supabase
       .from('form_settings')
@@ -76,6 +86,7 @@ export async function GET() {
       user,
       club,
       livingGroup,
+      sports,
       frozenForms,
     });
   } catch (error) {

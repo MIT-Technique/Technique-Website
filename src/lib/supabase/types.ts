@@ -1,4 +1,4 @@
-export type UserRole = 'admin' | 'staph' | 'club' | 'living_group' | 'student';
+export type UserRole = 'admin' | 'staph' | 'club' | 'living_group' | 'student' | 'sports';
 export type AuthProvider = 'mit_sso' | 'supabase_auth';
 export type ApprovalStatus = 'pending' | 'approved' | 'denied';
 export type LivingGroupStatus = 'active' | 'disabled' | 'pending';
@@ -268,6 +268,56 @@ export interface PhotographerPermission {
 export interface PhotographerPermissionWithUser extends PhotographerPermission {
   user?: Pick<User, 'id' | 'email' | 'first_name' | 'last_name'>;
   approver?: Pick<User, 'id' | 'email' | 'first_name' | 'last_name'>;
+}
+
+// Sports types
+export type SportsTeam = 'mens' | 'womens' | null;
+
+export interface Sports {
+  id: string;
+  user_id: string;
+  name: string;
+  description: string | null;
+  has_gender_teams: boolean;
+  achievement_summary: string | null;
+  candid_image_1: string | null;
+  candid_image_2: string | null;
+  candid_image_3: string | null;
+  mens_achievement_summary: string | null;
+  mens_candid_image_1: string | null;
+  mens_candid_image_2: string | null;
+  mens_candid_image_3: string | null;
+  womens_achievement_summary: string | null;
+  womens_candid_image_1: string | null;
+  womens_candid_image_2: string | null;
+  womens_candid_image_3: string | null;
+  document_links: string | null;
+  document_notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SportsCoach {
+  id: string;
+  sports_id: string;
+  name: string;
+  role: string;
+  display_order: number;
+  added_at: string;
+}
+
+export interface SportsManualMember {
+  id: string;
+  sports_id: string;
+  first_name: string;
+  last_name: string;
+  name: string;
+  team: SportsTeam;
+  added_at: string;
+}
+
+export interface UserWithSports extends User {
+  sports?: Sports;
 }
 
 // Time proposal types (bidirectional scheduling)

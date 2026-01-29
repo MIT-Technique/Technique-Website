@@ -35,58 +35,6 @@ export async function GET(request: NextRequest) {
 
       let user = existingUser;
 
-      if (type === 'admin' && email === 'technique@mit.edu') {
-        // Admin login - upsert admin user
-        if (!existingUser) {
-          const { data: newUser, error: createError } = await supabase
-            .from('users')
-            .insert({
-              email,
-              role: 'admin',
-              first_name: 'Technique',
-              last_name: 'Admin',
-              auth_provider: 'supabase_auth',
-              supabase_auth_id: supabaseAuthId,
-              is_active: true,
-            })
-            .select()
-            .single();
-
-          if (createError) {
-            console.error("Error creating admin user:", createError);
-            return NextResponse.redirect(
-              `${process.env.NEXT_PUBLIC_APP_URL}/en/login?error=user_create_failed`
-            );
-          }
-          user = newUser;
-        } else {
-          // Update supabase_auth_id if not set
-          await supabase
-            .from('users')
-            .update({
-              supabase_auth_id: supabaseAuthId,
-              updated_at: new Date().toISOString(),
-            })
-            .eq('email', email);
-        }
-
-        // Create session
-        const session = await getSession();
-        session.isLoggedIn = true;
-        session.userId = user?.id;
-        session.userInfo = {
-          sub: email,
-          name: 'Admin',
-          email,
-          email_verified: true,
-        };
-        await session.save();
-
-        return NextResponse.redirect(
-          `${process.env.NEXT_PUBLIC_APP_URL}/en/dashboard`
-        );
-      }
-
       if (type === 'club') {
         // Club signup or login
         if (!existingUser) {

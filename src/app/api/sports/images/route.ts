@@ -14,16 +14,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (user.role !== 'club') {
+    if (user.role !== 'sports') {
       return NextResponse.json(
-        { error: "Only club accounts can upload images" },
+        { error: "Only sports accounts can upload images" },
         { status: 403 }
       );
     }
 
     const formData = await request.formData();
     const file = formData.get('file') as File;
-    const slot = formData.get('slot') as string; // '1', '2', or '3'
+    const slot = formData.get('slot') as string;
+    const team = formData.get('team') as string | null; // 'mens', 'womens', or null
 
     if (!file) {
       return NextResponse.json(
@@ -35,6 +36,13 @@ export async function POST(request: NextRequest) {
     if (!['1', '2', '3'].includes(slot)) {
       return NextResponse.json(
         { error: "Invalid slot. Must be 1, 2, or 3" },
+        { status: 400 }
+      );
+    }
+
+    if (team && !['mens', 'womens'].includes(team)) {
+      return NextResponse.json(
+        { error: "Invalid team. Must be 'mens' or 'womens'" },
         { status: 400 }
       );
     }
@@ -58,28 +66,36 @@ export async function POST(request: NextRequest) {
 
     const supabase = createAdminClient();
 
-    // Get club
-    const { data: club } = await supabase
-      .from('clubs')
-      .select('id, club_id, name')
+    // Get sports team
+    const { data: sports } = await supabase
+      .from('sports')
+      .select('id, name')
       .eq('user_id', user.id)
       .single();
 
-    if (!club) {
+    if (!sports) {
       return NextResponse.json(
-        { error: "Club not found" },
+        { error: "Sports team not found" },
         { status: 404 }
       );
     }
 
-    // Upload to Supabase Storage
+    // Build storage path: sports/{safeName}/{team}/Candid{suffix}.{ext}
     const fileExt = file.name.split('.').pop();
-    const safeName = (club.name || club.club_id).replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '');
+    const safeName = (sports.name || sports.id).replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '');
     const suffix = slot === '1' ? '' : `_${slot}`;
-    const fileName = `clubs/${safeName}_Candid${suffix}.${fileExt}`;
+    const teamFolder = team ? `${team}/` : '';
+    const bucketName = 'sports-images';
+    const fileName = `sports/${safeName}/${teamFolder}Candid${suffix}.${fileExt}`;
 
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('club-images')
+    // Ensure bucket exists
+    const { data: buckets } = await supabase.storage.listBuckets();
+    if (!buckets?.find((b: { name: string }) => b.name === bucketName)) {
+      await supabase.storage.createBucket(bucketName, { public: true, fileSizeLimit: 5 * 1024 * 1024 });
+    }
+
+    const { error: uploadError } = await supabase.storage
+      .from(bucketName)
       .upload(fileName, file, {
         cacheControl: '3600',
         upsert: true,
@@ -95,23 +111,25 @@ export async function POST(request: NextRequest) {
 
     // Get public URL
     const { data: urlData } = supabase.storage
-      .from('club-images')
+      .from(bucketName)
       .getPublicUrl(fileName);
 
-    // Update club record
-    const imageField = `candid_image_${slot}`;
+    // Determine which DB column to update
+    const teamPrefix = team ? `${team}_` : '';
+    const imageField = `${teamPrefix}candid_image_${slot}`;
+
     const { error: updateError } = await supabase
-      .from('clubs')
+      .from('sports')
       .update({
         [imageField]: urlData.publicUrl,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', club.id);
+      .eq('id', sports.id);
 
     if (updateError) {
-      console.error("Update club error:", updateError);
+      console.error("Update sports error:", updateError);
       return NextResponse.json(
-        { error: "Failed to update club with image URL" },
+        { error: "Failed to update sports with image URL" },
         { status: 500 }
       );
     }
@@ -120,6 +138,7 @@ export async function POST(request: NextRequest) {
       success: true,
       url: urlData.publicUrl,
       slot,
+      team: team || null,
     });
   } catch (error) {
     console.error("Upload image error:", error);
@@ -142,15 +161,16 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    if (user.role !== 'club') {
+    if (user.role !== 'sports') {
       return NextResponse.json(
-        { error: "Only club accounts can delete images" },
+        { error: "Only sports accounts can delete images" },
         { status: 403 }
       );
     }
 
     const { searchParams } = new URL(request.url);
     const slot = searchParams.get('slot');
+    const team = searchParams.get('team'); // 'mens', 'womens', or null
 
     if (!slot || !['1', '2', '3'].includes(slot)) {
       return NextResponse.json(
@@ -159,43 +179,52 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
+    if (team && !['mens', 'womens'].includes(team)) {
+      return NextResponse.json(
+        { error: "Invalid team. Must be 'mens' or 'womens'" },
+        { status: 400 }
+      );
+    }
+
     const supabase = createAdminClient();
 
-    // Get club with current image URL
-    const imageField = `candid_image_${slot}`;
-    const { data: club } = await supabase
-      .from('clubs')
-      .select('id, candid_image_1, candid_image_2, candid_image_3')
+    // Get sports with current image URL
+    const teamPrefix = team ? `${team}_` : '';
+    const imageField = `${teamPrefix}candid_image_${slot}`;
+
+    const { data: sports } = await supabase
+      .from('sports')
+      .select('id, candid_image_1, candid_image_2, candid_image_3, mens_candid_image_1, mens_candid_image_2, mens_candid_image_3, womens_candid_image_1, womens_candid_image_2, womens_candid_image_3')
       .eq('user_id', user.id)
       .single();
 
-    if (!club) {
+    if (!sports) {
       return NextResponse.json(
-        { error: "Club not found" },
+        { error: "Sports team not found" },
         { status: 404 }
       );
     }
 
     // Delete file from storage
-    const imageUrl = (club as Record<string, unknown>)[imageField] as string | null;
+    const imageUrl = (sports as Record<string, unknown>)[imageField] as string | null;
     if (imageUrl) {
-      const match = imageUrl.match(/\/club-images\/(.+)$/);
+      const match = imageUrl.match(/\/sports-images\/(.+)$/);
       if (match) {
-        await supabase.storage.from('club-images').remove([decodeURIComponent(match[1])]);
+        await supabase.storage.from('sports-images').remove([decodeURIComponent(match[1])]);
       }
     }
 
     // Clear the image URL in database
     const { error: updateError } = await supabase
-      .from('clubs')
+      .from('sports')
       .update({
         [imageField]: null,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', club.id);
+      .eq('id', sports.id);
 
     if (updateError) {
-      console.error("Update club error:", updateError);
+      console.error("Update sports error:", updateError);
       return NextResponse.json(
         { error: "Failed to remove image" },
         { status: 500 }
@@ -205,6 +234,7 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({
       success: true,
       slot,
+      team: team || null,
     });
   } catch (error) {
     console.error("Delete image error:", error);
