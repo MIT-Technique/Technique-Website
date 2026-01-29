@@ -5,10 +5,11 @@ export async function GET(request: NextRequest) {
   try {
     const supabaseAdmin = createAdminClient();
 
-    // Fetch all clubs
+    // Fetch approved clubs
     const { data: clubs, error: clubsError } = await supabaseAdmin
       .from("clubs")
       .select("id, name")
+      .eq("approval_status", "approved")
       .order("name");
 
     if (clubsError) {
@@ -19,10 +20,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Fetch all living groups
+    // Fetch active living groups
     const { data: livingGroups, error: lgError } = await supabaseAdmin
       .from("living_groups")
       .select("id, name, living_group_type")
+      .eq("status", "active")
       .order("name");
 
     if (lgError) {

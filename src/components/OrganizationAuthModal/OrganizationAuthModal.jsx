@@ -550,7 +550,7 @@ export default function OrganizationAuthModal({ open, onClose }) {
                           sx={{
                             position: "sticky",
                             top: 0,
-                            padding: "8px 16px",
+                            padding: "8px 12px",
                             backgroundColor: "#f5f5f5",
                             fontWeight: 600,
                             fontSize: "0.75rem",
@@ -570,8 +570,8 @@ export default function OrganizationAuthModal({ open, onClose }) {
                               onClick={() => handleSelectOrg(org)}
                               sx={{
                                 px: 2,
-                                pt: 1.25,
-                                pb: 0.75,
+                                pt: 2,
+                                mb: 0,
                                 cursor: "pointer",
                                 "&:hover": { backgroundColor: "#f5f5f5" },
                                 backgroundColor: selectedOrg?.id === org.id ? "#e3f2fd" : "transparent",
@@ -610,8 +610,8 @@ export default function OrganizationAuthModal({ open, onClose }) {
                               onClick={() => handleSelectOrg(org)}
                               sx={{
                                 px: 2,
-                                pt: 1.25,
-                                pb: 0.75,
+                                pt: 2,
+                                pb: 0,
                                 cursor: "pointer",
                                 "&:hover": { backgroundColor: "#f5f5f5" },
                                 backgroundColor: selectedOrg?.id === org.id ? "#e3f2fd" : "transparent",
