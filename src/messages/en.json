@@ -29,6 +29,7 @@
       "parent": "PARENT",
       "alumni": "ALUMNI",
       "clubs": "CLUBS",
+      "candids": "CANDIDS",
       "studentWork": "STUDENT WORK",
       "hireUs": "HIRE US",
       "joinUs": "JOIN US",
@@ -314,15 +315,40 @@
       "metaDescription": "Update your information for the MIT Technique yearbook.",
       "description": "Update your information for the yearbook.",
       "fields": {
+        "email": "MIT Email",
+        "emailHelper": "Enter your @mit.edu email to submit or update your bio",
         "firstName": "First Name",
         "lastName": "Last Name",
         "major": "Major",
         "quote": "Quote",
         "quotePlaceholder": "Enter a quote for your yearbook entry (optional)"
       },
-      "submitButton": "Update Bio",
-      "success": "Your bio was updated successfully",
-      "error": "There was an error updating your bio"
+      "emailRequired": "Email is required",
+      "emailMitOnly": "Must be a valid @mit.edu email address",
+      "submitButton": "Submit Bio",
+      "success": "Your bio was saved successfully",
+      "error": "There was an error saving your bio"
+    },
+
+    "candids": {
+      "title": "Community Candids",
+      "description": "Submit candid photos for the yearbook. Resubmitting with the same email will replace your previous photos.",
+      "emailLabel": "MIT Email",
+      "emailHelper": "Your @mit.edu email — resubmitting replaces previous photos",
+      "emailRequired": "Email is required",
+      "emailMitOnly": "Must be a valid @mit.edu email address",
+      "orgLabel": "Organization (optional)",
+      "noOrg": "No specific organization",
+      "imagesLabel": "Upload up to 3 images (5MB max each)",
+      "uploadSlot": "Image {n}",
+      "imageHint": "Accepted formats: JPEG, PNG, WebP, GIF. Max 5MB per image.",
+      "submit": "Submit Photos",
+      "submitting": "Uploading...",
+      "success": "Photos submitted successfully!",
+      "error": "There was an error submitting your photos",
+      "noFiles": "Please select at least one image",
+      "invalidType": "Invalid file type. Only JPEG, PNG, WebP, and GIF are allowed",
+      "tooLarge": "File too large. Maximum size is 5MB"
     },
 
     "profile": {

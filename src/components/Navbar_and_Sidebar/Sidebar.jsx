@@ -56,7 +56,7 @@ function Sidebar({ pathname }) {
 
   const isAboutActive = [`/${locale}/about`, `/${locale}/archives`, `/${locale}/portfolio`, `/${locale}/contact`].some(isActive);
   const isPurchaseActive = [`/${locale}/purchase`, `/${locale}/seniors`, `/${locale}/parents`, `/${locale}/alumni`].some(isActive);
-  const isFormsActive = [`/${locale}/login`, `/${locale}/invoice`, `/${locale}/parent-inquiry`, `/${locale}/alumni-inquiry`, `/${locale}/clubs`, `/${locale}/student-work-feature`].some(isActive);
+  const isFormsActive = [`/${locale}/login`, `/${locale}/invoice`, `/${locale}/parent-inquiry`, `/${locale}/alumni-inquiry`, `/${locale}/candids`, `/${locale}/student-work-feature`].some(isActive);
   const isGetStartedActive = [`/${locale}/hire`, `/${locale}/join`].some(isActive);
 
   return (
@@ -294,7 +294,7 @@ function Sidebar({ pathname }) {
                 </ListItem>
                 {[
                   { href: `/${locale}/bio`, label: t('dropdown.seniorBio') },
-                  { href: `/${locale}/clubs`, label: t('dropdown.clubs') },
+                  { href: `/${locale}/candids`, label: t('dropdown.candids') },
                   { href: `/${locale}/student-work-feature`, label: t('dropdown.studentWork') },
                 ].map((item) => (
                   <ListItem key={item.href} disablePadding>

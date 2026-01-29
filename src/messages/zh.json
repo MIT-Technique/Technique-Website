@@ -29,6 +29,7 @@
       "parent": "家长",
       "alumni": "校友",
       "clubs": "社团",
+      "candids": "随拍",
       "studentWork": "学生作品",
       "hireUs": "雇用我们",
       "joinUs": "加入我们",
@@ -314,15 +315,40 @@
       "metaDescription": "更新您的MIT Technique年鉴信息。",
       "description": "更新您的年鉴信息。",
       "fields": {
+        "email": "MIT邮箱",
+        "emailHelper": "输入您的@mit.edu邮箱以提交或更新简介",
         "firstName": "名字",
         "lastName": "姓氏",
         "major": "专业",
         "quote": "引言",
         "quotePlaceholder": "输入您年鉴条目的引言（可选）"
       },
-      "submitButton": "更新简介",
-      "success": "您的简介已成功更新",
-      "error": "更新您的简介时出错"
+      "emailRequired": "邮箱为必填项",
+      "emailMitOnly": "必须是有效的@mit.edu邮箱地址",
+      "submitButton": "提交简介",
+      "success": "您的简介已成功保存",
+      "error": "保存简介时出错"
+    },
+
+    "candids": {
+      "title": "社区随拍",
+      "description": "为年鉴提交随拍照片。使用相同邮箱重新提交将替换之前的照片。",
+      "emailLabel": "MIT邮箱",
+      "emailHelper": "您的@mit.edu邮箱 — 重新提交将替换之前的照片",
+      "emailRequired": "邮箱为必填项",
+      "emailMitOnly": "必须是有效的@mit.edu邮箱地址",
+      "orgLabel": "组织（可选）",
+      "noOrg": "无特定组织",
+      "imagesLabel": "上传最多3张图片（每张最大5MB）",
+      "uploadSlot": "图片 {n}",
+      "imageHint": "支持格式：JPEG、PNG、WebP、GIF。每张最大5MB。",
+      "submit": "提交照片",
+      "submitting": "上传中...",
+      "success": "照片提交成功！",
+      "error": "提交照片时出错",
+      "noFiles": "请至少选择一张图片",
+      "invalidType": "文件类型无效。仅允许JPEG、PNG、WebP和GIF",
+      "tooLarge": "文件太大。最大为5MB"
     },
 
     "profile": {

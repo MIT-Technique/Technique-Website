@@ -29,6 +29,7 @@
       "parent": "PADRE",
       "alumni": "EXALUMNO",
       "clubs": "CLUBES",
+      "candids": "FOTOS",
       "studentWork": "TRABAJO ESTUDIANTIL",
       "hireUs": "CONTRÁTANOS",
       "joinUs": "ÚNETE",
@@ -314,15 +315,40 @@
       "metaDescription": "Actualiza tu información para el anuario MIT Technique.",
       "description": "Actualiza tu información para el anuario.",
       "fields": {
+        "email": "Correo MIT",
+        "emailHelper": "Ingresa tu correo @mit.edu para enviar o actualizar tu bio",
         "firstName": "Nombre",
         "lastName": "Apellido",
         "major": "Carrera",
         "quote": "Cita",
         "quotePlaceholder": "Ingresa una cita para tu entrada del anuario (opcional)"
       },
-      "submitButton": "Actualizar Bio",
-      "success": "Tu bio fue actualizada exitosamente",
-      "error": "Hubo un error al actualizar tu bio"
+      "emailRequired": "El correo es obligatorio",
+      "emailMitOnly": "Debe ser un correo @mit.edu válido",
+      "submitButton": "Enviar Bio",
+      "success": "Tu bio fue guardada exitosamente",
+      "error": "Hubo un error al guardar tu bio"
+    },
+
+    "candids": {
+      "title": "Fotos de la Comunidad",
+      "description": "Envía fotos espontáneas para el anuario. Reenviar con el mismo correo reemplazará tus fotos anteriores.",
+      "emailLabel": "Correo MIT",
+      "emailHelper": "Tu correo @mit.edu — reenviar reemplaza fotos anteriores",
+      "emailRequired": "El correo es obligatorio",
+      "emailMitOnly": "Debe ser un correo @mit.edu válido",
+      "orgLabel": "Organización (opcional)",
+      "noOrg": "Sin organización específica",
+      "imagesLabel": "Sube hasta 3 imágenes (máximo 5MB cada una)",
+      "uploadSlot": "Imagen {n}",
+      "imageHint": "Formatos aceptados: JPEG, PNG, WebP, GIF. Máximo 5MB por imagen.",
+      "submit": "Enviar Fotos",
+      "submitting": "Subiendo...",
+      "success": "¡Fotos enviadas exitosamente!",
+      "error": "Hubo un error al enviar tus fotos",
+      "noFiles": "Selecciona al menos una imagen",
+      "invalidType": "Tipo de archivo no válido. Solo JPEG, PNG, WebP y GIF son permitidos",
+      "tooLarge": "Archivo demasiado grande. El tamaño máximo es 5MB"
     },
 
     "profile": {

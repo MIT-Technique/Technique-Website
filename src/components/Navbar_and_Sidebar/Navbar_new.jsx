@@ -63,7 +63,7 @@ function Navbar() {
           header: t('dropdown.students'),
           items: [
             { href: `/${locale}/bio`, label: t('dropdown.seniorBio') },
-            { href: `/${locale}/clubs`, label: t('dropdown.clubs') },
+            { href: `/${locale}/candids`, label: t('dropdown.candids') },
             { href: `/${locale}/student-work-feature`, label: t('dropdown.studentWork') },
           ]
         },

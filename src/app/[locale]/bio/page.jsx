@@ -1,8 +1,8 @@
 "use client";
 import Footer from "../../../components/Footer/Footer";
-import { useState, useEffect } from "react";
+import { useState, useCallback } from "react";
 import * as React from "react";
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import InputLabel from "@mui/material/InputLabel";
@@ -14,7 +14,6 @@ import Snackbar from "@mui/material/Snackbar";
 import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import Alert from "@mui/material/Alert";
-import { useUser } from "../../../hooks/useUser";
 
 // Shared MUI text field styling
 const textFieldSx = {
@@ -33,10 +32,10 @@ const selectSx = {
 };
 
 export default function BioPage() {
-  const locale = useLocale();
   const t = useTranslations('pages.bio');
-  const { isLoggedIn, user, loading: userLoading } = useUser();
 
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [major, setMajor] = useState("");
@@ -45,245 +44,100 @@ export default function BioPage() {
   const [extracurriculars, setExtracurriculars] = useState("");
   const [open, setOpen] = useState(false);
   const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [isRedirecting, setIsRedirecting] = useState(false);
+  const [snackMessage, setSnackMessage] = useState("");
+  const [dataLoaded, setDataLoaded] = useState(false);
 
   const vertical = "top";
   const horizontal = "center";
 
-  // Redirect to student login if not logged in, or to logout page if not a student
-  useEffect(() => {
-    // Ensure locale is valid before redirecting
-    if (!userLoading && !isRedirecting && locale) {
-      if (!isLoggedIn) {
-        // Not logged in - redirect to login
-        setIsRedirecting(true);
-        window.location.href = `/${locale}/login/student?returnUrl=${encodeURIComponent(`/${locale}/bio`)}`;
-      } else if (user && user.role !== 'student') {
-        // Logged in but not a student - redirect to logout page
-        setIsRedirecting(true);
-        window.location.href = `/${locale}/logout`;
+  // Fetch existing bio when email is entered
+  const fetchBioByEmail = useCallback(async (emailValue) => {
+    const trimmed = emailValue.trim().toLowerCase();
+    if (!trimmed || !trimmed.endsWith('@mit.edu')) return;
+
+    try {
+      const res = await fetch(`/api/bio?email=${encodeURIComponent(trimmed)}`);
+      if (!res.ok) return;
+      const json = await res.json();
+      if (json.data.firstName) setFirstName(json.data.firstName);
+      if (json.data.lastName) setLastName(json.data.lastName);
+      if (json.data.major) setMajor(json.data.major);
+      if (json.data.second_major) {
+        setSecondMajor(json.data.second_major.length === 0 ? "None" : json.data.second_major);
       }
+      if (json.data.quote) setQuote(json.data.quote);
+      if (json.data.achievements) setExtracurriculars(json.data.achievements);
+      setDataLoaded(true);
+    } catch {
+      // Ignore fetch errors
     }
-  }, [userLoading, isLoggedIn, user, locale, isRedirecting]);
-
-  useEffect(() => {
-    if (!isLoggedIn) return;
-
-    const fetchUser = async () => {
-      try {
-        const res = await fetch("/api/bio", {
-          method: "GET",
-        });
-
-        if (!res.ok) {
-          throw new Error(`Request failed: ${res.status}`);
-        }
-
-        const json = await res.json();
-        setFirstName(json.data.firstName);
-        setLastName(json.data.lastName);
-        setMajor(json.data.major);
-        if (json.data.second_major.length === 0) {
-          setSecondMajor("None");
-        } else {
-          setSecondMajor(json.data.second_major);
-        }
-        setQuote(json.data.quote);
-        setExtracurriculars(json.data.achievements);
-      } catch (err) {
-        // setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUser();
-  }, [isLoggedIn]);
+  }, []);
 
   function handleClose() {
     setOpen(false);
     setError(false);
   }
 
+  function validateEmail(value) {
+    const trimmed = value.trim().toLowerCase();
+    if (!trimmed) {
+      setEmailError(t('emailRequired'));
+      return false;
+    }
+    if (!trimmed.endsWith('@mit.edu')) {
+      setEmailError(t('emailMitOnly'));
+      return false;
+    }
+    setEmailError("");
+    return true;
+  }
+
   async function updateBio() {
+    if (!validateEmail(email)) return;
+
     try {
       const response = await fetch("/api/bio", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          firstName: firstName,
-          lastName: lastName,
-          major: major,
+          email: email.trim().toLowerCase(),
+          firstName,
+          lastName,
+          major,
           second_major: secondMajor === "None" ? "" : secondMajor,
-          quote: quote,
+          quote,
           achievements: extracurriculars,
         }),
       });
 
       if (!response.ok) {
+        const data = await response.json();
+        setSnackMessage(data.error || t('error'));
         setOpen(true);
         setError(true);
       } else {
+        setSnackMessage(t('success'));
         setOpen(true);
+        setError(false);
       }
-    } catch (err) {
-      // console.error(err);
+    } catch {
+      setSnackMessage(t('error'));
       setError(true);
       setOpen(true);
     }
   }
 
   const majors = [
-    "1",
-    "1-12",
-    "1-ENG",
-    "2",
-    "2A",
-    "2-OE",
-    "3",
-    "3-A",
-    "3-C",
-    "4",
-    "4-B",
-    "5",
-    "5-7",
-    "6-1",
-    "6-2",
-    "6-3",
-    "6-3A",
-    "6-4",
-    "6-5",
-    "6-7",
-    "6-9",
-    "6-14",
-    "6-P",
-    "7",
-    "8",
-    "9",
-    "10",
-    "10-B",
-    "10-C",
-    "10-ENG",
-    "11",
-    "11-6",
-    "12",
-    "14-1",
-    "14-2",
-    "15-1",
-    "15-2",
-    "15-3",
-    "16",
-    "16-ENG",
-    "17",
-    "17-M",
-    "18",
-    "18-C",
-    "21",
-    "21A",
-    "21-CMS",
-    "21E",
-    "21G",
-    "21L",
-    "21H",
-    "21M",
-    "21T",
-    "21S",
-    "21W",
-    "20",
-    "22",
-    "22-ENG",
-    "24",
-    "24-1",
-    "24-2",
-    "STS",
+    "1", "1-12", "1-ENG", "2", "2A", "2-OE", "3", "3-A", "3-C",
+    "4", "4-B", "5", "5-7", "6-1", "6-2", "6-3", "6-3A", "6-4",
+    "6-5", "6-7", "6-9", "6-14", "6-P", "7", "8", "9", "10",
+    "10-B", "10-C", "10-ENG", "11", "11-6", "12", "14-1", "14-2",
+    "15-1", "15-2", "15-3", "16", "16-ENG", "17", "17-M", "18",
+    "18-C", "21", "21A", "21-CMS", "21E", "21G", "21L", "21H",
+    "21M", "21T", "21S", "21W", "20", "22", "22-ENG", "24",
+    "24-1", "24-2", "STS",
   ];
-  const second_majors = [
-    "None",
-    "1",
-    "1-12",
-    "1-ENG",
-    "2",
-    "2A",
-    "2-OE",
-    "3",
-    "3-A",
-    "3-C",
-    "4",
-    "4-B",
-    "5",
-    "5-7",
-    "6-1",
-    "6-2",
-    "6-3",
-    "6-3A",
-    "6-4",
-    "6-5",
-    "6-7",
-    "6-9",
-    "6-14",
-    "6-P",
-    "7",
-    "8",
-    "9",
-    "10",
-    "10-B",
-    "10-C",
-    "10-ENG",
-    "11",
-    "11-6",
-    "12",
-    "14-1",
-    "14-2",
-    "15-1",
-    "15-2",
-    "15-3",
-    "16",
-    "16-ENG",
-    "17",
-    "17-M",
-    "18",
-    "18-C",
-    "21",
-    "21A",
-    "21-CMS",
-    "21E",
-    "21G",
-    "21L",
-    "21H",
-    "21M",
-    "21T",
-    "21S",
-    "21W",
-    "20",
-    "22",
-    "22-ENG",
-    "24",
-    "24-1",
-    "24-2",
-    "STS",
-  ];
-
-  // Return null while redirecting to prevent DOM manipulation errors
-  if (isRedirecting) {
-    return null;
-  }
-
-  // Show loading while checking auth
-  if (userLoading || !isLoggedIn) {
-    return (
-      <>
-        <main className="min-h-screen pt-24 lg:pt-32">
-          <section className="section-tight container-narrow">
-            <div className="text-center">
-              <p className="text-text-secondary">Loading...</p>
-            </div>
-          </section>
-        </main>
-        <Footer />
-      </>
-    );
-  }
+  const second_majors = ["None", ...majors];
 
   return (
     <>
@@ -291,9 +145,6 @@ export default function BioPage() {
         <section className="section-tight container-narrow">
           <div className="text-center mb-8">
             <h1 className="mb-2">{t('title')}</h1>
-            <p className="text-text-secondary">
-              {t('description')}
-            </p>
           </div>
 
           <Box
@@ -309,6 +160,30 @@ export default function BioPage() {
               await updateBio();
             }}
           >
+            {/* Email Field */}
+            <TextField
+              required
+              label={t('fields.email')}
+              variant="outlined"
+              InputLabelProps={{ shrink: true }}
+              value={email}
+              onChange={(event) => {
+                setEmail(event.target.value);
+                if (emailError) validateEmail(event.target.value);
+              }}
+              onBlur={(event) => {
+                validateEmail(event.target.value);
+                if (!dataLoaded) fetchBioByEmail(event.target.value);
+              }}
+              name="email"
+              type="email"
+              placeholder="kerb@mit.edu"
+              error={!!emailError}
+              helperText={emailError || t('fields.emailHelper')}
+              sx={textFieldSx}
+              fullWidth
+            />
+
             <div className="grid grid-cols-2 gap-4">
               <TextField
                 required
@@ -387,7 +262,7 @@ export default function BioPage() {
                 ))}
               </Select>
             </FormControl>
-            
+
             <TextField
               label={t('fields.quote')}
               variant="outlined"
@@ -468,7 +343,7 @@ export default function BioPage() {
           variant="filled"
           sx={{ width: "100%" }}
         >
-          {error ? t('error') : t('success')}
+          {snackMessage || (error ? t('error') : t('success'))}
         </Alert>
       </Snackbar>
       <Footer />
