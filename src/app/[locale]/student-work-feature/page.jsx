@@ -273,6 +273,7 @@ export default function StudentWorkFeaturePage() {
             />
 
             {/* Project Details */}
+            <p className="text-sm text-text-secondary !pb-0">{t('projectSubtitle')}</p>
             <TextField
               required
               label={t('projectTitleLabel')}

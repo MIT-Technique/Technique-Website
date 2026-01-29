@@ -285,7 +285,7 @@ function Sidebar({ pathname }) {
                           fontSize: "0.6rem",
                           fontWeight: 600,
                           letterSpacing: "0.1em",
-                          color: isHomePage ? "rgba(255,255,255,0.4)" : "#999",
+                          color: isHomePage ? "rgba(255,255,255,0.6)" : "#999",
                           textTransform: "uppercase",
                         },
                       }}
@@ -330,7 +330,7 @@ function Sidebar({ pathname }) {
                           fontSize: "0.6rem",
                           fontWeight: 600,
                           letterSpacing: "0.1em",
-                          color: isHomePage ? "rgba(255,255,255,0.4)" : "#999",
+                          color: isHomePage ? "rgba(255,255,255,0.6)" : "#999",
                           textTransform: "uppercase",
                         },
                       }}
@@ -450,7 +450,7 @@ function Sidebar({ pathname }) {
 
             {/* Language Switcher */}
             <ListItem disablePadding sx={{ mt: 2, px: 3 }}>
-              <LanguageSwitcher />
+              <LanguageSwitcher isHomePage={isHomePage} />
             </ListItem>
 
             {/* Account Section */}

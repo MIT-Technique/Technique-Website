@@ -338,7 +338,7 @@
       "emailRequired": "邮箱为必填项",
       "emailMitOnly": "必须是有效的@mit.edu邮箱地址",
       "orgLabel": "组织（可选）",
-      "noOrg": "无特定组织",
+      "noOrg": "社团、宿舍、运动队",
       "imagesLabel": "上传最多3张图片（每张最大5MB）",
       "uploadSlot": "图片 {n}",
       "imageHint": "支持格式：JPEG、PNG、WebP、GIF。每张最大5MB。",

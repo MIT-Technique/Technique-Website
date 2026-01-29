@@ -4,10 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useTranslations } from 'next-intl';
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
+import Autocomplete from "@mui/material/Autocomplete";
 import { Button } from "@mui/material";
 import Snackbar from "@mui/material/Snackbar";
 import CloseIcon from "@mui/icons-material/Close";
@@ -23,11 +20,6 @@ const textFieldSx = {
   "& .MuiInputLabel-root.Mui-focused": { color: "#750014" },
 };
 
-const selectSx = {
-  "& .MuiOutlinedInput-notchedOutline": { borderColor: "#E5E5E5" },
-  "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#D0D0D0" },
-  "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#750014" },
-};
 
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
@@ -208,34 +200,27 @@ export default function CandidsPage() {
               fullWidth
             />
 
-            {/* Organization Dropdown (optional) */}
-            <FormControl fullWidth>
-              <InputLabel
-                id="org-label"
-                shrink
-                sx={{ "&.Mui-focused": { color: "#750014" } }}
-              >
-                {t('orgLabel')}
-              </InputLabel>
-              <Select
-                labelId="org-label"
-                value={selectedOrg}
-                label={t('orgLabel')}
-                notched
-                onChange={(e) => setSelectedOrg(e.target.value)}
-                sx={selectSx}
-                displayEmpty
-              >
-                <MenuItem value="">
-                  <em>{t('noOrg')}</em>
-                </MenuItem>
-                {organizations.map((org) => (
-                  <MenuItem key={org.id} value={org.id}>
-                    {org.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            {/* Organization Dropdown (optional, searchable) */}
+            <Autocomplete
+              options={organizations}
+              getOptionLabel={(option) => option.name || ""}
+              value={organizations.find(o => o.id === selectedOrg) || null}
+              onChange={(_, newValue) => {
+                setSelectedOrg(newValue ? newValue.id : "");
+              }}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              slotProps={{ listbox: { style: { maxHeight: 250 } } }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label={t('orgLabel')}
+                  InputLabelProps={{ ...params.InputLabelProps, shrink: true }}
+                  placeholder={t('noOrg')}
+                  sx={textFieldSx}
+                />
+              )}
+              fullWidth
+            />
 
             {/* Image Upload Slots */}
             <div>

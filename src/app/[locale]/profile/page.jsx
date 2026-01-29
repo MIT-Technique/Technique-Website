@@ -86,6 +86,28 @@ export default function ProfilePage() {
     }
   }, [isLoggedIn, userLoading, router, locale]);
 
+  // Auto-fade success messages after 4 seconds
+  useEffect(() => {
+    if (bioMessage.type === 'success' && bioMessage.text) {
+      const timer = setTimeout(() => setBioMessage({ type: '', text: '' }), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [bioMessage]);
+
+  useEffect(() => {
+    if (clubMessage.type === 'success' && clubMessage.text) {
+      const timer = setTimeout(() => setClubMessage({ type: '', text: '' }), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [clubMessage]);
+
+  useEffect(() => {
+    if (schedulingMessage.type === 'success' && schedulingMessage.text) {
+      const timer = setTimeout(() => setSchedulingMessage({ type: '', text: '' }), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [schedulingMessage]);
+
   // Fetch bio data for students
   useEffect(() => {
     if (isLoggedIn && user?.role === 'student') {

@@ -338,7 +338,7 @@
       "emailRequired": "El correo es obligatorio",
       "emailMitOnly": "Debe ser un correo @mit.edu válido",
       "orgLabel": "Organización (opcional)",
-      "noOrg": "Sin organización específica",
+      "noOrg": "Clubes, grupos residenciales, equipos deportivos",
       "imagesLabel": "Sube hasta 3 imágenes (máximo 5MB cada una)",
       "uploadSlot": "Imagen {n}",
       "imageHint": "Formatos aceptados: JPEG, PNG, WebP, GIF. Máximo 5MB por imagen.",

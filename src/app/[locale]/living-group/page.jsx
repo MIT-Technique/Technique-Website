@@ -196,12 +196,12 @@ export default function LivingGroupPage() {
     }
   }, [isLoggedIn, user, userLoading, router, locale]);
 
-  // Auto-fade success messages after 3 seconds
+  // Auto-fade success messages after 4 seconds
   useEffect(() => {
     if (message.type === 'success' && message.text) {
       const timer = setTimeout(() => {
         setMessage({ type: '', text: '' });
-      }, 3000);
+      }, 4000);
       return () => clearTimeout(timer);
     }
   }, [message]);
@@ -210,7 +210,7 @@ export default function LivingGroupPage() {
     if (membersMessage.type === 'success' && membersMessage.text) {
       const timer = setTimeout(() => {
         setMembersMessage({ type: '', text: '' });
-      }, 3000);
+      }, 4000);
       return () => clearTimeout(timer);
     }
   }, [membersMessage]);
@@ -219,7 +219,7 @@ export default function LivingGroupPage() {
     if (sectionsMessage.type === 'success' && sectionsMessage.text) {
       const timer = setTimeout(() => {
         setSectionsMessage({ type: '', text: '' });
-      }, 3000);
+      }, 4000);
       return () => clearTimeout(timer);
     }
   }, [sectionsMessage]);
@@ -228,7 +228,7 @@ export default function LivingGroupPage() {
     if (documentsMessage.type === 'success' && documentsMessage.text) {
       const timer = setTimeout(() => {
         setDocumentsMessage({ type: '', text: '' });
-      }, 3000);
+      }, 4000);
       return () => clearTimeout(timer);
     }
   }, [documentsMessage]);

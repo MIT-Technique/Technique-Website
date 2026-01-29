@@ -115,7 +115,7 @@ function Navbar() {
           {/* Nav Links */}
           <div className="flex items-center gap-8">
             {/* Language Switcher */}
-            <LanguageSwitcher />
+            <LanguageSwitcher isHomePage={isHomePage} />
             {navStructure.map((item, index) => (
               item.dropdown ? (
                 // Dropdown item
@@ -176,7 +176,7 @@ function Navbar() {
                           {item.dropdown.map((group, groupIndex) => (
                             <div key={groupIndex} className={groupIndex > 0 ? 'border-l border-border/30' : ''}>
                               <div className={`px-4 py-2 text-[0.65rem] font-semibold uppercase tracking-widest ${
-                                isHomePage ? "text-white/50" : "text-text-muted"
+                                isHomePage ? "text-white/60" : "text-text-muted"
                               }`}>
                                 {group.header}
                               </div>

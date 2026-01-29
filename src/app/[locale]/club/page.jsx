@@ -58,6 +58,35 @@ export default function ClubPage() {
     }
   }, [isLoggedIn, user, userLoading, router, locale]);
 
+  // Auto-fade success messages after 4 seconds
+  useEffect(() => {
+    if (message.type === 'success' && message.text) {
+      const timer = setTimeout(() => setMessage({ type: '', text: '' }), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
+  useEffect(() => {
+    if (imageMessage.type === 'success' && imageMessage.text) {
+      const timer = setTimeout(() => setImageMessage({ type: '', text: '' }), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [imageMessage]);
+
+  useEffect(() => {
+    if (membersMessage.type === 'success' && membersMessage.text) {
+      const timer = setTimeout(() => setMembersMessage({ type: '', text: '' }), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [membersMessage]);
+
+  useEffect(() => {
+    if (documentsMessage.type === 'success' && documentsMessage.text) {
+      const timer = setTimeout(() => setDocumentsMessage({ type: '', text: '' }), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [documentsMessage]);
+
   useEffect(() => {
     if (club) {
       setFormData({
