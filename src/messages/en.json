@@ -51,10 +51,11 @@
   "account": {
     "login": "SIGN IN",
     "staph": "STAPH",
-    "organization": "ORGANIZATION",
+    "organization": "ORGANIZATION LOGIN",
     "dashboard": "DASHBOARD",
     "profile": "PROFILE",
-    "signOut": "SIGN OUT"
+    "signOut": "SIGN OUT",
+    "admin": "ADMINISTRATOR"
   },
 
   "carousel": {

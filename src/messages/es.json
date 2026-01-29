@@ -5,7 +5,6 @@
     "siteName": "TECHNIQUE",
     "tagline": "Memorizando MIT desde 1885"
   },
-
   "nav": {
     "about": "ACERCA DE",
     "archive": "ARCHIVO",
@@ -36,31 +35,27 @@
       "faq": "PREGUNTAS FRECUENTES"
     }
   },
-
   "footer": {
     "copyright": "© 2026 Technique. Todos los derechos reservados.",
     "privacyPolicy": "Política de Privacidad",
     "emailLabel": "Envíanos un correo",
     "instagramLabel": "Síguenos en Instagram"
   },
-
   "languageSwitcher": {
     "selectLanguage": "Seleccionar idioma"
   },
-
   "account": {
     "login": "INICIAR SESIÓN",
     "staph": "STAPH",
-    "organization": "ORGANIZACIÓN",
+    "organization": "INICIO DE SESIÓN DE ORGANIZACIÓN",
     "dashboard": "PANEL",
     "profile": "PERFIL",
-    "signOut": "CERRAR SESIÓN"
+    "signOut": "CERRAR SESIÓN",
+    "admin": "ADMINISTRADOR"
   },
-
   "carousel": {
     "photoCredit": "Créditos de la foto: {photographer}"
   },
-
   "pages": {
     "home": {
       "subtitle": "Fotografía y Anuario de MIT",
@@ -68,7 +63,6 @@
       "tagline": "Memorizando MIT desde 1885",
       "photoCredit": "Foto: {photographer}"
     },
-
     "about": {
       "title": "Acerca de Nosotros",
       "metaTitle": "Acerca de Nosotros - MIT Technique",
@@ -93,7 +87,6 @@
         "paragraph2": "No se necesita experiencia para unirse a Technique. Nuestro staph dedicado está comprometido a ayudar a todos los que estén dispuestos a aprender, especialmente cuando se trata de fotografía o diseño."
       }
     },
-
     "yearbook": {
       "title": "Anuario",
       "metaTitle": "Anuario - MIT Technique",
@@ -119,7 +112,6 @@
         "studentWorkButton": "Trabajo Estudiantil"
       }
     },
-
     "contact": {
       "title": "Ponte en Contacto",
       "metaTitle": "Contacto - MIT Technique",
@@ -140,7 +132,6 @@
         "address3": "Cambridge, MA 02139"
       }
     },
-
     "hire": {
       "title": "Contrátanos",
       "metaTitle": "Contrátanos - Fotografía MIT Technique",
@@ -151,7 +142,6 @@
       "ctaHint": "Envíanos un correo con el asunto \"Cotización de Fotografía de Eventos\"",
       "imageAlt": "Fotografía de eventos por {photographer}"
     },
-
     "invoice": {
       "title": "Formulario de Factura",
       "metaTitle": "Factura - MIT Technique",
@@ -170,7 +160,6 @@
       "success": "Tu factura fue enviada exitosamente",
       "error": "Hubo un error al enviar tu factura"
     },
-
     "login": {
       "title": "Iniciar Sesión",
       "metaTitle": "Iniciar Sesión - MIT Technique",
@@ -209,7 +198,7 @@
         "invalidCredentials": "Credenciales inválidas",
         "emailNotVerified": "Por favor verifica tu email antes de iniciar sesión",
         "signInSuccess": "¡Sesión iniciada exitosamente!",
-        "successRedirecting": "¡Éxito! Redirigiendo\u2026",
+        "successRedirecting": "¡Éxito! Redirigiendo…",
         "forgotPassword": "¿Olvidaste tu contraseña?",
         "unexpectedIssues": "¿Problemas inesperados?",
         "forgotPasswordTitle": "Restablecer Contraseña",
@@ -267,7 +256,6 @@
       "clubLink": "Acceso de Club",
       "backToLogin": "← Volver al inicio de sesión de estudiante"
     },
-
     "logout": {
       "title": "Se Requiere Acceso de Estudiante",
       "message": "Por favor inicia sesión como estudiante para acceder al formulario de biografía de senior.",
@@ -275,7 +263,6 @@
       "signingOut": "Cerrando sesión...",
       "studentNote": "Por favor usa tu cuenta de estudiante de MIT para iniciar sesión y continuar."
     },
-
     "portfolio": {
       "title": "Portafolio",
       "metaTitle": "Portafolio - Fotografía MIT Technique",
@@ -283,7 +270,6 @@
       "description": "Una selección de trabajos de nuestros fotógrafos.",
       "imageAlt": "Fotografía por {photographer}"
     },
-
     "seniors": {
       "title": "Seniors",
       "metaTitle": "Retratos de Seniors - MIT Technique",
@@ -308,7 +294,6 @@
         "content": "Para todas las preguntas sobre la programación de sesiones de retratos de seniors, cambios tardíos en la información biográfica o cualquier otro problema, comunícate con {email}. Technique tiene una fecha límite de publicación para los retratos de seniors, por lo que lamentablemente no podemos acomodar a ningún estudiante que pierda todas las sesiones programadas de retratos de seniors. Ten la seguridad de que tu nombre aparecerá en el anuario en una sección que no presenta retratos de seniors."
       }
     },
-
     "bio": {
       "title": "Bio de Senior",
       "metaTitle": "Bio de Senior - MIT Technique",
@@ -329,7 +314,6 @@
       "success": "Tu bio fue guardada exitosamente",
       "error": "Hubo un error al guardar tu bio"
     },
-
     "candids": {
       "title": "Fotos de la Comunidad",
       "description": "Envía fotos espontáneas para el anuario. Reenviar con el mismo correo reemplazará tus fotos anteriores.",
@@ -350,7 +334,6 @@
       "invalidType": "Tipo de archivo no válido. Solo JPEG, PNG, WebP y GIF son permitidos",
       "tooLarge": "Archivo demasiado grande. El tamaño máximo es 5MB"
     },
-
     "profile": {
       "title": "Mi Perfil",
       "welcome": "Conectado como {email}",
@@ -450,14 +433,12 @@
       "disabled": "Tu cuenta ha sido deshabilitada. Por favor contacta a un administrador.",
       "frozen": "Este formulario está congelado. No puedes hacer cambios en este momento."
     },
-
     "archives": {
       "title": "Archivo",
       "metaTitle": "Archivo - Anuarios MIT Technique",
       "metaDescription": "Explora ediciones pasadas de los anuarios Technique que datan de 1885.",
       "description": "Explora ediciones pasadas de Technique, que datan de 1885."
     },
-
     "parents": {
       "title": "Padres",
       "metaTitle": "Padres - MIT Technique",
@@ -475,7 +456,6 @@
         "emailButton": "Envíenos un Correo"
       }
     },
-
     "alumni": {
       "title": "Exalumnos",
       "metaTitle": "Exalumnos - MIT Technique",
@@ -495,7 +475,6 @@
         "emailButton": "Envíenos un Correo"
       }
     },
-
     "join": {
       "title": "Únete a Nosotros",
       "metaTitle": "Únete a Technique - MIT Technique",
@@ -528,7 +507,6 @@
         "hint": "Envíanos un correo para saber más sobre cómo unirte a Technique"
       }
     },
-
     "parentInquiry": {
       "title": "Consulta de Padres",
       "metaTitle": "Consulta de Padres - MIT Technique",
@@ -551,7 +529,6 @@
       "success": "Su consulta fue enviada exitosamente",
       "error": "Hubo un error al enviar su consulta"
     },
-
     "alumniInquiry": {
       "title": "Consulta de Exalumnos",
       "metaTitle": "Consulta de Exalumnos - MIT Technique",
@@ -573,7 +550,6 @@
       "success": "Su consulta fue enviada exitosamente",
       "error": "Hubo un error al enviar su consulta"
     },
-
     "activities": {
       "title": "Formulario de Clubes",
       "metaTitle": "Formulario de Clubes - MIT Technique",
@@ -584,7 +560,6 @@
         "hint": "Complete el formulario para enviar la información y fotos de su club"
       }
     },
-
     "studentWorkFeature": {
       "title": "Trabajo Estudiantil",
       "metaTitle": "Trabajo Estudiantil - MIT Technique",
@@ -614,18 +589,15 @@
       "success": "¡Su trabajo ha sido enviado exitosamente!",
       "error": "Algo salió mal. Por favor intente de nuevo."
     },
-
     "privacy": {
       "title": "Política de Privacidad",
       "metaTitle": "Política de Privacidad - MIT Technique",
       "metaDescription": "Conozca cómo MIT Technique recopila y utiliza su información.",
       "lastUpdated": "Última actualización: 17 de enero de 2026",
-
       "translation": {
         "title": "Aviso de Traducción",
         "content": "Este sitio web está disponible en varios idiomas para mayor accesibilidad. Aunque nos esforzamos por la precisión, las traducciones pueden contener errores o variaciones de la versión original en inglés. En caso de discrepancias, prevalecerá la versión en inglés. Si nota algún error de traducción, contáctenos en technique@mit.edu."
       },
-
       "collection": {
         "title": "Información que Recopilamos",
         "intro": "Recopilamos información que usted nos proporciona directamente e información recopilada automáticamente cuando utiliza nuestro sitio web.",
@@ -652,7 +624,6 @@
           "content": "Podemos recopilar datos de uso anónimos como páginas visitadas, tiempo en el sitio e información del navegador para mejorar nuestros servicios."
         }
       },
-
       "usage": {
         "title": "Cómo Usamos su Información",
         "items": {
@@ -662,12 +633,10 @@
           "improvement": "Para mejorar nuestro sitio web y la experiencia del usuario"
         }
       },
-
       "storage": {
         "title": "Almacenamiento y Seguridad de Datos",
         "content": "Su información personal se almacena de forma segura en MongoDB Atlas con cifrado estándar de la industria. Conservamos la información biográfica de seniors para fines de publicación del anuario y archivos históricos. Implementamos medidas de seguridad razonables para proteger sus datos, pero ningún método de transmisión por Internet es 100% seguro."
       },
-
       "thirdParty": {
         "title": "Servicios de Terceros",
         "intro": "Utilizamos los siguientes servicios de terceros:",
@@ -677,7 +646,6 @@
           "vercel": "Para alojamiento y despliegue del sitio web"
         }
       },
-
       "rights": {
         "title": "Sus Derechos",
         "intro": "Usted tiene derecho a:",
@@ -689,17 +657,14 @@
         },
         "contact": "Para ejercer estos derechos, contáctenos en technique@mit.edu."
       },
-
       "children": {
         "title": "Privacidad de Menores",
         "content": "Nuestros servicios están destinados a estudiantes de MIT (típicamente mayores de 18 años). No recopilamos a sabiendas información de personas menores de 18 años sin el consentimiento de los padres."
       },
-
       "changes": {
         "title": "Cambios a Esta Política",
         "content": "Podemos actualizar esta política de privacidad de vez en cuando. Le notificaremos de cualquier cambio material publicando la nueva política en esta página con una fecha de 'Última actualización' actualizada."
       },
-
       "contact": {
         "title": "Contáctenos",
         "content": "Si tiene preguntas sobre esta política de privacidad o nuestras prácticas de datos, contáctenos:",
@@ -708,7 +673,6 @@
       }
     }
   },
-
   "dashboard": {
     "title": "Panel de Administración",
     "welcome": "Bienvenido, {name}",
@@ -917,7 +881,6 @@
       }
     }
   },
-
   "clubPage": {
     "title": "Panel del Club",
     "welcome": "Bienvenido, {name}",
@@ -1049,7 +1012,6 @@
     "saving": "Guardando...",
     "save": "Guardar Cambios"
   },
-
   "livingGroupPage": {
     "title": "Panel del Grupo de Vivienda",
     "welcome": "Bienvenido, {name}",
@@ -1241,7 +1203,6 @@
       }
     }
   },
-
   "photographerTimes": {
     "title": "Programación de Staph",
     "timezoneNote": "Todos los horarios están en Hora Estándar del Este (EST)",
@@ -1275,7 +1236,6 @@
     "actionError": "Error al procesar propuesta",
     "declineReasonPrompt": "Ingresa una razón para rechazar (opcional):"
   },
-
   "resources": {
     "title": "Recursos y Preguntas Frecuentes",
     "metaTitle": "Recursos y FAQ - MIT Technique",
@@ -1313,7 +1273,6 @@
       }
     }
   },
-
   "sportsPage": {
     "title": "Panel del Equipo Deportivo",
     "welcome": "Bienvenido, {name}",

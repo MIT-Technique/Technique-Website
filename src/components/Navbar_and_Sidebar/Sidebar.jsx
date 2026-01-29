@@ -11,6 +11,7 @@ import Collapse from "@mui/material/Collapse";
 import { VscThreeBars, VscClose, VscChevronDown } from "react-icons/vsc";
 import { useTranslations, useLocale } from 'next-intl';
 import LanguageSwitcher from "../LanguageSwitcher/LanguageSwitcher";
+import OrganizationAuthModal from "../OrganizationAuthModal/OrganizationAuthModal";
 import { useUser } from "../../hooks/useUser";
 
 function Sidebar({ pathname }) {
@@ -25,6 +26,7 @@ function Sidebar({ pathname }) {
   const [formsOpen, setFormsOpen] = useState(false);
   const [getStartedOpen, setGetStartedOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
+  const [orgModalOpen, setOrgModalOpen] = useState(false);
 
   // Get dashboard link based on role
   const getDashboardLink = () => {
@@ -531,15 +533,17 @@ function Sidebar({ pathname }) {
                   </Collapse>
                 </>
               ) : (
-                <ListItem disablePadding sx={{ mt: 1 }}>
-                  <Link
-                    href={`/${locale}/login`}
-                    onClick={() => setIsOpen(false)}
-                    className="w-full"
-                  >
-                    <ListItemButton sx={{ px: 3, py: 1.5 }}>
+                <>
+                  <ListItem disablePadding sx={{ mt: 1 }}>
+                    <ListItemButton
+                      onClick={() => {
+                        setIsOpen(false);
+                        setOrgModalOpen(true);
+                      }}
+                      sx={{ px: 3, py: 1.5 }}
+                    >
                       <ListItemText
-                        primary={tAccount('login')}
+                        primary={tAccount('organization')}
                         primaryTypographyProps={{
                           sx: {
                             fontSize: "0.75rem",
@@ -550,13 +554,31 @@ function Sidebar({ pathname }) {
                         }}
                       />
                     </ListItemButton>
-                  </Link>
-                </ListItem>
+                  </ListItem>
+                  <ListItem disablePadding sx={{ px: 3, pt: 0.5 }}>
+                    <Link
+                      href={`/${locale}/login/admin`}
+                      onClick={() => setIsOpen(false)}
+                      style={{
+                        fontSize: "0.65rem",
+                        color: mutedColor,
+                        textDecoration: "none",
+                      }}
+                    >
+                      {tAccount('staph')}
+                    </Link>
+                  </ListItem>
+                </>
               )
             )}
           </List>
         </Box>
       </Drawer>
+
+      <OrganizationAuthModal
+        open={orgModalOpen}
+        onClose={() => setOrgModalOpen(false)}
+      />
     </div>
   );
 }
