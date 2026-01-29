@@ -42,14 +42,14 @@ function AccountButton({ isHomePage = false }) {
     );
   }
 
-  function handleStudentLogin() {
-    // Trigger MIT SSO login
-    window.location.href = "/api/login";
-  }
-
   function handleOrganizationLogin() {
     setLoginDropdownOpen(false);
     setOrgModalOpen(true);
+  }
+
+  function handleStaphLogin() {
+    setLoginDropdownOpen(false);
+    window.location.href = `/${locale}/login/admin`;
   }
 
   if (!isLoggedIn) {
@@ -87,16 +87,6 @@ function AccountButton({ isHomePage = false }) {
               }`}
             >
               <button
-                onClick={handleStudentLogin}
-                className={`block w-full text-left px-4 py-2 text-xs uppercase tracking-wider transition-colors ${
-                  isHomePage
-                    ? 'text-white/70 hover:text-white hover:bg-white/10'
-                    : 'text-text-secondary hover:text-text-primary hover:bg-bg-secondary'
-                }`}
-              >
-                {t('student')}
-              </button>
-              <button
                 onClick={handleOrganizationLogin}
                 className={`block w-full text-left px-4 py-2 text-xs uppercase tracking-wider transition-colors ${
                   isHomePage
@@ -105,6 +95,16 @@ function AccountButton({ isHomePage = false }) {
                 }`}
               >
                 {t('organization')}
+              </button>
+              <button
+                onClick={handleStaphLogin}
+                className={`block w-full text-left px-4 py-2 text-xs uppercase tracking-wider transition-colors ${
+                  isHomePage
+                    ? 'text-white/70 hover:text-white hover:bg-white/10'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-bg-secondary'
+                }`}
+              >
+                {t('staph')}
               </button>
             </div>
           </div>
@@ -121,7 +121,7 @@ function AccountButton({ isHomePage = false }) {
   // Get dashboard link based on role
   const getDashboardLink = () => {
     // Admin goes to dashboard, everyone else goes to unified profile page
-    if (user?.role === 'admin') {
+    if (user?.role === 'admin' || user?.role === 'staph') {
       return `/${locale}/dashboard`;
     }
     return `/${locale}/profile`;
@@ -175,7 +175,7 @@ function AccountButton({ isHomePage = false }) {
                 : 'text-text-secondary hover:text-text-primary hover:bg-bg-secondary'
             }`}
           >
-            {user?.role === 'admin' ? t('dashboard') : t('profile')}
+            {(user?.role === 'admin' || user?.role === 'staph') ? t('dashboard') : t('profile')}
           </Link>
           <button
             onClick={() => {

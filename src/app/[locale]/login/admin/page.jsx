@@ -17,6 +17,7 @@ const textFieldSx = {
 
 export default function AdminLoginPage() {
   const t = useTranslations('pages.login');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
@@ -36,7 +37,7 @@ export default function AdminLoginPage() {
       const res = await fetch('/api/auth/admin-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ email: email || undefined, password }),
       });
 
       const data = await res.json();
@@ -78,6 +79,18 @@ export default function AdminLoginPage() {
             }}
             onSubmit={handleAdminLogin}
           >
+            <TextField
+              type="email"
+              label={t('admin.emailLabel')}
+              variant="outlined"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder={t('admin.emailPlaceholder')}
+              sx={{ ...textFieldSx, mb: 2 }}
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+            />
+
             <TextField
               type="password"
               label={t('admin.passwordLabel')}

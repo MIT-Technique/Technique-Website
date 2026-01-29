@@ -4,6 +4,7 @@ import { getSession as getOriginalSession } from "../../../lib/lib";
 import { createAdminClient } from "../../../lib/supabase/admin";
 
 // GET - Fetch current user's bio data
+// Name/major from users table, quote/achievements from senior_bios table
 export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
     // Check both sessions (new technique session and original MIT SSO session)
@@ -22,16 +23,16 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       ? newSession.userInfo!.email
       : originalSession.userInfo!.email;
 
-    // Get user from Supabase
     const supabase = createAdminClient();
+
+    // Get user basic info
     const { data: user, error } = await supabase
       .from('users')
-      .select('first_name, last_name, major, second_major, quote, achievements')
+      .select('id, first_name, last_name, major, second_major')
       .eq('email', userEmail)
       .single();
 
     if (error || !user) {
-      // User not found in Supabase - return empty data so they can fill it in
       return NextResponse.json({
         data: {
           firstName: '',
@@ -44,15 +45,21 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       }, { status: 200 });
     }
 
-    // Return data in camelCase format for backward compatibility with bio page
+    // Get senior bio data
+    const { data: seniorBio } = await supabase
+      .from('senior_bios')
+      .select('quote, achievements')
+      .eq('user_id', user.id)
+      .single();
+
     return NextResponse.json({
       data: {
         firstName: user.first_name || '',
         lastName: user.last_name || '',
         major: user.major || '',
         second_major: user.second_major || '',
-        quote: user.quote || '',
-        achievements: user.achievements || '',
+        quote: seniorBio?.quote || '',
+        achievements: seniorBio?.achievements || '',
       }
     }, { status: 200 });
   } catch (error) {
@@ -65,6 +72,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 }
 
 // PUT - Update current user's bio data
+// Name/major saved to users table, quote/achievements saved to senior_bios table
 export async function PUT(request: NextRequest): Promise<NextResponse> {
   try {
     // Check both sessions
@@ -111,9 +119,11 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
       .eq('email', userEmail)
       .single();
 
+    let userId: string;
+
     if (fetchError || !existingUser) {
       // Create new user if not exists
-      const { error: insertError } = await supabase
+      const { data: newUser, error: insertError } = await supabase
         .from('users')
         .insert({
           email: userEmail,
@@ -121,22 +131,23 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
           last_name: lastName,
           major: major,
           second_major: second_major || null,
-          quote: quote || null,
-          achievements: achievements || null,
           role: 'student',
           auth_provider: 'mit_sso',
           is_active: true,
-        });
+        })
+        .select('id')
+        .single();
 
-      if (insertError) {
+      if (insertError || !newUser) {
         console.error("Error creating user:", insertError);
         return NextResponse.json(
           { error: "Failed to save bio data" },
           { status: 500 }
         );
       }
+      userId = newUser.id;
     } else {
-      // Update existing user
+      // Update existing user (name/major only)
       const { error: updateError } = await supabase
         .from('users')
         .update({
@@ -144,8 +155,6 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
           last_name: lastName,
           major: major,
           second_major: second_major || null,
-          quote: quote || null,
-          achievements: achievements || null,
           updated_at: new Date().toISOString(),
         })
         .eq('email', userEmail);
@@ -157,6 +166,25 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
           { status: 500 }
         );
       }
+      userId = existingUser.id;
+    }
+
+    // Upsert senior bio (quote/achievements)
+    const { error: bioError } = await supabase
+      .from('senior_bios')
+      .upsert({
+        user_id: userId,
+        quote: quote || null,
+        achievements: achievements || null,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'user_id' });
+
+    if (bioError) {
+      console.error("Error saving senior bio:", bioError);
+      return NextResponse.json(
+        { error: "Failed to save senior bio data" },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ success: true }, { status: 200 });

@@ -49,7 +49,7 @@
 
   "account": {
     "login": "登录",
-    "student": "学生",
+    "staph": "STAPH",
     "organization": "组织",
     "dashboard": "控制台",
     "profile": "个人资料",
@@ -223,10 +223,12 @@
       "dividerText": "或",
       "success": "成功登录",
       "admin": {
-        "title": "管理员登录",
-        "description": "仅限Technique管理员。",
+        "title": "Staph 登录",
+        "description": "Technique staph 和管理员专用。",
+        "emailLabel": "邮箱",
+        "emailPlaceholder": "留空则以管理员身份登录",
         "passwordLabel": "密码",
-        "passwordPlaceholder": "输入管理员密码",
+        "passwordPlaceholder": "输入密码",
         "passwordRequired": "密码不能为空",
         "signInButton": "登录",
         "signingIn": "登录中...",

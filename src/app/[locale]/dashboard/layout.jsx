@@ -14,7 +14,7 @@ export default function DashboardLayout({ children }) {
   const { isLoggedIn, user, loading } = useUser();
 
   useEffect(() => {
-    if (!loading && (!isLoggedIn || user?.role !== 'admin')) {
+    if (!loading && (!isLoggedIn || user?.role !== 'admin' && user?.role !== 'staph')) {
       router.push(`/${locale}/login`);
     }
   }, [isLoggedIn, user, loading, router, locale]);
@@ -29,7 +29,7 @@ export default function DashboardLayout({ children }) {
     );
   }
 
-  if (!isLoggedIn || user?.role !== 'admin') {
+  if (!isLoggedIn || user?.role !== 'admin' && user?.role !== 'staph') {
     return null;
   }
 

@@ -49,7 +49,7 @@
 
   "account": {
     "login": "SIGN IN",
-    "student": "STUDENT",
+    "staph": "STAPH",
     "organization": "ORGANIZATION",
     "dashboard": "DASHBOARD",
     "profile": "PROFILE",
@@ -223,10 +223,12 @@
         "livingGroupNotFound": "Living group not found"
       },
       "admin": {
-        "title": "Admin Login",
-        "description": "For Technique administrators only.",
+        "title": "Staph Login",
+        "description": "For Technique staph and administrators.",
+        "emailLabel": "Email",
+        "emailPlaceholder": "Leave blank for admin login",
         "passwordLabel": "Password",
-        "passwordPlaceholder": "Enter admin password",
+        "passwordPlaceholder": "Enter password",
         "passwordRequired": "Password is required",
         "signInButton": "Sign In",
         "signingIn": "Signing in...",

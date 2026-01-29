@@ -49,7 +49,7 @@
 
   "account": {
     "login": "INICIAR SESIÓN",
-    "student": "ESTUDIANTE",
+    "staph": "STAPH",
     "organization": "ORGANIZACIÓN",
     "dashboard": "PANEL",
     "profile": "PERFIL",
@@ -223,10 +223,12 @@
         "livingGroupNotFound": "Grupo de vivienda no encontrado"
       },
       "admin": {
-        "title": "Acceso de Administrador",
-        "description": "Solo para administradores de Technique.",
+        "title": "Acceso Staph",
+        "description": "Para staph y administradores de Technique.",
+        "emailLabel": "Correo Electrónico",
+        "emailPlaceholder": "Dejar en blanco para acceso de administrador",
         "passwordLabel": "Contraseña",
-        "passwordPlaceholder": "Ingrese contraseña de administrador",
+        "passwordPlaceholder": "Ingrese contraseña",
         "passwordRequired": "La contraseña es obligatoria",
         "signInButton": "Iniciar Sesión",
         "signingIn": "Iniciando sesión...",
