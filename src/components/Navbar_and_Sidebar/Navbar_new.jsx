@@ -50,7 +50,7 @@ function Navbar() {
     {
       label: t('yearbook'),
       dropdown: [
-        { href: `/${locale}/purchase`, label: t('purchase') },
+        { href: `/${locale}/purchase`, label: t('purchase'), external: true },
         { href: `/${locale}/seniors`, label: t('seniors') },
         { href: `/${locale}/parents`, label: t('parents') },
         { href: `/${locale}/alumni`, label: t('alumni') },
@@ -206,6 +206,7 @@ function Navbar() {
                           <Link
                             key={subItem.href}
                             href={subItem.href}
+                            {...(subItem.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                             className={`block px-4 py-2 text-xs uppercase tracking-wider transition-colors ${
                               isHomePage
                                 ? isActive(subItem.href)

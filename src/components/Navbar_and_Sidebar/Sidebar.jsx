@@ -166,6 +166,7 @@ function Sidebar({ pathname }) {
                   <ListItem key={item.href} disablePadding>
                     <Link
                       href={item.href}
+                      {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                       onClick={() => setIsOpen(false)}
                       className="w-full"
                     >
@@ -218,7 +219,7 @@ function Sidebar({ pathname }) {
             <Collapse in={purchaseOpen} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 {[
-                  { href: `/${locale}/purchase`, label: t('purchase') },
+                  { href: `/${locale}/purchase`, label: t('purchase'), external: true },
                   { href: `/${locale}/seniors`, label: t('seniors') },
                   { href: `/${locale}/parents`, label: t('parents') },
                   { href: `/${locale}/alumni`, label: t('alumni') },
@@ -226,6 +227,7 @@ function Sidebar({ pathname }) {
                   <ListItem key={item.href} disablePadding>
                     <Link
                       href={item.href}
+                      {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                       onClick={() => setIsOpen(false)}
                       className="w-full"
                     >
@@ -302,6 +304,7 @@ function Sidebar({ pathname }) {
                   <ListItem key={item.href} disablePadding>
                     <Link
                       href={item.href}
+                      {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                       onClick={() => setIsOpen(false)}
                       className="w-full"
                     >
@@ -347,6 +350,7 @@ function Sidebar({ pathname }) {
                   <ListItem key={item.href} disablePadding>
                     <Link
                       href={item.href}
+                      {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                       onClick={() => setIsOpen(false)}
                       className="w-full"
                     >
@@ -428,6 +432,7 @@ function Sidebar({ pathname }) {
                   <ListItem key={item.href} disablePadding>
                     <Link
                       href={item.href}
+                      {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                       onClick={() => setIsOpen(false)}
                       className="w-full"
                     >
