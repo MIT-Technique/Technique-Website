@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import { useTranslations } from 'next-intl';
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
-import Autocomplete from "@mui/material/Autocomplete";
 import { Button } from "@mui/material";
 import Snackbar from "@mui/material/Snackbar";
 import CloseIcon from "@mui/icons-material/Close";
@@ -20,7 +19,6 @@ const textFieldSx = {
   "& .MuiInputLabel-root.Mui-focused": { color: "#750014" },
 };
 
-
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
@@ -28,8 +26,9 @@ export default function CandidsPage() {
   const t = useTranslations('pages.candids');
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
-  const [organizations, setOrganizations] = useState([]);
-  const [selectedOrg, setSelectedOrg] = useState("");
+  const [eventName, setEventName] = useState("");
+  const [eventNameError, setEventNameError] = useState("");
+  const [eventDescription, setEventDescription] = useState("");
   const [files, setFiles] = useState([null, null, null]);
   const [previews, setPreviews] = useState([null, null, null]);
   const [submitting, setSubmitting] = useState(false);
@@ -40,27 +39,43 @@ export default function CandidsPage() {
   const fileInputRefs = [useRef(null), useRef(null), useRef(null)];
 
   useEffect(() => {
-    fetch('/api/organizations/list')
-      .then(res => res.json())
-      .then(data => setOrganizations(data.organizations || []))
-      .catch(() => {});
     fetch('/api/form-status?form=candids_form')
       .then(res => res.json())
       .then(data => setIsFrozen(data.isFrozen || false))
       .catch(() => {});
   }, []);
 
-  function validateEmail(value) {
+  function normalizeEmail(value) {
     const trimmed = value.trim().toLowerCase();
-    if (!trimmed) {
+    if (!trimmed) return '';
+    // If no @ symbol, assume it's just the kerb and append @mit.edu
+    if (!trimmed.includes('@')) {
+      return `${trimmed}@mit.edu`;
+    }
+    return trimmed;
+  }
+
+  function validateEmail(value) {
+    const normalized = normalizeEmail(value);
+    if (!normalized) {
       setEmailError(t('emailRequired'));
       return false;
     }
-    if (!trimmed.endsWith('@mit.edu')) {
+    if (!normalized.endsWith('@mit.edu')) {
       setEmailError(t('emailMitOnly'));
       return false;
     }
     setEmailError("");
+    return true;
+  }
+
+  function validateEventName(value) {
+    const trimmed = value.trim();
+    if (!trimmed) {
+      setEventNameError(t('eventNameRequired'));
+      return false;
+    }
+    setEventNameError("");
     return true;
   }
 
@@ -101,9 +116,20 @@ export default function CandidsPage() {
     if (fileInputRefs[index].current) fileInputRefs[index].current.value = '';
   }
 
+  function handleDescriptionChange(e) {
+    const value = e.target.value;
+    const words = value.trim().split(/\s+/).filter(Boolean);
+    if (words.length <= 75 || value.length < eventDescription.length) {
+      setEventDescription(value);
+    }
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!validateEmail(email)) return;
+    const emailValid = validateEmail(email);
+    const nameValid = validateEventName(eventName);
+
+    if (!emailValid || !nameValid) return;
 
     const activeFiles = files.filter(Boolean);
     if (activeFiles.length === 0) {
@@ -116,7 +142,7 @@ export default function CandidsPage() {
     setSubmitting(true);
     try {
       const formData = new FormData();
-      formData.append('email', email.trim().toLowerCase());
+      formData.append('email', normalizeEmail(email));
 
       let fileIndex = 1;
       for (const file of files) {
@@ -126,15 +152,10 @@ export default function CandidsPage() {
         }
       }
 
-      if (selectedOrg) {
-        const org = organizations.find(o => o.id === selectedOrg);
-        if (org) {
-          formData.append('organizationName', org.name);
-          formData.append('organizationType', org.type);
-          if (org.livingGroupType) {
-            formData.append('livingGroupType', org.livingGroupType);
-          }
-        }
+      formData.append('organizationName', eventName.trim());
+      formData.append('organizationType', 'event');
+      if (eventDescription.trim()) {
+        formData.append('eventDescription', eventDescription.trim());
       }
 
       const res = await fetch('/api/candids/upload', {
@@ -149,7 +170,8 @@ export default function CandidsPage() {
         // Reset form
         setFiles([null, null, null]);
         setPreviews([null, null, null]);
-        setSelectedOrg("");
+        setEventName("");
+        setEventDescription("");
         fileInputRefs.forEach(ref => { if (ref.current) ref.current.value = ''; });
       } else {
         const data = await res.json();
@@ -165,6 +187,8 @@ export default function CandidsPage() {
       setSubmitting(false);
     }
   }
+
+  const descriptionWordCount = eventDescription.trim().split(/\s+/).filter(Boolean).length;
 
   return (
     <>
@@ -203,35 +227,54 @@ export default function CandidsPage() {
               }}
               onBlur={(e) => validateEmail(e.target.value)}
               name="email"
-              type="email"
-              placeholder="kerb@mit.edu"
+              placeholder="kerb"
               error={!!emailError}
-              helperText={emailError || t('emailHelper')}
+              helperText={emailError}
+              sx={textFieldSx}
+              fullWidth
+              InputProps={{
+                endAdornment: <span style={{ color: '#666', marginLeft: 4 }}>@mit.edu</span>,
+              }}
+            />
+
+            {/* Event Name */}
+            <TextField
+              required
+              label={t('eventNameLabel')}
+              variant="outlined"
+              InputLabelProps={{ shrink: true }}
+              value={eventName}
+              onChange={(e) => {
+                setEventName(e.target.value);
+                if (eventNameError) validateEventName(e.target.value);
+              }}
+              onBlur={(e) => validateEventName(e.target.value)}
+              placeholder={t('eventNamePlaceholder')}
+              error={!!eventNameError}
+              helperText={eventNameError || t('eventNameHint')}
               sx={textFieldSx}
               fullWidth
             />
 
-            {/* Organization Dropdown (optional, searchable) */}
-            <Autocomplete
-              options={organizations}
-              getOptionLabel={(option) => option.name || ""}
-              value={organizations.find(o => o.id === selectedOrg) || null}
-              onChange={(_, newValue) => {
-                setSelectedOrg(newValue ? newValue.id : "");
-              }}
-              isOptionEqualToValue={(option, value) => option.id === value.id}
-              slotProps={{ listbox: { style: { maxHeight: 250 } } }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label={t('orgLabel')}
-                  InputLabelProps={{ ...params.InputLabelProps, shrink: true }}
-                  placeholder={t('noOrg')}
-                  sx={textFieldSx}
-                />
-              )}
-              fullWidth
-            />
+            {/* Event Description (optional) */}
+            <div>
+              <TextField
+                label={t('eventDescriptionLabel')}
+                variant="outlined"
+                InputLabelProps={{ shrink: true }}
+                value={eventDescription}
+                onChange={handleDescriptionChange}
+                placeholder={t('eventDescriptionPlaceholder')}
+                multiline
+                minRows={2}
+                maxRows={4}
+                sx={textFieldSx}
+                fullWidth
+              />
+              <p className="text-xs text-text-muted mt-1">
+                {descriptionWordCount} / 75
+              </p>
+            </div>
 
             {/* Image Upload Slots */}
             <div>
@@ -297,6 +340,14 @@ export default function CandidsPage() {
             >
               {submitting ? t('submitting') : t('submit')}
             </Button>
+
+            {/* Contact mailto */}
+            <p className="text-xs text-text-muted text-center">
+              {t('contactText')}{' '}
+              <a href="mailto:technique@mit.edu" className="text-primary hover:underline">
+                technique@mit.edu
+              </a>
+            </p>
           </Box>
         </section>
       </main>

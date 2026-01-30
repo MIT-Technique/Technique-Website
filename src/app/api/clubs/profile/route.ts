@@ -100,9 +100,9 @@ export async function PUT(request: NextRequest) {
     // Validate description word count
     if (typeof updateData.description === 'string') {
       const wordCount = updateData.description.trim().split(/\s+/).filter(Boolean).length;
-      if (wordCount > 150) {
+      if (wordCount > 75) {
         return NextResponse.json(
-          { error: "Description must be 150 words or fewer" },
+          { error: "Description must be 75 words or fewer" },
           { status: 400 }
         );
       }

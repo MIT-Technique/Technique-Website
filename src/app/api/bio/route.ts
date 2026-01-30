@@ -13,6 +13,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
           firstName: '',
           lastName: '',
           major: '',
+          minor: '',
           second_major: '',
           quote: '',
           achievements: '',
@@ -24,7 +25,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     const { data: bio } = await supabase
       .from('senior_bios')
-      .select('first_name, last_name, major, second_major, quote, achievements')
+      .select('first_name, last_name, major, minor, second_major, quote, achievements')
       .eq('email', email)
       .single();
 
@@ -33,6 +34,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         firstName: bio?.first_name || '',
         lastName: bio?.last_name || '',
         major: bio?.major || '',
+        minor: bio?.minor || '',
         second_major: bio?.second_major || '',
         quote: bio?.quote || '',
         achievements: bio?.achievements || '',
@@ -51,7 +53,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 export async function PUT(request: NextRequest): Promise<NextResponse> {
   try {
     const body = await request.json();
-    const { email, firstName, lastName, major, second_major, quote, achievements } = body;
+    const { email, firstName, lastName, major, minor, second_major, quote, achievements } = body;
 
     // Validate email
     if (!email || typeof email !== 'string') {
@@ -94,8 +96,9 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
         email: normalizedEmail,
         first_name: firstName,
         last_name: lastName,
-        major: major,
-        second_major: second_major === "None" ? "" : (second_major || null),
+        major: major || null,
+        minor: minor || null,
+        second_major: second_major || null,
         quote: quote || null,
         achievements: achievements || null,
         updated_at: new Date().toISOString(),

@@ -439,19 +439,21 @@ export default function ClubPage() {
 
                 <div>
                   <label className="block text-sm font-medium mb-2">{t('form.description')}</label>
+                  <p className="text-sm text-text-muted mb-2">{t('form.descriptionHint')}</p>
                   <textarea
                     value={formData.description}
                     onChange={(e) => {
                       const words = e.target.value.trim().split(/\s+/).filter(Boolean);
-                      if (words.length <= 150 || e.target.value.length < formData.description.length) {
+                      if (words.length <= 75 || e.target.value.length < formData.description.length) {
                         setFormData({ ...formData, description: e.target.value });
                       }
                     }}
+                    placeholder={t('form.descriptionPlaceholder')}
                     className="w-full border border-border rounded px-4 py-2 min-h-[100px]"
                     disabled={isFrozen}
                   />
                   <p className="text-xs text-text-muted mt-1">
-                    {formData.description.trim().split(/\s+/).filter(Boolean).length} / 150 words
+                    {formData.description.trim().split(/\s+/).filter(Boolean).length} / 75 words
                   </p>
                 </div>
 

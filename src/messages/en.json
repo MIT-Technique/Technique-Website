@@ -318,10 +318,12 @@
       "description": "Update your information for the yearbook.",
       "fields": {
         "email": "MIT Email",
-        "emailHelper": "Enter your @mit.edu email to submit or update your bio",
+        "emailHelper": "For saving and updating",
         "firstName": "First Name",
         "lastName": "Last Name",
         "major": "Major",
+        "minor": "Minor",
+        "secondMajor": "Second Major",
         "quote": "Quote",
         "quotePlaceholder": "Enter a quote for your yearbook entry (optional)"
       },
@@ -329,18 +331,23 @@
       "emailMitOnly": "Must be a valid @mit.edu email address",
       "submitButton": "Submit Bio",
       "success": "Your bio was saved successfully",
-      "error": "There was an error saving your bio"
+      "error": "There was an error saving your bio",
+      "contactText": "Questions or suggestions?"
     },
 
     "candids": {
       "title": "Community Candids",
       "description": "Submit candid photos for the yearbook. Resubmitting with the same email will replace your previous photos.",
       "emailLabel": "MIT Email",
-      "emailHelper": "Your @mit.edu email — resubmitting replaces previous photos",
+      "emailHelper": "Resubmitting replaces previous photos",
       "emailRequired": "Email is required",
       "emailMitOnly": "Must be a valid @mit.edu email address",
-      "orgLabel": "Organization (optional)",
-      "noOrg": "Clubs, living groups, sport teams",
+      "eventNameLabel": "Event or Activity Name",
+      "eventNamePlaceholder": "e.g., CPW 2026, Spring Concert, Hackathon",
+      "eventNameHint": "Clubs, living groups, and sports submit through their organization accounts",
+      "eventNameRequired": "Event or activity name is required",
+      "eventDescriptionLabel": "Description (optional)",
+      "eventDescriptionPlaceholder": "Briefly describe the event or activity",
       "imagesLabel": "Upload up to 3 images (5MB max each)",
       "uploadSlot": "Image {n}",
       "imageHint": "Accepted formats: JPEG, PNG, WebP, GIF. Max 5MB per image.",
@@ -351,7 +358,8 @@
       "noFiles": "Please select at least one image",
       "invalidType": "Invalid file type. Only JPEG, PNG, WebP, and GIF are allowed",
       "tooLarge": "File too large. Maximum size is 5MB",
-      "frozen": "This form is currently closed and not accepting submissions."
+      "frozen": "This form is currently closed and not accepting submissions.",
+      "contactText": "Questions or suggestions?"
     },
 
     "profile": {
@@ -616,7 +624,8 @@
       "submitting": "Submitting...",
       "success": "Your work has been submitted successfully!",
       "error": "Something went wrong. Please try again.",
-      "frozen": "This form is currently closed and not accepting submissions."
+      "frozen": "This form is currently closed and not accepting submissions.",
+      "contactText": "Questions or suggestions?"
     },
 
     "privacy": {
@@ -974,6 +983,8 @@
     "form": {
       "name": "Club Name",
       "description": "Description",
+      "descriptionPlaceholder": "MIT Technique is MIT's yearbook club. We publish annual printed yearbooks. Our club is involved in many activities including photography, layout, graphic design, and more!",
+      "descriptionHint": "Briefly describe your club's purpose and activities.",
       "memberList": "Member List",
       "memberListPlaceholder": "Enter member names, one per line or separated by commas",
       "memberListHint": "List the names of members who should appear in the yearbook",

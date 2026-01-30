@@ -302,10 +302,12 @@
       "description": "Actualiza tu información para el anuario.",
       "fields": {
         "email": "Correo MIT",
-        "emailHelper": "Ingresa tu correo @mit.edu para enviar o actualizar tu bio",
+        "emailHelper": "Para guardar y actualizar",
         "firstName": "Nombre",
         "lastName": "Apellido",
         "major": "Carrera",
+        "minor": "Especialización Secundaria",
+        "secondMajor": "Segunda Carrera",
         "quote": "Cita",
         "quotePlaceholder": "Ingresa una cita para tu entrada del anuario (opcional)"
       },
@@ -313,17 +315,22 @@
       "emailMitOnly": "Debe ser un correo @mit.edu válido",
       "submitButton": "Enviar Bio",
       "success": "Tu bio fue guardada exitosamente",
-      "error": "Hubo un error al guardar tu bio"
+      "error": "Hubo un error al guardar tu bio",
+      "contactText": "¿Preguntas o sugerencias?"
     },
     "candids": {
       "title": "Fotos de la Comunidad",
       "description": "Envía fotos espontáneas para el anuario. Reenviar con el mismo correo reemplazará tus fotos anteriores.",
       "emailLabel": "Correo MIT",
-      "emailHelper": "Tu correo @mit.edu — reenviar reemplaza fotos anteriores",
+      "emailHelper": "Reenviar reemplaza fotos anteriores",
       "emailRequired": "El correo es obligatorio",
       "emailMitOnly": "Debe ser un correo @mit.edu válido",
-      "orgLabel": "Organización (opcional)",
-      "noOrg": "Clubes, grupos residenciales, equipos deportivos",
+      "eventNameLabel": "Nombre del Evento o Actividad",
+      "eventNamePlaceholder": "ej., CPW 2026, Concierto de Primavera, Hackathon",
+      "eventNameHint": "Clubes, grupos residenciales y deportes envían a través de sus cuentas de organización",
+      "eventNameRequired": "El nombre del evento o actividad es obligatorio",
+      "eventDescriptionLabel": "Descripción (opcional)",
+      "eventDescriptionPlaceholder": "Describe brevemente el evento o actividad",
       "imagesLabel": "Sube hasta 3 imágenes (máximo 5MB cada una)",
       "uploadSlot": "Imagen {n}",
       "imageHint": "Formatos aceptados: JPEG, PNG, WebP, GIF. Máximo 5MB por imagen.",
@@ -334,7 +341,8 @@
       "noFiles": "Selecciona al menos una imagen",
       "invalidType": "Tipo de archivo no válido. Solo JPEG, PNG, WebP y GIF son permitidos",
       "tooLarge": "Archivo demasiado grande. El tamaño máximo es 5MB",
-      "frozen": "Este formulario está cerrado y no acepta envíos en este momento."
+      "frozen": "Este formulario está cerrado y no acepta envíos en este momento.",
+      "contactText": "¿Preguntas o sugerencias?"
     },
     "profile": {
       "title": "Mi Perfil",
@@ -590,7 +598,8 @@
       "submitting": "Enviando...",
       "success": "¡Su trabajo ha sido enviado exitosamente!",
       "error": "Algo salió mal. Por favor intente de nuevo.",
-      "frozen": "Este formulario está cerrado y no acepta envíos en este momento."
+      "frozen": "Este formulario está cerrado y no acepta envíos en este momento.",
+      "contactText": "¿Preguntas o sugerencias?"
     },
     "privacy": {
       "title": "Política de Privacidad",
@@ -936,6 +945,8 @@
     "form": {
       "name": "Nombre del Club",
       "description": "Descripción",
+      "descriptionPlaceholder": "MIT Technique es el club del anuario de MIT. Publicamos anuarios impresos anualmente. Nuestro club participa en muchas actividades incluyendo fotografía, diseño, y más!",
+      "descriptionHint": "Describa brevemente el propósito y las actividades de su club.",
       "memberList": "Lista de Miembros",
       "memberListPlaceholder": "Ingrese nombres de miembros, uno por línea o separados por comas",
       "memberListHint": "Liste los nombres de los miembros que deben aparecer en el anuario",

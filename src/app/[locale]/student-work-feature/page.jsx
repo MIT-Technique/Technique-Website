@@ -48,13 +48,23 @@ export default function StudentWorkFeaturePage() {
       .catch(() => {});
   }, []);
 
-  function validateEmail(value) {
+  function normalizeEmail(value) {
     const trimmed = value.trim().toLowerCase();
-    if (!trimmed) {
+    if (!trimmed) return '';
+    // If no @ symbol, assume it's just the kerb and append @mit.edu
+    if (!trimmed.includes('@')) {
+      return `${trimmed}@mit.edu`;
+    }
+    return trimmed;
+  }
+
+  function validateEmail(value) {
+    const normalized = normalizeEmail(value);
+    if (!normalized) {
       setEmailError(t('emailRequired'));
       return false;
     }
-    if (!trimmed.endsWith('@mit.edu')) {
+    if (!normalized.endsWith('@mit.edu')) {
       setEmailError(t('emailMitOnly'));
       return false;
     }
@@ -140,7 +150,7 @@ export default function StudentWorkFeaturePage() {
     setSubmitting(true);
     try {
       const formData = new FormData();
-      formData.append('email', email.trim().toLowerCase());
+      formData.append('email', normalizeEmail(email));
       const filteredMembers = members.map(m => m.trim()).filter(Boolean);
       formData.append('members', JSON.stringify(filteredMembers));
       if (additionalCredits.trim()) formData.append('additionalCredits', additionalCredits.trim());
@@ -224,12 +234,14 @@ export default function StudentWorkFeaturePage() {
               }}
               onBlur={(e) => validateEmail(e.target.value)}
               name="email"
-              type="email"
-              placeholder="kerb@mit.edu"
+              placeholder="kerb"
               error={!!emailError}
-              helperText={emailError || t('emailHelper')}
+              helperText={emailError}
               sx={textFieldSx}
               fullWidth
+              InputProps={{
+                endAdornment: <span style={{ color: '#666', marginLeft: 4 }}>@mit.edu</span>,
+              }}
             />
 
             {/* Members */}
@@ -388,6 +400,14 @@ export default function StudentWorkFeaturePage() {
             >
               {submitting ? t('submitting') : t('submit')}
             </Button>
+
+            {/* Contact mailto */}
+            <p className="text-xs text-text-muted text-center mt-4">
+              {t('contactText')}{' '}
+              <a href="mailto:technique@mit.edu" className="text-primary hover:underline">
+                technique@mit.edu
+              </a>
+            </p>
           </Box>
         </section>
       </main>
