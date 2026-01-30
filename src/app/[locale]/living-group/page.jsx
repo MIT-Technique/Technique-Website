@@ -873,9 +873,11 @@ export default function LivingGroupPage() {
   // Check if disabled
   const isDisabled = livingGroup?.status === 'disabled';
 
+  const isFsilg = livingGroup?.living_group_type === 'fsilg';
+
   const tabs = [
     { id: 'book', label: t('tabs.book') },
-    { id: 'assign', label: t('tabs.assign') },
+    ...(!isFsilg ? [{ id: 'assign', label: t('tabs.assign') }] : []),
     { id: 'members', label: t('tabs.members') },
     { id: 'documents', label: t('tabs.documents') },
     { id: 'settings', label: t('tabs.settings') },
