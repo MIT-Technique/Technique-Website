@@ -19,10 +19,11 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "0");
     const limit = parseInt(searchParams.get("limit") || "20");
+    const days = searchParams.get("days");
     const offset = page * limit;
 
     // Fetch logs with actor info
-    const { data: logs, error, count } = await supabase
+    let query = supabase
       .from("admin_logs")
       .select(
         `
@@ -36,8 +37,15 @@ export async function GET(request: NextRequest) {
       `,
         { count: "exact" }
       )
-      .order("created_at", { ascending: false })
-      .range(offset, offset + limit - 1);
+      .order("created_at", { ascending: false });
+
+    if (days) {
+      const cutoff = new Date();
+      cutoff.setDate(cutoff.getDate() - parseInt(days));
+      query = query.gte("created_at", cutoff.toISOString());
+    }
+
+    const { data: logs, error, count } = await query.range(offset, offset + limit - 1);
 
     if (error) {
       console.error("Error fetching logs:", error);

@@ -47,7 +47,8 @@
   "account": {
     "login": "登录",
     "staph": "STAPH",
-    "organization": "组织登录",
+    "organization": "组织",
+    "organizationLogin": "组织登录",
     "dashboard": "控制台",
     "profile": "个人资料",
     "signOut": "退出登录",
@@ -332,7 +333,8 @@
       "error": "提交照片时出错",
       "noFiles": "请至少选择一张图片",
       "invalidType": "文件类型无效。仅允许JPEG、PNG、WebP和GIF",
-      "tooLarge": "文件太大。最大为5MB"
+      "tooLarge": "文件太大。最大为5MB",
+      "frozen": "此表单目前已关闭，暂不接受提交。"
     },
     "profile": {
       "title": "我的资料",
@@ -587,7 +589,8 @@
       "submit": "提交作品",
       "submitting": "提交中...",
       "success": "您的作品已成功提交！",
-      "error": "出现错误，请重试。"
+      "error": "出现错误，请重试。",
+      "frozen": "此表单目前已关闭，暂不接受提交。"
     },
     "privacy": {
       "title": "隐私政策",
@@ -675,6 +678,7 @@
   },
   "dashboard": {
     "title": "管理控制台",
+    "staphTitle": "Staph 控制台",
     "welcome": "欢迎，{name}",
     "tabs": {
       "overview": "概览",
@@ -683,6 +687,7 @@
       "livingGroups": "宿舍",
       "users": "用户",
       "sports": "体育",
+      "logs": "日志",
       "settings": "设置"
     },
     "stats": {
@@ -791,6 +796,8 @@
         "upcoming": "即将拍摄"
       },
       "noLivingGroups": "未找到宿舍",
+      "dorms": "宿舍",
+      "fsilgs": "FSILGs",
       "status": {
         "active": "活跃",
         "disabled": "已禁用"
@@ -872,7 +879,10 @@
       "forms": {
         "seniorBio": "毕业生简介表单",
         "clubForm": "社团表单",
-        "livingGroupBooking": "宿舍拍摄预约"
+        "livingGroupBooking": "宿舍拍摄预约",
+        "sportsForm": "运动队表单",
+        "candidsForm": "抓拍照片表单",
+        "studentWorkForm": "学生作品表单"
       },
       "info": {
         "title": "系统信息",

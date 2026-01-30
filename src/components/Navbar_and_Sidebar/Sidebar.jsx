@@ -548,7 +548,7 @@ function Sidebar({ pathname }) {
                       sx={{ px: 3, py: 1.5 }}
                     >
                       <ListItemText
-                        primary={tAccount('organization')}
+                        primary={tAccount('organizationLogin')}
                         primaryTypographyProps={{
                           sx: {
                             fontSize: "0.75rem",

@@ -51,7 +51,8 @@
   "account": {
     "login": "SIGN IN",
     "staph": "STAPH",
-    "organization": "ORGANIZATION LOGIN",
+    "organization": "ORGANIZATION",
+    "organizationLogin": "Organization Login",
     "dashboard": "DASHBOARD",
     "profile": "PROFILE",
     "signOut": "SIGN OUT",
@@ -349,7 +350,8 @@
       "error": "There was an error submitting your photos",
       "noFiles": "Please select at least one image",
       "invalidType": "Invalid file type. Only JPEG, PNG, WebP, and GIF are allowed",
-      "tooLarge": "File too large. Maximum size is 5MB"
+      "tooLarge": "File too large. Maximum size is 5MB",
+      "frozen": "This form is currently closed and not accepting submissions."
     },
 
     "profile": {
@@ -613,7 +615,8 @@
       "submit": "Submit Work",
       "submitting": "Submitting...",
       "success": "Your work has been submitted successfully!",
-      "error": "Something went wrong. Please try again."
+      "error": "Something went wrong. Please try again.",
+      "frozen": "This form is currently closed and not accepting submissions."
     },
 
     "privacy": {
@@ -712,6 +715,7 @@
 
   "dashboard": {
     "title": "Admin Dashboard",
+    "staphTitle": "Staph Dashboard",
     "welcome": "Welcome, {name}",
     "tabs": {
       "overview": "Overview",
@@ -720,6 +724,7 @@
       "livingGroups": "Living Groups",
       "users": "Users",
       "sports": "Sports",
+      "logs": "Logs",
       "settings": "Settings"
     },
     "stats": {
@@ -828,6 +833,8 @@
         "upcoming": "Upcoming Photoshoots"
       },
       "noLivingGroups": "No living groups found",
+      "dorms": "Dorms",
+      "fsilgs": "FSILGs",
       "status": {
         "active": "Active",
         "disabled": "Disabled"
@@ -909,7 +916,10 @@
       "forms": {
         "seniorBio": "Senior Bio Form",
         "clubForm": "Club Form",
-        "livingGroupBooking": "Living Group Booking"
+        "livingGroupBooking": "Living Group Booking",
+        "sportsForm": "Sports Form",
+        "candidsForm": "Candids Form",
+        "studentWorkForm": "Student Work Form"
       },
       "info": {
         "title": "System Information",

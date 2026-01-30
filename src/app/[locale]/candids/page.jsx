@@ -36,12 +36,17 @@ export default function CandidsPage() {
   const [snackOpen, setSnackOpen] = useState(false);
   const [snackError, setSnackError] = useState(false);
   const [snackMessage, setSnackMessage] = useState("");
+  const [isFrozen, setIsFrozen] = useState(false);
   const fileInputRefs = [useRef(null), useRef(null), useRef(null)];
 
   useEffect(() => {
     fetch('/api/organizations/list')
       .then(res => res.json())
       .then(data => setOrganizations(data.organizations || []))
+      .catch(() => {});
+    fetch('/api/form-status?form=candids_form')
+      .then(res => res.json())
+      .then(data => setIsFrozen(data.isFrozen || false))
       .catch(() => {});
   }, []);
 
@@ -169,6 +174,12 @@ export default function CandidsPage() {
             <h1 className="mb-2">{t('title')}</h1>
           </div>
 
+          {isFrozen && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-600 font-medium">{t('frozen')}</p>
+            </div>
+          )}
+
           <Box
             component="form"
             className="card-elevated"
@@ -270,7 +281,7 @@ export default function CandidsPage() {
             <Button
               type="submit"
               variant="contained"
-              disabled={submitting || !files.some(Boolean)}
+              disabled={submitting || !files.some(Boolean) || isFrozen}
               sx={{
                 mt: 1,
                 backgroundColor: "#750014",

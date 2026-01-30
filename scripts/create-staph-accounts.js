@@ -40,8 +40,8 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey, {
 // ADD STAPH MEMBER EMAILS HERE
 // ============================================================
 const STAPH_EMAILS = [
-  // "kerberos@mit.edu",
-  // "another@mit.edu",
+  "alisonh@mit.edu",
+  "lsantos7@mit.edu",
 ];
 // ============================================================
 

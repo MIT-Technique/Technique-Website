@@ -12,6 +12,9 @@ export default function SettingsPage() {
     { name: 'senior_bio', label: t('forms.seniorBio') },
     { name: 'club_form', label: t('forms.clubForm') },
     { name: 'living_group_booking', label: t('forms.livingGroupBooking') },
+    { name: 'sports_form', label: t('forms.sportsForm') },
+    { name: 'candids_form', label: t('forms.candidsForm') },
+    { name: 'student_work_form', label: t('forms.studentWorkForm') },
   ];
 
   useEffect(() => {

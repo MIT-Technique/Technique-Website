@@ -90,7 +90,7 @@ export default function OrganizationAuthModal({ open, onClose }) {
   const fetchOrganizations = async () => {
     setLoadingOrgs(true);
     try {
-      const res = await fetch("/api/organizations/list");
+      const res = await fetch("/api/organizations/list", { cache: "no-store" });
       const data = await res.json();
       if (data.organizations) {
         setOrganizations(data.organizations);

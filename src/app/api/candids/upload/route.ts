@@ -6,6 +6,20 @@ const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if form is frozen
+    const supabaseCheck = createAdminClient();
+    const { data: formSettings } = await supabaseCheck
+      .from('form_settings')
+      .select('is_frozen')
+      .eq('form_name', 'candids_form')
+      .single();
+    if (formSettings?.is_frozen) {
+      return NextResponse.json(
+        { error: "This form is currently closed" },
+        { status: 403 }
+      );
+    }
+
     const formData = await request.formData();
     const email = formData.get('email') as string | null;
     const organizationName = formData.get('organizationName') as string | null;

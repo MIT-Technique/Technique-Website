@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "../../../../lib/supabase/admin";
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const supabaseAdmin = createAdminClient();
@@ -9,7 +11,6 @@ export async function GET(request: NextRequest) {
     const { data: clubs, error: clubsError } = await supabaseAdmin
       .from("clubs")
       .select("id, name")
-      .eq("approval_status", "approved")
       .order("name");
 
     if (clubsError) {
@@ -20,11 +21,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Fetch active living groups
+    // Fetch all living groups
     const { data: livingGroups, error: lgError } = await supabaseAdmin
       .from("living_groups")
       .select("id, name, living_group_type")
-      .eq("status", "active")
       .order("name");
 
     if (lgError) {

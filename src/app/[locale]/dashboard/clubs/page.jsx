@@ -1,23 +1,25 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
+
+const PAGE_SIZE = 10;
 
 export default function ClubsPage() {
   const t = useTranslations('dashboard.clubs');
   const locale = useLocale();
   const [clubs, setClubs] = useState([]);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(0);
+  const fetchIdRef = useRef(0);
 
   // Leader requests state
   const [leaderRequests, setLeaderRequests] = useState([]);
   const [leaderRequestsLoading, setLeaderRequestsLoading] = useState(true);
   const [processingRequestId, setProcessingRequestId] = useState(null);
-
-  useEffect(() => {
-    fetchClubs();
-  }, []);
 
   useEffect(() => {
     fetchLeaderRequests();
@@ -59,28 +61,65 @@ export default function ClubsPage() {
   }
 
   async function fetchClubs() {
+    const id = ++fetchIdRef.current;
     try {
       setLoading(true);
-      let url = '/api/admin/clubs';
-      if (search) url += `?search=${encodeURIComponent(search)}`;
+      setClubs([]);
+      setTotal(0);
+
+      // Fetch first page quickly
+      let url = `/api/admin/clubs?limit=${PAGE_SIZE}&offset=0`;
+      if (search) url += `&search=${encodeURIComponent(search)}`;
 
       const res = await fetch(url);
       const data = await res.json();
+      if (id !== fetchIdRef.current) return;
+
       setClubs(data.clubs || []);
+      setTotal(data.total || 0);
+      setLoading(false);
+
+      // Fetch remaining in background
+      const remaining = (data.total || 0) - PAGE_SIZE;
+      if (remaining > 0) {
+        setLoadingMore(true);
+        let restUrl = `/api/admin/clubs?limit=${remaining}&offset=${PAGE_SIZE}`;
+        if (search) restUrl += `&search=${encodeURIComponent(search)}`;
+
+        const restRes = await fetch(restUrl);
+        const restData = await restRes.json();
+        if (id !== fetchIdRef.current) return;
+
+        setClubs(prev => [...prev, ...(restData.clubs || [])]);
+        setLoadingMore(false);
+      }
     } catch (error) {
       console.error('Error fetching clubs:', error);
-    } finally {
-      setLoading(false);
+      if (id === fetchIdRef.current) {
+        setLoading(false);
+        setLoadingMore(false);
+      }
     }
   }
 
   // Search with debounce
   useEffect(() => {
     const timer = setTimeout(() => {
+      setPage(0);
       fetchClubs();
     }, 300);
     return () => clearTimeout(timer);
   }, [search]);
+
+  // Initial fetch
+  useEffect(() => {
+    fetchClubs();
+  }, []);
+
+  const totalPages = Math.ceil(clubs.length / PAGE_SIZE);
+  const totalPagesEstimate = Math.ceil(total / PAGE_SIZE);
+  const displayTotalPages = loadingMore ? totalPagesEstimate : totalPages;
+  const paginatedClubs = clubs.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
   return (
     <div>
@@ -129,8 +168,8 @@ export default function ClubsPage() {
         </div>
       )}
 
-      {/* Search */}
-      <div className="mb-4">
+      {/* Search + Pagination Arrows */}
+      <div className="mb-4 flex items-center gap-3">
         <input
           type="text"
           placeholder={t('searchPlaceholder') || 'Search clubs...'}
@@ -138,6 +177,25 @@ export default function ClubsPage() {
           onChange={(e) => setSearch(e.target.value)}
           className="px-3 py-2 border border-border rounded-lg w-full max-w-sm text-sm"
         />
+        <div className="flex items-center gap-1 ml-auto">
+          <button
+            onClick={() => setPage((p) => Math.max(0, p - 1))}
+            disabled={page === 0}
+            className="px-2 py-1 text-sm border border-border rounded disabled:opacity-30 hover:bg-bg-secondary"
+          >
+            ←
+          </button>
+          <span className="text-sm text-text-muted px-2">
+            {page + 1} / {displayTotalPages || 1}
+          </span>
+          <button
+            onClick={() => setPage((p) => Math.min(displayTotalPages - 1, p + 1))}
+            disabled={page >= displayTotalPages - 1 || (loadingMore && page >= totalPages - 1)}
+            className="px-2 py-1 text-sm border border-border rounded disabled:opacity-30 hover:bg-bg-secondary"
+          >
+            →
+          </button>
+        </div>
       </div>
 
       {/* Clubs List */}
@@ -146,65 +204,42 @@ export default function ClubsPage() {
       ) : clubs.length === 0 ? (
         <p className="text-text-secondary">{t('noClubs')}</p>
       ) : (
-        <div className="space-y-4">
-          {clubs.map((club) => (
+        <div className="space-y-2">
+          {paginatedClubs.map((club) => (
             <div
               key={club.id}
-              className="p-4 border border-border rounded-lg bg-white"
+              className="px-4 py-3 border border-border rounded-lg bg-white"
             >
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <h3 className="font-medium">{club.name || t('unnamed')}</h3>
-                    <span className="text-xs px-2 py-0.5 bg-bg-secondary rounded">
-                      ID: {club.club_id}
-                    </span>
-                  </div>
-                  {club.description && (
-                    <p className="text-sm text-text-secondary mb-2">{club.description}</p>
-                  )}
-
-                  {/* Member Counts */}
-                  <div className="flex gap-4 text-sm text-text-muted mb-2">
-                    <span>{t('activeMembers', { count: club.active_member_count || 0 })}</span>
-                    <span>{t('manualMembers', { count: club.manual_member_count || 0 })}</span>
-                  </div>
-
-                  {/* Expandable Leaders */}
-                  {club.leaders && club.leaders.length > 0 ? (
-                    <details className="mt-2">
-                      <summary className="text-sm text-accent cursor-pointer hover:underline">
-                        {t('viewLeaders', { count: club.leaders.length })}
-                      </summary>
-                      <ul className="mt-2 space-y-1 text-sm text-text-secondary pl-4">
-                        {club.leaders.map((leader, i) => (
-                          <li key={i}>
-                            {leader.first_name} {leader.last_name} — {leader.email}
-                          </li>
-                        ))}
-                      </ul>
-                    </details>
-                  ) : (
-                    <p className="text-sm text-text-muted">{t('noLeaders')}</p>
-                  )}
-
-                  {/* Images */}
-                  <div className="flex gap-2 mt-3">
-                    {[club.candid_image_1, club.candid_image_2, club.candid_image_3]
-                      .filter(Boolean)
-                      .map((img, i) => (
-                        <img
-                          key={i}
-                          src={img}
-                          alt={`Club image ${i + 1}`}
-                          className="w-20 h-20 object-cover rounded"
-                        />
-                      ))}
-                  </div>
-                </div>
+              <div className="flex items-center gap-3 text-sm">
+                <span className="font-medium">{club.name || t('unnamed')}</span>
+                <span className="text-text-muted">
+                  ({club.manual_member_count || 0})
+                </span>
+                {club.email && (
+                  <span className="text-text-secondary ml-auto">{club.email}</span>
+                )}
               </div>
+
+              {/* Images */}
+              {[club.candid_image_1, club.candid_image_2, club.candid_image_3].filter(Boolean).length > 0 && (
+                <div className="flex gap-2 mt-2">
+                  {[club.candid_image_1, club.candid_image_2, club.candid_image_3]
+                    .filter(Boolean)
+                    .map((img, i) => (
+                      <img
+                        key={i}
+                        src={img}
+                        alt={`Club image ${i + 1}`}
+                        className="w-16 h-16 object-cover rounded"
+                      />
+                    ))}
+                </div>
+              )}
             </div>
           ))}
+          {loadingMore && page >= totalPages - 1 && (
+            <p className="text-text-muted text-sm text-center py-2">Loading more...</p>
+          )}
         </div>
       )}
     </div>

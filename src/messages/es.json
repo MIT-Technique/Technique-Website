@@ -47,7 +47,8 @@
   "account": {
     "login": "INICIAR SESIÓN",
     "staph": "STAPH",
-    "organization": "INICIO DE SESIÓN DE ORGANIZACIÓN",
+    "organization": "ORGANIZACIÓN",
+    "organizationLogin": "Inicio de Sesión de Organización",
     "dashboard": "PANEL",
     "profile": "PERFIL",
     "signOut": "CERRAR SESIÓN",
@@ -332,7 +333,8 @@
       "error": "Hubo un error al enviar tus fotos",
       "noFiles": "Selecciona al menos una imagen",
       "invalidType": "Tipo de archivo no válido. Solo JPEG, PNG, WebP y GIF son permitidos",
-      "tooLarge": "Archivo demasiado grande. El tamaño máximo es 5MB"
+      "tooLarge": "Archivo demasiado grande. El tamaño máximo es 5MB",
+      "frozen": "Este formulario está cerrado y no acepta envíos en este momento."
     },
     "profile": {
       "title": "Mi Perfil",
@@ -587,7 +589,8 @@
       "submit": "Enviar Trabajo",
       "submitting": "Enviando...",
       "success": "¡Su trabajo ha sido enviado exitosamente!",
-      "error": "Algo salió mal. Por favor intente de nuevo."
+      "error": "Algo salió mal. Por favor intente de nuevo.",
+      "frozen": "Este formulario está cerrado y no acepta envíos en este momento."
     },
     "privacy": {
       "title": "Política de Privacidad",
@@ -675,6 +678,7 @@
   },
   "dashboard": {
     "title": "Panel de Administración",
+    "staphTitle": "Panel de Staph",
     "welcome": "Bienvenido, {name}",
     "tabs": {
       "overview": "Resumen",
@@ -683,6 +687,7 @@
       "livingGroups": "Grupos de Vivienda",
       "users": "Usuarios",
       "sports": "Deportes",
+      "logs": "Registros",
       "settings": "Configuración"
     },
     "stats": {
@@ -791,6 +796,8 @@
         "upcoming": "Próximas Sesiones"
       },
       "noLivingGroups": "No se encontraron grupos",
+      "dorms": "Dormitorios",
+      "fsilgs": "FSILGs",
       "status": {
         "active": "Activo",
         "disabled": "Deshabilitado"
@@ -872,7 +879,10 @@
       "forms": {
         "seniorBio": "Formulario de Bio de Senior",
         "clubForm": "Formulario de Club",
-        "livingGroupBooking": "Reserva de Grupo de Vivienda"
+        "livingGroupBooking": "Reserva de Grupo de Vivienda",
+        "sportsForm": "Formulario de Deportes",
+        "candidsForm": "Formulario de Fotos Espontáneas",
+        "studentWorkForm": "Formulario de Trabajo Estudiantil"
       },
       "info": {
         "title": "Información del Sistema",

@@ -17,7 +17,11 @@ export default function DashboardLayout({ children }) {
     if (!loading && (!isLoggedIn || user?.role !== 'admin' && user?.role !== 'staph')) {
       router.push(`/${locale}/login`);
     }
-  }, [isLoggedIn, user, loading, router, locale]);
+    // Redirect staph users from overview to photoshoots (their default tab)
+    if (!loading && isLoggedIn && user?.role === 'staph' && pathname === `/${locale}/dashboard`) {
+      router.replace(`/${locale}/dashboard/photoshoots`);
+    }
+  }, [isLoggedIn, user, loading, router, locale, pathname]);
 
   if (loading) {
     return (
@@ -33,22 +37,27 @@ export default function DashboardLayout({ children }) {
     return null;
   }
 
-  const tabs = [
-    { id: 'overview', label: t('tabs.overview'), href: `/${locale}/dashboard` },
-    { id: 'photoshoots', label: t('tabs.photoshoots'), href: `/${locale}/dashboard/photoshoots` },
-    { id: 'clubs', label: t('tabs.clubs'), href: `/${locale}/dashboard/clubs` },
-    { id: 'living-groups', label: t('tabs.livingGroups'), href: `/${locale}/dashboard/living-groups` },
-    { id: 'sports', label: t('tabs.sports'), href: `/${locale}/dashboard/sports` },
-    { id: 'users', label: t('tabs.users'), href: `/${locale}/dashboard/users` },
-    { id: 'settings', label: t('tabs.settings'), href: `/${locale}/dashboard/settings` },
+  const isAdmin = user?.role === 'admin';
+
+  const allTabs = [
+    { id: 'overview', label: t('tabs.overview'), href: `/${locale}/dashboard`, adminOnly: true },
+    { id: 'photoshoots', label: t('tabs.photoshoots'), href: `/${locale}/dashboard/photoshoots`, adminOnly: false },
+    { id: 'clubs', label: t('tabs.clubs'), href: `/${locale}/dashboard/clubs`, adminOnly: true },
+    { id: 'living-groups', label: t('tabs.livingGroups'), href: `/${locale}/dashboard/living-groups`, adminOnly: false },
+    { id: 'sports', label: t('tabs.sports'), href: `/${locale}/dashboard/sports`, adminOnly: true },
+    { id: 'users', label: t('tabs.users'), href: `/${locale}/dashboard/users`, adminOnly: true },
+    { id: 'logs', label: t('tabs.logs'), href: `/${locale}/dashboard/logs`, adminOnly: true },
+    { id: 'settings', label: t('tabs.settings'), href: `/${locale}/dashboard/settings`, adminOnly: true },
   ];
+
+  const tabs = isAdmin ? allTabs : allTabs.filter(tab => !tab.adminOnly);
 
   return (
     <main className="min-h-screen pt-24 lg:pt-32 pb-12">
       <div className="container mx-auto px-4 max-w-6xl">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-2xl font-medium mb-2">{t('title')}</h1>
+          <h1 className="text-2xl font-medium mb-2">{isAdmin ? t('title') : t('staphTitle')}</h1>
           <p className="text-text-secondary text-sm">
             {t('welcome', { name: user?.first_name || user?.email })}
           </p>

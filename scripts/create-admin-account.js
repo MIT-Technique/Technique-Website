@@ -54,41 +54,47 @@ async function createAdminAccount() {
   console.log("Creating admin account...");
   console.log(`  Email: ${ADMIN_EMAIL}`);
 
-  // 1. Check if auth user already exists
-  const { data: existingUsers } = await supabase.auth.admin.listUsers();
-  const existingAuth = existingUsers?.users?.find(u => u.email === ADMIN_EMAIL);
-
+  // 1. Find existing auth user by email and delete, then recreate
   let authUserId;
 
-  if (existingAuth) {
-    console.log("  Auth user already exists, updating password...");
-    const { data: updated, error: updateError } = await supabase.auth.admin.updateUserById(
-      existingAuth.id,
-      { password }
-    );
-    if (updateError) {
-      console.error(`  Failed to update password: ${updateError.message}`);
-      process.exit(1);
-    }
-    authUserId = existingAuth.id;
-  } else {
-    // Create new auth user
-    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-      email: ADMIN_EMAIL,
-      password,
-      email_confirm: true,
-      user_metadata: {
-        name: "Technique Admin",
-        role: "admin",
-      },
-    });
-
-    if (authError) {
-      console.error(`  Failed to create auth user: ${authError.message}`);
-      process.exit(1);
-    }
-    authUserId = authData.user.id;
+  // Search for existing auth user across all pages
+  let page = 1;
+  let existingAuth = null;
+  while (true) {
+    const { data: { users }, error } = await supabase.auth.admin.listUsers({ page, perPage: 1000 });
+    if (error || !users || users.length === 0) break;
+    existingAuth = users.find(u => u.email === ADMIN_EMAIL);
+    if (existingAuth) break;
+    if (users.length < 1000) break;
+    page++;
   }
+
+  if (existingAuth) {
+    console.log("  Existing auth user found, deleting...");
+    const { error: deleteError } = await supabase.auth.admin.deleteUser(existingAuth.id);
+    if (deleteError) {
+      console.error(`  Failed to delete existing auth user: ${deleteError.message}`);
+      process.exit(1);
+    }
+    console.log("  Deleted existing auth user.");
+  }
+
+  // Create new auth user
+  const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+    email: ADMIN_EMAIL,
+    password,
+    email_confirm: true,
+    user_metadata: {
+      name: "Technique Admin",
+      role: "admin",
+    },
+  });
+
+  if (authError) {
+    console.error(`  Failed to create auth user: ${authError.message}`);
+    process.exit(1);
+  }
+  authUserId = authData.user.id;
 
   // 2. Upsert public.users record
   const { data: existingUser } = await supabase

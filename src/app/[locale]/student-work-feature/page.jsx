@@ -1,6 +1,6 @@
 "use client";
 import Footer from "../../../components/Footer/Footer";
-import { useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTranslations } from 'next-intl';
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
@@ -38,7 +38,15 @@ export default function StudentWorkFeaturePage() {
   const [snackOpen, setSnackOpen] = useState(false);
   const [snackError, setSnackError] = useState(false);
   const [snackMessage, setSnackMessage] = useState("");
+  const [isFrozen, setIsFrozen] = useState(false);
   const fileInputRefs = [useRef(null), useRef(null), useRef(null), useRef(null), useRef(null)];
+
+  useEffect(() => {
+    fetch('/api/form-status?form=student_work_form')
+      .then(res => res.json())
+      .then(data => setIsFrozen(data.isFrozen || false))
+      .catch(() => {});
+  }, []);
 
   function validateEmail(value) {
     const trimmed = value.trim().toLowerCase();
@@ -186,6 +194,12 @@ export default function StudentWorkFeaturePage() {
           <div className="text-center mb-8">
             <h1 className="mb-2">{t('title')}</h1>
           </div>
+
+          {isFrozen && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-600 font-medium">{t('frozen')}</p>
+            </div>
+          )}
 
           <Box
             component="form"
@@ -358,7 +372,7 @@ export default function StudentWorkFeaturePage() {
             <Button
               type="submit"
               variant="contained"
-              disabled={submitting}
+              disabled={submitting || isFrozen}
               sx={{
                 mt: 1,
                 backgroundColor: "#750014",
