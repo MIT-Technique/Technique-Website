@@ -15,7 +15,7 @@
     "alumni": "ALUMNI",
     "forms": "FORMS",
     "seniors": "SENIORS",
-    "resources": "RESOURCES",
+    "resources": "FAQ",
     "getStarted": "GET STARTED",
     "dropdown": {
       "ourHistory": "OUR HISTORY",
@@ -1278,34 +1278,48 @@
   },
 
   "resources": {
-    "title": "Resources & FAQ",
-    "metaTitle": "Resources & FAQ - MIT Technique",
-    "metaDescription": "Frequently asked questions about MIT Technique yearbook, accounts, and services.",
-    "description": "Find answers to common questions about yearbooks, accounts, and our services.",
+    "title": "Frequently Asked Questions",
+    "metaTitle": "FAQ - MIT Technique",
+    "metaDescription": "Frequently asked questions about the MIT Technique yearbook, senior portraits, and organizations.",
+    "description": "Find answers to common questions about the yearbook, senior portraits, and getting featured.",
     "faq": {
-      "title": "Frequently Asked Questions",
-      "accounts": {
-        "title": "Accounts & Login",
-        "q1": "How do I create an account?",
-        "a1": "MIT students can log in using MIT SSO (Touchstone) to manage their senior bio. Clubs and living groups can log in with their organization credentials.",
-        "q2": "What's the difference between student and organization accounts?",
-        "a2": "Student accounts are for MIT students to manage their senior bio. Organization accounts (clubs and living groups) are used to manage yearbook profiles, member lists, and photoshoot scheduling."
-      },
       "yearbook": {
-        "title": "Yearbook & Ordering",
+        "title": "Yearbook",
         "q1": "When can I order the yearbook?",
         "a1": "Yearbooks are typically available for preorder in the spring semester. Check the Yearbook page for current availability and pricing.",
-        "q2": "How do I submit my senior bio?",
-        "a2": "Log in with your MIT account, then navigate to your profile. You can edit your quote, achievements, and other information that will appear in the yearbook.",
+        "q2": "How much does the yearbook cost?",
+        "a2": "Preorder pricing is discounted compared to the regular price. Seniors who attend their portrait session receive an additional discount. Visit the Yearbook page for exact pricing.",
         "q3": "Can parents or alumni order yearbooks?",
-        "a3": "Yes! Visit the Parents or Alumni pages for information on ordering yearbooks as a gift or for yourself."
+        "a3": "Yes! Visit the Parents or Alumni pages for ordering information. You can also use our inquiry forms for questions about purchasing current or past editions.",
+        "q4": "When is the yearbook released?",
+        "a4": "The yearbook is released late spring. Preorder copies can be picked up on campus."
       },
-      "clubs": {
-        "title": "Clubs & Organizations",
-        "q1": "How do I add my club to the yearbook?",
-        "a1": "Log in with your club account and fill out your club profile with a description, member list, and candid photos. Your submission will be reviewed by the Technique staff.",
-        "q2": "What photos should clubs submit?",
-        "a2": "Submit high-quality candid photos that represent your club's activities. You can upload up to 3 photos. Avoid posed group shots - we want to capture your club in action!"
+      "seniors": {
+        "title": "Senior Portraits & Bios",
+        "q1": "How do I schedule a senior portrait?",
+        "a1": "Portrait sessions open on a rolling basis. Visit the Seniors page and click \"Schedule Your Portrait\" to book an available time slot.",
+        "q2": "How do I submit my senior bio?",
+        "a2": "Sign in with your MIT credentials and navigate to the Senior Bio page. You can enter your name, major, and an optional quote that will appear alongside your portrait in the yearbook.",
+        "q3": "What if I missed my portrait session?",
+        "a3": "Contact technique@mit.edu as soon as possible. Technique has a publication deadline, so late sessions cannot always be accommodated. Your name will still appear in the yearbook regardless."
+      },
+      "organizations": {
+        "title": "Clubs, Living Groups & Sports",
+        "q1": "How does my organization get featured in the yearbook?",
+        "a1": "Each organization has a dashboard where you can add a description, member list, and candid photos. Log in with your organization credentials to access it.",
+        "q2": "What kind of photos should we submit?",
+        "a2": "Submit high-quality candid photos that show your organization in action. You can upload up to 3 images. Avoid posed group shots — we want to capture authentic moments!",
+        "q3": "How do living groups schedule a photoshoot?",
+        "a3": "Log in to your living group dashboard and use the booking tab to select an available time slot, or propose a new time for Technique staph to review."
+      },
+      "general": {
+        "title": "General",
+        "q1": "What is Technique?",
+        "a1": "Technique is MIT's official photography, yearbook, and design student organization. We have published an annual yearbook commemorating life at MIT since 1885.",
+        "q2": "How can I join Technique?",
+        "a2": "Everyone is welcome regardless of experience. Visit the Join Us page or come to our Saturday meetings at 12pm in room 4-253. We offer photography, design, and business opportunities.",
+        "q3": "Can I hire Technique for event photography?",
+        "a3": "Yes! We offer event photography services for MIT-affiliated organizations and groups. Visit the Hire Us page or email us with the subject line \"Event Photography Quote\" to get started."
       },
       "contact": {
         "title": "Still have questions?",

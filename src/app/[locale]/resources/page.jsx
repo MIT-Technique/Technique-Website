@@ -17,31 +17,40 @@ function ResourcesPage() {
 
   const faqSections = [
     {
-      id: 'accounts',
-      title: t('faq.accounts.title'),
-      questions: [
-        { q: t('faq.accounts.q1'), a: t('faq.accounts.a1') },
-        { q: t('faq.accounts.q2'), a: t('faq.accounts.a2') },
-        { q: t('faq.accounts.q3'), a: t('faq.accounts.a3') },
-        { q: t('faq.accounts.q4'), a: t('faq.accounts.a4') },
-      ],
-    },
-    {
       id: 'yearbook',
       title: t('faq.yearbook.title'),
       questions: [
         { q: t('faq.yearbook.q1'), a: t('faq.yearbook.a1') },
         { q: t('faq.yearbook.q2'), a: t('faq.yearbook.a2') },
         { q: t('faq.yearbook.q3'), a: t('faq.yearbook.a3') },
+        { q: t('faq.yearbook.q4'), a: t('faq.yearbook.a4') },
       ],
     },
     {
-      id: 'clubs',
-      title: t('faq.clubs.title'),
+      id: 'seniors',
+      title: t('faq.seniors.title'),
       questions: [
-        { q: t('faq.clubs.q1'), a: t('faq.clubs.a1') },
-        { q: t('faq.clubs.q2'), a: t('faq.clubs.a2') },
-        { q: t('faq.clubs.q3'), a: t('faq.clubs.a3') },
+        { q: t('faq.seniors.q1'), a: t('faq.seniors.a1') },
+        { q: t('faq.seniors.q2'), a: t('faq.seniors.a2') },
+        { q: t('faq.seniors.q3'), a: t('faq.seniors.a3') },
+      ],
+    },
+    {
+      id: 'organizations',
+      title: t('faq.organizations.title'),
+      questions: [
+        { q: t('faq.organizations.q1'), a: t('faq.organizations.a1') },
+        { q: t('faq.organizations.q2'), a: t('faq.organizations.a2') },
+        { q: t('faq.organizations.q3'), a: t('faq.organizations.a3') },
+      ],
+    },
+    {
+      id: 'general',
+      title: t('faq.general.title'),
+      questions: [
+        { q: t('faq.general.q1'), a: t('faq.general.a1') },
+        { q: t('faq.general.q2'), a: t('faq.general.a2') },
+        { q: t('faq.general.q3'), a: t('faq.general.a3') },
       ],
     },
   ];

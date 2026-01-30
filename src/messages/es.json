@@ -14,7 +14,7 @@
     "alumni": "EXALUMNOS",
     "forms": "FORMULARIOS",
     "seniors": "SENIORS",
-    "resources": "RECURSOS",
+    "resources": "FAQ",
     "getStarted": "COMENZAR",
     "dropdown": {
       "ourHistory": "NUESTRA HISTORIA",
@@ -1237,34 +1237,48 @@
     "declineReasonPrompt": "Ingresa una razón para rechazar (opcional):"
   },
   "resources": {
-    "title": "Recursos y Preguntas Frecuentes",
-    "metaTitle": "Recursos y FAQ - MIT Technique",
-    "metaDescription": "Preguntas frecuentes sobre el anuario de MIT Technique, cuentas y servicios.",
-    "description": "Encuentra respuestas a preguntas comunes sobre anuarios, cuentas y nuestros servicios.",
+    "title": "Preguntas Frecuentes",
+    "metaTitle": "FAQ - MIT Technique",
+    "metaDescription": "Preguntas frecuentes sobre el anuario de MIT Technique, retratos de graduación y organizaciones.",
+    "description": "Encuentra respuestas a preguntas comunes sobre el anuario, retratos de graduación y cómo aparecer en él.",
     "faq": {
-      "title": "Preguntas Frecuentes",
-      "accounts": {
-        "title": "Cuentas e Inicio de Sesión",
-        "q1": "¿Cómo creo una cuenta?",
-        "a1": "Los estudiantes de MIT pueden iniciar sesión usando MIT SSO (Touchstone) para gestionar su biografía de senior. Los clubes y grupos de vivienda pueden iniciar sesión con sus credenciales de organización.",
-        "q2": "¿Cuál es la diferencia entre cuentas de estudiante y de organización?",
-        "a2": "Las cuentas de estudiante son para que los estudiantes de MIT gestionen su biografía de senior. Las cuentas de organización (clubes y grupos de vivienda) se usan para gestionar perfiles de anuario, listas de miembros y programación de sesiones de fotos."
-      },
       "yearbook": {
-        "title": "Anuario y Pedidos",
+        "title": "Anuario",
         "q1": "¿Cuándo puedo ordenar el anuario?",
         "a1": "Los anuarios típicamente están disponibles para preorden en el semestre de primavera. Consulta la página de Anuario para disponibilidad y precios actuales.",
-        "q2": "¿Cómo envío mi biografía de senior?",
-        "a2": "Inicia sesión con tu cuenta de MIT, luego navega a tu perfil. Puedes editar tu cita, logros y otra información que aparecerá en el anuario.",
+        "q2": "¿Cuánto cuesta el anuario?",
+        "a2": "El precio de preorden es más bajo que el precio regular. Los graduados que asisten a su sesión de retrato reciben un descuento adicional. Visita la página de Anuario para precios exactos.",
         "q3": "¿Pueden los padres o exalumnos ordenar anuarios?",
-        "a3": "¡Sí! Visita las páginas de Padres o Exalumnos para información sobre cómo ordenar anuarios como regalo o para ti mismo."
+        "a3": "¡Sí! Visita las páginas de Padres o Exalumnos para información sobre pedidos. También puedes usar nuestros formularios de consulta para preguntas sobre ediciones actuales o anteriores.",
+        "q4": "¿Cuándo se publica el anuario?",
+        "a4": "El anuario se publica a finales de primavera. Las copias de preorden se pueden recoger en el campus."
       },
-      "clubs": {
-        "title": "Clubes y Organizaciones",
-        "q1": "¿Cómo agrego mi club al anuario?",
-        "a1": "Inicia sesión con tu cuenta de club y completa tu perfil con descripción, lista de miembros y fotos candidas. Tu envío será revisado por el personal de Technique.",
-        "q2": "¿Qué fotos deben enviar los clubes?",
-        "a2": "Envía fotos candidas de alta calidad que representen las actividades de tu club. Puedes subir hasta 3 fotos. Evita fotos grupales posadas - ¡queremos capturar a tu club en acción!"
+      "seniors": {
+        "title": "Retratos y Biografías de Graduados",
+        "q1": "¿Cómo programo mi retrato de graduación?",
+        "a1": "Las sesiones de retrato se abren de forma continua. Visita la página de Graduados y haz clic en \"Programa tu Retrato\" para reservar un horario disponible.",
+        "q2": "¿Cómo envío mi biografía de graduación?",
+        "a2": "Inicia sesión con tus credenciales de MIT y ve a la página de Biografía de Graduado. Puedes ingresar tu nombre, carrera y una cita opcional que aparecerá junto a tu retrato en el anuario.",
+        "q3": "¿Qué pasa si no pude asistir a mi sesión de retrato?",
+        "a3": "Contacta a technique@mit.edu lo antes posible. Technique tiene una fecha límite de publicación, por lo que no siempre se pueden acomodar sesiones tardías. Tu nombre aparecerá en el anuario de todas formas."
+      },
+      "organizations": {
+        "title": "Clubes, Grupos de Vivienda y Deportes",
+        "q1": "¿Cómo aparece mi organización en el anuario?",
+        "a1": "Cada organización tiene un panel donde pueden agregar descripción, lista de miembros y fotos candidas. Inicia sesión con las credenciales de tu organización para acceder.",
+        "q2": "¿Qué tipo de fotos debemos enviar?",
+        "a2": "Envía fotos candidas de alta calidad que muestren a tu organización en acción. Puedes subir hasta 3 imágenes. Evita fotos grupales posadas — ¡queremos capturar momentos auténticos!",
+        "q3": "¿Cómo programan los grupos de vivienda una sesión de fotos?",
+        "a3": "Inicia sesión en tu panel de grupo de vivienda y usa la pestaña de reservas para seleccionar un horario disponible, o propón un nuevo horario para que el equipo de Technique lo revise."
+      },
+      "general": {
+        "title": "General",
+        "q1": "¿Qué es Technique?",
+        "a1": "Technique es la organización estudiantil oficial de fotografía, anuario y diseño de MIT. Hemos publicado un anuario anual que conmemora la vida en MIT desde 1885.",
+        "q2": "¿Cómo puedo unirme a Technique?",
+        "a2": "Todos son bienvenidos sin importar su experiencia. Visita la página Únete o ven a nuestras reuniones de los sábados a las 12pm en el salón 4-253. Ofrecemos oportunidades en fotografía, diseño y negocios.",
+        "q3": "¿Puedo contratar a Technique para fotografía de eventos?",
+        "a3": "¡Sí! Ofrecemos servicios de fotografía de eventos para organizaciones y grupos afiliados a MIT. Visita la página Contrátanos o envíanos un correo con el asunto \"Cotización de Fotografía de Evento\"."
       },
       "contact": {
         "title": "¿Todavía tienes preguntas?",
