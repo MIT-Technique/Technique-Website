@@ -1,6 +1,6 @@
 "use client";
 import Footer from "../../../components/Footer/Footer";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useTranslations } from 'next-intl';
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
@@ -47,6 +47,33 @@ export default function StudentWorkFeaturePage() {
       .then(data => setIsFrozen(data.isFrozen || false))
       .catch(() => {});
   }, []);
+
+  const [dataLoaded, setDataLoaded] = useState(false);
+
+  // Fetch user data when email is entered to auto-populate first member name
+  const fetchUserByEmail = useCallback(async (emailValue) => {
+    const trimmed = emailValue.trim().toLowerCase();
+    if (!trimmed) return;
+    const normalized = trimmed.includes('@') ? trimmed : `${trimmed}@mit.edu`;
+    if (!normalized.endsWith('@mit.edu')) return;
+
+    try {
+      const res = await fetch(`/api/user/lookup?email=${encodeURIComponent(normalized)}`);
+      if (!res.ok) return;
+      const json = await res.json();
+      if (json.data) {
+        const fullName = [json.data.firstName, json.data.lastName].filter(Boolean).join(' ');
+        if (fullName && !members[0]?.trim()) {
+          const updated = [...members];
+          updated[0] = fullName;
+          setMembers(updated);
+        }
+      }
+      setDataLoaded(true);
+    } catch {
+      // Ignore fetch errors
+    }
+  }, [members]);
 
   function normalizeEmail(value) {
     const trimmed = value.trim().toLowerCase();
@@ -232,7 +259,10 @@ export default function StudentWorkFeaturePage() {
                 setEmail(e.target.value);
                 if (emailError) validateEmail(e.target.value);
               }}
-              onBlur={(e) => validateEmail(e.target.value)}
+              onBlur={(e) => {
+                validateEmail(e.target.value);
+                if (!dataLoaded) fetchUserByEmail(e.target.value);
+              }}
               name="email"
               placeholder="kerb"
               error={!!emailError}
