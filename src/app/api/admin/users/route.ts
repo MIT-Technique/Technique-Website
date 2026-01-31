@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (search) {
-      query = query.or(`email.ilike.%${search}%,first_name.ilike.%${search}%,last_name.ilike.%${search}%`);
+      query = query.or(`email.ilike.%${search}%,name.ilike.%${search}%`);
     }
 
     const { data: users, error } = await query;
@@ -76,7 +76,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const validRoles: UserRole[] = ['admin', 'staph', 'club', 'living_group', 'student'];
+    const validRoles: UserRole[] = ['admin', 'staph', 'club', 'living_group'];
     if (role && !validRoles.includes(role)) {
       return NextResponse.json(
         { error: "Invalid role" },

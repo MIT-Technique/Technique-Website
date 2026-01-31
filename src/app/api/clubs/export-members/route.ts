@@ -42,8 +42,7 @@ export async function GET() {
       .from('club_memberships')
       .select(`
         user:users (
-          first_name,
-          last_name
+          name
         )
       `)
       .eq('club_id', club.id);
@@ -76,14 +75,9 @@ export async function GET() {
     // Add active member names
     if (activeMembers) {
       for (const member of activeMembers) {
-        const userData = (Array.isArray(member.user) ? member.user[0] : member.user) as { first_name: string | null; last_name: string | null } | null;
-        if (userData) {
-          const firstName = userData.first_name || '';
-          const lastName = userData.last_name || '';
-          const fullName = `${firstName} ${lastName}`.trim();
-          if (fullName) {
-            allNames.push(fullName);
-          }
+        const userData = (Array.isArray(member.user) ? member.user[0] : member.user) as { name: string | null } | null;
+        if (userData?.name) {
+          allNames.push(userData.name);
         }
       }
     }

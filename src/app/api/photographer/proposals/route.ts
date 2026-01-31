@@ -63,7 +63,7 @@ export async function GET() {
         status,
         created_at,
         living_group:living_groups(id, name),
-        proposer:users!time_proposals_proposed_by_fkey(id, email, first_name, last_name)
+        proposer:users!time_proposals_proposed_by_fkey(id, email, name)
       `
       )
       .eq("status", "pending")

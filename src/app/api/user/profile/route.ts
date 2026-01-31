@@ -39,8 +39,8 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
     const supabase = createAdminClient();
 
-    // Check if bio form is frozen (for students)
-    if (user.role === 'student') {
+    // Check if bio form is frozen (for staph)
+    if (user.role === 'staph') {
       const { data: formSettings } = await supabase
         .from('form_settings')
         .select('is_frozen')
@@ -57,8 +57,7 @@ export async function PUT(request: NextRequest) {
 
     // Validate and sanitize fields
     const allowedFields = [
-      'first_name',
-      'last_name',
+      'name',
       'major',
       'second_major',
       'quote',

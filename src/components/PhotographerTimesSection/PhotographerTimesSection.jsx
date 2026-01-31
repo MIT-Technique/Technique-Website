@@ -114,7 +114,7 @@ export default function PhotographerTimesSection() {
   function getCreatorLabel(time) {
     if (!time.creator) return t('unknownCreator');
     if (time.creator.role === 'admin') return 'TNQ Photo';
-    const name = `${time.creator.first_name || ''} ${time.creator.last_name || ''}`.trim();
+    const name = time.creator.name || '';
     return name || time.creator.email || t('unknownCreator');
   }
 

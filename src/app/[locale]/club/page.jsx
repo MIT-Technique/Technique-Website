@@ -35,7 +35,7 @@ export default function ClubPage() {
   const [membersLoading, setMembersLoading] = useState(true);
   const [membersMessage, setMembersMessage] = useState({ type: '', text: '' });
   const [inputMode, setInputMode] = useState('single'); // 'single' or 'bulk'
-  const [singleMember, setSingleMember] = useState({ firstName: '', lastName: '' });
+  const [singleMember, setSingleMember] = useState({ name: '' });
   const [bulkText, setBulkText] = useState('');
   const [parsePreview, setParsePreview] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
@@ -243,7 +243,7 @@ export default function ClubPage() {
 
   async function handleAddSingleMember(e) {
     e.preventDefault();
-    if (!singleMember.lastName.trim()) return;
+    if (!singleMember.name.trim()) return;
 
     setAddingMember(true);
     setMembersMessage({ type: '', text: '' });
@@ -253,13 +253,12 @@ export default function ClubPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          firstName: singleMember.firstName.trim(),
-          lastName: singleMember.lastName.trim(),
+          name: singleMember.name.trim(),
         }),
       });
 
       if (res.ok) {
-        setSingleMember({ firstName: '', lastName: '' });
+        setSingleMember({ name: '' });
         setMembersMessage({ type: 'success', text: t('members.addSuccess') });
         fetchMembers();
       } else {
@@ -329,11 +328,7 @@ export default function ClubPage() {
 
     // Find the member to get their name for the success message
     const memberToRemove = manualMembers.find(m => m.id === memberId);
-    const memberName = memberToRemove
-      ? (memberToRemove.first_name
-          ? `${memberToRemove.last_name}, ${memberToRemove.first_name}`
-          : memberToRemove.last_name)
-      : '';
+    const memberName = memberToRemove?.name || '';
 
     try {
       const res = await fetch(`/api/clubs/manual-members?id=${memberId}`, {
@@ -570,22 +565,15 @@ export default function ClubPage() {
                   <div className="flex gap-2 flex-wrap">
                     <input
                       type="text"
-                      value={singleMember.firstName}
-                      onChange={(e) => setSingleMember({ ...singleMember, firstName: e.target.value })}
-                      placeholder={t('members.firstNamePlaceholder')}
-                      className="flex-1 min-w-[150px] border border-border rounded px-4 py-2"
-                    />
-                    <input
-                      type="text"
-                      value={singleMember.lastName}
-                      onChange={(e) => setSingleMember({ ...singleMember, lastName: e.target.value })}
-                      placeholder={t('members.lastNamePlaceholder')}
+                      value={singleMember.name}
+                      onChange={(e) => setSingleMember({ ...singleMember, name: e.target.value })}
+                      placeholder={t('members.namePlaceholder')}
                       className="flex-1 min-w-[150px] border border-border rounded px-4 py-2"
                       required
                     />
                     <button
                       type="submit"
-                      disabled={addingMember || !singleMember.lastName.trim()}
+                      disabled={addingMember || !singleMember.name.trim()}
                       className="btn-primary whitespace-nowrap"
                     >
                       {addingMember ? t('members.adding') : t('members.add')}
@@ -644,7 +632,7 @@ export default function ClubPage() {
                           <div className="max-h-40 overflow-y-auto bg-white p-2 rounded border text-sm">
                             {parsePreview.success.map((name, i) => (
                               <div key={i} className="py-1">
-                                {name.lastName}, {name.firstName || '(no first name)'}
+                                {name.name}
                               </div>
                             ))}
                           </div>
@@ -691,7 +679,7 @@ export default function ClubPage() {
                         className="px-3 py-2 border border-border rounded-lg flex justify-between items-center"
                       >
                         <span>
-                          {member.last_name}, {member.first_name || '(no first name)'}
+                          {member.name}
                         </span>
                         <button
                           onClick={() => handleRemoveManualMember(member.id)}

@@ -107,14 +107,13 @@ export async function upsertMitSsoUser(email: string, firstName: string): Promis
     return data as User;
   }
 
-  // Create new user with default student role
+  // Create new user with default staph role
   const { data, error } = await supabase
     .from('users')
     .insert({
       email,
-      first_name: firstName,
-      role: 'student',
-      auth_provider: 'mit_sso',
+      name: firstName,
+      role: 'staph',
       is_active: true,
     })
     .select()

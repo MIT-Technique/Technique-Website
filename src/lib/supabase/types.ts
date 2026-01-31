@@ -1,5 +1,4 @@
-export type UserRole = 'admin' | 'staph' | 'club' | 'living_group' | 'student' | 'sports';
-export type AuthProvider = 'mit_sso' | 'supabase_auth';
+export type UserRole = 'admin' | 'staph' | 'club' | 'living_group' | 'sports';
 export type ApprovalStatus = 'pending' | 'approved' | 'denied';
 export type LivingGroupStatus = 'active' | 'disabled' | 'pending';
 export type PromotionRequestType = 'staph_request' | 'photographer_request';
@@ -11,14 +10,13 @@ export interface User {
   role: UserRole;
   is_staph: boolean;
   is_living_group_leader: boolean;
-  first_name: string | null;
-  last_name: string | null;
+  name: string | null;
+  access: string[];
   major: string | null;
   second_major: string | null;
   quote: string | null;
   achievements: string | null;
   school_year: number | null;
-  auth_provider: AuthProvider;
   supabase_auth_id: string | null;
   is_active: boolean;
   created_at: string;
@@ -179,7 +177,7 @@ export interface ClubManualMember {
 
 // Extended club membership types with relations
 export interface ClubMembershipWithUser extends ClubMembership {
-  user?: Pick<User, 'id' | 'email' | 'first_name' | 'last_name'>;
+  user?: Pick<User, 'id' | 'email' | 'name'>;
 }
 
 export interface ClubMembershipWithClub extends ClubMembership {
@@ -187,7 +185,7 @@ export interface ClubMembershipWithClub extends ClubMembership {
 }
 
 export interface ClubJoinRequestWithUser extends ClubJoinRequest {
-  user?: Pick<User, 'id' | 'email' | 'first_name' | 'last_name'>;
+  user?: Pick<User, 'id' | 'email' | 'name'>;
 }
 
 export interface ClubJoinRequestWithClub extends ClubJoinRequest {
@@ -195,9 +193,9 @@ export interface ClubJoinRequestWithClub extends ClubJoinRequest {
 }
 
 export interface ClubLeaderRequestWithDetails extends ClubLeaderRequest {
-  user?: Pick<User, 'id' | 'email' | 'first_name' | 'last_name'>;
+  user?: Pick<User, 'id' | 'email' | 'name'>;
   club?: Club;
-  requester?: Pick<User, 'id' | 'email' | 'first_name' | 'last_name'>;
+  requester?: Pick<User, 'id' | 'email' | 'name'>;
 }
 
 // Living group section and membership types
@@ -232,12 +230,12 @@ export interface SectionExpectedCount {
 
 // Extended living group types with relations
 export interface LivingGroupMembershipWithUser extends LivingGroupMembership {
-  user?: Pick<User, 'id' | 'email' | 'first_name' | 'last_name'>;
+  user?: Pick<User, 'id' | 'email' | 'name'>;
   section?: DormSection;
 }
 
 export interface LivingGroupMembershipWithDetails extends LivingGroupMembership {
-  user?: Pick<User, 'id' | 'email' | 'first_name' | 'last_name'>;
+  user?: Pick<User, 'id' | 'email' | 'name'>;
   section?: DormSection;
   living_group?: LivingGroup;
 }
@@ -266,8 +264,8 @@ export interface PhotographerPermission {
 }
 
 export interface PhotographerPermissionWithUser extends PhotographerPermission {
-  user?: Pick<User, 'id' | 'email' | 'first_name' | 'last_name'>;
-  approver?: Pick<User, 'id' | 'email' | 'first_name' | 'last_name'>;
+  user?: Pick<User, 'id' | 'email' | 'name'>;
+  approver?: Pick<User, 'id' | 'email' | 'name'>;
 }
 
 // Sports types
@@ -309,8 +307,6 @@ export interface SportsCoach {
 export interface SportsManualMember {
   id: string;
   sports_id: string;
-  first_name: string;
-  last_name: string;
   name: string;
   team: SportsTeam;
   added_at: string;
@@ -344,6 +340,6 @@ export interface TimeProposal {
 
 export interface TimeProposalWithDetails extends TimeProposal {
   living_group?: LivingGroup;
-  proposer?: Pick<User, 'id' | 'email' | 'first_name' | 'last_name'>;
-  accepter?: Pick<User, 'id' | 'email' | 'first_name' | 'last_name'>;
+  proposer?: Pick<User, 'id' | 'email' | 'name'>;
+  accepter?: Pick<User, 'id' | 'email' | 'name'>;
 }

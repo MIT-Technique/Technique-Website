@@ -128,8 +128,7 @@ export async function POST(request: NextRequest) {
         .insert({
           email: email.toLowerCase(),
           role: "club",
-          first_name: clubName.trim(),
-          auth_provider: "supabase_auth",
+          name: clubName.trim(),
           supabase_auth_id: authData.user.id,
           is_active: true,
         })
@@ -264,8 +263,7 @@ export async function POST(request: NextRequest) {
         .insert({
           email: systemEmail,
           role: "living_group",
-          first_name: livingGroupName,
-          auth_provider: "supabase_auth",
+          name: livingGroupName,
           supabase_auth_id: authData.user.id,
           is_active: true,
         })

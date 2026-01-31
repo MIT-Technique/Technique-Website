@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
         end_time,
         notes,
         created_by,
-        creator:users!photoshoot_times_created_by_fkey(id, email, first_name, last_name, role)
+        creator:users!photoshoot_times_created_by_fkey(id, email, name, role)
       `)
       .is('living_group_id', null)
       .is('cancelled_at', null)
@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
         .from('photoshoot_times')
         .select(`
           *,
-          creator:users!photoshoot_times_created_by_fkey(id, email, first_name, last_name, role)
+          creator:users!photoshoot_times_created_by_fkey(id, email, name, role)
         `)
         .eq('living_group_id', livingGroup.id)
         .is('cancelled_at', null)

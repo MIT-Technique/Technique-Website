@@ -24,8 +24,8 @@ export async function GET(request: NextRequest) {
       .from('promotion_requests')
       .select(`
         *,
-        user:users!promotion_requests_user_id_fkey(id, email, first_name, last_name, role),
-        reviewed_by_user:users!promotion_requests_reviewed_by_fkey(id, email, first_name, last_name)
+        user:users!promotion_requests_user_id_fkey(id, email, name, role),
+        reviewed_by_user:users!promotion_requests_reviewed_by_fkey(id, email, name)
       `)
       .order('created_at', { ascending: false });
 
