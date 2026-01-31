@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 
-const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_SIZE = 20 * 1024 * 1024; // 20MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
 export default function ImageUpload({ imageUrl, onUpload, onDelete, disabled, label, fileName }) {
@@ -22,7 +22,7 @@ export default function ImageUpload({ imageUrl, onUpload, onDelete, disabled, la
       return 'Invalid file type. Only JPEG, PNG, WebP, and GIF are allowed.';
     }
     if (file.size > MAX_SIZE) {
-      return 'File too large. Maximum size is 5MB.';
+      return 'File too large. Maximum size is 20MB.';
     }
     return null;
   }

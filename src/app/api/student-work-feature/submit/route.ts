@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "../../../../lib/supabase/admin";
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_SIZE = 20 * 1024 * 1024; // 20MB
 const MAX_FILES = 5;
 
 // GET - Fetch existing student work submission by email
@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
       }
       if (file.size > MAX_SIZE) {
         return NextResponse.json(
-          { error: `File too large: ${file.name}. Maximum size is 10MB` },
+          { error: `File too large: ${file.name}. Maximum size is 20MB` },
           { status: 400 }
         );
       }

@@ -56,10 +56,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
+    // Validate file size (max 20MB)
+    if (file.size > 20 * 1024 * 1024) {
       return NextResponse.json(
-        { error: "File too large. Maximum size is 5MB" },
+        { error: "File too large. Maximum size is 20MB" },
         { status: 400 }
       );
     }
@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
     // Ensure bucket exists
     const { data: buckets } = await supabase.storage.listBuckets();
     if (!buckets?.find((b: { name: string }) => b.name === bucketName)) {
-      await supabase.storage.createBucket(bucketName, { public: true, fileSizeLimit: 5 * 1024 * 1024 });
+      await supabase.storage.createBucket(bucketName, { public: true, fileSizeLimit: 20 * 1024 * 1024 });
     }
 
     const { error: uploadError } = await supabase.storage

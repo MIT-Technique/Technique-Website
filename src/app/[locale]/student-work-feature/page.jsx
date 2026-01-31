@@ -19,7 +19,7 @@ const textFieldSx = {
   "& .MuiInputLabel-root.Mui-focused": { color: "#750014" },
 };
 
-const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_SIZE = 20 * 1024 * 1024; // 20MB
 const MAX_FILES = 5;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
