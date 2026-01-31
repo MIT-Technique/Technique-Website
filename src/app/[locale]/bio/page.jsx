@@ -300,10 +300,16 @@ export default function BioPage() {
           </div>
 
           <Box
+            component="form"
+            className="card-elevated"
             sx={{
               display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
+              flexDirection: "column",
+              gap: 2,
+            }}
+            onSubmit={async (event) => {
+              event.preventDefault();
+              await updateBio();
             }}
           >
             {/* Email Field */}
@@ -485,14 +491,23 @@ export default function BioPage() {
               type="submit"
               variant="contained"
               sx={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 2,
+                mt: 2,
+                backgroundColor: "#750014",
+                "&:hover": {
+                  backgroundColor: "#5C0010",
+                },
+                "&:active": {
+                  backgroundColor: "#5C0010",
+                  transform: "translateY(1px)",
+                },
+                transition: "all 0.2s ease",
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+                fontWeight: 500,
+                py: 1.5,
+                boxShadow: "none",
               }}
-              onSubmit={async (event) => {
-                event.preventDefault();
-                await updateBio();
-              }}
+              fullWidth
             >
               {t('submitButton')}
             </Button>
