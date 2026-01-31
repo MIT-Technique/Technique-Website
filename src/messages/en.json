@@ -325,7 +325,8 @@
         "minor": "Minor",
         "secondMajor": "Second Major",
         "quote": "Quote",
-        "quotePlaceholder": "Enter a quote for your yearbook entry (optional)"
+        "quotePlaceholder": "Enter a quote for your yearbook entry (optional)",
+        "emailAutofillHint": "Enter first to autofill saved responses"
       },
       "emailRequired": "Email is required",
       "emailMitOnly": "Must be a valid @mit.edu email address",
@@ -340,6 +341,7 @@
       "description": "Submit candid photos for the yearbook. Resubmitting with the same email will replace your previous photos.",
       "emailLabel": "MIT Email",
       "emailHelper": "Resubmitting replaces previous photos",
+      "emailAutofillHint": "Enter first to autofill saved responses",
       "emailRequired": "Email is required",
       "emailMitOnly": "Must be a valid @mit.edu email address",
       "eventNameLabel": "Event or Activity Name",
@@ -621,6 +623,7 @@
       "metaDescription": "Submit your student work for a chance to be featured in the yearbook.",
       "emailLabel": "MIT Email",
       "emailHelper": "Submit or update your work",
+      "emailAutofillHint": "Enter first to autofill saved responses",
       "emailRequired": "Email is required",
       "emailMitOnly": "Must be a valid @mit.edu email",
       "membersLabel": "Members",

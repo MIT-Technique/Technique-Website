@@ -329,7 +329,7 @@ export default function BioPage() {
               name="email"
               placeholder="kerb"
               error={!!emailError}
-              helperText={emailError}
+              helperText={emailError || t('fields.emailAutofillHint')}
               sx={textFieldSx}
               fullWidth
               InputProps={{

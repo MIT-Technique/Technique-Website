@@ -5,6 +5,39 @@ const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 const MAX_SIZE = 10 * 1024 * 1024; // 10MB
 const MAX_FILES = 5;
 
+// GET - Fetch existing student work submission by email
+export async function GET(request: NextRequest): Promise<NextResponse> {
+  try {
+    const { searchParams } = new URL(request.url);
+    const email = searchParams.get('email')?.trim().toLowerCase();
+
+    if (!email || !email.endsWith('@mit.edu')) {
+      return NextResponse.json({ data: null }, { status: 200 });
+    }
+
+    const supabase = createAdminClient();
+    const { data } = await supabase
+      .from('student_work_submissions')
+      .select('members, additional_credits, project_title, project_description, links, image_urls')
+      .eq('email', email)
+      .single();
+
+    return NextResponse.json({
+      data: data ? {
+        members: data.members || [],
+        additionalCredits: data.additional_credits || '',
+        projectTitle: data.project_title || '',
+        projectDescription: data.project_description || '',
+        links: data.links || '',
+        imageUrls: data.image_urls || [],
+      } : null,
+    });
+  } catch (error) {
+    console.error("Student work fetch error:", error);
+    return NextResponse.json({ data: null }, { status: 200 });
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     // Check if form is frozen
@@ -28,6 +61,13 @@ export async function POST(request: NextRequest) {
     const projectTitle = formData.get('projectTitle') as string | null;
     const projectDescription = formData.get('projectDescription') as string | null;
     const links = formData.get('links') as string | null;
+    const keepImageUrlsJson = formData.get('keepImageUrls') as string | null;
+    let keepImageUrls: string[] = [];
+    try {
+      keepImageUrls = keepImageUrlsJson ? JSON.parse(keepImageUrlsJson) : [];
+    } catch {
+      keepImageUrls = [];
+    }
 
     // Validate required fields
     if (!email || typeof email !== 'string') {
@@ -86,10 +126,11 @@ export async function POST(request: NextRequest) {
       .eq('email', normalizedEmail)
       .single();
 
-    // Delete old images if re-submitting
+    // Delete old images if re-submitting, but keep ones the user wants to retain
     if (existing?.image_urls?.length) {
       const bucketName = 'student-work-images';
       for (const url of existing.image_urls) {
+        if (keepImageUrls.includes(url)) continue;
         const match = url.match(new RegExp(`/${bucketName}/(.+)$`));
         if (match) {
           await supabase.storage.from(bucketName).remove([decodeURIComponent(match[1])]);
@@ -98,7 +139,7 @@ export async function POST(request: NextRequest) {
     }
 
     const timestamp = Date.now();
-    const uploadedUrls: string[] = [];
+    const uploadedUrls: string[] = [...keepImageUrls];
     const bucketName = 'student-work-images';
 
     // Ensure bucket exists

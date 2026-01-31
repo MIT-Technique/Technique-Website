@@ -34,6 +34,7 @@ export default function StudentWorkFeaturePage() {
   const [links, setLinks] = useState("");
   const [files, setFiles] = useState([null, null, null, null, null]);
   const [previews, setPreviews] = useState([null, null, null, null, null]);
+  const [existingImageUrls, setExistingImageUrls] = useState([null, null, null, null, null]);
   const [submitting, setSubmitting] = useState(false);
   const [snackOpen, setSnackOpen] = useState(false);
   const [snackError, setSnackError] = useState(false);
@@ -50,7 +51,7 @@ export default function StudentWorkFeaturePage() {
 
   const [dataLoaded, setDataLoaded] = useState(false);
 
-  // Fetch user data when email is entered to auto-populate first member name
+  // Fetch saved submission and user data when email is entered
   const fetchUserByEmail = useCallback(async (emailValue) => {
     const trimmed = emailValue.trim().toLowerCase();
     if (!trimmed) return;
@@ -58,22 +59,51 @@ export default function StudentWorkFeaturePage() {
     if (!normalized.endsWith('@mit.edu')) return;
 
     try {
+      // First try to load existing submission
+      const subRes = await fetch(`/api/student-work-feature/submit?email=${encodeURIComponent(normalized)}`);
+      if (subRes.ok) {
+        const subJson = await subRes.json();
+        if (subJson.data) {
+          if (subJson.data.members?.length && !members[0]?.trim()) setMembers(subJson.data.members);
+          if (subJson.data.additionalCredits && !additionalCredits.trim()) setAdditionalCredits(subJson.data.additionalCredits);
+          if (subJson.data.projectTitle && !projectTitle.trim()) setProjectTitle(subJson.data.projectTitle);
+          if (subJson.data.projectDescription && !projectDescription.trim()) setProjectDescription(subJson.data.projectDescription);
+          if (subJson.data.links && !links.trim()) setLinks(subJson.data.links);
+          if (subJson.data.imageUrls?.length) {
+            const newPreviews = [null, null, null, null, null];
+            const newExisting = [null, null, null, null, null];
+            subJson.data.imageUrls.forEach((url, i) => {
+              if (i < 5) {
+                newPreviews[i] = url;
+                newExisting[i] = url;
+              }
+            });
+            setPreviews(newPreviews);
+            setExistingImageUrls(newExisting);
+          }
+          setDataLoaded(true);
+          return;
+        }
+      }
+
+      // Fallback: fetch user name for first member
       const res = await fetch(`/api/user/lookup?email=${encodeURIComponent(normalized)}`);
-      if (!res.ok) return;
-      const json = await res.json();
-      if (json.data) {
-        const fullName = [json.data.firstName, json.data.lastName].filter(Boolean).join(' ');
-        if (fullName && !members[0]?.trim()) {
-          const updated = [...members];
-          updated[0] = fullName;
-          setMembers(updated);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.data) {
+          const fullName = [json.data.firstName, json.data.lastName].filter(Boolean).join(' ');
+          if (fullName && !members[0]?.trim()) {
+            const updated = [...members];
+            updated[0] = fullName;
+            setMembers(updated);
+          }
         }
       }
       setDataLoaded(true);
     } catch {
       // Ignore fetch errors
     }
-  }, [members]);
+  }, [members, additionalCredits, projectTitle, projectDescription, links]);
 
   function normalizeEmail(value) {
     const trimmed = value.trim().toLowerCase();
@@ -133,9 +163,13 @@ export default function StudentWorkFeaturePage() {
     setFiles(newFiles);
 
     const newPreviews = [...previews];
-    if (newPreviews[index]) URL.revokeObjectURL(newPreviews[index]);
+    if (newPreviews[index] && newPreviews[index].startsWith('blob:')) URL.revokeObjectURL(newPreviews[index]);
     newPreviews[index] = URL.createObjectURL(file);
     setPreviews(newPreviews);
+
+    const newExisting = [...existingImageUrls];
+    newExisting[index] = null;
+    setExistingImageUrls(newExisting);
   }
 
   function removeFile(index) {
@@ -144,9 +178,13 @@ export default function StudentWorkFeaturePage() {
     setFiles(newFiles);
 
     const newPreviews = [...previews];
-    if (newPreviews[index]) URL.revokeObjectURL(newPreviews[index]);
+    if (newPreviews[index] && newPreviews[index].startsWith('blob:')) URL.revokeObjectURL(newPreviews[index]);
     newPreviews[index] = null;
     setPreviews(newPreviews);
+
+    const newExisting = [...existingImageUrls];
+    newExisting[index] = null;
+    setExistingImageUrls(newExisting);
 
     if (fileInputRefs[index].current) fileInputRefs[index].current.value = '';
   }
@@ -191,6 +229,12 @@ export default function StudentWorkFeaturePage() {
           formData.append(`file${fileIndex}`, file);
           fileIndex++;
         }
+      }
+
+      // Send existing image URLs to keep (not replaced or removed by user)
+      const keepUrls = existingImageUrls.filter(Boolean);
+      if (keepUrls.length > 0) {
+        formData.append('keepImageUrls', JSON.stringify(keepUrls));
       }
 
       const res = await fetch('/api/student-work-feature/submit', {
@@ -266,7 +310,7 @@ export default function StudentWorkFeaturePage() {
               name="email"
               placeholder="kerb"
               error={!!emailError}
-              helperText={emailError}
+              helperText={emailError || t('emailAutofillHint')}
               sx={textFieldSx}
               fullWidth
               InputProps={{

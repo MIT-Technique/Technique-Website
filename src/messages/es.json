@@ -309,7 +309,8 @@
         "minor": "Especialización Secundaria",
         "secondMajor": "Segunda Carrera",
         "quote": "Cita",
-        "quotePlaceholder": "Ingresa una cita para tu entrada del anuario (opcional)"
+        "quotePlaceholder": "Ingresa una cita para tu entrada del anuario (opcional)",
+        "emailAutofillHint": "Ingresa primero para autocompletar respuestas guardadas"
       },
       "emailRequired": "El correo es obligatorio",
       "emailMitOnly": "Debe ser un correo @mit.edu válido",
@@ -323,6 +324,7 @@
       "description": "Envía fotos espontáneas para el anuario. Reenviar con el mismo correo reemplazará tus fotos anteriores.",
       "emailLabel": "Correo MIT",
       "emailHelper": "Reenviar reemplaza fotos anteriores",
+      "emailAutofillHint": "Ingresa primero para autocompletar respuestas guardadas",
       "emailRequired": "El correo es obligatorio",
       "emailMitOnly": "Debe ser un correo @mit.edu válido",
       "eventNameLabel": "Nombre del Evento o Actividad",
@@ -596,6 +598,7 @@
       "metaDescription": "Envíe su trabajo estudiantil para aparecer en el anuario.",
       "emailLabel": "Correo MIT",
       "emailHelper": "Envíe o actualice su trabajo",
+      "emailAutofillHint": "Ingresa primero para autocompletar respuestas guardadas",
       "emailRequired": "El correo electrónico es obligatorio",
       "emailMitOnly": "Debe ser un correo @mit.edu válido",
       "membersLabel": "Miembros",

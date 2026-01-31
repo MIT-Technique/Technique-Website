@@ -1,6 +1,6 @@
 "use client";
 import Footer from "../../../components/Footer/Footer";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useTranslations } from 'next-intl';
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
@@ -31,6 +31,7 @@ export default function CandidsPage() {
   const [eventDescription, setEventDescription] = useState("");
   const [files, setFiles] = useState([null, null, null]);
   const [previews, setPreviews] = useState([null, null, null]);
+  const [existingImageUrls, setExistingImageUrls] = useState([null, null, null]);
   const [submitting, setSubmitting] = useState(false);
   const [snackOpen, setSnackOpen] = useState(false);
   const [snackError, setSnackError] = useState(false);
@@ -44,6 +45,41 @@ export default function CandidsPage() {
       .then(data => setIsFrozen(data.isFrozen || false))
       .catch(() => {});
   }, []);
+
+  const [dataLoaded, setDataLoaded] = useState(false);
+
+  // Fetch existing candid submission when email is entered
+  const fetchCandidsByEmail = useCallback(async (emailValue) => {
+    const trimmed = emailValue.trim().toLowerCase();
+    if (!trimmed) return;
+    const normalized = trimmed.includes('@') ? trimmed : `${trimmed}@mit.edu`;
+    if (!normalized.endsWith('@mit.edu')) return;
+
+    try {
+      const res = await fetch(`/api/candids/upload?email=${encodeURIComponent(normalized)}`);
+      if (!res.ok) return;
+      const json = await res.json();
+      if (json.data) {
+        if (json.data.eventName && !eventName.trim()) setEventName(json.data.eventName);
+        if (json.data.eventDescription && !eventDescription.trim()) setEventDescription(json.data.eventDescription);
+        if (json.data.imageUrls?.length) {
+          const newPreviews = [null, null, null];
+          const newExisting = [null, null, null];
+          json.data.imageUrls.forEach((url, i) => {
+            if (i < 3) {
+              newPreviews[i] = url;
+              newExisting[i] = url;
+            }
+          });
+          setPreviews(newPreviews);
+          setExistingImageUrls(newExisting);
+        }
+      }
+      setDataLoaded(true);
+    } catch {
+      // Ignore fetch errors
+    }
+  }, [eventName, eventDescription]);
 
   function normalizeEmail(value) {
     const trimmed = value.trim().toLowerCase();
@@ -98,9 +134,13 @@ export default function CandidsPage() {
     setFiles(newFiles);
 
     const newPreviews = [...previews];
-    if (newPreviews[index]) URL.revokeObjectURL(newPreviews[index]);
+    if (newPreviews[index] && newPreviews[index].startsWith('blob:')) URL.revokeObjectURL(newPreviews[index]);
     newPreviews[index] = URL.createObjectURL(file);
     setPreviews(newPreviews);
+
+    const newExisting = [...existingImageUrls];
+    newExisting[index] = null;
+    setExistingImageUrls(newExisting);
   }
 
   function removeFile(index) {
@@ -109,9 +149,14 @@ export default function CandidsPage() {
     setFiles(newFiles);
 
     const newPreviews = [...previews];
-    if (newPreviews[index]) URL.revokeObjectURL(newPreviews[index]);
+    // Only revoke if it's a blob URL (not a remote existing image URL)
+    if (newPreviews[index] && newPreviews[index].startsWith('blob:')) URL.revokeObjectURL(newPreviews[index]);
     newPreviews[index] = null;
     setPreviews(newPreviews);
+
+    const newExisting = [...existingImageUrls];
+    newExisting[index] = null;
+    setExistingImageUrls(newExisting);
 
     if (fileInputRefs[index].current) fileInputRefs[index].current.value = '';
   }
@@ -132,7 +177,8 @@ export default function CandidsPage() {
     if (!emailValid || !nameValid) return;
 
     const activeFiles = files.filter(Boolean);
-    if (activeFiles.length === 0) {
+    const hasExistingImages = existingImageUrls.some(Boolean);
+    if (activeFiles.length === 0 && !hasExistingImages) {
       setSnackMessage(t('noFiles'));
       setSnackError(true);
       setSnackOpen(true);
@@ -150,6 +196,12 @@ export default function CandidsPage() {
           formData.append(`file${fileIndex}`, file);
           fileIndex++;
         }
+      }
+
+      // Send existing image URLs to keep (not replaced or removed by user)
+      const keepUrls = existingImageUrls.filter(Boolean);
+      if (keepUrls.length > 0) {
+        formData.append('keepImageUrls', JSON.stringify(keepUrls));
       }
 
       formData.append('organizationName', eventName.trim()); // API expects this field name
@@ -223,11 +275,14 @@ export default function CandidsPage() {
                 setEmail(e.target.value);
                 if (emailError) validateEmail(e.target.value);
               }}
-              onBlur={(e) => validateEmail(e.target.value)}
+              onBlur={(e) => {
+                validateEmail(e.target.value);
+                if (!dataLoaded) fetchCandidsByEmail(e.target.value);
+              }}
               name="email"
               placeholder="kerb"
               error={!!emailError}
-              helperText={emailError}
+              helperText={emailError || t('emailAutofillHint')}
               sx={textFieldSx}
               fullWidth
               InputProps={{
@@ -322,7 +377,7 @@ export default function CandidsPage() {
             <Button
               type="submit"
               variant="contained"
-              disabled={submitting || !files.some(Boolean) || isFrozen}
+              disabled={submitting || (!files.some(Boolean) && !existingImageUrls.some(Boolean)) || isFrozen}
               sx={{
                 mt: 1,
                 backgroundColor: "#750014",

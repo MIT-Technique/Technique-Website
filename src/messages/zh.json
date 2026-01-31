@@ -309,7 +309,8 @@
         "minor": "辅修",
         "secondMajor": "第二专业",
         "quote": "引言",
-        "quotePlaceholder": "输入您年鉴条目的引言（可选）"
+        "quotePlaceholder": "输入您年鉴条目的引言（可选）",
+        "emailAutofillHint": "先输入邮箱以自动填充已保存的回复"
       },
       "emailRequired": "邮箱为必填项",
       "emailMitOnly": "必须是有效的@mit.edu邮箱地址",
@@ -323,6 +324,7 @@
       "description": "为年鉴提交随拍照片。使用相同邮箱重新提交将替换之前的照片。",
       "emailLabel": "MIT邮箱",
       "emailHelper": "重新提交将替换之前的照片",
+      "emailAutofillHint": "先输入邮箱以自动填充已保存的回复",
       "emailRequired": "邮箱为必填项",
       "emailMitOnly": "必须是有效的@mit.edu邮箱地址",
       "eventNameLabel": "活动名称",
@@ -596,6 +598,7 @@
       "metaDescription": "在年鉴中展示您的学术项目、研究或创意作品。",
       "emailLabel": "MIT邮箱",
       "emailHelper": "提交或更新您的作品",
+      "emailAutofillHint": "先输入邮箱以自动填充已保存的回复",
       "emailRequired": "邮箱为必填项",
       "emailMitOnly": "必须是有效的@mit.edu邮箱",
       "membersLabel": "成员",
