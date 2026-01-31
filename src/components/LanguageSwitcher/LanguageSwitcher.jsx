@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { locales, localeNames } from '../../i18n/config';
 import LanguageIcon from '@mui/icons-material/Language';
 
-export default function LanguageSwitcher() {
+export default function LanguageSwitcher({ isHomePage = false }) {
   const router = useRouter();
   const pathname = usePathname();
   const currentLocale = useLocale();
@@ -27,7 +27,9 @@ export default function LanguageSwitcher() {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 text-sm hover:text-accent transition-colors"
+        className={`flex items-center gap-2 px-3 py-2 text-sm transition-colors ${
+          isHomePage ? "text-white/70 hover:text-white" : "hover:text-accent"
+        }`}
         aria-label={t('selectLanguage')}
       >
         <LanguageIcon sx={{ fontSize: 18 }} />

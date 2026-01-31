@@ -33,6 +33,8 @@ const nextConfig = {
       {
         source: "/bio",
         destination: "/en/bio",
+        source: "/admin",
+        destination: "/en/login/admin",
         permanent: false,
       },
     ];

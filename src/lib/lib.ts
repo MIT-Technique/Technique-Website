@@ -13,7 +13,7 @@ export const clientConfig: Partial<openid.ClientMetadata> = {
   post_logout_redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL}`,
   response_type: "code",
   grant_type: "authorization_code",
-  post_login_route: `${process.env.NEXT_PUBLIC_APP_URL}/en/bio`,
+  post_login_route: `${process.env.NEXT_PUBLIC_APP_URL}/en/profile`,
   code_challenge_method: "S256",
   token_endpoint: process.env.NEXT_PUBLIC_API_URL + "/oidc/token",
   token_endpoint_auth_method: "client_secret_basic",
@@ -24,6 +24,7 @@ export interface SessionData {
   access_token?: string;
   code_verifier?: string;
   state?: string;
+  returnUrl?: string;
   userInfo?: {
     sub: string;
     name: string;
@@ -53,7 +54,7 @@ export const sessionOptions: SessionOptions = {
 };
 
 export async function getSession(): Promise<IronSession<SessionData>> {
-  const cookiesList = cookies();
+  const cookiesList = await cookies();
   // console.log(`COOKIE HEADERS1=${cookiesList}`);
   // console.log(`COOKIE HEADERS2=${JSON.stringify(cookiesList)}`);
   let session = await getIronSession<SessionData>(cookiesList, sessionOptions);

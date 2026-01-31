@@ -1,6 +1,6 @@
 "use client";
 import Footer from "../../../components/Footer/Footer";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import * as React from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
@@ -22,15 +22,29 @@ const textFieldSx = {
   "& .MuiInputLabel-root.Mui-focused": { color: "#750014" },
 };
 
+// Generate year options for old pictures (1861 to current year)
+const currentYear = new Date().getFullYear();
+const allYearOptions = [];
+for (let y = currentYear; y >= 1861; y--) {
+  allYearOptions.push(y);
+}
+
 export default function AlumniInquiryPage() {
   const t = useTranslations('pages.alumniInquiry');
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [graduationYear, setGraduationYear] = useState("");
   const [category, setCategory] = useState("");
+  const [selectedYear, setSelectedYear] = useState("");
+  const [shippingAddress, setShippingAddress] = useState("");
+  const [shippingCity, setShippingCity] = useState("");
+  const [shippingState, setShippingState] = useState("");
+  const [shippingZip, setShippingZip] = useState("");
   const [message, setMessage] = useState("");
   const [open, setOpen] = useState(false);
   const [error, setError] = useState(false);
+  const [availableYearbookYears, setAvailableYearbookYears] = useState([]);
+  const [loadingYears, setLoadingYears] = useState(false);
   const vertical = "top";
   const horizontal = "center";
 
@@ -40,25 +54,70 @@ export default function AlumniInquiryPage() {
     { value: "other", label: t('fields.categoryOptions.other') },
   ];
 
+  const showYearDropdown = category === "oldYearbooks" || category === "oldPictures";
+  const isYearbookCategory = category === "oldYearbooks";
+  const showShippingFields = isYearbookCategory && selectedYear;
+
+  // Fetch available yearbook years when yearbook category is selected
+  useEffect(() => {
+    if (isYearbookCategory && availableYearbookYears.length === 0) {
+      setLoadingYears(true);
+      fetch('/api/yearbook-inventory?available=true')
+        .then(res => res.json())
+        .then(data => {
+          setAvailableYearbookYears(data.years || []);
+        })
+        .catch(() => {
+          setAvailableYearbookYears([]);
+        })
+        .finally(() => {
+          setLoadingYears(false);
+        });
+    }
+  }, [isYearbookCategory, availableYearbookYears.length]);
+
   function handleClose() {
     setOpen(false);
     setError(false);
   }
 
+  function handleCategoryChange(value) {
+    setCategory(value);
+    setSelectedYear("");
+    setShippingAddress("");
+    setShippingCity("");
+    setShippingState("");
+    setShippingZip("");
+  }
+
   const sendInquiry = async () => {
+    // Build data object with conditional fields
+    const data = {
+      name,
+      email,
+      graduationYear,
+      category: categoryOptions.find(opt => opt.value === category)?.label || category,
+      message,
+    };
+
+    if (showYearDropdown && selectedYear) {
+      data.requestedYear = selectedYear;
+    }
+
+    if (showShippingFields && shippingAddress) {
+      data.shippingAddress = shippingAddress;
+      data.shippingCity = shippingCity;
+      data.shippingState = shippingState;
+      data.shippingZip = shippingZip;
+    }
+
     try {
       const response = await fetch("/api/sendContactForm", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           formType: "alumni",
-          data: {
-            name,
-            email,
-            graduationYear,
-            category: categoryOptions.find(opt => opt.value === category)?.label || category,
-            message,
-          },
+          data,
         }),
       });
 
@@ -68,10 +127,15 @@ export default function AlumniInquiryPage() {
       setEmail("");
       setGraduationYear("");
       setCategory("");
+      setSelectedYear("");
+      setShippingAddress("");
+      setShippingCity("");
+      setShippingState("");
+      setShippingZip("");
       setMessage("");
       setOpen(true);
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
       setError(true);
       setOpen(true);
     }
@@ -139,7 +203,7 @@ export default function AlumniInquiryPage() {
               select
               label={t('fields.category')}
               value={category}
-              onChange={(event) => setCategory(event.target.value)}
+              onChange={(event) => handleCategoryChange(event.target.value)}
               name="category"
               sx={textFieldSx}
               fullWidth
@@ -150,6 +214,99 @@ export default function AlumniInquiryPage() {
                 </MenuItem>
               ))}
             </TextField>
+
+            {/* Year dropdown - shown for oldYearbooks and oldPictures */}
+            {showYearDropdown && (
+              <TextField
+                required
+                select
+                label={t('fields.yearRequested')}
+                value={selectedYear}
+                onChange={(event) => setSelectedYear(event.target.value)}
+                name="selectedYear"
+                sx={textFieldSx}
+                fullWidth
+                disabled={isYearbookCategory && loadingYears}
+              >
+                <MenuItem value="" disabled>
+                  {isYearbookCategory && loadingYears ? t('fields.loadingYears') : t('fields.selectYear')}
+                </MenuItem>
+                {isYearbookCategory
+                  ? availableYearbookYears.map((year) => (
+                      <MenuItem key={year} value={year}>
+                        {year}
+                      </MenuItem>
+                    ))
+                  : allYearOptions.map((year) => (
+                      <MenuItem key={year} value={year}>
+                        {year}
+                      </MenuItem>
+                    ))
+                }
+              </TextField>
+            )}
+
+            {/* No yearbooks available message */}
+            {isYearbookCategory && !loadingYears && availableYearbookYears.length === 0 && (
+              <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                <p className="text-amber-700 font-medium text-sm">
+                  {t('fields.noYearbooksAvailable')}
+                </p>
+              </div>
+            )}
+
+            {/* Shipping address fields - shown when yearbook year is selected */}
+            {showShippingFields && (
+              <>
+                <p className="text-sm text-text-secondary -mb-1">
+                  {t('fields.shippingTitle')}
+                </p>
+                <TextField
+                  label={t('fields.shippingAddress')}
+                  variant="outlined"
+                  InputLabelProps={{ shrink: true }}
+                  value={shippingAddress}
+                  onChange={(event) => setShippingAddress(event.target.value)}
+                  name="shippingAddress"
+                  placeholder={t('fields.shippingAddressPlaceholder')}
+                  sx={textFieldSx}
+                  fullWidth
+                />
+                <div className="grid grid-cols-3 gap-2">
+                  <TextField
+                    label={t('fields.shippingCity')}
+                    variant="outlined"
+                    InputLabelProps={{ shrink: true }}
+                    value={shippingCity}
+                    onChange={(event) => setShippingCity(event.target.value)}
+                    name="shippingCity"
+                    sx={textFieldSx}
+                    fullWidth
+                  />
+                  <TextField
+                    label={t('fields.shippingState')}
+                    variant="outlined"
+                    InputLabelProps={{ shrink: true }}
+                    value={shippingState}
+                    onChange={(event) => setShippingState(event.target.value)}
+                    name="shippingState"
+                    sx={textFieldSx}
+                    fullWidth
+                  />
+                  <TextField
+                    label={t('fields.shippingZip')}
+                    variant="outlined"
+                    InputLabelProps={{ shrink: true }}
+                    value={shippingZip}
+                    onChange={(event) => setShippingZip(event.target.value)}
+                    name="shippingZip"
+                    sx={textFieldSx}
+                    fullWidth
+                  />
+                </div>
+              </>
+            )}
+
             <TextField
               required
               label={t('fields.message')}
@@ -166,6 +323,7 @@ export default function AlumniInquiryPage() {
             <Button
               type="submit"
               variant="contained"
+              disabled={isYearbookCategory && (loadingYears || availableYearbookYears.length === 0)}
               sx={{
                 mt: 2,
                 backgroundColor: "#750014",
@@ -175,6 +333,9 @@ export default function AlumniInquiryPage() {
                 "&:active": {
                   backgroundColor: "#5C0010",
                   transform: "translateY(1px)",
+                },
+                "&:disabled": {
+                  backgroundColor: "#ccc",
                 },
                 transition: "all 0.2s ease",
                 textTransform: "uppercase",

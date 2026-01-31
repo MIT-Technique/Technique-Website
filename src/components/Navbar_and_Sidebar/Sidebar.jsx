@@ -11,16 +11,36 @@ import Collapse from "@mui/material/Collapse";
 import { VscThreeBars, VscClose, VscChevronDown } from "react-icons/vsc";
 import { useTranslations, useLocale } from 'next-intl';
 import LanguageSwitcher from "../LanguageSwitcher/LanguageSwitcher";
-import { LineWeight } from "@mui/icons-material";
+import OrganizationAuthModal from "../OrganizationAuthModal/OrganizationAuthModal";
+import { useUser } from "../../hooks/useUser";
 
 function Sidebar({ pathname }) {
   const locale = useLocale();
   const t = useTranslations('nav');
   const tCommon = useTranslations('common');
+  const tAccount = useTranslations('account');
+  const { isLoggedIn, user, club, sports, livingGroup, loading, logout } = useUser();
   const [isOpen, setIsOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [purchaseOpen, setPurchaseOpen] = useState(false);
   const [formsOpen, setFormsOpen] = useState(false);
   const [getStartedOpen, setGetStartedOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [orgModalOpen, setOrgModalOpen] = useState(false);
+
+  // Get dashboard link based on role
+  const getDashboardLink = () => {
+    switch (user?.role) {
+      case 'admin':
+        return `/${locale}/dashboard`;
+      case 'club':
+        return `/${locale}/club`;
+      case 'living_group':
+        return `/${locale}/living-group`;
+      default:
+        return `/${locale}/bio`;
+    }
+  };
 
   const isHomePage = pathname === `/${locale}`;
   const textColor = isHomePage ? "#FFFFFF" : "#1A1A1A";
@@ -29,12 +49,16 @@ function Sidebar({ pathname }) {
   const borderColor = isHomePage ? "rgba(255,255,255,0.1)" : "#E5E5E5";
 
   const isActive = (href) => {
+    // Senior Bio link (/login) should only be active on exactly /login or /bio, not on /login/admin, /login/club, etc.
     if (href === `/${locale}/login`) return pathname === `/${locale}/login` || pathname === `/${locale}/bio`;
+    // For other paths, check exact match or subpath, but exclude login subpages from general matching
+    if (pathname.startsWith(`/${locale}/login/`)) return pathname === href;
     return pathname === href || pathname.startsWith(href + "/");
   };
 
   const isAboutActive = [`/${locale}/about`, `/${locale}/archives`, `/${locale}/portfolio`, `/${locale}/contact`].some(isActive);
-  const isFormsActive = [`/${locale}/login`, `/${locale}/invoice`, `/${locale}/parent-inquiry`, `/${locale}/alumni-inquiry`, `/${locale}/clubs`, `/${locale}/student-work-feature`].some(isActive);
+  const isPurchaseActive = [`/${locale}/purchase`, `/${locale}/seniors`, `/${locale}/parents`, `/${locale}/alumni`].some(isActive);
+  const isFormsActive = [`/${locale}/login`, `/${locale}/invoice`, `/${locale}/parent-inquiry`, `/${locale}/alumni-inquiry`, `/${locale}/candids`, `/${locale}/student-work-feature`].some(isActive);
   const isGetStartedActive = [`/${locale}/hire`, `/${locale}/join`].some(isActive);
 
   return (
@@ -142,6 +166,7 @@ function Sidebar({ pathname }) {
                   <ListItem key={item.href} disablePadding>
                     <Link
                       href={item.href}
+                      {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                       onClick={() => setIsOpen(false)}
                       className="w-full"
                     >
@@ -164,97 +189,66 @@ function Sidebar({ pathname }) {
               </List>
             </Collapse>
 
-            {/* Yearbook */}
+            {/* Yearbook Dropdown */}
             <ListItem disablePadding>
-              <Link
-                href={`/${locale}/yearbook`}
-                onClick={() => setIsOpen(false)}
-                className="w-full"
+              <ListItemButton
+                onClick={() => setPurchaseOpen(!purchaseOpen)}
+                sx={{ px: 3, py: 1.5 }}
               >
-                <ListItemButton sx={{ px: 3, py: 1.5 }}>
-                  <ListItemText
-                    primary={t('yearbook')}
-                    primaryTypographyProps={{
-                      sx: {
-                        fontSize: "0.75rem",
-                        fontWeight: 500,
-                        letterSpacing: "0.1em",
-                        color: isActive(`/${locale}/yearbook`) ? "#750014" : textColor,
-                      },
-                    }}
-                  />
-                </ListItemButton>
-              </Link>
+                <ListItemText
+                  primary={t('yearbook')}
+                  primaryTypographyProps={{
+                    sx: {
+                      fontSize: "0.75rem",
+                      fontWeight: 500,
+                      letterSpacing: "0.1em",
+                      color: isPurchaseActive ? "#750014" : textColor,
+                    },
+                  }}
+                />
+                <VscChevronDown
+                  size={16}
+                  style={{
+                    color: isPurchaseActive ? "#750014" : textColor,
+                    transform: purchaseOpen ? "rotate(180deg)" : "rotate(0deg)",
+                    transition: "transform 0.2s",
+                  }}
+                />
+              </ListItemButton>
             </ListItem>
-
-            {/* Seniors */}
-            <ListItem disablePadding>
-              <Link
-                href={`/${locale}/seniors`}
-                onClick={() => setIsOpen(false)}
-                className="w-full"
-              >
-                <ListItemButton sx={{ px: 3, py: 1.5 }}>
-                  <ListItemText
-                    primary={t('seniors')}
-                    primaryTypographyProps={{
-                      sx: {
-                        fontSize: "0.75rem",
-                        fontWeight: 500,
-                        letterSpacing: "0.1em",
-                        color: isActive(`/${locale}/seniors`) ? "#750014" : textColor,
-                      },
-                    }}
-                  />
-                </ListItemButton>
-              </Link>
-            </ListItem>
-
-            {/* Parents */}
-            <ListItem disablePadding>
-              <Link
-                href={`/${locale}/parents`}
-                onClick={() => setIsOpen(false)}
-                className="w-full"
-              >
-                <ListItemButton sx={{ px: 3, py: 1.5 }}>
-                  <ListItemText
-                    primary={t('parents')}
-                    primaryTypographyProps={{
-                      sx: {
-                        fontSize: "0.75rem",
-                        fontWeight: 500,
-                        letterSpacing: "0.1em",
-                        color: isActive(`/${locale}/parents`) ? "#750014" : textColor,
-                      },
-                    }}
-                  />
-                </ListItemButton>
-              </Link>
-            </ListItem>
-
-            {/* Alumni */}
-            <ListItem disablePadding>
-              <Link
-                href={`/${locale}/alumni`}
-                onClick={() => setIsOpen(false)}
-                className="w-full"
-              >
-                <ListItemButton sx={{ px: 3, py: 1.5 }}>
-                  <ListItemText
-                    primary={t('alumni')}
-                    primaryTypographyProps={{
-                      sx: {
-                        fontSize: "0.75rem",
-                        fontWeight: 500,
-                        letterSpacing: "0.1em",
-                        color: isActive(`/${locale}/alumni`) ? "#750014" : textColor,
-                      },
-                    }}
-                  />
-                </ListItemButton>
-              </Link>
-            </ListItem>
+            <Collapse in={purchaseOpen} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                {[
+                  { href: `/${locale}/purchase`, label: t('purchase'), external: true },
+                  { href: `/${locale}/seniors`, label: t('seniors') },
+                  { href: `/${locale}/parents`, label: t('parents') },
+                  { href: `/${locale}/alumni`, label: t('alumni') },
+                ].map((item) => (
+                  <ListItem key={item.href} disablePadding>
+                    <Link
+                      href={item.href}
+                      {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                      onClick={() => setIsOpen(false)}
+                      className="w-full"
+                    >
+                      <ListItemButton sx={{ pl: 6, py: 1 }}>
+                        <ListItemText
+                          primary={item.label}
+                          primaryTypographyProps={{
+                            sx: {
+                              fontSize: "0.7rem",
+                              fontWeight: 400,
+                              letterSpacing: "0.05em",
+                              color: isActive(item.href) ? "#750014" : mutedColor,
+                            },
+                          }}
+                        />
+                      </ListItemButton>
+                    </Link>
+                  </ListItem>
+                ))}
+              </List>
+            </Collapse>
 
             {/* Forms Dropdown */}
             <ListItem disablePadding>
@@ -295,7 +289,7 @@ function Sidebar({ pathname }) {
                           fontSize: "0.6rem",
                           fontWeight: 600,
                           letterSpacing: "0.1em",
-                          color: isHomePage ? "rgba(255,255,255,0.4)" : "#999",
+                          color: isHomePage ? "rgba(255,255,255,0.6)" : "#999",
                           textTransform: "uppercase",
                         },
                       }}
@@ -303,13 +297,14 @@ function Sidebar({ pathname }) {
                   </ListItemButton>
                 </ListItem>
                 {[
-                  { href: `/${locale}/login`, label: t('dropdown.seniorBio') },
-                  { href: `/${locale}/clubs`, label: t('dropdown.clubs') },
+                  { href: `/${locale}/bio`, label: t('dropdown.seniorBio') },
+                  { href: `/${locale}/candids`, label: t('dropdown.candids') },
                   { href: `/${locale}/student-work-feature`, label: t('dropdown.studentWork') },
                 ].map((item) => (
                   <ListItem key={item.href} disablePadding>
                     <Link
                       href={item.href}
+                      {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                       onClick={() => setIsOpen(false)}
                       className="w-full"
                     >
@@ -340,7 +335,7 @@ function Sidebar({ pathname }) {
                           fontSize: "0.6rem",
                           fontWeight: 600,
                           letterSpacing: "0.1em",
-                          color: isHomePage ? "rgba(255,255,255,0.4)" : "#999",
+                          color: isHomePage ? "rgba(255,255,255,0.6)" : "#999",
                           textTransform: "uppercase",
                         },
                       }}
@@ -355,6 +350,7 @@ function Sidebar({ pathname }) {
                   <ListItem key={item.href} disablePadding>
                     <Link
                       href={item.href}
+                      {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                       onClick={() => setIsOpen(false)}
                       className="w-full"
                     >
@@ -376,6 +372,29 @@ function Sidebar({ pathname }) {
                 ))}
               </List>
             </Collapse>
+
+            {/* Resources */}
+            <ListItem disablePadding>
+              <Link
+                href={`/${locale}/resources`}
+                onClick={() => setIsOpen(false)}
+                className="w-full"
+              >
+                <ListItemButton sx={{ px: 3, py: 1.5 }}>
+                  <ListItemText
+                    primary={t('resources')}
+                    primaryTypographyProps={{
+                      sx: {
+                        fontSize: "0.75rem",
+                        fontWeight: 500,
+                        letterSpacing: "0.1em",
+                        color: isActive(`/${locale}/resources`) ? "#750014" : textColor,
+                      },
+                    }}
+                  />
+                </ListItemButton>
+              </Link>
+            </ListItem>
 
             {/* Get Started Dropdown */}
             <ListItem disablePadding>
@@ -413,6 +432,7 @@ function Sidebar({ pathname }) {
                   <ListItem key={item.href} disablePadding>
                     <Link
                       href={item.href}
+                      {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                       onClick={() => setIsOpen(false)}
                       className="w-full"
                     >
@@ -437,40 +457,133 @@ function Sidebar({ pathname }) {
 
             {/* Language Switcher */}
             <ListItem disablePadding sx={{ mt: 2, px: 3 }}>
-              <LanguageSwitcher />
+              <LanguageSwitcher isHomePage={isHomePage} />
             </ListItem>
-            <Collapse in={getStartedOpen} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-                {[
-                  { href: `/${locale}/join`, label: t('dropdown.joinUs') },
-                ].map((item) => (
-                  <ListItem key={item.href} disablePadding>
-                    <Link
-                      href={item.href}
-                      onClick={() => setIsOpen(false)}
-                      className="w-full"
+
+            {/* Account Section */}
+            {!loading && (
+              isLoggedIn ? (
+                <>
+                  <ListItem disablePadding sx={{ mt: 1 }}>
+                    <ListItemButton
+                      onClick={() => setAccountOpen(!accountOpen)}
+                      sx={{ px: 3, py: 1.5 }}
                     >
-                      <ListItemButton sx={{ pl: 6, py: 1 }}>
-                        <ListItemText
-                          primary={item.label}
-                          primaryTypographyProps={{
-                            sx: {
-                              fontSize: "0.7rem",
-                              fontWeight: 400,
-                              letterSpacing: "0.05em",
-                              color: isActive(item.href) ? "#750014" : mutedColor,
-                            },
+                      <ListItemText
+                        primary={sports?.name || club?.name || livingGroup?.name || user?.name || user?.email?.split('@')[0] || tAccount('login')}
+                        primaryTypographyProps={{
+                          sx: {
+                            fontSize: "0.75rem",
+                            fontWeight: 500,
+                            letterSpacing: "0.1em",
+                            color: textColor,
+                          },
+                        }}
+                      />
+                      <VscChevronDown
+                        size={16}
+                        style={{
+                          color: textColor,
+                          transform: accountOpen ? "rotate(180deg)" : "rotate(0deg)",
+                          transition: "transform 0.2s",
+                        }}
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                  <Collapse in={accountOpen} timeout="auto" unmountOnExit>
+                    <List component="div" disablePadding>
+                      <ListItem disablePadding>
+                        <Link
+                          href={getDashboardLink()}
+                          onClick={() => setIsOpen(false)}
+                          className="w-full"
+                        >
+                          <ListItemButton sx={{ pl: 6, py: 1 }}>
+                            <ListItemText
+                              primary={tAccount('dashboard')}
+                              primaryTypographyProps={{
+                                sx: {
+                                  fontSize: "0.7rem",
+                                  fontWeight: 400,
+                                  letterSpacing: "0.05em",
+                                  color: mutedColor,
+                                },
+                              }}
+                            />
+                          </ListItemButton>
+                        </Link>
+                      </ListItem>
+                      <ListItem disablePadding>
+                        <ListItemButton
+                          onClick={() => {
+                            setIsOpen(false);
+                            logout();
                           }}
-                        />
-                      </ListItemButton>
+                          sx={{ pl: 6, py: 1 }}
+                        >
+                          <ListItemText
+                            primary={tAccount('signOut')}
+                            primaryTypographyProps={{
+                              sx: {
+                                fontSize: "0.7rem",
+                                fontWeight: 400,
+                                letterSpacing: "0.05em",
+                                color: mutedColor,
+                              },
+                            }}
+                          />
+                        </ListItemButton>
+                      </ListItem>
+                    </List>
+                  </Collapse>
+                </>
+              ) : (
+                <>
+                  <ListItem disablePadding sx={{ mt: 1 }}>
+                    <ListItemButton
+                      onClick={() => {
+                        setIsOpen(false);
+                        setOrgModalOpen(true);
+                      }}
+                      sx={{ px: 3, py: 1.5 }}
+                    >
+                      <ListItemText
+                        primary={tAccount('organizationLogin')}
+                        primaryTypographyProps={{
+                          sx: {
+                            fontSize: "0.75rem",
+                            fontWeight: 500,
+                            letterSpacing: "0.1em",
+                            color: textColor,
+                          },
+                        }}
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                  <ListItem disablePadding sx={{ px: 3, pt: 0.5 }}>
+                    <Link
+                      href={`/${locale}/login/admin`}
+                      onClick={() => setIsOpen(false)}
+                      style={{
+                        fontSize: "0.65rem",
+                        color: mutedColor,
+                        textDecoration: "none",
+                      }}
+                    >
+                      {tAccount('staph')}
                     </Link>
                   </ListItem>
-                ))}
-              </List>
-            </Collapse>
+                </>
+              )
+            )}
           </List>
         </Box>
       </Drawer>
+
+      <OrganizationAuthModal
+        open={orgModalOpen}
+        onClose={() => setOrgModalOpen(false)}
+      />
     </div>
   );
 }

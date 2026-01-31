@@ -1,24 +1,15 @@
 "use client";
 import Footer from "../../../components/Footer/Footer";
-import { useState } from "react";
+import OrganizationAuthModal from "../../../components/OrganizationAuthModal/OrganizationAuthModal";
 import * as React from "react";
+import { useState } from "react";
 import Box from "@mui/material/Box";
 import { Button } from "@mui/material";
-import Snackbar from "@mui/material/Snackbar";
-import CloseIcon from "@mui/icons-material/Close";
-import IconButton from "@mui/material/IconButton";
-import Alert from "@mui/material/Alert";
 import { useTranslations } from 'next-intl';
 
 export default function LoginPage() {
   const t = useTranslations('pages.login');
-  const [open, setOpen] = useState(false);
-  const vertical = "top";
-  const horizontal = "center";
-
-  function handleClose() {
-    setOpen(false);
-  }
+  const [orgModalOpen, setOrgModalOpen] = useState(false);
 
   return (
     <>
@@ -31,6 +22,7 @@ export default function LoginPage() {
             </p>
           </div>
 
+          {/* MIT SSO Login Section */}
           <Box
             component="form"
             className="card-elevated"
@@ -70,34 +62,25 @@ export default function LoginPage() {
               {t('signInButton')}
             </Button>
           </Box>
+
+          {/* Organization Login Link */}
+          <div className="text-center mt-6">
+            <span className="text-sm text-text-muted">{t('organizationPrefix')} </span>
+            <button
+              onClick={() => setOrgModalOpen(true)}
+              className="text-sm text-accent hover:underline"
+            >
+              {t('organizationLink')}
+            </button>
+          </div>
+
+          {/* Organization Auth Modal */}
+          <OrganizationAuthModal
+            open={orgModalOpen}
+            onClose={() => setOrgModalOpen(false)}
+          />
         </section>
       </main>
-
-      <Snackbar
-        anchorOrigin={{ vertical, horizontal }}
-        open={open}
-        onClose={handleClose}
-        autoHideDuration={4000}
-        action={
-          <IconButton
-            aria-label="close"
-            color="inherit"
-            sx={{ p: 0.5 }}
-            onClick={handleClose}
-          >
-            <CloseIcon />
-          </IconButton>
-        }
-      >
-        <Alert
-          onClose={handleClose}
-          severity="success"
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {t('success')}
-        </Alert>
-      </Snackbar>
       <Footer />
     </>
   );

@@ -5,15 +5,16 @@
     "siteName": "TECHNIQUE",
     "tagline": "Memorizando MIT desde 1885"
   },
-
   "nav": {
     "about": "ACERCA DE",
     "archive": "ARCHIVO",
+    "purchase": "COMPRAR",
     "yearbook": "ANUARIO",
     "parents": "PADRES",
     "alumni": "EXALUMNOS",
     "forms": "FORMULARIOS",
     "seniors": "SENIORS",
+    "resources": "FAQ",
     "getStarted": "COMENZAR",
     "dropdown": {
       "ourHistory": "NUESTRA HISTORIA",
@@ -27,27 +28,35 @@
       "parent": "PADRE",
       "alumni": "EXALUMNO",
       "clubs": "CLUBES",
+      "candids": "FOTOS",
       "studentWork": "TRABAJO ESTUDIANTIL",
       "hireUs": "CONTRÁTANOS",
-      "joinUs": "ÚNETE"
+      "joinUs": "ÚNETE",
+      "faq": "PREGUNTAS FRECUENTES"
     }
   },
-
   "footer": {
     "copyright": "© 2026 Technique. Todos los derechos reservados.",
     "privacyPolicy": "Política de Privacidad",
     "emailLabel": "Envíanos un correo",
     "instagramLabel": "Síguenos en Instagram"
   },
-
   "languageSwitcher": {
     "selectLanguage": "Seleccionar idioma"
   },
-
+  "account": {
+    "login": "INICIAR SESIÓN",
+    "staph": "STAPH",
+    "organization": "ORGANIZACIÓN",
+    "organizationLogin": "Inicio de Sesión de Organización",
+    "dashboard": "PANEL",
+    "profile": "PERFIL",
+    "signOut": "CERRAR SESIÓN",
+    "admin": "ADMINISTRADOR"
+  },
   "carousel": {
     "photoCredit": "Créditos de la foto: {photographer}"
   },
-
   "pages": {
     "home": {
       "subtitle": "Fotografía y Anuario de MIT",
@@ -55,7 +64,6 @@
       "tagline": "Memorizando MIT desde 1885",
       "photoCredit": "Foto: {photographer}"
     },
-
     "about": {
       "title": "Acerca de Nosotros",
       "metaTitle": "Acerca de Nosotros - MIT Technique",
@@ -80,7 +88,6 @@
         "paragraph2": "No se necesita experiencia para unirse a Technique. Nuestro staph dedicado está comprometido a ayudar a todos los que estén dispuestos a aprender, especialmente cuando se trata de fotografía o diseño."
       }
     },
-
     "yearbook": {
       "title": "Anuario",
       "metaTitle": "Anuario - MIT Technique",
@@ -106,7 +113,6 @@
         "studentWorkButton": "Trabajo Estudiantil"
       }
     },
-
     "contact": {
       "title": "Ponte en Contacto",
       "metaTitle": "Contacto - MIT Technique",
@@ -127,7 +133,6 @@
         "address3": "Cambridge, MA 02139"
       }
     },
-
     "hire": {
       "title": "Contrátanos",
       "metaTitle": "Contrátanos - Fotografía MIT Technique",
@@ -138,7 +143,6 @@
       "ctaHint": "Envíanos un correo con el asunto \"Cotización de Fotografía de Eventos\"",
       "imageAlt": "Fotografía de eventos por {photographer}"
     },
-
     "invoice": {
       "title": "Formulario de Factura",
       "metaTitle": "Factura - MIT Technique",
@@ -157,17 +161,109 @@
       "success": "Tu factura fue enviada exitosamente",
       "error": "Hubo un error al enviar tu factura"
     },
-
     "login": {
-      "title": "Bio de Senior",
+      "title": "Iniciar Sesión",
       "metaTitle": "Iniciar Sesión - MIT Technique",
-      "metaDescription": "Inicia sesión para actualizar tu información de bio de senior.",
-      "description": "Inicia sesión para actualizar tu información de bio de senior.",
-      "instructionText": "Haz clic abajo para iniciar sesión con tus credenciales de MIT.",
-      "signInButton": "Iniciar Sesión",
-      "success": "Sesión iniciada exitosamente"
+      "metaDescription": "Inicia sesión para acceder a tu cuenta.",
+      "description": "Inicia sesión para acceder a tu cuenta y gestionar tu información.",
+      "instructionText": "Inicio de sesión de estudiantes con credenciales de MIT.",
+      "signInButton": "Iniciar Sesión con MIT",
+      "dividerText": "o",
+      "success": "Sesión iniciada exitosamente",
+      "organizationButton": "Acceso de Organización",
+      "organizationPrefix": "¿Representas a un club o grupo de vivienda?",
+      "organizationLink": "Acceso de Organización",
+      "org": {
+        "title": "Acceso de Organización",
+        "signIn": "Iniciar Sesión",
+        "signInTitle": "Inicio de Sesión de Organización",
+        "selectOrganization": "Organización",
+        "searchOrganization": "Buscar tu organización...",
+        "organizationRequired": "Por favor selecciona una organización",
+        "noOrganizationsFound": "No se encontraron organizaciones",
+        "organizationNotFound": "Organización no encontrada",
+        "clubsGroup": "Clubes",
+        "livingGroupsGroup": "Grupos de Vivienda",
+        "sportsGroup": "Deportes",
+        "email": "Email",
+        "emailOptional": "Email (Opcional)",
+        "emailPlaceholder": "tu-org@mit.edu",
+        "emailOptionalHint": "Solo para contacto",
+        "password": "Contraseña",
+        "club": "Club",
+        "livingGroup": "Grupo de Vivienda",
+        "signInButton": "Iniciar Sesión",
+        "signingIn": "Iniciando sesión...",
+        "emailInvalid": "El email debe ser una dirección @mit.edu",
+        "passwordRequired": "La contraseña es requerida",
+        "invalidCredentials": "Credenciales inválidas",
+        "emailNotVerified": "Por favor verifica tu email antes de iniciar sesión",
+        "signInSuccess": "¡Sesión iniciada exitosamente!",
+        "successRedirecting": "¡Éxito! Redirigiendo…",
+        "forgotPassword": "¿Olvidaste tu contraseña?",
+        "unexpectedIssues": "¿Problemas inesperados?",
+        "forgotPasswordTitle": "Restablecer Contraseña",
+        "forgotPasswordDescription": "Selecciona tu organización para recibir un enlace de restablecimiento.",
+        "sendResetLink": "Enviar Enlace",
+        "sendingResetLink": "Enviando...",
+        "resetLinkSent": "Si existe una cuenta, se ha enviado un enlace de restablecimiento.",
+        "backToSignIn": "Volver a Iniciar Sesión",
+        "forgotPasswordLivingGroupInfo": "Se enviará un enlace de restablecimiento al correo de su Líder del Grupo de Vivienda.",
+        "noLeaderError": "No hay líder asignado a este Grupo de Vivienda. Por favor contacte a tnq-exec@mit.edu para asistencia.",
+        "resetSentToLeader": "La información de restablecimiento ha sido enviada. Consulte con su Líder del Grupo de Vivienda.",
+        "livingGroupNotFound": "Grupo de vivienda no encontrado"
+      },
+      "admin": {
+        "title": "Acceso Staph",
+        "description": "Para staph y administradores de Technique.",
+        "emailLabel": "Correo Electrónico",
+        "emailPlaceholder": "Dejar en blanco para acceso de administrador",
+        "passwordLabel": "Contraseña",
+        "passwordPlaceholder": "Ingrese contraseña",
+        "passwordRequired": "La contraseña es obligatoria",
+        "signInButton": "Iniciar Sesión",
+        "signingIn": "Iniciando sesión...",
+        "success": "¡Acceso exitoso! Redirigiendo...",
+        "error": "Credenciales inválidas. Por favor intenta de nuevo."
+      },
+      "sso": {
+        "title": "Acceso para Estudiantes y Organizaciones"
+      },
+      "club": {
+        "title": "Acceso de Club",
+        "description": "Inicia sesión con el email registrado de tu club para gestionar el perfil.",
+        "emailLabel": "Email del Club",
+        "emailPlaceholder": "tu-club@mit.edu",
+        "sendLinkButton": "Enviar Enlace de Acceso",
+        "sending": "Enviando...",
+        "success": "¡Enlace de acceso enviado! Revisa tu correo.",
+        "error": "Error al enviar el enlace. Por favor intenta de nuevo.",
+        "signIn": "Iniciar Sesión",
+        "signUp": "Registrarse",
+        "signUpTitle": "Registro de Club",
+        "signUpDescription": "Registra tu club para gestionar tu perfil del anuario.",
+        "clubNameLabel": "Nombre del Club",
+        "clubNamePlaceholder": "ej., MIT Robotics Club",
+        "signUpButton": "Registrar Club",
+        "signUpSuccess": "¡Enlace de registro enviado! Revisa tu correo.",
+        "signUpError": "Error al registrar. Por favor intenta de nuevo.",
+        "noAccount": "¿No tienes una cuenta?",
+        "haveAccount": "¿Ya tienes una cuenta?",
+        "personalEmailWarning": "Este parece ser un email personal de MIT. Por favor usa el email oficial de tu club si está disponible."
+      },
+      "adminLinkPrefix": "¿Personal de Technique?",
+      "adminLink": "Acceso de Administrador",
+      "clubLinkPrefix": "¿Representas a un club?",
+      "clubLink": "Acceso de Club",
+      "backToLogin": "← Volver al inicio de sesión de estudiante"
     },
-
+    "logout": {
+      "title": "Se Requiere Acceso de Estudiante",
+      "message": "Por favor inicia sesión como estudiante para acceder al formulario de biografía de senior.",
+      "signOut": "Cerrar Sesión",
+      "signingOut": "Cerrando sesión...",
+      "studentNote": "Por favor usa tu cuenta de estudiante de MIT para iniciar sesión y continuar."
+    },
     "portfolio": {
       "title": "Portafolio",
       "metaTitle": "Portafolio - Fotografía MIT Technique",
@@ -175,7 +271,6 @@
       "description": "Una selección de trabajos de nuestros fotógrafos.",
       "imageAlt": "Fotografía por {photographer}"
     },
-
     "seniors": {
       "title": "Seniors",
       "metaTitle": "Retratos de Seniors - MIT Technique",
@@ -200,31 +295,160 @@
         "content": "Para todas las preguntas sobre la programación de sesiones de retratos de seniors, cambios tardíos en la información biográfica o cualquier otro problema, comunícate con {email}. Technique tiene una fecha límite de publicación para los retratos de seniors, por lo que lamentablemente no podemos acomodar a ningún estudiante que pierda todas las sesiones programadas de retratos de seniors. Ten la seguridad de que tu nombre aparecerá en el anuario en una sección que no presenta retratos de seniors."
       }
     },
-
     "bio": {
       "title": "Bio de Senior",
       "metaTitle": "Bio de Senior - MIT Technique",
       "metaDescription": "Actualiza tu información para el anuario MIT Technique.",
       "description": "Actualiza tu información para el anuario.",
       "fields": {
+        "email": "Correo MIT",
+        "emailHelper": "Para guardar y actualizar",
+        "firstName": "Nombre",
+        "lastName": "Apellido",
+        "major": "Carrera",
+        "minor": "Especialización Secundaria",
+        "secondMajor": "Segunda Carrera",
+        "quote": "Cita",
+        "quotePlaceholder": "Ingresa una cita para tu entrada del anuario (opcional)"
+      },
+      "emailRequired": "El correo es obligatorio",
+      "emailMitOnly": "Debe ser un correo @mit.edu válido",
+      "submitButton": "Enviar Bio",
+      "success": "Tu bio fue guardada exitosamente",
+      "error": "Hubo un error al guardar tu bio",
+      "contactText": "¿Preguntas o sugerencias?"
+    },
+    "candids": {
+      "title": "Fotos de la Comunidad",
+      "description": "Envía fotos espontáneas para el anuario. Reenviar con el mismo correo reemplazará tus fotos anteriores.",
+      "emailLabel": "Correo MIT",
+      "emailHelper": "Reenviar reemplaza fotos anteriores",
+      "emailRequired": "El correo es obligatorio",
+      "emailMitOnly": "Debe ser un correo @mit.edu válido",
+      "eventNameLabel": "Nombre del Evento o Actividad",
+      "eventNamePlaceholder": "ej., CPW 2026, Concierto de Primavera, Hackathon",
+      "eventNameHint": "Clubes, grupos residenciales y deportes envían a través de sus cuentas de organización",
+      "eventNameRequired": "El nombre del evento o actividad es obligatorio",
+      "eventDescriptionLabel": "Descripción (opcional)",
+      "eventDescriptionPlaceholder": "Describe brevemente el evento o actividad",
+      "imagesLabel": "Sube hasta 3 imágenes (máximo 5MB cada una)",
+      "uploadSlot": "Imagen {n}",
+      "imageHint": "Formatos aceptados: JPEG, PNG, WebP, GIF. Máximo 5MB por imagen.",
+      "submit": "Enviar Fotos",
+      "submitting": "Subiendo...",
+      "success": "¡Fotos enviadas exitosamente!",
+      "error": "Hubo un error al enviar tus fotos",
+      "noFiles": "Selecciona al menos una imagen",
+      "invalidType": "Tipo de archivo no válido. Solo JPEG, PNG, WebP y GIF son permitidos",
+      "tooLarge": "Archivo demasiado grande. El tamaño máximo es 5MB",
+      "frozen": "Este formulario está cerrado y no acepta envíos en este momento.",
+      "contactText": "¿Preguntas o sugerencias?"
+    },
+    "profile": {
+      "title": "Mi Perfil",
+      "welcome": "Conectado como {email}",
+      "metaTitle": "Perfil - MIT Technique",
+      "metaDescription": "Gestiona tu perfil y configuración de cuenta.",
+      "tabs": {
+        "profile": "Perfil",
+        "seniorBio": "Bio de Senior",
+        "clubInfo": "Info del Club",
+        "scheduling": "Programación",
+        "photographerTools": "Herramientas de Staph"
+      },
+      "profile": {
+        "title": "Información de la Cuenta",
+        "email": "Email",
+        "role": "Rol",
+        "name": "Nombre"
+      },
+      "promotion": {
+        "title": "¿Necesitas otro acceso?",
+        "description": "Solicita un cambio de rol si representas un club o grupo de vivienda.",
+        "requestButton": "Solicitar Cambio de Rol"
+      },
+      "adminTools": {
+        "title": "Herramientas de Admin",
+        "openDashboard": "Abrir Dashboard",
+        "clubMaterialsComingSoon": "Acceso a materiales de clubes próximamente"
+      },
+      "bio": {
         "firstName": "Nombre",
         "lastName": "Apellido",
         "major": "Carrera",
         "quote": "Cita",
-        "quotePlaceholder": "Ingresa una cita para tu entrada del anuario (opcional)"
+        "quotePlaceholder": "Ingresa una cita para tu entrada del anuario (opcional)",
+        "success": "Tu bio fue actualizada exitosamente",
+        "error": "Hubo un error al actualizar tu bio",
+        "saving": "Guardando...",
+        "save": "Guardar Bio"
       },
-      "submitButton": "Actualizar Bio",
-      "success": "Tu bio fue actualizada exitosamente",
-      "error": "Hubo un error al actualizar tu bio"
+      "studentInfo": {
+        "title": "Información del Estudiante",
+        "description": "Mantén tu información actualizada. Estos datos se pueden usar para autocompletar tu Bio de Senior cuando seas senior.",
+        "firstName": "Nombre",
+        "lastName": "Apellido",
+        "major": "Carrera",
+        "secondMajor": "Segunda Carrera",
+        "none": "Ninguna",
+        "graduationYear": "Año de Graduación",
+        "success": "Tu información fue actualizada exitosamente",
+        "error": "Hubo un error al actualizar tu información",
+        "saving": "Guardando...",
+        "save": "Guardar Información",
+        "seniorBioTitle": "Bio de Senior",
+        "seniorBioDescription": "Los seniors que se gradúan pueden completar su bio del anuario con detalles adicionales como una cita.",
+        "completeSeniorBio": "Completar Bio de Senior",
+        "notSenior": "La Bio de Senior solo está disponible para seniors que se gradúan. Por favor actualiza tu año de graduación en tu perfil si crees que esto es incorrecto.",
+        "notSeniorShort": "solo seniors"
+      },
+      "club": {
+        "status": "Estado",
+        "statusValues": {
+          "pending": "En Revisión",
+          "approved": "Aprobado",
+          "denied": "Rechazado"
+        },
+        "clubId": "ID del Club",
+        "name": "Nombre del Club",
+        "description": "Descripción",
+        "memberList": "Lista de Miembros",
+        "memberListPlaceholder": "Ingresa nombres de miembros, uno por línea",
+        "success": "Perfil del club actualizado exitosamente",
+        "error": "Error al actualizar perfil del club",
+        "saving": "Guardando...",
+        "save": "Guardar Cambios"
+      },
+      "scheduling": {
+        "title": "Programación de Sesión de Fotos",
+        "status": "Estado",
+        "currentBooking": "Tu Horario Reservado",
+        "noBooking": "Aún no hay horario reservado",
+        "cancellationPending": "Solicitud de cancelación pendiente de revisión",
+        "requestCancel": "Solicitar Cancelación",
+        "requesting": "Solicitando...",
+        "cancelReason": "Por favor proporciona una razón para la cancelación (opcional):",
+        "cancelSuccess": "Solicitud de cancelación enviada",
+        "cancelError": "Error al enviar solicitud de cancelación",
+        "availableTimes": "Horarios Disponibles",
+        "noTimes": "No hay horarios disponibles",
+        "book": "Reservar",
+        "booking": "Reservando...",
+        "bookSuccess": "Horario reservado exitosamente",
+        "bookError": "Error al reservar horario",
+        "location": "Ubicación",
+        "locationPlaceholder": "ej., Salón Principal de Baker House",
+        "locationHint": "Ingresa dónde se realizará la sesión de fotos"
+      },
+      "disabled": "Tu cuenta ha sido deshabilitada. Por favor contacta a un administrador.",
+      "frozen": "Este formulario está congelado. No puedes hacer cambios en este momento."
     },
-
     "archives": {
       "title": "Archivo",
       "metaTitle": "Archivo - Anuarios MIT Technique",
       "metaDescription": "Explora ediciones pasadas de los anuarios Technique que datan de 1885.",
       "description": "Explora ediciones pasadas de Technique, que datan de 1885."
     },
-
     "parents": {
       "title": "Padres",
       "metaTitle": "Padres - MIT Technique",
@@ -242,7 +466,6 @@
         "emailButton": "Envíenos un Correo"
       }
     },
-
     "alumni": {
       "title": "Exalumnos",
       "metaTitle": "Exalumnos - MIT Technique",
@@ -262,7 +485,6 @@
         "emailButton": "Envíenos un Correo"
       }
     },
-
     "join": {
       "title": "Únete a Nosotros",
       "metaTitle": "Únete a Technique - MIT Technique",
@@ -295,7 +517,6 @@
         "hint": "Envíanos un correo para saber más sobre cómo unirte a Technique"
       }
     },
-
     "parentInquiry": {
       "title": "Consulta de Padres",
       "metaTitle": "Consulta de Padres - MIT Technique",
@@ -312,13 +533,22 @@
           "yearbookNotDelivered": "Consulta de Anuario",
           "other": "Otro"
         },
+        "yearRequested": "Año Solicitado",
+        "selectYear": "Seleccione un año...",
+        "loadingYears": "Cargando años disponibles...",
+        "noYearbooksAvailable": "No hay anuarios disponibles actualmente para compra. Por favor vuelva más tarde o contáctenos.",
+        "shippingTitle": "Dirección de Envío (opcional)",
+        "shippingAddress": "Dirección",
+        "shippingAddressPlaceholder": "123 Calle Principal, Apt 4",
+        "shippingCity": "Ciudad",
+        "shippingState": "Estado",
+        "shippingZip": "Código Postal",
         "message": "Mensaje"
       },
       "submitButton": "Enviar Consulta",
       "success": "Su consulta fue enviada exitosamente",
       "error": "Hubo un error al enviar su consulta"
     },
-
     "alumniInquiry": {
       "title": "Consulta de Exalumnos",
       "metaTitle": "Consulta de Exalumnos - MIT Technique",
@@ -334,13 +564,22 @@
           "oldPictures": "Fotos Antiguas",
           "other": "Otras Consultas"
         },
+        "yearRequested": "Año Solicitado",
+        "selectYear": "Seleccione un año...",
+        "loadingYears": "Cargando años disponibles...",
+        "noYearbooksAvailable": "No hay anuarios disponibles actualmente para compra. Por favor vuelva más tarde o contáctenos.",
+        "shippingTitle": "Dirección de Envío (opcional)",
+        "shippingAddress": "Dirección",
+        "shippingAddressPlaceholder": "123 Calle Principal, Apt 4",
+        "shippingCity": "Ciudad",
+        "shippingState": "Estado",
+        "shippingZip": "Código Postal",
         "message": "Mensaje"
       },
       "submitButton": "Enviar Consulta",
       "success": "Su consulta fue enviada exitosamente",
       "error": "Hubo un error al enviar su consulta"
     },
-
     "activities": {
       "title": "Formulario de Clubes",
       "metaTitle": "Formulario de Clubes - MIT Technique",
@@ -351,29 +590,46 @@
         "hint": "Complete el formulario para enviar la información y fotos de su club"
       }
     },
-
     "studentWorkFeature": {
       "title": "Trabajo Estudiantil",
       "metaTitle": "Trabajo Estudiantil - MIT Technique",
       "metaDescription": "Envíe su trabajo estudiantil para aparecer en el anuario.",
-      "description": "Muestra tus proyectos académicos, investigación o trabajos creativos en el anuario.",
-      "cta": {
-        "button": "Enviar Trabajo",
-        "hint": "Complete el formulario para enviar su trabajo para consideración"
-      }
+      "emailLabel": "Correo MIT",
+      "emailHelper": "Envíe o actualice su trabajo",
+      "emailRequired": "El correo electrónico es obligatorio",
+      "emailMitOnly": "Debe ser un correo @mit.edu válido",
+      "membersLabel": "Miembros",
+      "memberLabel": "Miembro {n}",
+      "addMember": "Agregar Miembro",
+      "additionalCreditsLabel": "Créditos adicionales",
+      "projectTitleLabel": "Título del proyecto",
+      "projectDescriptionLabel": "Descripción del proyecto",
+      "projectDescriptionHint": "Por favor mantenga menos de 150 palabras",
+      "linksLabel": "Enlace(s)",
+      "linksHint": "Sitios web del proyecto, vistas previas de Figma, etc. Debe estar relacionado con el proyecto.",
+      "imagesLabel": "Imágenes (opcional)",
+      "imageHint": "Hasta 5 imágenes, máximo 10MB cada una. JPEG, PNG, WebP o GIF.",
+      "member1Required": "Se requiere al menos un nombre de miembro",
+      "titleRequired": "El título del proyecto es obligatorio",
+      "descriptionRequired": "La descripción del proyecto es obligatoria",
+      "invalidType": "Solo se permiten imágenes JPEG, PNG, WebP y GIF",
+      "tooLarge": "Archivo demasiado grande. El tamaño máximo es 10MB",
+      "submit": "Enviar Trabajo",
+      "submitting": "Enviando...",
+      "success": "¡Su trabajo ha sido enviado exitosamente!",
+      "error": "Algo salió mal. Por favor intente de nuevo.",
+      "frozen": "Este formulario está cerrado y no acepta envíos en este momento.",
+      "contactText": "¿Preguntas o sugerencias?"
     },
-
     "privacy": {
       "title": "Política de Privacidad",
       "metaTitle": "Política de Privacidad - MIT Technique",
       "metaDescription": "Conozca cómo MIT Technique recopila y utiliza su información.",
       "lastUpdated": "Última actualización: 17 de enero de 2026",
-
       "translation": {
         "title": "Aviso de Traducción",
         "content": "Este sitio web está disponible en varios idiomas para mayor accesibilidad. Aunque nos esforzamos por la precisión, las traducciones pueden contener errores o variaciones de la versión original en inglés. En caso de discrepancias, prevalecerá la versión en inglés. Si nota algún error de traducción, contáctenos en technique@mit.edu."
       },
-
       "collection": {
         "title": "Información que Recopilamos",
         "intro": "Recopilamos información que usted nos proporciona directamente e información recopilada automáticamente cuando utiliza nuestro sitio web.",
@@ -400,7 +656,6 @@
           "content": "Podemos recopilar datos de uso anónimos como páginas visitadas, tiempo en el sitio e información del navegador para mejorar nuestros servicios."
         }
       },
-
       "usage": {
         "title": "Cómo Usamos su Información",
         "items": {
@@ -410,12 +665,10 @@
           "improvement": "Para mejorar nuestro sitio web y la experiencia del usuario"
         }
       },
-
       "storage": {
         "title": "Almacenamiento y Seguridad de Datos",
         "content": "Su información personal se almacena de forma segura en MongoDB Atlas con cifrado estándar de la industria. Conservamos la información biográfica de seniors para fines de publicación del anuario y archivos históricos. Implementamos medidas de seguridad razonables para proteger sus datos, pero ningún método de transmisión por Internet es 100% seguro."
       },
-
       "thirdParty": {
         "title": "Servicios de Terceros",
         "intro": "Utilizamos los siguientes servicios de terceros:",
@@ -425,7 +678,6 @@
           "vercel": "Para alojamiento y despliegue del sitio web"
         }
       },
-
       "rights": {
         "title": "Sus Derechos",
         "intro": "Usted tiene derecho a:",
@@ -437,23 +689,926 @@
         },
         "contact": "Para ejercer estos derechos, contáctenos en technique@mit.edu."
       },
-
       "children": {
         "title": "Privacidad de Menores",
         "content": "Nuestros servicios están destinados a estudiantes de MIT (típicamente mayores de 18 años). No recopilamos a sabiendas información de personas menores de 18 años sin el consentimiento de los padres."
       },
-
       "changes": {
         "title": "Cambios a Esta Política",
         "content": "Podemos actualizar esta política de privacidad de vez en cuando. Le notificaremos de cualquier cambio material publicando la nueva política en esta página con una fecha de 'Última actualización' actualizada."
       },
-
       "contact": {
         "title": "Contáctenos",
         "content": "Si tiene preguntas sobre esta política de privacidad o nuestras prácticas de datos, contáctenos:",
         "office": "Oficina:",
         "address": "Dirección Postal:"
       }
+    }
+  },
+  "dashboard": {
+    "title": "Panel de Administración",
+    "staphTitle": "Panel de Staph",
+    "noPermissions": "No tienes permisos asignados. Por favor contacta a un administrador para obtener acceso.",
+    "welcome": "Bienvenido, {name}",
+    "tabs": {
+      "overview": "Resumen",
+      "organizations": "Organizaciones",
+      "photoshoots": "Sesiones de Fotos",
+      "clubs": "Clubes",
+      "livingGroups": "Grupos de Vivienda",
+      "users": "Usuarios",
+      "sports": "Deportes",
+      "logs": "Registros",
+      "settings": "Configuración",
+      "forms": "Formularios",
+      "yearbookInventory": "Inventario del Anuario",
+      "reset": "Restablecer",
+      "responses": "Respuestas",
+      "respClubs": "Clubes",
+      "respLivingGroups": "Grupos de Vivienda",
+      "respSports": "Deportes",
+      "respActivities": "Actividades",
+      "respSeniors": "Seniors"
+    },
+    "stats": {
+      "clubs": "Clubes",
+      "livingGroups": "Grupos de Vivienda",
+      "sports": "Deportes",
+      "descriptionsCompleted": "{count}/{total} descripciones",
+      "lgCandidsSubmitted": "{count}/{total} fotos enviadas",
+      "totalImages": "Total de Imágenes",
+      "bookedPhotoshoots": "Sesiones Reservadas",
+      "cancellationRequests": "Solicitudes de Cancelación"
+    },
+    "overview": {
+      "title": "Resumen",
+      "quickActions": "Acciones Rápidas"
+    },
+    "actions": {
+      "managePhotoshoots": "Gestionar Sesiones",
+      "managePhotoshootsDesc": "Agregar, editar o eliminar horarios de sesiones",
+      "manageUsers": "Gestionar Usuarios",
+      "manageUsersDesc": "Ver y gestionar cuentas y roles de usuarios",
+      "formSettings": "Configuración de Formularios",
+      "formSettingsDesc": "Congelar o descongelar formularios"
+    },
+    "photoshoots": {
+      "title": "Horarios de Sesiones",
+      "addTime": "Agregar Horario",
+      "cancel": "Cancelar",
+      "form": {
+        "date": "Fecha",
+        "startTime": "Hora de Inicio",
+        "endTime": "Hora de Fin",
+        "notes": "Notas",
+        "notesPlaceholder": "Notas opcionales",
+        "submit": "Agregar Horario"
+      },
+      "filters": {
+        "all": "Todos",
+        "available": "Disponibles",
+        "booked": "Reservados",
+        "cancellation": "Solicitudes de Cancelación"
+      },
+      "noTimes": "No se encontraron horarios",
+      "bookedBy": "Reservado por",
+      "location": "Ubicación",
+      "cancellationRequested": "Cancelación solicitada",
+      "noReason": "Sin razón proporcionada",
+      "approve": "Aprobar",
+      "deny": "Rechazar",
+      "delete": "Eliminar",
+      "confirmDelete": "¿Está seguro de que desea eliminar este horario?"
+    },
+    "clubs": {
+      "title": "Gestión de Clubes",
+      "searchPlaceholder": "Buscar clubes...",
+      "filters": {
+        "all": "Todos",
+        "pending": "Pendientes",
+        "approved": "Aprobados",
+        "denied": "Rechazados"
+      },
+      "noClubs": "No se encontraron clubes",
+      "unnamed": "Club Sin Nombre",
+      "status": {
+        "pending": "Pendiente",
+        "approved": "Aprobado",
+        "denied": "Rechazado"
+      },
+      "contactEmail": "Contacto",
+      "members": "Miembros",
+      "notes": "Notas",
+      "approve": "Aprobar",
+      "deny": "Rechazar",
+      "denyReason": "Ingrese razón de rechazo (opcional):",
+      "activeMembers": "Activos: {count}",
+      "manualMembers": "Manuales: {count}",
+      "viewLeaders": "Ver Líderes ({count})",
+      "noLeaders": "Sin líderes asignados",
+      "leaderRequests": {
+        "title": "Solicitudes de Promoción a Líder",
+        "leaderOf": "líder de",
+        "requestedBy": "Solicitado por",
+        "approve": "Aprobar",
+        "deny": "Rechazar"
+      }
+    },
+    "livingGroups": {
+      "title": "Gestión de Grupos de Vivienda",
+      "searchPlaceholder": "Buscar grupos...",
+      "promoteUser": "Promover Usuario",
+      "cancel": "Cancelar",
+      "promoteTitle": "Promover Usuario a Líder de Grupo",
+      "form": {
+        "searchUser": "Buscar Usuario",
+        "searchPlaceholder": "Ingrese email para buscar",
+        "livingGroupName": "Nombre del Grupo",
+        "namePlaceholder": "ej., Baker House",
+        "instructions": "Busque un estudiante y haga clic para promoverlo. Asegúrese de ingresar el nombre del grupo primero."
+      },
+      "enterLivingGroupName": "Por favor ingrese el nombre del grupo",
+      "promoteError": "Error al promover usuario",
+      "filters": {
+        "all": "Todos",
+        "active": "Activos",
+        "disabled": "Deshabilitados",
+        "upcoming": "Próximas Sesiones"
+      },
+      "noLivingGroups": "No se encontraron grupos",
+      "noResults": "No se encontraron resultados",
+      "dorms": "Dormitorios",
+      "fsilgs": "FSILGs",
+      "searchDormsPlaceholder": "Buscar dormitorios...",
+      "searchFsilgsPlaceholder": "Buscar FSILGs...",
+      "pageOf": "Página {current} de {total}",
+      "previousPage": "Página anterior",
+      "nextPage": "Página siguiente",
+      "status": {
+        "active": "Activo",
+        "disabled": "Deshabilitado"
+      },
+      "leader": "Líder",
+      "bookedTime": "Horario Reservado",
+      "disable": "Deshabilitar",
+      "enable": "Habilitar",
+      "members": "Miembros",
+      "memberCount": "{count} miembros",
+      "expectedCount": "Esperados: {count}",
+      "showMemberCounts": "Mostrar Conteo de Miembros"
+    },
+    "sports": {
+      "searchPlaceholder": "Buscar deportes...",
+      "noSports": "No se encontraron deportes",
+      "genderTeams": "Equipos Masculino y Femenino",
+      "memberCount": "{count} miembros"
+    },
+    "users": {
+      "title": "Gestión de Usuarios",
+      "allUsers": "Todos los Usuarios",
+      "promotionRequests": "Solicitudes de Promoción",
+      "searchPlaceholder": "Buscar por email o nombre",
+      "filters": {
+        "allRoles": "Todos los Roles",
+        "allUsers": "Todos",
+        "individual": "Individual",
+        "orgsOnly": "Orgs",
+        "student": "Estudiante",
+        "staph": "Staph",
+        "club": "Club",
+        "livingGroup": "Grupo de Vivienda",
+        "sports": "Deportes",
+        "admin": "Administrador"
+      },
+      "noUsers": "No se encontraron usuarios",
+      "noRequests": "No hay solicitudes pendientes",
+      "table": {
+        "email": "Email",
+        "name": "Nombre",
+        "role": "Rol",
+        "staph": "Staph",
+        "status": "Estado",
+        "actions": "Registrado",
+        "access": "Acceso",
+        "permissions": "Permisos"
+      },
+      "accessPermissions": "Acceso a Respuestas",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "staphYes": "Staph",
+      "staphNo": "No",
+      "grantStaphConfirm": "¿Conceder acceso staph a este usuario?",
+      "revokeStaphConfirm": "¿Revocar acceso staph de este usuario?",
+      "requestType": "Tipo de Solicitud",
+      "staphRequest": "Solicitud de Staph",
+      "clubPromotion": "Promoción a Club",
+      "lglPromotion": "Líder de Grupo",
+      "livingGroupName": "Grupo de Vivienda",
+      "reason": "Razón",
+      "submitted": "Enviado",
+      "approve": "Aprobar",
+      "deny": "Rechazar",
+      "denyReason": "Ingrese razón de rechazo (opcional):",
+      "designateAdmin": "Designar Admin",
+      "designateConfirm": "¿Designar a este staph como admin?",
+      "maxAdmins": "Máximo de admins alcanzado ({count}/{max})",
+      "designatedAdmins": "Admins Designados: {count}/{max}",
+      "createStaph": "Crear Cuenta de Staph",
+      "createStaphKerb": "Kerberos de MIT",
+      "createStaphSubmit": "Crear Cuenta",
+      "createStaphSuccess": "Cuenta creada. Copia la contraseña antes de cerrar:",
+      "createStaphDone": "Listo",
+      "copy": "Copiar",
+      "logs": {
+        "title": "Registros",
+        "noLogs": "No hay registros de actividad todavía"
+      }
+    },
+    "settings": {
+      "title": "Configuración",
+      "formFreeze": {
+        "title": "Congelar Formularios",
+        "description": "Congele formularios para evitar que los usuarios hagan cambios. Los formularios congelados mostrarán una superposición y deshabilitarán todas las entradas.",
+        "frozen": "Congelado - Los usuarios no pueden hacer cambios",
+        "active": "Activo - Los usuarios pueden hacer cambios",
+        "freeze": "Congelar",
+        "unfreeze": "Descongelar"
+      },
+      "forms": {
+        "seniorBio": "Formulario de Bio de Senior",
+        "clubForm": "Formulario de Club",
+        "livingGroupBooking": "Reserva de Grupo de Vivienda",
+        "sportsForm": "Formulario de Deportes",
+        "candidsForm": "Formulario de Fotos Espontáneas",
+        "studentWorkForm": "Formulario de Trabajo Estudiantil"
+      },
+      "info": {
+        "title": "Información del Sistema",
+        "adminEmail": "Email de Admin",
+        "graduatingYear": "Año de Graduación"
+      },
+      "inventory": {
+        "title": "Inventario de Anuarios",
+        "description": "Administre el inventario de anuarios pasados para compras de exalumnos y padres.",
+        "searchPlaceholder": "Buscar por año...",
+        "year": "Año",
+        "quantity": "Cantidad",
+        "status": "Estado",
+        "actions": "Acciones",
+        "inStock": "En Stock",
+        "outOfStock": "Agotado",
+        "edit": "Editar",
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "noResults": "No se encontró inventario",
+        "add": "Agregar"
+      },
+      "reset": {
+        "title": "Restablecer Datos",
+        "description": "Eliminar datos permanentemente de la base de datos. Estas acciones no se pueden deshacer.",
+        "resetButton": "Restablecer",
+        "cleared": "Eliminado",
+        "error": "Error",
+        "confirmTitle": "Confirmar Restablecimiento",
+        "confirmButton": "Restablecer",
+        "cancelButton": "Cancelar",
+        "clearBookingTimes": {
+          "label": "Eliminar Horarios de Reserva",
+          "description": "Eliminar todos los horarios propuestos, asignaciones de tiempo y liberar todas las sesiones fotográficas reservadas.",
+          "confirmMessage": "Esto eliminará todas las propuestas de horarios, asignaciones de tiempo y liberará todas las sesiones fotográficas. No se puede deshacer."
+        },
+        "clearSeniorBios": {
+          "label": "Eliminar Biografías de Seniors",
+          "description": "Eliminar todas las respuestas del formulario de biografías de seniors.",
+          "confirmMessage": "Esto eliminará permanentemente todas las biografías de seniors. No se puede deshacer."
+        },
+        "clearCommunityCandids": {
+          "label": "Eliminar Fotos Candid Comunitarias",
+          "description": "Eliminar todas las fotos candid comunitarias y sus imágenes subidas.",
+          "confirmMessage": "Esto eliminará permanentemente todas las fotos candid comunitarias y sus imágenes. No se puede deshacer."
+        },
+        "clearStudentWork": {
+          "label": "Eliminar Trabajos Estudiantiles",
+          "description": "Eliminar todas las presentaciones de trabajos estudiantiles y sus imágenes subidas.",
+          "confirmMessage": "Esto eliminará permanentemente todas las presentaciones de trabajos estudiantiles y sus imágenes. No se puede deshacer."
+        },
+        "clearOrgImages": {
+          "label": "Eliminar Imágenes de Organizaciones",
+          "description": "Eliminar todas las imágenes subidas de clubes, grupos de vivienda y equipos deportivos.",
+          "confirmMessage": "Esto eliminará permanentemente todas las imágenes de organizaciones. No se puede deshacer."
+        }
+      }
+    },
+    "responses": {
+      "common": {
+        "exportCSV": "Exportar CSV",
+        "downloadImages": "Descargar Imágenes",
+        "totalSubmissions": "Total de Envíos",
+        "noData": "No se encontraron datos",
+        "loading": "Cargando...",
+        "downloading": "Descargando...",
+        "exporting": "Exportando...",
+        "imageCount": "{count} imágenes",
+        "yes": "✓",
+        "no": "✗",
+        "total": "Total"
+      },
+      "clubs": {
+        "title": "Respuestas de Clubes",
+        "totalClubs": "Total de Clubes",
+        "withDescriptions": "Con Descripciones",
+        "withMembers": "Con Miembros",
+        "totalMembers": "Total de Miembros",
+        "clubName": "Nombre del Club",
+        "description": "¿Descripción?",
+        "images": "Imágenes",
+        "members": "Miembros",
+        "exportMembers": "Exportar Miembros de Clubes CSV",
+        "downloadImages": "Descargar Imágenes de Clubes"
+      },
+      "livingGroups": {
+        "title": "Respuestas de Grupos de Vivienda",
+        "totalLGs": "Total de Grupos",
+        "withBookings": "Con Reservas de Sesiones",
+        "totalMembers": "Total de Miembros",
+        "lgName": "Nombre del Grupo",
+        "type": "Tipo",
+        "sections": "Secciones",
+        "candids": "Fotos Candid",
+        "booked": "Reservado",
+        "sectionName": "Sección",
+        "sectionImage": "¿Imagen?",
+        "sectionMembers": "Miembros",
+        "members": "Miembros",
+        "autoBooked": "Auto",
+        "manualBooked": "Manual",
+        "exportMembers": "Exportar Miembros CSV",
+        "downloadImages": "Descargar Imágenes"
+      },
+      "sports": {
+        "title": "Respuestas de Deportes",
+        "totalTeams": "Total de Equipos",
+        "withAchievements": "Con Logros",
+        "withMembers": "Con Miembros",
+        "totalMembers": "Total de Miembros",
+        "totalCoaches": "Total de Entrenadores",
+        "teamName": "Nombre del Equipo",
+        "description": "¿Descripción?",
+        "achievement": "¿Logro?",
+        "mensAchievement": "¿Logro Masc.?",
+        "womensAchievement": "¿Logro Fem.?",
+        "mensImages": "Imágenes Masc.",
+        "womensImages": "Imágenes Fem.",
+        "mensMembers": "Miembros Masc.",
+        "womensMembers": "Miembros Fem.",
+        "coaches": "Entrenadores",
+        "exportMembers": "Exportar Miembros CSV",
+        "downloadImages": "Descargar Imágenes"
+      },
+      "activities": {
+        "title": "Respuestas de Actividades",
+        "candidsTitle": "Fotos Comunitarias",
+        "studentWorkTitle": "Trabajos Estudiantiles",
+        "totalCandids": "Total de Fotos",
+        "uniqueEvents": "Eventos Únicos",
+        "totalStudentWork": "Total de Trabajos",
+        "email": "Email",
+        "eventName": "Nombre del Evento",
+        "eventDescription": "Descripción del Evento",
+        "projectTitle": "Título del Proyecto",
+        "projectMembers": "Miembros",
+        "downloadCandidImages": "Descargar Fotos Comunitarias",
+        "downloadStudentWorkImages": "Descargar Imágenes de Trabajos"
+      },
+      "seniors": {
+        "title": "Biografías de Seniors",
+        "totalBios": "Total de Biografías",
+        "name": "Nombre",
+        "major": "Carrera",
+        "minor": "Minor",
+        "secondMajor": "2da Carrera",
+        "quote": "Cita",
+        "achievements": "Logros",
+        "exportBios": "Exportar Biografías CSV"
+      }
+    }
+  },
+  "clubPage": {
+    "title": "Panel del Club",
+    "welcome": "Bienvenido, {name}",
+    "email": {
+      "title": "Email de Visualización",
+      "placeholder": "tu-club@mit.edu",
+      "save": "Guardar",
+      "saved": "Email guardado exitosamente",
+      "error": "Error al guardar email"
+    },
+    "status": "Estado",
+    "statusValues": {
+      "pending": "En Revisión",
+      "approved": "Aprobado",
+      "denied": "Rechazado"
+    },
+    "clubId": "ID del Club",
+    "notes": "Notas del Admin",
+    "frozen": "Este formulario está congelado. No puede hacer cambios en este momento.",
+    "tabs": {
+      "profile": "Perfil",
+      "members": "Miembros",
+      "documents": "Documentos"
+    },
+    "password": {
+      "title": "Cambiar Contraseña",
+      "oldPassword": "Contraseña Actual",
+      "newPassword": "Nueva Contraseña",
+      "confirmPassword": "Confirmar Nueva Contraseña",
+      "requirements": "La contraseña debe tener al menos 8 caracteres e incluir mayúscula, minúscula, número y símbolo.",
+      "minLength": "Al menos 8 caracteres",
+      "uppercase": "Una letra mayúscula",
+      "lowercase": "Una letra minúscula",
+      "number": "Un número",
+      "symbol": "Un símbolo",
+      "mismatch": "Las contraseñas no coinciden",
+      "changeButton": "Cambiar Contraseña",
+      "saving": "Cambiando...",
+      "changed": "Contraseña cambiada exitosamente",
+      "wrongOldPassword": "La contraseña actual es incorrecta",
+      "error": "Error al cambiar contraseña"
+    },
+    "form": {
+      "name": "Nombre del Club",
+      "description": "Descripción",
+      "descriptionPlaceholder": "MIT Technique es el club del anuario de MIT. Publicamos anuarios impresos anualmente. Nuestro club participa en muchas actividades incluyendo fotografía, diseño, y más!",
+      "descriptionHint": "Describa brevemente el propósito y las actividades de su club.",
+      "memberList": "Lista de Miembros",
+      "memberListPlaceholder": "Ingrese nombres de miembros, uno por línea o separados por comas",
+      "memberListHint": "Liste los nombres de los miembros que deben aparecer en el anuario",
+      "images": "Imágenes Candid",
+      "imagesHint": "Suba hasta 3 imágenes candid de su club (1 principal + 2 opcionales). Máx. 5MB cada una.",
+      "mainImage": "Imagen Principal",
+      "additionalImage": "Adicional (Opcional)",
+      "fileNaming": "Nombre de archivos: {name}_Candid (principal), {name}_Candid_2, {name}_Candid_3 (adicionales)"
+    },
+    "members": {
+      "title": "Miembros del Club",
+      "active": "Miembros Activos",
+      "activeMembers": "Miembros Activos",
+      "noActiveMembers": "Aún no hay miembros activos.",
+      "manual": "Miembros Manuales",
+      "manualMembers": "Miembros Manuales",
+      "manuallyAddedMembers": "Miembros Añadidos Manualmente",
+      "noManualMembers": "No hay miembros manuales añadidos.",
+      "noMembers": "Aún no hay miembros",
+      "addManual": "Añadir Miembro",
+      "add": "Añadir",
+      "addSingle": "Añadir Individual",
+      "bulkImport": "Importación Masiva",
+      "addManualPlaceholder": "Ingrese nombre del miembro",
+      "addPlaceholder": "Ingrese nombre del miembro",
+      "firstNamePlaceholder": "Nombre",
+      "lastNamePlaceholder": "Apellido (requerido)",
+      "bulkInputLabel": "Pegue nombres de miembros",
+      "bulkInputHint": "Pegue nombres separados por comas, saltos de línea o tabulaciones. Formatos: 'Nombre Apellido', 'Apellido, Nombre', o nombres únicos.",
+      "bulkPlaceholder": "John Smith, Jane Doe, Bob Johnson\no\nJohn Smith\nJane Doe\nBob Johnson\no\nSmith, John\nDoe, Jane",
+      "preview": "Vista Previa",
+      "import": "Importar Todos",
+      "importing": "Importando...",
+      "previewTitle": "Vista Previa de Importación",
+      "previewCount": "Se importarán {count} nombres",
+      "successfulParse": "Analizados exitosamente",
+      "parseErrors": "No se pudieron analizar",
+      "closePreview": "Cerrar Vista Previa",
+      "bulkAddSuccess": "Se añadieron {count} miembros exitosamente",
+      "bulkAddError": "Error al importar miembros",
+      "withErrors": "({count} errores)",
+      "withDuplicates": "({count} duplicados omitidos)",
+      "adding": "Añadiendo...",
+      "remove": "Eliminar",
+      "removing": "Eliminando...",
+      "addSuccess": "Miembro añadido exitosamente",
+      "addError": "Error al añadir miembro",
+      "removeSuccess": "Miembro eliminado exitosamente",
+      "removeError": "Error al eliminar miembro",
+      "export": "Exportar para InDesign",
+      "exporting": "Exportando...",
+      "exportSuccess": "¡{count} miembros copiados al portapapeles!",
+      "exportError": "Error al exportar miembros",
+      "exportHint": "Copiar todos los nombres (ordenados por apellido)",
+      "copied": "¡Copiado al portapapeles!",
+      "leader": "Líder",
+      "member": "Miembro",
+      "promotionRequested": "Solicitud de promoción a líder enviada",
+      "promotionError": "Error al solicitar promoción",
+      "requestCancelled": "Solicitud de promoción cancelada",
+      "cancelError": "Error al cancelar solicitud",
+      "demoteSuccess": "Líder degradado a miembro",
+      "demoteError": "Error al degradar líder",
+      "role": {
+        "member": "Miembro",
+        "leader": "Líder"
+      }
+    },
+    "documents": {
+      "title": "Documentos Internos",
+      "description": "Almacena enlaces y notas internos para tu organización. Esta información solo es visible para tu cuenta.",
+      "linksLabel": "Enlaces Internos",
+      "linksPlaceholder": "Añade enlaces internos (uno por línea)\nEjemplo:\nhttps://drive.google.com/tu-carpeta\nhttps://docs.google.com/tu-documento",
+      "linksHint": "Añade URLs a carpetas de Google Drive, documentos compartidos, etc.",
+      "notesLabel": "Notas Internas",
+      "notesPlaceholder": "Añade notas internas para tu organización...",
+      "notesHint": "Solo visible para tu cuenta",
+      "save": "Guardar Documentos",
+      "saveSuccess": "Documentos guardados exitosamente",
+      "saveError": "Error al guardar documentos"
+    },
+    "success": "El perfil de su club ha sido actualizado",
+    "error": "Error al actualizar el perfil del club",
+    "saving": "Guardando...",
+    "save": "Guardar Cambios"
+  },
+  "livingGroupPage": {
+    "title": "Panel del Grupo de Vivienda",
+    "welcome": "Bienvenido, {name}",
+    "locationLabel": "Ubicación",
+    "notesLabel": "Notas",
+    "tabs": {
+      "profile": "Perfil",
+      "book": "Reservar",
+      "assign": "Secciones",
+      "members": "Miembros",
+      "documents": "Documentos",
+      "settings": "Configuración"
+    },
+    "email": {
+      "title": "Email de Visualización",
+      "placeholder": "tu-grupo@mit.edu",
+      "save": "Guardar"
+    },
+    "password": {
+      "title": "Cambiar Contraseña",
+      "oldPassword": "Contraseña Actual",
+      "newPassword": "Nueva Contraseña",
+      "confirmPassword": "Confirmar Nueva Contraseña",
+      "requirements": "La contraseña debe tener al menos 8 caracteres e incluir mayúscula, minúscula, número y símbolo.",
+      "minLength": "Al menos 8 caracteres",
+      "uppercase": "Una letra mayúscula",
+      "lowercase": "Una letra minúscula",
+      "number": "Un número",
+      "symbol": "Un símbolo",
+      "mismatch": "Las contraseñas no coinciden",
+      "changeButton": "Cambiar Contraseña",
+      "saving": "Cambiando...",
+      "changed": "Contraseña cambiada exitosamente",
+      "wrongOldPassword": "La contraseña actual es incorrecta",
+      "error": "Error al cambiar contraseña"
+    },
+    "settings": {
+      "title": "Configuración",
+      "emailTitle": "Email de Contacto",
+      "emailDescription": "Este email se usa para restablecimiento de contraseñas y contacto.",
+      "emailPlaceholder": "tu-grupo@mit.edu",
+      "saveEmail": "Guardar",
+      "emailSaved": "Email guardado exitosamente",
+      "emailError": "Error al guardar email"
+    },
+    "disabled": "Su cuenta ha sido deshabilitada",
+    "disabledHint": "Por favor contacte a un administrador para asistencia",
+    "frozen": "Las reservas están congeladas. No puede hacer cambios en este momento.",
+    "currentBooking": "Su Horario Reservado",
+    "cancelBooking": "Cancelar Reserva",
+    "cancelling": "Cancelando...",
+    "confirmCancel": "¿Estás seguro de que quieres cancelar esta reserva?",
+    "cancelSuccess": "Reserva cancelada exitosamente",
+    "cancelError": "Error al cancelar la reserva",
+    "availableTimes": "Horarios Disponibles",
+    "noTimes": "No hay horarios disponibles",
+    "book": "Reservar Este Horario",
+    "booking": "Reservando...",
+    "bookSuccess": "Horario reservado exitosamente",
+    "bookError": "Error al reservar horario",
+    "postedBy": "Publicado por {name}",
+    "unknownCreator": "Desconocido",
+    "assign": {
+      "title": "Gestionar Secciones",
+      "description": "Crea secciones para organizar miembros (ej: pisos, alas, edificios). Los miembros pueden asignarse a secciones.",
+      "addPlaceholder": "Nombre de sección (ej: Piso 1)",
+      "addSection": "Añadir Sección",
+      "adding": "Añadiendo...",
+      "addSectionSuccess": "Sección añadida exitosamente",
+      "addSectionError": "Error al añadir sección",
+      "noSections": "Aún no hay secciones creadas",
+      "memberCount": "{count} miembro(s)",
+      "sectionImage": "Imagen de Sección",
+      "sectionFileNaming": "Nombre del archivo: Nombre_Organización_Nombre_Sección_Candid",
+      "removeSection": "Eliminar",
+      "removing": "Eliminando...",
+      "removeSectionSuccess": "Sección eliminada exitosamente",
+      "removeSectionError": "Error al eliminar sección",
+      "confirmRemoveTitle": "¿Eliminar Sección?",
+      "confirmRemoveMessage": "¿Está seguro de que desea eliminar '{section}'? Todos los miembros en esta sección se moverán a 'Sin asignar'.",
+      "saved": "Asignación guardada",
+      "saveError": "Error al guardar asignación",
+      "timeSlots": {
+        "title": "Asignar Secciones a Intervalos de Tiempo",
+        "description": "Asigna cada sección a un intervalo de 15 minutos durante tu sesión de fotos.",
+        "slot": "Intervalo",
+        "section": "Sección",
+        "notAssigned": "No asignado",
+        "saving": "Guardando...",
+        "unassignedSections": "Secciones aún no asignadas",
+        "allAssigned": "¡Todas las secciones asignadas!"
+      }
+    },
+    "members": {
+      "title": "Miembros",
+      "totalMembers": "Total de Miembros: {count}",
+      "totalExpected": "Total Esperado: {count}",
+      "noMembers": "Aún no hay miembros",
+      "memberCount": "{count} miembro(s)",
+      "expectedCount": "Esperado: {count}",
+      "setExpected": "Establecer Esperado",
+      "updateExpected": "Actualizar",
+      "expectedPlaceholder": "Cantidad esperada",
+      "updateSuccess": "Cantidad esperada actualizada",
+      "updateError": "Error al actualizar miembro",
+      "addMember": "Añadir Miembro",
+      "addSingle": "Añadir Individual",
+      "bulkImport": "Importación Masiva",
+      "addPlaceholder": "Nombre del miembro",
+      "firstNamePlaceholder": "Nombre",
+      "lastNamePlaceholder": "Apellido (requerido)",
+      "bulkInputLabel": "Pegue nombres de miembros",
+      "bulkInputHint": "Pegue nombres separados por comas, saltos de línea o tabulaciones. Formatos: 'Nombre Apellido', 'Apellido, Nombre', o nombres únicos.",
+      "bulkPlaceholder": "John Smith, Jane Doe, Bob Johnson\no\nJohn Smith\nJane Doe\nBob Johnson\no\nSmith, John\nDoe, Jane",
+      "preview": "Vista Previa",
+      "import": "Importar Todos",
+      "importing": "Importando...",
+      "previewTitle": "Vista Previa de Importación",
+      "previewCount": "Se importarán {count} nombres",
+      "successfulParse": "Analizados exitosamente",
+      "parseErrors": "No se pudieron analizar",
+      "closePreview": "Cerrar Vista Previa",
+      "bulkAddSuccess": "Se añadieron {count} miembros exitosamente",
+      "bulkAddError": "Error al importar miembros",
+      "withErrors": "({count} errores)",
+      "withDuplicates": "({count} duplicados omitidos)",
+      "assignLater": "Asignar secciones más tarde",
+      "assignAllToSection": "Asignar todos a la sección:",
+      "searchPlaceholder": "Buscar por email...",
+      "selectSection": "Asignar a sección",
+      "noSection": "Sin asignar",
+      "unassigned": "Sin asignar",
+      "allSections": "Todas las Secciones",
+      "noResults": "No se encontraron estudiantes",
+      "add": "Añadir",
+      "adding": "Añadiendo...",
+      "addSuccess": "Miembro añadido exitosamente",
+      "addError": "Error al añadir miembro",
+      "remove": "Eliminar",
+      "removing": "Eliminando...",
+      "confirm": "Confirmar",
+      "cancel": "Cancelar",
+      "removeSuccess": "Miembro eliminado exitosamente",
+      "removeError": "Error al eliminar miembro",
+      "confirmRemove": "¿Eliminar este miembro?"
+    },
+    "documents": {
+      "title": "Documentos Internos",
+      "description": "Almacena enlaces y notas internos para tu organización. Esta información solo es visible para tu cuenta.",
+      "linksLabel": "Enlaces Internos",
+      "linksPlaceholder": "Añade enlaces internos (uno por línea)\nEjemplo:\nhttps://drive.google.com/tu-carpeta\nhttps://docs.google.com/tu-documento",
+      "linksHint": "Añade URLs a carpetas de Google Drive, documentos compartidos, etc.",
+      "notesLabel": "Notas Internas",
+      "notesPlaceholder": "Añade notas internas para tu organización...",
+      "notesHint": "Solo visible para tu cuenta",
+      "save": "Guardar Documentos",
+      "saving": "Guardando...",
+      "saveSuccess": "Documentos guardados exitosamente",
+      "saveError": "Error al guardar documentos"
+    },
+    "proposeTime": {
+      "title": "Proponer un Horario",
+      "description": "Sugiere un horario para que el staph acepte. Si el staph acepta, tu sesión será programada.",
+      "timezoneNote": "Todos los horarios están en Hora Estándar del Este (EST)",
+      "date": "Fecha",
+      "startTime": "Hora de Inicio",
+      "endTime": "Hora de Fin",
+      "location": "Ubicación (opcional)",
+      "notes": "Notas (opcional)",
+      "submit": "Enviar Propuesta",
+      "submitting": "Enviando...",
+      "submitSuccess": "Horario propuesto y publicado exitosamente",
+      "submitError": "Error al enviar propuesta",
+      "fieldsRequired": "Fecha, hora de inicio y hora de fin son requeridos",
+      "startBeforeEnd": "La hora de inicio debe ser anterior a la hora de fin",
+      "noPastDates": "No se puede programar en el pasado",
+      "yourProposals": "Tus Propuestas",
+      "noProposals": "Sin propuestas aún",
+      "cancel": "Cancelar",
+      "cancelSuccess": "Propuesta cancelada",
+      "cancelError": "Error al cancelar propuesta",
+      "acceptedBy": "Aceptado por {name}",
+      "status": {
+        "pending": "Pendiente",
+        "posted": "Publicado",
+        "accepted": "Aceptado",
+        "declined": "Rechazado",
+        "cancelled": "Cancelado"
+      }
+    }
+  },
+  "photographerTimes": {
+    "title": "Programación de Staph",
+    "timezoneNote": "Todos los horarios están en Hora Estándar del Este (EST)",
+    "addTime": "Agregar Horario",
+    "date": "Fecha",
+    "startTime": "Hora de Inicio",
+    "endTime": "Hora de Fin",
+    "location": "Ubicación (opcional)",
+    "notes": "Notas (opcional)",
+    "addTimeButton": "Agregar Horario",
+    "adding": "Agregando...",
+    "addSuccess": "Horario agregado exitosamente",
+    "addError": "Error al agregar horario",
+    "fieldsRequired": "Fecha, hora de inicio y hora de fin son requeridos",
+    "yourTimes": "Tus Horarios Publicados",
+    "allTimes": "Todos los Horarios Publicados",
+    "noTimes": "No se han publicado horarios aún",
+    "postedBy": "Publicado por {name}",
+    "unknownCreator": "Desconocido",
+    "delete": "Eliminar",
+    "confirm": "Confirmar",
+    "deleteSuccess": "Horario eliminado",
+    "deleteError": "Error al eliminar horario",
+    "bookedBy": "Reservado por {name}",
+    "pendingProposals": "Horarios Propuestos",
+    "noProposals": "No hay horarios propuestos de grupos de vivienda",
+    "accept": "Aceptar",
+    "decline": "Rechazar",
+    "acceptSuccess": "Propuesta aceptada y horario programado",
+    "declineSuccess": "Propuesta rechazada",
+    "actionError": "Error al procesar propuesta",
+    "declineReasonPrompt": "Ingresa una razón para rechazar (opcional):"
+  },
+  "resources": {
+    "title": "Preguntas Frecuentes",
+    "metaTitle": "FAQ - MIT Technique",
+    "metaDescription": "Preguntas frecuentes sobre el anuario de MIT Technique, retratos de graduación y organizaciones.",
+    "description": "Encuentra respuestas a preguntas comunes sobre el anuario, retratos de graduación y cómo aparecer en él.",
+    "faq": {
+      "yearbook": {
+        "title": "Anuario",
+        "q1": "¿Cuándo puedo ordenar el anuario?",
+        "a1": "Los anuarios típicamente están disponibles para preorden en el semestre de primavera. Consulta la página de Anuario para disponibilidad y precios actuales.",
+        "q2": "¿Cuánto cuesta el anuario?",
+        "a2": "El precio de preorden es más bajo que el precio regular. Los graduados que asisten a su sesión de retrato reciben un descuento adicional. Visita la página de Anuario para precios exactos.",
+        "q3": "¿Pueden los padres o exalumnos ordenar anuarios?",
+        "a3": "¡Sí! Visita las páginas de Padres o Exalumnos para información sobre pedidos. También puedes usar nuestros formularios de consulta para preguntas sobre ediciones actuales o anteriores.",
+        "q4": "¿Cuándo se publica el anuario?",
+        "a4": "El anuario se publica a finales de primavera. Las copias de preorden se pueden recoger en el campus."
+      },
+      "seniors": {
+        "title": "Retratos y Biografías de Graduados",
+        "q1": "¿Cómo programo mi retrato de graduación?",
+        "a1": "Las sesiones de retrato se abren de forma continua. Visita la página de Graduados y haz clic en \"Programa tu Retrato\" para reservar un horario disponible.",
+        "q2": "¿Cómo envío mi biografía de graduación?",
+        "a2": "Ve a la página de Biografía de Graduado. Puedes ingresar tu nombre, carrera y una cita opcional que aparecerá junto a tu retrato en el anuario.",
+        "q3": "¿Qué pasa si no pude asistir a mi sesión de retrato?",
+        "a3": "Contacta a technique@mit.edu lo antes posible. Technique tiene una fecha límite de publicación, por lo que no siempre se pueden acomodar sesiones tardías. Tu nombre aparecerá en el anuario de todas formas."
+      },
+      "organizations": {
+        "title": "Clubes, Grupos de Vivienda y Deportes",
+        "q1": "¿Cómo aparece mi organización en el anuario?",
+        "a1": "Cada organización tiene un panel donde pueden agregar descripción, lista de miembros y fotos candidas. Inicia sesión con las credenciales de tu organización para acceder.",
+        "q2": "¿Qué tipo de fotos debemos enviar?",
+        "a2": "Envía fotos candidas de alta calidad que muestren a tu organización en acción. Puedes subir hasta 3 imágenes. Evita fotos grupales posadas — ¡queremos capturar momentos auténticos!",
+        "q3": "¿Cómo programan los grupos de vivienda una sesión de fotos?",
+        "a3": "Inicia sesión en tu panel de grupo de vivienda y usa la pestaña de reservas para seleccionar un horario disponible, o propón un nuevo horario para que el equipo de Technique lo revise."
+      },
+      "general": {
+        "title": "General",
+        "q1": "¿Qué es Technique?",
+        "a1": "Technique es la organización estudiantil oficial de fotografía, anuario y diseño de MIT. Hemos publicado un anuario anual que conmemora la vida en MIT desde 1885.",
+        "q2": "¿Cómo puedo unirme a Technique?",
+        "a2": "Todos son bienvenidos sin importar su experiencia. Visita la página Únete o ven a nuestras reuniones de los sábados a las 12pm en el salón 4-253. Ofrecemos oportunidades en fotografía, diseño y negocios.",
+        "q3": "¿Puedo contratar a Technique para fotografía de eventos?",
+        "a3": "¡Sí! Ofrecemos servicios de fotografía de eventos para organizaciones y grupos afiliados a MIT. Visita la página Contrátanos o envíanos un correo con el asunto \"Cotización de Fotografía de Evento\"."
+      },
+      "contact": {
+        "title": "¿Todavía tienes preguntas?",
+        "description": "Estamos aquí para ayudar. Contáctanos directamente.",
+        "button": "Contáctanos"
+      }
+    }
+  },
+  "sportsPage": {
+    "title": "Panel del Equipo Deportivo",
+    "welcome": "Bienvenido, {name}",
+    "frozen": "Este formulario está congelado. No se pueden hacer cambios.",
+    "success": "Cambios guardados exitosamente",
+    "error": "Error al guardar cambios",
+    "save": "Guardar Cambios",
+    "saving": "Guardando...",
+    "tabs": {
+      "profile": "Perfil",
+      "coaches": "Entrenadores",
+      "members": "Miembros",
+      "photos": "Fotos",
+      "achievements": "Logros",
+      "documents": "Documentos"
+    },
+    "profile": {
+      "email": "Correo de Contacto",
+      "description": "Descripción",
+      "hasGenderTeams": "Tiene equipos masculino y femenino",
+      "genderToggleTitle": "Cambiar estructura del equipo",
+      "genderToggleWarning": "Cambiar esta configuración afectará cómo se organizan los miembros, fotos y logros. La información específica de la estructura actual podría perderse. Recuerde guardar los cambios para confirmar.",
+      "genderToggleConfirm": "Proceder",
+      "genderToggleCancel": "Cancelar"
+    },
+    "email": {
+      "placeholder": "equipo@mit.edu",
+      "save": "Guardar",
+      "saved": "Correo guardado",
+      "error": "Error al guardar correo"
+    },
+    "coaches": {
+      "title": "Cuerpo Técnico",
+      "addCoach": "Agregar Entrenador",
+      "namePlaceholder": "Nombre del entrenador",
+      "rolePlaceholder": "Rol (ej. Entrenador Principal)",
+      "headCoach": "Entrenador Principal",
+      "assistantCoach": "Entrenador Asistente",
+      "director": "Director",
+      "noCoaches": "No hay entrenadores agregados",
+      "remove": "Eliminar",
+      "addSuccess": "Entrenador agregado",
+      "addError": "Error al agregar entrenador",
+      "removeSuccess": "Entrenador eliminado",
+      "removeError": "Error al eliminar entrenador"
+    },
+    "members": {
+      "mensTeam": "Equipo Masculino",
+      "womensTeam": "Equipo Femenino",
+      "unifiedTeam": "Miembros del Equipo",
+      "addSingle": "Agregar Individual",
+      "bulkImport": "Importar en Masa",
+      "namePlaceholder": "Ingrese nombre del miembro",
+      "firstNamePlaceholder": "Nombre",
+      "lastNamePlaceholder": "Apellido",
+      "add": "Agregar",
+      "adding": "Agregando...",
+      "remove": "Eliminar",
+      "removing": "Eliminando...",
+      "noMembers": "No hay miembros agregados",
+      "listTitle": "Miembros",
+      "addSuccess": "Miembro agregado",
+      "addError": "Error al agregar miembro",
+      "removeSuccess": "Miembro eliminado",
+      "removeError": "Error al eliminar miembro",
+      "bulkInputLabel": "Pegar nombres",
+      "bulkInputHint": "Un nombre por línea: Nombre Apellido o Apellido, Nombre",
+      "bulkPlaceholder": "Juan Pérez\nPérez, María\n...",
+      "preview": "Vista Previa",
+      "import": "Importar Todo",
+      "importing": "Importando...",
+      "previewTitle": "Vista Previa de Importación",
+      "previewCount": "{count} nombres procesados exitosamente",
+      "successfulParse": "Exitosos",
+      "parseErrors": "Errores",
+      "closePreview": "Cerrar Vista Previa",
+      "bulkAddSuccess": "{count} miembros agregados",
+      "bulkAddError": "Error al importar miembros",
+      "withErrors": "({count} errores de análisis)",
+      "withDuplicates": "({count} duplicados omitidos)"
+    },
+    "photos": {
+      "mainImage": "Foto Principal",
+      "additionalImage": "Foto Adicional",
+      "mensPhotos": "Fotos del Equipo Masculino",
+      "womensPhotos": "Fotos del Equipo Femenino",
+      "teamPhotos": "Fotos del Equipo"
+    },
+    "achievements": {
+      "title": "Resumen de Logros",
+      "mensAchievements": "Logros del Equipo Masculino",
+      "womensAchievements": "Logros del Equipo Femenino",
+      "placeholder": "Ingrese logros, premios, récords del equipo..."
+    },
+    "documents": {
+      "title": "Documentos Internos",
+      "description": "Almacena enlaces y notas internos para tu organización. Esta información solo es visible para tu cuenta.",
+      "linksLabel": "Enlaces Internos",
+      "linksPlaceholder": "Añade enlaces internos (uno por línea)\nEjemplo:\nhttps://drive.google.com/tu-carpeta\nhttps://docs.google.com/tu-documento",
+      "linksHint": "Añade URLs a carpetas de Google Drive, documentos compartidos, etc.",
+      "notesLabel": "Notas Internas",
+      "notesPlaceholder": "Añade notas internas para tu organización...",
+      "notesHint": "Solo visible para tu cuenta",
+      "save": "Guardar Documentos",
+      "saveSuccess": "Documentos guardados",
+      "saveError": "Error al guardar documentos"
     }
   }
 }

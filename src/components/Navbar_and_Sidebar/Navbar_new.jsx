@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations, useLocale } from 'next-intl';
 import LanguageSwitcher from "../LanguageSwitcher/LanguageSwitcher";
+import AccountButton from "../AccountButton/AccountButton";
 import "./Navbar.css";
 
 function Navbar() {
@@ -18,14 +19,20 @@ function Navbar() {
   // Check if any item in a dropdown is active
   const isDropdownActive = (items) => {
     return items.some(item => {
+      // Senior Bio link should only be active on exactly /login or /bio, not login subpages
       if (item.href === `/${locale}/login`) return pathname === `/${locale}/login` || pathname === `/${locale}/bio`;
+      // When on login subpages, only match exact paths
+      if (pathname.startsWith(`/${locale}/login/`)) return pathname === item.href;
       return pathname === item.href || pathname.startsWith(item.href + "/");
     });
   };
 
   const isActive = (href) => {
     if (href === `/${locale}`) return pathname === `/${locale}`;
+    // Senior Bio link should only be active on exactly /login or /bio, not login subpages like /login/admin
     if (href === `/${locale}/login`) return pathname === `/${locale}/login` || pathname === `/${locale}/bio`;
+    // When on login subpages (/login/admin, /login/club, etc.), only match exact paths
+    if (pathname.startsWith(`/${locale}/login/`)) return pathname === href;
     return pathname === href || pathname.startsWith(href + "/");
   };
 
@@ -40,18 +47,23 @@ function Navbar() {
         { href: `/${locale}/contact`, label: t('dropdown.contact') },
       ],
     },
-    { href: `/${locale}/yearbook`, label: t('yearbook') },
-    { href: `/${locale}/seniors`, label: t('seniors') },
-    { href: `/${locale}/parents`, label: t('parents') },
-    { href: `/${locale}/alumni`, label: t('alumni') },
+    {
+      label: t('yearbook'),
+      dropdown: [
+        { href: `/${locale}/purchase`, label: t('purchase'), external: true },
+        { href: `/${locale}/seniors`, label: t('seniors') },
+        { href: `/${locale}/parents`, label: t('parents') },
+        { href: `/${locale}/alumni`, label: t('alumni') },
+      ],
+    },
     {
       label: t('forms'),
       dropdown: [
         {
           header: t('dropdown.students'),
           items: [
-            { href: `/${locale}/login`, label: t('dropdown.seniorBio') },
-            { href: `/${locale}/clubs`, label: t('dropdown.clubs') },
+            { href: `/${locale}/bio`, label: t('dropdown.seniorBio') },
+            { href: `/${locale}/candids`, label: t('dropdown.candids') },
             { href: `/${locale}/student-work-feature`, label: t('dropdown.studentWork') },
           ]
         },
@@ -66,6 +78,7 @@ function Navbar() {
       ],
       grouped: true,
     },
+    { href: `/${locale}/resources`, label: t('resources') },
     {
       label: t('getStarted'),
       dropdown: [
@@ -102,7 +115,7 @@ function Navbar() {
           {/* Nav Links */}
           <div className="flex items-center gap-8">
             {/* Language Switcher */}
-            <LanguageSwitcher />
+            <LanguageSwitcher isHomePage={isHomePage} />
             {navStructure.map((item, index) => (
               item.dropdown ? (
                 // Dropdown item
@@ -163,7 +176,7 @@ function Navbar() {
                           {item.dropdown.map((group, groupIndex) => (
                             <div key={groupIndex} className={groupIndex > 0 ? 'border-l border-border/30' : ''}>
                               <div className={`px-4 py-2 text-[0.65rem] font-semibold uppercase tracking-widest ${
-                                isHomePage ? "text-white/50" : "text-text-muted"
+                                isHomePage ? "text-white/60" : "text-text-muted"
                               }`}>
                                 {group.header}
                               </div>
@@ -193,6 +206,7 @@ function Navbar() {
                           <Link
                             key={subItem.href}
                             href={subItem.href}
+                            {...(subItem.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                             className={`block px-4 py-2 text-xs uppercase tracking-wider transition-colors ${
                               isHomePage
                                 ? isActive(subItem.href)
@@ -236,6 +250,8 @@ function Navbar() {
                 </Link>
               )
             ))}
+            {/* Account Button */}
+            <AccountButton isHomePage={isHomePage} />
           </div>
         </nav>
       </div>

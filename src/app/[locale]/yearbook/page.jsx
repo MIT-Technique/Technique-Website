@@ -101,13 +101,13 @@ function YearbookPage() {
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href={`/${locale}/clubs`}
-              className="btn-secondary"
+              className="btn-secondary hover:!bg-accent hover:!border-accent"
             >
               {t('forms.clubsButton')}
             </Link>
             <Link
               href={`/${locale}/student-work-feature`}
-              className="btn-secondary"
+              className="btn-secondary hover:!bg-accent hover:!border-accent"
             >
               {t('forms.studentWorkButton')}
             </Link>

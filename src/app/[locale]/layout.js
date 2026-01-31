@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { locales, localeDirection } from "../../i18n/config";
 import "../globals.css";
 import Navbar from "../../components/Navbar_and_Sidebar/Navbar_new";
+import CookieConsent from "../../components/CookieConsent/CookieConsent";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
@@ -42,6 +43,7 @@ export default async function RootLayout({ children, params: { locale } }) {
         <NextIntlClientProvider messages={messages} locale={locale}>
           <Navbar />
           <div className="min-h-screen">{children}</div>
+          <CookieConsent />
         </NextIntlClientProvider>
       </body>
     </html>

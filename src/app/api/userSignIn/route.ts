@@ -1,11 +1,11 @@
-import { getClientConfig, getSession, clientConfig } from "../../../lib/lib";
-import { headers } from "next/headers";
+import { getClientConfig, getSession } from "../../../lib/lib";
+import { upsertMitSsoUser } from "../../../lib/auth/session";
+import { headers, cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import * as client from "openid-client";
+
 export async function GET(request: NextRequest, response: NextResponse) {
-  // console.log("Getting Session");
   const session = await getSession();
-  // console.log("Getting CLient Config");
   const openIdClientConfig = await getClientConfig();
   const headerList = headers();
   const host =
@@ -14,7 +14,6 @@ export async function GET(request: NextRequest, response: NextResponse) {
   const currentUrl = new URL(
     `${protocol}://${host}${request.nextUrl.pathname}${request.nextUrl.search}`
   );
-  // console.log("Getting client auth code grant");
 
   const tokenSet = await client.authorizationCodeGrant(
     openIdClientConfig,
@@ -26,32 +25,57 @@ export async function GET(request: NextRequest, response: NextResponse) {
   );
 
   const { access_token } = tokenSet;
+  let claims = tokenSet.claims()!;
+
+  const email = claims.sub as string;
+  const firstName = (claims.given_name || '') as string;
+
+  // Upsert user in Supabase
+  const user = await upsertMitSsoUser(email, firstName);
+
+  // Store session info in original MIT SSO session
   session.isLoggedIn = true;
   session.access_token = access_token;
-  let claims = tokenSet.claims()!;
-  const { sub } = claims;
-  // call userinfo endpoint to get user info
-  // console.log("Getting client fetch user info");
-
-  //This call is what was making logging in timeout for Max
-  // const userinfo = await client.fetchUserInfo(
-  //   openIdClientConfig,
-  //   access_token,
-  //   sub
-  // );
-
-  // console.log(`claims: ${JSON.stringify(claims, null, 2)}`);
-  // store userinfo in session
   session.userInfo = {
     sub: claims.sub,
-    name: claims.given_name! as string,
-    email: claims.sub as string,
+    name: firstName,
+    email: email,
     email_verified: true,
   };
-  // console.log("Saving session");
-  // console.log(`session user info: ${JSON.stringify(session, null, 2)}`);
   await session.save();
-  // console.log("All async commands finished");
-  
-  return Response.redirect(`${clientConfig.post_login_route}`);
+
+  // Redirect based on role
+  if (user?.role === 'admin') {
+    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/en/dashboard`);
+  }
+  if (user?.role === 'club') {
+    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/en/club`);
+  }
+  if (user?.role === 'living_group') {
+    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/en/living-group`);
+  }
+  if (user?.role === 'sports') {
+    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/en/sports`);
+  }
+
+  // For students, check for returnUrl from cookie (set by /api/login before OAuth redirect)
+  const cookieStore = cookies();
+  const returnUrlCookie = cookieStore.get('auth_return_url');
+  console.log('[/api/userSignIn] auth_return_url cookie:', returnUrlCookie?.value);
+
+  if (returnUrlCookie?.value && returnUrlCookie.value.startsWith('/')) {
+    console.log('[/api/userSignIn] Redirecting to cookie returnUrl:', returnUrlCookie.value);
+    const response = NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}${returnUrlCookie.value}`);
+    // Clear the cookie after use
+    response.cookies.delete('auth_return_url');
+    return response;
+  }
+
+  // Default redirect: staph goes to profile, non-staph students go to bio page
+  if (user?.is_staph) {
+    console.log('[/api/userSignIn] Staph user, redirecting to /en/profile');
+    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/en/profile`);
+  }
+  console.log('[/api/userSignIn] Non-staph student, redirecting to /en/bio');
+  return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/en/bio`);
 }
