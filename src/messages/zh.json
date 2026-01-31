@@ -720,7 +720,13 @@
       "logs": "日志",
       "settings": "设置",
       "forms": "表单",
-      "yearbookInventory": "年鉴库存"
+      "yearbookInventory": "年鉴库存",
+      "responses": "提交数据",
+      "respClubs": "社团",
+      "respLivingGroups": "宿舍",
+      "respSports": "体育",
+      "respActivities": "活动",
+      "respSeniors": "毕业生"
     },
     "stats": {
       "clubs": "社团",
@@ -945,6 +951,94 @@
         "cancel": "取消",
         "noResults": "未找到库存",
         "add": "添加"
+      }
+    },
+    "responses": {
+      "common": {
+        "exportCSV": "导出CSV",
+        "downloadImages": "下载图片",
+        "totalSubmissions": "总提交数",
+        "noData": "未找到数据",
+        "loading": "加载中...",
+        "downloading": "下载中...",
+        "exporting": "导出中...",
+        "imageCount": "{count} 张图片",
+        "yes": "✓",
+        "no": "✗",
+        "total": "总计"
+      },
+      "clubs": {
+        "title": "社团提交数据",
+        "totalClubs": "社团总数",
+        "withDescriptions": "有描述",
+        "withMembers": "已添加成员",
+        "totalMembers": "总成员数",
+        "clubName": "社团名称",
+        "description": "描述?",
+        "images": "图片",
+        "members": "成员",
+        "exportMembers": "导出社团成员CSV",
+        "downloadImages": "下载社团图片"
+      },
+      "livingGroups": {
+        "title": "宿舍提交数据",
+        "totalLGs": "宿舍总数",
+        "withBookings": "已预约拍摄",
+        "totalMembers": "总成员数",
+        "lgName": "宿舍名称",
+        "type": "类型",
+        "sections": "分区",
+        "sectionName": "分区",
+        "sectionImage": "图片?",
+        "sectionMembers": "成员",
+        "exportMembers": "导出宿舍成员CSV",
+        "downloadImages": "下载宿舍图片"
+      },
+      "sports": {
+        "title": "体育提交数据",
+        "totalTeams": "运动队总数",
+        "withAchievements": "有成就",
+        "withMembers": "已添加成员",
+        "totalMembers": "总成员数",
+        "totalCoaches": "教练总数",
+        "teamName": "队名",
+        "description": "描述?",
+        "achievement": "成就?",
+        "mensAchievement": "男队成就?",
+        "womensAchievement": "女队成就?",
+        "mensImages": "男队图片",
+        "womensImages": "女队图片",
+        "mensMembers": "男队成员",
+        "womensMembers": "女队成员",
+        "coaches": "教练",
+        "exportMembers": "导出运动员CSV",
+        "downloadImages": "下载体育图片"
+      },
+      "activities": {
+        "title": "活动提交数据",
+        "candidsTitle": "社区照片",
+        "studentWorkTitle": "学生作品",
+        "totalCandids": "照片提交总数",
+        "uniqueEvents": "独立活动数",
+        "totalStudentWork": "作品总数",
+        "email": "邮箱",
+        "eventName": "活动名称",
+        "eventDescription": "活动描述",
+        "projectTitle": "项目标题",
+        "projectMembers": "成员",
+        "downloadCandidImages": "下载社区照片",
+        "downloadStudentWorkImages": "下载学生作品图片"
+      },
+      "seniors": {
+        "title": "毕业生简介",
+        "totalBios": "简介总数",
+        "name": "姓名",
+        "major": "专业",
+        "minor": "辅修",
+        "secondMajor": "第二专业",
+        "quote": "引言",
+        "achievements": "成就",
+        "exportBios": "导出简介CSV"
       }
     }
   },

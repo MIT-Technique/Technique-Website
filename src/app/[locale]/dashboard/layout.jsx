@@ -46,6 +46,14 @@ function DashboardLayoutInner({ children }) {
     { id: 'sports', label: t('tabs.sports'), href: `/${locale}/dashboard/sports`, adminOnly: true },
   ];
 
+  const responsesSubTabs = [
+    { id: 'resp-clubs', label: t('tabs.respClubs'), href: `/${locale}/dashboard/responses/clubs` },
+    { id: 'resp-living-groups', label: t('tabs.respLivingGroups'), href: `/${locale}/dashboard/responses/living-groups` },
+    { id: 'resp-sports', label: t('tabs.respSports'), href: `/${locale}/dashboard/responses/sports` },
+    { id: 'resp-activities', label: t('tabs.respActivities'), href: `/${locale}/dashboard/responses/activities` },
+    { id: 'resp-seniors', label: t('tabs.respSeniors'), href: `/${locale}/dashboard/responses/seniors` },
+  ];
+
   const settingsSubTabs = [
     { id: 'users', label: t('tabs.users'), href: `/${locale}/dashboard/users` },
     { id: 'logs', label: t('tabs.logs'), href: `/${locale}/dashboard/logs` },
@@ -54,6 +62,7 @@ function DashboardLayoutInner({ children }) {
   ];
 
   const isOrgPage = orgSubTabs.some(tab => pathname === tab.href);
+  const isResponsesPage = responsesSubTabs.some(tab => pathname === tab.href) || pathname === `/${locale}/dashboard/responses`;
   const isSettingsPage = settingsSubTabs.some(tab => pathname === tab.href);
   const isUsersPage = pathname === `/${locale}/dashboard/users`;
   const userTypeFilter = searchParams.get('type') || 'all';
@@ -62,6 +71,7 @@ function DashboardLayoutInner({ children }) {
     { id: 'overview', label: t('tabs.overview'), href: `/${locale}/dashboard`, adminOnly: true },
     { id: 'organizations', label: t('tabs.organizations'), href: `/${locale}/dashboard/clubs`, adminOnly: false },
     { id: 'photoshoots', label: t('tabs.photoshoots'), href: `/${locale}/dashboard/photoshoots`, adminOnly: false },
+    { id: 'responses', label: t('tabs.responses'), href: `/${locale}/dashboard/responses/clubs`, adminOnly: true },
     { id: 'settings', label: t('tabs.settings'), href: `/${locale}/dashboard/users`, adminOnly: true },
   ];
 
@@ -85,6 +95,8 @@ function DashboardLayoutInner({ children }) {
             {tabs.map((tab) => {
               const isActive = tab.id === 'organizations'
                 ? isOrgPage
+                : tab.id === 'responses'
+                ? isResponsesPage
                 : tab.id === 'settings'
                 ? isSettingsPage
                 : pathname === tab.href;
@@ -106,9 +118,9 @@ function DashboardLayoutInner({ children }) {
         </div>
 
         {/* Sub-tabs */}
-        {(isOrgPage || isSettingsPage) && (
-          <div className="flex items-center gap-4 mb-6">
-            {(isOrgPage ? visibleOrgSubTabs : settingsSubTabs).map((tab) => (
+        {(isOrgPage || isResponsesPage || isSettingsPage) && (
+          <div className="flex items-center gap-4 mb-6 overflow-x-auto">
+            {(isOrgPage ? visibleOrgSubTabs : isResponsesPage ? responsesSubTabs : settingsSubTabs).map((tab) => (
               <Link
                 key={tab.id}
                 href={tab.href}

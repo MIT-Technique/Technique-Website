@@ -757,7 +757,13 @@
       "logs": "Logs",
       "settings": "Settings",
       "forms": "Forms",
-      "yearbookInventory": "Yearbook Inventory"
+      "yearbookInventory": "Yearbook Inventory",
+      "responses": "Responses",
+      "respClubs": "Clubs",
+      "respLivingGroups": "Living Groups",
+      "respSports": "Sports",
+      "respActivities": "Activities",
+      "respSeniors": "Seniors"
     },
     "stats": {
       "clubs": "Clubs",
@@ -982,6 +988,94 @@
         "cancel": "Cancel",
         "noResults": "No inventory found",
         "add": "Add"
+      }
+    },
+    "responses": {
+      "common": {
+        "exportCSV": "Export CSV",
+        "downloadImages": "Download Images",
+        "totalSubmissions": "Total Submissions",
+        "noData": "No data found",
+        "loading": "Loading...",
+        "downloading": "Downloading...",
+        "exporting": "Exporting...",
+        "imageCount": "{count} images",
+        "yes": "✓",
+        "no": "✗",
+        "total": "Total"
+      },
+      "clubs": {
+        "title": "Club Responses",
+        "totalClubs": "Total Clubs",
+        "withDescriptions": "With Descriptions",
+        "withMembers": "Added Members",
+        "totalMembers": "Total Members",
+        "clubName": "Club Name",
+        "description": "Description?",
+        "images": "Images",
+        "members": "Members",
+        "exportMembers": "Export Club Members CSV",
+        "downloadImages": "Download Club Images"
+      },
+      "livingGroups": {
+        "title": "Living Group Responses",
+        "totalLGs": "Total Living Groups",
+        "withBookings": "With Photoshoot Bookings",
+        "totalMembers": "Total Members",
+        "lgName": "LG Name",
+        "type": "Type",
+        "sections": "Sections",
+        "sectionName": "Section",
+        "sectionImage": "Image?",
+        "sectionMembers": "Members",
+        "exportMembers": "Export LG Members CSV",
+        "downloadImages": "Download LG Images"
+      },
+      "sports": {
+        "title": "Sports Responses",
+        "totalTeams": "Total Sports Teams",
+        "withAchievements": "With Achievements",
+        "withMembers": "Added Members",
+        "totalMembers": "Total Members",
+        "totalCoaches": "Total Coaches",
+        "teamName": "Team Name",
+        "description": "Description?",
+        "achievement": "Achievement?",
+        "mensAchievement": "Men's Ach.?",
+        "womensAchievement": "Women's Ach.?",
+        "mensImages": "Men's Images",
+        "womensImages": "Women's Images",
+        "mensMembers": "Men's Members",
+        "womensMembers": "Women's Members",
+        "coaches": "Coaches",
+        "exportMembers": "Export Sport Members CSV",
+        "downloadImages": "Download Sports Images"
+      },
+      "activities": {
+        "title": "Activities Responses",
+        "candidsTitle": "Community Candids",
+        "studentWorkTitle": "Student Work Submissions",
+        "totalCandids": "Total Candid Submissions",
+        "uniqueEvents": "Unique Events",
+        "totalStudentWork": "Total Student Work",
+        "email": "Email",
+        "eventName": "Event Name",
+        "eventDescription": "Event Description",
+        "projectTitle": "Project Title",
+        "projectMembers": "Members",
+        "downloadCandidImages": "Download Community Candid Images",
+        "downloadStudentWorkImages": "Download Student Work Images"
+      },
+      "seniors": {
+        "title": "Senior Bios",
+        "totalBios": "Total Senior Bios",
+        "name": "Name",
+        "major": "Major",
+        "minor": "Minor",
+        "secondMajor": "2nd Major",
+        "quote": "Quote",
+        "achievements": "Achievements",
+        "exportBios": "Export Senior Bios CSV"
       }
     }
   },

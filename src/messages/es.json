@@ -720,7 +720,13 @@
       "logs": "Registros",
       "settings": "Configuración",
       "forms": "Formularios",
-      "yearbookInventory": "Inventario del Anuario"
+      "yearbookInventory": "Inventario del Anuario",
+      "responses": "Respuestas",
+      "respClubs": "Clubes",
+      "respLivingGroups": "Grupos de Vivienda",
+      "respSports": "Deportes",
+      "respActivities": "Actividades",
+      "respSeniors": "Seniors"
     },
     "stats": {
       "clubs": "Clubes",
@@ -945,6 +951,94 @@
         "cancel": "Cancelar",
         "noResults": "No se encontró inventario",
         "add": "Agregar"
+      }
+    },
+    "responses": {
+      "common": {
+        "exportCSV": "Exportar CSV",
+        "downloadImages": "Descargar Imágenes",
+        "totalSubmissions": "Total de Envíos",
+        "noData": "No se encontraron datos",
+        "loading": "Cargando...",
+        "downloading": "Descargando...",
+        "exporting": "Exportando...",
+        "imageCount": "{count} imágenes",
+        "yes": "✓",
+        "no": "✗",
+        "total": "Total"
+      },
+      "clubs": {
+        "title": "Respuestas de Clubes",
+        "totalClubs": "Total de Clubes",
+        "withDescriptions": "Con Descripciones",
+        "withMembers": "Con Miembros",
+        "totalMembers": "Total de Miembros",
+        "clubName": "Nombre del Club",
+        "description": "¿Descripción?",
+        "images": "Imágenes",
+        "members": "Miembros",
+        "exportMembers": "Exportar Miembros de Clubes CSV",
+        "downloadImages": "Descargar Imágenes de Clubes"
+      },
+      "livingGroups": {
+        "title": "Respuestas de Grupos de Vivienda",
+        "totalLGs": "Total de Grupos",
+        "withBookings": "Con Reservas de Sesiones",
+        "totalMembers": "Total de Miembros",
+        "lgName": "Nombre del Grupo",
+        "type": "Tipo",
+        "sections": "Secciones",
+        "sectionName": "Sección",
+        "sectionImage": "¿Imagen?",
+        "sectionMembers": "Miembros",
+        "exportMembers": "Exportar Miembros CSV",
+        "downloadImages": "Descargar Imágenes"
+      },
+      "sports": {
+        "title": "Respuestas de Deportes",
+        "totalTeams": "Total de Equipos",
+        "withAchievements": "Con Logros",
+        "withMembers": "Con Miembros",
+        "totalMembers": "Total de Miembros",
+        "totalCoaches": "Total de Entrenadores",
+        "teamName": "Nombre del Equipo",
+        "description": "¿Descripción?",
+        "achievement": "¿Logro?",
+        "mensAchievement": "¿Logro Masc.?",
+        "womensAchievement": "¿Logro Fem.?",
+        "mensImages": "Imágenes Masc.",
+        "womensImages": "Imágenes Fem.",
+        "mensMembers": "Miembros Masc.",
+        "womensMembers": "Miembros Fem.",
+        "coaches": "Entrenadores",
+        "exportMembers": "Exportar Miembros CSV",
+        "downloadImages": "Descargar Imágenes"
+      },
+      "activities": {
+        "title": "Respuestas de Actividades",
+        "candidsTitle": "Fotos Comunitarias",
+        "studentWorkTitle": "Trabajos Estudiantiles",
+        "totalCandids": "Total de Fotos",
+        "uniqueEvents": "Eventos Únicos",
+        "totalStudentWork": "Total de Trabajos",
+        "email": "Email",
+        "eventName": "Nombre del Evento",
+        "eventDescription": "Descripción del Evento",
+        "projectTitle": "Título del Proyecto",
+        "projectMembers": "Miembros",
+        "downloadCandidImages": "Descargar Fotos Comunitarias",
+        "downloadStudentWorkImages": "Descargar Imágenes de Trabajos"
+      },
+      "seniors": {
+        "title": "Biografías de Seniors",
+        "totalBios": "Total de Biografías",
+        "name": "Nombre",
+        "major": "Carrera",
+        "minor": "Minor",
+        "secondMajor": "2da Carrera",
+        "quote": "Cita",
+        "achievements": "Logros",
+        "exportBios": "Exportar Biografías CSV"
       }
     }
   },
