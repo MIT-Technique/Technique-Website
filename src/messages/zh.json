@@ -1556,6 +1556,7 @@
       "unifiedTeam": "队员",
       "addSingle": "单个添加",
       "bulkImport": "批量导入",
+      "namePlaceholder": "输入成员姓名",
       "firstNamePlaceholder": "名",
       "lastNamePlaceholder": "姓",
       "add": "添加",

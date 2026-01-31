@@ -1555,6 +1555,7 @@
       "unifiedTeam": "Miembros del Equipo",
       "addSingle": "Agregar Individual",
       "bulkImport": "Importar en Masa",
+      "namePlaceholder": "Ingrese nombre del miembro",
       "firstNamePlaceholder": "Nombre",
       "lastNamePlaceholder": "Apellido",
       "add": "Agregar",
