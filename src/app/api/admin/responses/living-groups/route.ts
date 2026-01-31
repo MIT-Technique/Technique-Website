@@ -57,7 +57,7 @@ export async function GET() {
     });
 
     // Resolve manually_booked_by user names
-    const bookerIds = [...new Set((lgs || []).map(lg => lg.manually_booked_by).filter(Boolean))];
+    const bookerIds = Array.from(new Set((lgs || []).map(lg => lg.manually_booked_by).filter(Boolean)));
     const bookerNameMap: Record<string, string> = {};
     if (bookerIds.length > 0) {
       const { data: bookers } = await supabase
