@@ -2,7 +2,7 @@
 import Footer from "../../../components/Footer/Footer";
 import { useState, useCallback } from "react";
 import * as React from "react";
-import { useTranslations } from 'next-intl';
+import { useTranslations } from "next-intl";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import InputLabel from "@mui/material/InputLabel";
@@ -32,7 +32,7 @@ const selectSx = {
 };
 
 export default function BioPage() {
-  const t = useTranslations('pages.bio');
+  const t = useTranslations("pages.bio");
 
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -52,29 +52,60 @@ export default function BioPage() {
   const horizontal = "center";
 
   // Fetch existing bio when email is entered
-  const fetchBioByEmail = useCallback(async (emailValue) => {
-    const trimmed = emailValue.trim().toLowerCase();
-    if (!trimmed) return;
-    // Normalize: if no @, append @mit.edu
-    const normalized = trimmed.includes('@') ? trimmed : `${trimmed}@mit.edu`;
-    if (!normalized.endsWith('@mit.edu')) return;
+  const fetchBioByEmail = useCallback(
+    async (emailValue) => {
+      const trimmed = emailValue.trim().toLowerCase();
+      if (!trimmed) return;
+      // Normalize: if no @, append @mit.edu
+      const normalized = trimmed.includes("@") ? trimmed : `${trimmed}@mit.edu`;
+      if (!normalized.endsWith("@mit.edu")) return;
 
-    try {
-      const res = await fetch(`/api/bio?email=${encodeURIComponent(normalized)}`);
-      if (!res.ok) return;
-      const json = await res.json();
-      if (json.data.firstName) setFirstName(json.data.firstName);
-      if (json.data.lastName) setLastName(json.data.lastName);
-      if (json.data.major) setMajor(json.data.major);
-      if (json.data.minor) setMinor(json.data.minor);
-      if (json.data.second_major) setSecondMajor(json.data.second_major);
-      if (json.data.quote) setQuote(json.data.quote);
-      if (json.data.achievements) setExtracurriculars(json.data.achievements);
-      setDataLoaded(true);
-    } catch {
-      // Ignore fetch errors
-    }
-  }, []);
+      try {
+        const res = await fetch(
+          `/api/bio?email=${encodeURIComponent(normalized)}`,
+        );
+        if (res.ok) {
+          const json = await res.json();
+          if (json.data.firstName) setFirstName(json.data.firstName);
+          if (json.data.lastName) setLastName(json.data.lastName);
+          if (json.data.major) setMajor(json.data.major);
+          if (json.data.minor) setMinor(json.data.minor);
+          if (json.data.second_major) setSecondMajor(json.data.second_major);
+          if (json.data.quote) setQuote(json.data.quote);
+          if (json.data.achievements)
+            setExtracurriculars(json.data.achievements);
+
+          // If we got name/major from senior_bios, we're done
+          if (json.data.firstName && json.data.lastName && json.data.major) {
+            setDataLoaded(true);
+            return;
+          }
+        }
+
+        // Fallback: fetch from users table for missing fields
+        const userRes = await fetch(
+          `/api/user/lookup?email=${encodeURIComponent(normalized)}`,
+        );
+        if (userRes.ok) {
+          const userJson = await userRes.json();
+          if (userJson.data) {
+            if (!firstName && userJson.data.firstName)
+              setFirstName(userJson.data.firstName);
+            if (!lastName && userJson.data.lastName)
+              setLastName(userJson.data.lastName);
+            if (!major && userJson.data.major) setMajor(userJson.data.major);
+            if (!secondMajor && userJson.data.secondMajor)
+              setSecondMajor(userJson.data.secondMajor);
+          }
+        }
+
+        setDataLoaded(true);
+      } catch {
+        // Ignore fetch errors
+      }
+    },
+    [firstName, lastName, major, secondMajor],
+  );
 
   function handleClose() {
     setOpen(false);
@@ -83,9 +114,9 @@ export default function BioPage() {
 
   function normalizeEmail(value) {
     const trimmed = value.trim().toLowerCase();
-    if (!trimmed) return '';
+    if (!trimmed) return "";
     // If no @ symbol, assume it's just the kerb and append @mit.edu
-    if (!trimmed.includes('@')) {
+    if (!trimmed.includes("@")) {
       return `${trimmed}@mit.edu`;
     }
     return trimmed;
@@ -94,11 +125,11 @@ export default function BioPage() {
   function validateEmail(value) {
     const normalized = normalizeEmail(value);
     if (!normalized) {
-      setEmailError(t('emailRequired'));
+      setEmailError(t("emailRequired"));
       return false;
     }
-    if (!normalized.endsWith('@mit.edu')) {
-      setEmailError(t('emailMitOnly'));
+    if (!normalized.endsWith("@mit.edu")) {
+      setEmailError(t("emailMitOnly"));
       return false;
     }
     setEmailError("");
@@ -126,16 +157,16 @@ export default function BioPage() {
 
       if (!response.ok) {
         const data = await response.json();
-        setSnackMessage(data.error || t('error'));
+        setSnackMessage(data.error || t("error"));
         setOpen(true);
         setError(true);
       } else {
-        setSnackMessage(t('success'));
+        setSnackMessage(t("success"));
         setOpen(true);
         setError(false);
       }
     } catch {
-      setSnackMessage(t('error'));
+      setSnackMessage(t("error"));
       setError(true);
       setOpen(true);
     }
@@ -267,7 +298,7 @@ export default function BioPage() {
       <main className="min-h-screen pt-24 lg:pt-32">
         <section className="section-tight container-narrow">
           <div className="text-center mb-8">
-            <h1 className="mb-2">{t('title')}</h1>
+            <h1 className="mb-2">{t("title")}</h1>
           </div>
 
           <Box
@@ -286,7 +317,7 @@ export default function BioPage() {
             {/* Email Field */}
             <TextField
               required
-              label={t('fields.email')}
+              label={t("fields.email")}
               variant="outlined"
               InputLabelProps={{ shrink: true }}
               value={email}
@@ -305,14 +336,16 @@ export default function BioPage() {
               sx={textFieldSx}
               fullWidth
               InputProps={{
-                endAdornment: <span style={{ color: '#666', marginLeft: 4 }}>@mit.edu</span>,
+                endAdornment: (
+                  <span style={{ color: "#666", marginLeft: 4 }}>@mit.edu</span>
+                ),
               }}
             />
 
             <div className="grid grid-cols-2 gap-4">
               <TextField
                 required
-                label={t('fields.firstName')}
+                label={t("fields.firstName")}
                 variant="outlined"
                 InputLabelProps={{ shrink: true }}
                 value={firstName}
@@ -322,7 +355,7 @@ export default function BioPage() {
               />
               <TextField
                 required
-                label={t('fields.lastName')}
+                label={t("fields.lastName")}
                 variant="outlined"
                 InputLabelProps={{ shrink: true }}
                 value={lastName}
@@ -340,13 +373,13 @@ export default function BioPage() {
                   "&.Mui-focused": { color: "#750014" },
                 }}
               >
-                {t('fields.major')} *
+                {t("fields.major")} *
               </InputLabel>
               <Select
                 labelId="major-label"
                 id="major-select"
                 value={major}
-                label={`${t('fields.major')} *`}
+                label={`${t("fields.major")} *`}
                 notched
                 required
                 displayEmpty
@@ -357,7 +390,10 @@ export default function BioPage() {
                   Select...
                 </MenuItem>
                 {majors.map((m) => (
-                  <MenuItem key={`${m.course}-${m.name}`} value={`${m.course}, ${m.name}`}>
+                  <MenuItem
+                    key={`${m.course}-${m.name}`}
+                    value={`${m.course}, ${m.name}`}
+                  >
                     {m.course}, {m.name}
                   </MenuItem>
                 ))}
@@ -373,23 +409,24 @@ export default function BioPage() {
                     "&.Mui-focused": { color: "#750014" },
                   }}
                 >
-                  {t('fields.minor')}
+                  {t("fields.minor")}
                 </InputLabel>
                 <Select
                   labelId="minor-label"
                   id="minor-select"
                   value={minor}
-                  label={t('fields.minor')}
+                  label={t("fields.minor")}
                   notched
                   displayEmpty
                   onChange={(event) => setMinor(event.target.value)}
                   sx={selectSx}
                 >
-                  <MenuItem value="">
-                    Select...
-                  </MenuItem>
+                  <MenuItem value="">Select...</MenuItem>
                   {minors.map((m) => (
-                    <MenuItem key={`${m.course}-${m.name}`} value={`${m.course}, ${m.name}`}>
+                    <MenuItem
+                      key={`${m.course}-${m.name}`}
+                      value={`${m.course}, ${m.name}`}
+                    >
                       {m.course}, {m.name}
                     </MenuItem>
                   ))}
@@ -404,23 +441,24 @@ export default function BioPage() {
                     "&.Mui-focused": { color: "#750014" },
                   }}
                 >
-                  {t('fields.secondMajor')}
+                  {t("fields.secondMajor")}
                 </InputLabel>
                 <Select
                   labelId="second-major-label"
                   id="second-major-select"
                   value={secondMajor}
-                  label={t('fields.secondMajor')}
+                  label={t("fields.secondMajor")}
                   notched
                   displayEmpty
                   onChange={(event) => setSecondMajor(event.target.value)}
                   sx={selectSx}
                 >
-                  <MenuItem value="">
-                    Select...
-                  </MenuItem>
+                  <MenuItem value="">Select...</MenuItem>
                   {majors.map((m) => (
-                    <MenuItem key={`second-${m.course}-${m.name}`} value={`${m.course}, ${m.name}`}>
+                    <MenuItem
+                      key={`second-${m.course}-${m.name}`}
+                      value={`${m.course}, ${m.name}`}
+                    >
                       {m.course}, {m.name}
                     </MenuItem>
                   ))}
@@ -429,7 +467,7 @@ export default function BioPage() {
             </div>
 
             <TextField
-              label={t('fields.quote')}
+              label={t("fields.quote")}
               variant="outlined"
               InputLabelProps={{ shrink: true }}
               value={quote}
@@ -440,7 +478,7 @@ export default function BioPage() {
               maxRows={8}
               sx={textFieldSx}
               fullWidth
-              placeholder={t('fields.quotePlaceholder')}
+              placeholder={t("fields.quotePlaceholder")}
             />
 
             <TextField
@@ -480,13 +518,16 @@ export default function BioPage() {
               }}
               fullWidth
             >
-              {t('submitButton')}
+              {t("submitButton")}
             </Button>
 
             {/* Contact mailto */}
             <p className="text-xs text-text-muted text-center mt-4">
-              {t('contactText')}{' '}
-              <a href="mailto:technique@mit.edu" className="text-primary hover:underline">
+              {t("contactText")}{" "}
+              <a
+                href="mailto:technique@mit.edu"
+                className="text-primary hover:underline"
+              >
                 technique@mit.edu
               </a>
             </p>
@@ -516,7 +557,7 @@ export default function BioPage() {
           variant="filled"
           sx={{ width: "100%" }}
         >
-          {snackMessage || (error ? t('error') : t('success'))}
+          {snackMessage || (error ? t("error") : t("success"))}
         </Alert>
       </Snackbar>
       <Footer />
