@@ -53,7 +53,7 @@ export default function BioPage() {
   const vertical = "top";
   const horizontal = "center";
 
-  // Fetch existing bio when email is entered
+  // Fetch existing bio when email is entered, with fallback to users table
   const fetchBioByEmail = useCallback(async (emailValue) => {
     const trimmed = emailValue.trim().toLowerCase();
     if (!trimmed) return;
@@ -62,21 +62,42 @@ export default function BioPage() {
     if (!normalized.endsWith('@mit.edu')) return;
 
     try {
+      // First try senior_bios
       const res = await fetch(`/api/bio?email=${encodeURIComponent(normalized)}`);
-      if (!res.ok) return;
-      const json = await res.json();
-      if (json.data.firstName) setFirstName(json.data.firstName);
-      if (json.data.lastName) setLastName(json.data.lastName);
-      if (json.data.major) setMajor(json.data.major);
-      if (json.data.minor) setMinor(json.data.minor);
-      if (json.data.second_major) setSecondMajor(json.data.second_major);
-      if (json.data.quote) setQuote(json.data.quote);
-      if (json.data.achievements) setExtracurriculars(json.data.achievements);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.data.firstName) setFirstName(json.data.firstName);
+        if (json.data.lastName) setLastName(json.data.lastName);
+        if (json.data.major) setMajor(json.data.major);
+        if (json.data.minor) setMinor(json.data.minor);
+        if (json.data.second_major) setSecondMajor(json.data.second_major);
+        if (json.data.quote) setQuote(json.data.quote);
+        if (json.data.achievements) setExtracurriculars(json.data.achievements);
+
+        // If we got name/major from senior_bios, we're done
+        if (json.data.firstName && json.data.lastName && json.data.major) {
+          setDataLoaded(true);
+          return;
+        }
+      }
+
+      // Fallback: fetch from users table for missing fields
+      const userRes = await fetch(`/api/user/lookup?email=${encodeURIComponent(normalized)}`);
+      if (userRes.ok) {
+        const userJson = await userRes.json();
+        if (userJson.data) {
+          if (!firstName && userJson.data.firstName) setFirstName(userJson.data.firstName);
+          if (!lastName && userJson.data.lastName) setLastName(userJson.data.lastName);
+          if (!major && userJson.data.major) setMajor(userJson.data.major);
+          if (!secondMajor && userJson.data.secondMajor) setSecondMajor(userJson.data.secondMajor);
+        }
+      }
+
       setDataLoaded(true);
     } catch {
       // Ignore fetch errors
     }
-  }, []);
+  }, [firstName, lastName, major, secondMajor]);
 
   function handleClose() {
     setOpen(false);
@@ -109,6 +130,13 @@ export default function BioPage() {
 
   async function updateBio() {
     if (!validateEmail(email)) return;
+
+    if (!firstName.trim() || !lastName.trim() || !major) {
+      setSnackMessage("First name, last name, and major are required");
+      setOpen(true);
+      setError(true);
+      return;
+    }
 
     try {
       const response = await fetch("/api/bio", {

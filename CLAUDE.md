@@ -384,12 +384,7 @@ Located in `/src/app/api/` - **NOT localized** (language-agnostic).
 ### User Roles
 
 ```typescript
-type UserRole =
-  | "admin"
-  | "staph"
-  | "club"
-  | "living_group"
-  | "sports";
+type UserRole = "admin" | "staph" | "club" | "living_group" | "sports";
 ```
 
 - `admin` - Full dashboard access, user management, org approval
@@ -716,9 +711,12 @@ document_links text,
 document_notes text,
 dorm_sections ARRAY DEFAULT '{}'::text[],
 section_images jsonb DEFAULT '{}'::jsonb,
+manually_booked boolean DEFAULT false,
+manually_booked_by uuid,
 CONSTRAINT living_groups_pkey PRIMARY KEY (id),
 CONSTRAINT living_groups_disabled_by_fkey FOREIGN KEY (disabled_by) REFERENCES public.users(id),
-CONSTRAINT living_groups_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
+CONSTRAINT living_groups_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
+CONSTRAINT living_groups_manually_booked_by_fkey FOREIGN KEY (manually_booked_by) REFERENCES public.users(id)
 );
 CREATE TABLE public.photographer_permissions (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -769,7 +767,8 @@ achievements text,
 created_at timestamp with time zone DEFAULT now(),
 updated_at timestamp with time zone DEFAULT now(),
 minor text,
-name text,
+first_name text,
+last_name text,
 CONSTRAINT senior_bios_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.sessions (
@@ -866,7 +865,7 @@ CONSTRAINT time_proposals_declined_by_fkey FOREIGN KEY (declined_by) REFERENCES 
 CREATE TABLE public.users (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 email character varying NOT NULL UNIQUE,
-role character varying NOT NULL DEFAULT 'staph'::character varying CHECK (role::text = ANY (ARRAY['admin'::text, 'staph'::text, 'club'::text, 'living_group'::text, 'sports'::text])),
+role character varying NOT NULL DEFAULT 'student'::character varying CHECK (role::text = ANY (ARRAY['admin'::text, 'staph'::text, 'club'::text, 'living_group'::text, 'student'::text, 'sports'::text])),
 supabase_auth_id uuid,
 is_active boolean DEFAULT true,
 created_at timestamp with time zone DEFAULT now(),
