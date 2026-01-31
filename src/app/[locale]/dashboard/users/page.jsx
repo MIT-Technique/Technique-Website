@@ -310,17 +310,26 @@ export default function UsersPage() {
                   <td className="py-2 px-2 max-w-[200px] truncate" title={user.email}>{user.email}</td>
                   <td className="py-2 px-2 max-w-[150px] truncate" title={user.name}>{user.name}</td>
                   <td className="py-2 px-2">
-                    <select
-                      value={user.role}
-                      onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                      className="border border-border rounded px-2 py-1 text-xs"
-                    >
-                      <option value="staph">Staph</option>
-                      <option value="club">Club</option>
-                      <option value="living_group">Living Group</option>
-                      <option value="sports">Sports</option>
-                      <option value="admin">Admin</option>
-                    </select>
+                    {ORG_ROLES.includes(user.role) ? (
+                      <select
+                        value={user.role}
+                        onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                        className="border border-border rounded px-2 py-1 text-xs"
+                      >
+                        <option value="club">Club</option>
+                        <option value="living_group">Living Group</option>
+                        <option value="sports">Sports</option>
+                      </select>
+                    ) : (
+                      <select
+                        value={user.role}
+                        onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                        className="border border-border rounded px-2 py-1 text-xs"
+                      >
+                        <option value="staph">Staph</option>
+                        <option value="admin">Admin</option>
+                      </select>
+                    )}
                   </td>
                   <td className="py-2 px-2 relative">
                     {!['club', 'living_group', 'sports'].includes(user.role) ? (

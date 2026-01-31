@@ -17,20 +17,34 @@ export default function ResponsesLivingGroupsPage() {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(0);
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const res = await fetch('/api/admin/responses/living-groups');
-        const json = await res.json();
-        setData(json);
-      } catch (error) {
-        console.error('Error fetching LG responses:', error);
-      } finally {
-        setLoading(false);
-      }
+  async function fetchData() {
+    try {
+      const res = await fetch('/api/admin/responses/living-groups');
+      const json = await res.json();
+      setData(json);
+    } catch (error) {
+      console.error('Error fetching LG responses:', error);
+    } finally {
+      setLoading(false);
     }
+  }
+
+  useEffect(() => {
     fetchData();
   }, []);
+
+  async function handleToggleBook(lgId, book) {
+    try {
+      await fetch('/api/admin/responses/living-groups/book', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ livingGroupId: lgId, manuallyBooked: book }),
+      });
+      await fetchData();
+    } catch (error) {
+      console.error('Error toggling booking:', error);
+    }
+  }
 
   const filtered = useMemo(() => {
     if (!data) return [];
@@ -137,31 +151,62 @@ export default function ResponsesLivingGroupsPage() {
             <tr className="border-b border-border bg-bg-secondary">
               <th className="text-left p-3 font-medium">{t('livingGroups.lgName')}</th>
               <th className="text-center p-3 font-medium">{t('livingGroups.type')}</th>
-              <th className="text-center p-3 font-medium">{t('livingGroups.sections')}</th>
+              <th className="text-center p-3 font-medium">{t('livingGroups.candids')}</th>
+              <th className="text-center p-3 font-medium">{t('livingGroups.booked')}</th>
+              <th className="text-center p-3 font-medium">{t('livingGroups.members')}</th>
             </tr>
           </thead>
           <tbody>
             {paginated.map((lg) => (
               <React.Fragment key={lg.id}>
-                <tr className={`border-b border-border ${lg.sections.length > 0 ? 'cursor-pointer hover:bg-bg-secondary/50' : ''}`} onClick={() => lg.sections.length > 0 && toggleExpand(lg.id)}>
+                <tr className={`border-b border-border ${lg.type !== 'fsilg' && lg.sections.length > 0 ? 'cursor-pointer hover:bg-bg-secondary/50' : ''}`} onClick={() => lg.type !== 'fsilg' && lg.sections.length > 0 && toggleExpand(lg.id)}>
                   <td className="p-3">
-                    {lg.sections.length > 0 && <span className="mr-2">{expandedLGs.includes(lg.id) ? '▼' : '▶'}</span>}
+                    {lg.type !== 'fsilg' && lg.sections.length > 0 && <span className="mr-2">{expandedLGs.includes(lg.id) ? '▼' : '▶'}</span>}
                     {lg.name}
                   </td>
                   <td className="p-3 text-center">{lg.type}</td>
-                  <td className="p-3 text-center">{lg.sections.length} sections · {lg.totalMembers} members</td>
+                  <td className="p-3 text-center">{lg.candidCount || 0}</td>
+                  <td className="p-3 text-center">
+                    {lg.sections.some(s => s.hasTimeAssignment) ? (
+                      <span className="text-xs px-2 py-0.5 rounded bg-green-100 text-green-800">{t('livingGroups.autoBooked')}</span>
+                    ) : lg.manuallyBooked ? (
+                      <button onClick={(e) => { e.stopPropagation(); handleToggleBook(lg.id, false); }}
+                        className="text-xs px-2 py-0.5 rounded bg-blue-100 text-blue-800 hover:bg-blue-200 inline-flex items-center gap-1"
+                        title={lg.manuallyBookedByName || ''}>
+                        &#10003; {lg.manuallyBookedByName || t('livingGroups.manualBooked')}
+                      </button>
+                    ) : (
+                      <button onClick={(e) => { e.stopPropagation(); handleToggleBook(lg.id, true); }}
+                        className="text-xs px-2 py-0.5 rounded bg-red-100 text-red-800 hover:bg-red-200">
+                        {tc('no')}
+                      </button>
+                    )}
+                  </td>
+                  <td className="p-3 text-center">
+                    {lg.type === 'fsilg'
+                      ? `${lg.totalMembers} members`
+                      : `${lg.sections.length} sections · ${lg.totalMembers} members`}
+                  </td>
                 </tr>
-                {expandedLGs.includes(lg.id) && lg.sections.map((section) => (
+                {lg.type !== 'fsilg' && expandedLGs.includes(lg.id) && lg.sections.map((section) => (
                   <tr key={`${lg.id}-${section.name}`} className="border-b border-border bg-bg-secondary/30">
                     <td className="p-3 pl-10">{section.name}</td>
                     <td className="p-3 text-center">{section.hasImage ? tc('yes') : tc('no')}</td>
+                    <td className="p-3 text-center">{section.hasImage ? '1' : '0'}</td>
+                    <td className="p-3 text-center">
+                      {section.hasTimeAssignment ? (
+                        <span className="text-xs px-2 py-0.5 rounded bg-green-100 text-green-800">{tc('yes')}</span>
+                      ) : (
+                        <span className="text-xs px-2 py-0.5 rounded bg-red-100 text-red-800">{tc('no')}</span>
+                      )}
+                    </td>
                     <td className="p-3 text-center">{section.memberCount}</td>
                   </tr>
                 ))}
               </React.Fragment>
             ))}
             {paginated.length === 0 && (
-              <tr><td colSpan={3} className="p-3 text-center text-text-secondary">{tc('noData')}</td></tr>
+              <tr><td colSpan={5} className="p-3 text-center text-text-secondary">{tc('noData')}</td></tr>
             )}
           </tbody>
         </table>

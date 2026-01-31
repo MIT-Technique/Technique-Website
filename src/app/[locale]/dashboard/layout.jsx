@@ -70,6 +70,7 @@ function DashboardLayoutInner({ children }) {
     { id: 'logs', label: t('tabs.logs'), href: `/${locale}/dashboard/logs` },
     { id: 'forms', label: t('tabs.forms'), href: `/${locale}/dashboard/settings` },
     { id: 'yearbook-inventory', label: t('tabs.yearbookInventory'), href: `/${locale}/dashboard/settings/yearbook-inventory` },
+    { id: 'reset', label: t('tabs.reset'), href: `/${locale}/dashboard/settings/reset` },
   ];
 
   const isOrgPage = orgSubTabs.some(tab => pathname === tab.href);
@@ -80,7 +81,7 @@ function DashboardLayoutInner({ children }) {
 
   const allTabs = [
     { id: 'overview', label: t('tabs.overview'), href: `/${locale}/dashboard`, adminOnly: true },
-    { id: 'organizations', label: t('tabs.organizations'), href: `/${locale}/dashboard/clubs`, adminOnly: false },
+    { id: 'organizations', label: t('tabs.organizations'), href: `/${locale}/dashboard/clubs`, adminOnly: true },
     { id: 'photoshoots', label: t('tabs.photoshoots'), href: `/${locale}/dashboard/photoshoots`, adminOnly: false },
     { id: 'responses', label: t('tabs.responses'), href: responsesSubTabs[0]?.href || `/${locale}/dashboard/responses/clubs`, adminOnly: false, requiresAccess: true },
     { id: 'settings', label: t('tabs.settings'), href: `/${locale}/dashboard/users`, adminOnly: true },

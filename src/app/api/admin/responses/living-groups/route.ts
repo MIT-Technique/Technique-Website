@@ -13,7 +13,7 @@ export async function GET() {
 
     const { data: lgs, error } = await supabase
       .from('living_groups')
-      .select('id, name, living_group_type, dorm_sections, section_images')
+      .select('id, name, living_group_type, dorm_sections, section_images, manually_booked, manually_booked_by')
       .order('name', { ascending: true });
 
     if (error) {
@@ -44,16 +44,43 @@ export async function GET() {
 
     const bookedLGs = new Set((bookings || []).map(b => b.living_group_id));
 
+    // Get time assignments per section
+    const { data: timeAssignments } = await supabase
+      .from('living_group_time_assignments')
+      .select('living_group_id, section_name')
+      .in('living_group_id', lgIds);
+
+    const assignedSections: Record<string, Set<string>> = {};
+    (timeAssignments || []).forEach(ta => {
+      if (!assignedSections[ta.living_group_id]) assignedSections[ta.living_group_id] = new Set();
+      if (ta.section_name) assignedSections[ta.living_group_id].add(ta.section_name);
+    });
+
+    // Resolve manually_booked_by user names
+    const bookerIds = [...new Set((lgs || []).map(lg => lg.manually_booked_by).filter(Boolean))];
+    const bookerNameMap: Record<string, string> = {};
+    if (bookerIds.length > 0) {
+      const { data: bookers } = await supabase
+        .from('users')
+        .select('id, name, email')
+        .in('id', bookerIds);
+      (bookers || []).forEach(u => {
+        bookerNameMap[u.id] = u.name || u.email;
+      });
+    }
+
     const enrichedLGs = (lgs || []).map(lg => {
+      const sectionImages = lg.section_images || {};
       const sections = (lg.dorm_sections || []).map((sectionName: string) => {
-        const sectionImages = lg.section_images || {};
         return {
           name: sectionName,
           hasImage: !!sectionImages[sectionName],
           memberCount: memberCountMap[lg.id]?.[sectionName] || 0,
+          hasTimeAssignment: assignedSections[lg.id]?.has(sectionName) || false,
         };
       });
 
+      const candidCount = Object.values(sectionImages).filter(Boolean).length;
       const totalMembers = Object.values(memberCountMap[lg.id] || {}).reduce((a: number, b: number) => a + b, 0);
 
       return {
@@ -61,6 +88,9 @@ export async function GET() {
         name: lg.name,
         type: lg.living_group_type,
         hasBooking: bookedLGs.has(lg.id),
+        manuallyBooked: lg.manually_booked || false,
+        manuallyBookedByName: lg.manually_booked_by ? (bookerNameMap[lg.manually_booked_by] || null) : null,
+        candidCount,
         sections,
         totalMembers,
       };

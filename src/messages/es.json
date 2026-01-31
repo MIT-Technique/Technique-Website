@@ -722,6 +722,7 @@
       "settings": "Configuración",
       "forms": "Formularios",
       "yearbookInventory": "Inventario del Anuario",
+      "reset": "Restablecer",
       "responses": "Respuestas",
       "respClubs": "Clubes",
       "respLivingGroups": "Grupos de Vivienda",
@@ -963,6 +964,41 @@
         "cancel": "Cancelar",
         "noResults": "No se encontró inventario",
         "add": "Agregar"
+      },
+      "reset": {
+        "title": "Restablecer Datos",
+        "description": "Eliminar datos permanentemente de la base de datos. Estas acciones no se pueden deshacer.",
+        "resetButton": "Restablecer",
+        "cleared": "Eliminado",
+        "error": "Error",
+        "confirmTitle": "Confirmar Restablecimiento",
+        "confirmButton": "Restablecer",
+        "cancelButton": "Cancelar",
+        "clearBookingTimes": {
+          "label": "Eliminar Horarios de Reserva",
+          "description": "Eliminar todos los horarios propuestos, asignaciones de tiempo y liberar todas las sesiones fotográficas reservadas.",
+          "confirmMessage": "Esto eliminará todas las propuestas de horarios, asignaciones de tiempo y liberará todas las sesiones fotográficas. No se puede deshacer."
+        },
+        "clearSeniorBios": {
+          "label": "Eliminar Biografías de Seniors",
+          "description": "Eliminar todas las respuestas del formulario de biografías de seniors.",
+          "confirmMessage": "Esto eliminará permanentemente todas las biografías de seniors. No se puede deshacer."
+        },
+        "clearCommunityCandids": {
+          "label": "Eliminar Fotos Candid Comunitarias",
+          "description": "Eliminar todas las fotos candid comunitarias y sus imágenes subidas.",
+          "confirmMessage": "Esto eliminará permanentemente todas las fotos candid comunitarias y sus imágenes. No se puede deshacer."
+        },
+        "clearStudentWork": {
+          "label": "Eliminar Trabajos Estudiantiles",
+          "description": "Eliminar todas las presentaciones de trabajos estudiantiles y sus imágenes subidas.",
+          "confirmMessage": "Esto eliminará permanentemente todas las presentaciones de trabajos estudiantiles y sus imágenes. No se puede deshacer."
+        },
+        "clearOrgImages": {
+          "label": "Eliminar Imágenes de Organizaciones",
+          "description": "Eliminar todas las imágenes subidas de clubes, grupos de vivienda y equipos deportivos.",
+          "confirmMessage": "Esto eliminará permanentemente todas las imágenes de organizaciones. No se puede deshacer."
+        }
       }
     },
     "responses": {
@@ -1000,9 +1036,14 @@
         "lgName": "Nombre del Grupo",
         "type": "Tipo",
         "sections": "Secciones",
+        "candids": "Fotos Candid",
+        "booked": "Reservado",
         "sectionName": "Sección",
         "sectionImage": "¿Imagen?",
         "sectionMembers": "Miembros",
+        "members": "Miembros",
+        "autoBooked": "Auto",
+        "manualBooked": "Manual",
         "exportMembers": "Exportar Miembros CSV",
         "downloadImages": "Descargar Imágenes"
       },

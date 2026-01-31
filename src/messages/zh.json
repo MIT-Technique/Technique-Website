@@ -722,6 +722,7 @@
       "settings": "设置",
       "forms": "表单",
       "yearbookInventory": "年鉴库存",
+      "reset": "重置",
       "responses": "提交数据",
       "respClubs": "社团",
       "respLivingGroups": "宿舍",
@@ -963,6 +964,41 @@
         "cancel": "取消",
         "noResults": "未找到库存",
         "add": "添加"
+      },
+      "reset": {
+        "title": "重置数据",
+        "description": "永久删除数据库中的数据。这些操作无法撤消。",
+        "resetButton": "重置",
+        "cleared": "已清除",
+        "error": "错误",
+        "confirmTitle": "确认重置",
+        "confirmButton": "重置",
+        "cancelButton": "取消",
+        "clearBookingTimes": {
+          "label": "清除预约时间",
+          "description": "删除所有提议的预约时间、时间分配，并清除所有已预约的拍摄时间段。",
+          "confirmMessage": "这将删除所有时间提议、时间分配，并取消所有拍摄预约。此操作无法撤消。"
+        },
+        "clearSeniorBios": {
+          "label": "清除毕业生简历",
+          "description": "删除所有毕业生简历表单回复。",
+          "confirmMessage": "这将永久删除所有毕业生简历提交。此操作无法撤消。"
+        },
+        "clearCommunityCandids": {
+          "label": "清除社区抓拍照片",
+          "description": "删除所有社区抓拍照片提交及其上传的图片。",
+          "confirmMessage": "这将永久删除所有社区抓拍照片提交及其图片。此操作无法撤消。"
+        },
+        "clearStudentWork": {
+          "label": "清除学生作品",
+          "description": "删除所有学生作品展示提交及其上传的图片。",
+          "confirmMessage": "这将永久删除所有学生作品提交及其图片。此操作无法撤消。"
+        },
+        "clearOrgImages": {
+          "label": "清除组织图片",
+          "description": "删除社团、宿舍和体育队上传的所有图片。",
+          "confirmMessage": "这将永久删除社团、宿舍和体育队的所有组织图片。此操作无法撤消。"
+        }
       }
     },
     "responses": {
@@ -1000,9 +1036,14 @@
         "lgName": "宿舍名称",
         "type": "类型",
         "sections": "分区",
+        "candids": "抓拍照片",
+        "booked": "已预约",
         "sectionName": "分区",
         "sectionImage": "图片?",
         "sectionMembers": "成员",
+        "members": "成员",
+        "autoBooked": "自动",
+        "manualBooked": "手动",
         "exportMembers": "导出宿舍成员CSV",
         "downloadImages": "下载宿舍图片"
       },
