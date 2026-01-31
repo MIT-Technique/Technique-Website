@@ -26,7 +26,7 @@ async function listAllFiles(supabase: ReturnType<typeof createAdminClient>, buck
 export async function GET(request: NextRequest) {
   try {
     const user = await getCurrentUser();
-    if (!user || user.role !== 'admin') {
+    if (!user || (user.role !== 'admin' && !(user.is_staph && user.access?.length > 0))) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

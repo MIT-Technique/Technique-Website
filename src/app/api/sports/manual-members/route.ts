@@ -29,10 +29,9 @@ export async function GET(request: NextRequest) {
 
     let query = supabase
       .from('sports_manual_members')
-      .select('id, first_name, last_name, team, added_at')
+      .select('id, name, team, added_at')
       .eq('sports_id', sports.id)
-      .order('last_name')
-      .order('first_name');
+      .order('name');
 
     if (teamFilter && ['mens', 'womens'].includes(teamFilter)) {
       query = query.eq('team', teamFilter);
@@ -62,7 +61,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { firstName, lastName, bulkText, team } = body;
+    const { name, bulkText, team } = body;
 
     // Validate team value
     if (team && !['mens', 'womens'].includes(team)) {
@@ -95,7 +94,7 @@ export async function POST(request: NextRequest) {
       // Check for duplicates
       const { data: existingMembers } = await supabase
         .from('sports_manual_members')
-        .select('first_name, last_name')
+        .select('name')
         .eq('sports_id', sports.id)
         .eq('team', team || null);
 
@@ -103,11 +102,10 @@ export async function POST(request: NextRequest) {
       const toInsert = parseResult.success.filter((parsed) => {
         const isDuplicate = existingMembers?.some(
           (existing) =>
-            existing.first_name.toLowerCase() === parsed.firstName.toLowerCase() &&
-            existing.last_name.toLowerCase() === parsed.lastName.toLowerCase()
+            existing.name.toLowerCase() === parsed.name.toLowerCase()
         );
         if (isDuplicate) {
-          duplicates.push(`${parsed.firstName} ${parsed.lastName}`.trim());
+          duplicates.push(parsed.name);
         }
         return !isDuplicate;
       });
@@ -124,11 +122,7 @@ export async function POST(request: NextRequest) {
         .insert(
           toInsert.map((parsed) => ({
             sports_id: sports.id,
-            first_name: parsed.firstName,
-            last_name: parsed.lastName,
-            name: parsed.firstName
-              ? `${parsed.lastName}, ${parsed.firstName}`
-              : parsed.lastName,
+            name: parsed.name,
             team: team || null,
           }))
         )
@@ -148,19 +142,18 @@ export async function POST(request: NextRequest) {
     }
 
     // SINGLE ADD MODE
-    if (firstName === undefined || lastName === undefined) {
-      return NextResponse.json({ error: "First name and last name are required" }, { status: 400 });
+    if (name === undefined) {
+      return NextResponse.json({ error: "Name is required" }, { status: 400 });
     }
 
-    const trimmedFirst = String(firstName).trim();
-    const trimmedLast = String(lastName).trim();
+    const trimmedName = String(name).trim();
 
-    if (!trimmedLast || trimmedLast.length === 0) {
-      return NextResponse.json({ error: "Last name is required" }, { status: 400 });
+    if (!trimmedName || trimmedName.length === 0) {
+      return NextResponse.json({ error: "Name is required" }, { status: 400 });
     }
 
-    if (trimmedFirst.length > 100 || trimmedLast.length > 100) {
-      return NextResponse.json({ error: "Name fields must be 100 characters or less" }, { status: 400 });
+    if (trimmedName.length > 200) {
+      return NextResponse.json({ error: "Name must be 200 characters or less" }, { status: 400 });
     }
 
     // Duplicate check
@@ -168,8 +161,7 @@ export async function POST(request: NextRequest) {
       .from('sports_manual_members')
       .select('id')
       .eq('sports_id', sports.id)
-      .eq('first_name', trimmedFirst)
-      .eq('last_name', trimmedLast)
+      .eq('name', trimmedName)
       .eq('team', team || null)
       .maybeSingle();
 
@@ -181,11 +173,7 @@ export async function POST(request: NextRequest) {
       .from('sports_manual_members')
       .insert({
         sports_id: sports.id,
-        first_name: trimmedFirst,
-        last_name: trimmedLast,
-        name: trimmedFirst
-          ? `${trimmedLast}, ${trimmedFirst}`
-          : trimmedLast,
+        name: trimmedName,
         team: team || null,
       })
       .select()

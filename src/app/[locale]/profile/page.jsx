@@ -110,7 +110,7 @@ export default function ProfilePage() {
 
   // Fetch bio data for students
   useEffect(() => {
-    if (isLoggedIn && user?.role === 'student') {
+    if (isLoggedIn && user?.role === 'staph') {
       fetchBioData();
     }
   }, [isLoggedIn, user]);
@@ -337,14 +337,14 @@ export default function ProfilePage() {
                   <div className="flex justify-between">
                     <span className="text-text-secondary">{t('profile.role')}</span>
                     <span className="capitalize">
-                      {user?.is_staph ? 'Staph' : user?.role === 'admin' ? 'Admin' : user?.role !== 'student' ? user?.role?.replace('_', ' ') : 'Student'}
+                      {user?.role === 'admin' ? 'Admin' : user?.role === 'staph' ? 'Staph' : user?.role?.replace('_', ' ')}
                     </span>
                   </div>
                 </div>
               </div>
 
               {/* Student Information Section */}
-              {user?.role === 'student' && (
+              {user?.role === 'staph' && (
                 <div className="card-elevated p-6">
                   <h2 className="text-lg font-medium mb-4">{t('studentInfo.title')}</h2>
                   <p className="text-sm text-text-secondary mb-4">{t('studentInfo.description')}</p>
@@ -443,7 +443,7 @@ export default function ProfilePage() {
               )}
 
               {/* Senior Bio CTA - compact, lower priority */}
-              {user?.role === 'student' && (
+              {user?.role === 'staph' && (
                 <div className="flex items-center justify-between px-4 py-3 bg-bg-secondary/50 rounded-lg">
                   <span className="text-sm text-text-secondary">{t('studentInfo.seniorBioTitle')}</span>
                   <button

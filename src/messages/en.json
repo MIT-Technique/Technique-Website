@@ -745,6 +745,7 @@
   "dashboard": {
     "title": "Admin Dashboard",
     "staphTitle": "Staph Dashboard",
+    "noPermissions": "You don't have any permissions set. Please contact an admin for additional access.",
     "welcome": "Welcome, {name}",
     "tabs": {
       "overview": "Overview",
@@ -923,8 +924,13 @@
         "role": "Role",
         "staph": "Staph",
         "status": "Status",
-        "actions": "Joined"
+        "actions": "Joined",
+        "access": "Access",
+        "permissions": "Permissions"
       },
+      "accessPermissions": "Response Access",
+      "save": "Save",
+      "cancel": "Cancel",
       "active": "Active",
       "inactive": "Inactive",
       "staphYes": "Staph",
@@ -945,6 +951,12 @@
       "designateConfirm": "Designate this staph member as admin?",
       "maxAdmins": "Max admins reached ({count}/{max})",
       "designatedAdmins": "Designated Admins: {count}/{max}",
+      "createStaph": "Create Staph Account",
+      "createStaphKerb": "MIT Kerberos",
+      "createStaphSubmit": "Create Account",
+      "createStaphSuccess": "Account created. Copy the password before closing:",
+      "createStaphDone": "Done",
+      "copy": "Copy",
       "logs": {
         "title": "Logs",
         "noLogs": "No activity logs yet"

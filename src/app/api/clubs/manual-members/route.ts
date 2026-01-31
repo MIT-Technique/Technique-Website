@@ -60,7 +60,7 @@ async function getClubIdForUser(
   };
 }
 
-// GET - Fetch all manual members for a club (sorted by last name, first name)
+// GET - Fetch all manual members for a club (sorted by name)
 export async function GET(request: NextRequest) {
   try {
     const user = await getCurrentUser();
@@ -88,13 +88,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Fetch members sorted by last name, then first name
+    // Fetch members sorted by name
     const { data: members, error } = await supabase
       .from("club_manual_members")
       .select("*")
       .eq("club_id", clubId)
-      .order("last_name")
-      .order("first_name");
+      .order("name");
 
     if (error) {
       console.error("Get members error:", error);
@@ -125,8 +124,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const {
-      firstName,
-      lastName,
+      name,
       bulkText,
       clubId: clubIdParam,
     } = body;
@@ -164,18 +162,17 @@ export async function POST(request: NextRequest) {
       // Check for duplicates against existing members
       const { data: existingMembers } = await supabase
         .from("club_manual_members")
-        .select("first_name, last_name")
+        .select("name")
         .eq("club_id", clubId);
 
       const duplicates: string[] = [];
       const toInsert = parseResult.success.filter((parsed) => {
         const isDuplicate = existingMembers?.some(
           (existing) =>
-            existing.first_name.toLowerCase() === parsed.firstName.toLowerCase() &&
-            existing.last_name.toLowerCase() === parsed.lastName.toLowerCase()
+            existing.name.toLowerCase() === parsed.name.toLowerCase()
         );
         if (isDuplicate) {
-          duplicates.push(`${parsed.firstName} ${parsed.lastName}`.trim());
+          duplicates.push(parsed.name);
         }
         return !isDuplicate;
       });
@@ -197,11 +194,7 @@ export async function POST(request: NextRequest) {
         .insert(
           toInsert.map((parsed) => ({
             club_id: clubId,
-            first_name: parsed.firstName,
-            last_name: parsed.lastName,
-            name: parsed.firstName
-              ? `${parsed.lastName}, ${parsed.firstName}`
-              : parsed.lastName,
+            name: parsed.name,
           }))
         )
         .select();
@@ -223,26 +216,25 @@ export async function POST(request: NextRequest) {
     }
 
     // SINGLE ADD MODE
-    if (firstName === undefined || lastName === undefined) {
+    if (name === undefined) {
       return NextResponse.json(
-        { error: "First name and last name are required" },
+        { error: "Name is required" },
         { status: 400 }
       );
     }
 
-    const trimmedFirst = String(firstName).trim();
-    const trimmedLast = String(lastName).trim();
+    const trimmedName = String(name).trim();
 
-    if (!trimmedLast || trimmedLast.length === 0) {
+    if (!trimmedName || trimmedName.length === 0) {
       return NextResponse.json(
-        { error: "Last name is required" },
+        { error: "Name is required" },
         { status: 400 }
       );
     }
 
-    if (trimmedFirst.length > 100 || trimmedLast.length > 100) {
+    if (trimmedName.length > 200) {
       return NextResponse.json(
-        { error: "Name fields must be 100 characters or less" },
+        { error: "Name must be 200 characters or less" },
         { status: 400 }
       );
     }
@@ -252,8 +244,7 @@ export async function POST(request: NextRequest) {
       .from("club_manual_members")
       .select("id")
       .eq("club_id", clubId)
-      .eq("first_name", trimmedFirst)
-      .eq("last_name", trimmedLast)
+      .eq("name", trimmedName)
       .maybeSingle();
 
     if (duplicate) {
@@ -268,11 +259,7 @@ export async function POST(request: NextRequest) {
       .from("club_manual_members")
       .insert({
         club_id: clubId,
-        first_name: trimmedFirst,
-        last_name: trimmedLast,
-        name: trimmedFirst
-          ? `${trimmedLast}, ${trimmedFirst}`
-          : trimmedLast,
+        name: trimmedName,
       })
       .select()
       .single();

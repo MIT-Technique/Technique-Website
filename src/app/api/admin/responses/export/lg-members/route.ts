@@ -5,7 +5,7 @@ import { createAdminClient } from "../../../../../../lib/supabase/admin";
 export async function GET() {
   try {
     const user = await getCurrentUser();
-    if (!user || user.role !== 'admin') {
+    if (!user || (user.role !== 'admin' && !(user.is_staph && user.access?.includes('living_groups')))) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -20,15 +20,15 @@ export async function GET() {
 
     const { data: members } = await supabase
       .from('living_group_manual_members')
-      .select('living_group_id, first_name, last_name')
+      .select('living_group_id, name')
       .in('living_group_id', lgIds)
-      .order('last_name', { ascending: true });
+      .order('name', { ascending: true });
 
     const membersByLG: Record<string, string[]> = {};
     (lgs || []).forEach(lg => { membersByLG[lg.id] = []; });
     (members || []).forEach(m => {
       if (membersByLG[m.living_group_id]) {
-        membersByLG[m.living_group_id].push(`${m.first_name} ${m.last_name}`);
+        membersByLG[m.living_group_id].push(m.name);
       }
     });
 

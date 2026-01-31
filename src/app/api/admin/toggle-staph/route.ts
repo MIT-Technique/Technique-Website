@@ -42,10 +42,10 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Can only toggle staph for students
-    if (targetUser.role !== 'student') {
+    // Can only toggle staph for staph-role users
+    if (targetUser.role !== 'staph') {
       return NextResponse.json(
-        { error: "Can only toggle staph status for students" },
+        { error: "Can only toggle staph status for staph users" },
         { status: 400 }
       );
     }

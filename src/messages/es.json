@@ -708,6 +708,7 @@
   "dashboard": {
     "title": "Panel de Administración",
     "staphTitle": "Panel de Staph",
+    "noPermissions": "No tienes permisos asignados. Por favor contacta a un administrador para obtener acceso.",
     "welcome": "Bienvenido, {name}",
     "tabs": {
       "overview": "Resumen",
@@ -886,8 +887,13 @@
         "role": "Rol",
         "staph": "Staph",
         "status": "Estado",
-        "actions": "Registrado"
+        "actions": "Registrado",
+        "access": "Acceso",
+        "permissions": "Permisos"
       },
+      "accessPermissions": "Acceso a Respuestas",
+      "save": "Guardar",
+      "cancel": "Cancelar",
       "active": "Activo",
       "inactive": "Inactivo",
       "staphYes": "Staph",
@@ -908,6 +914,12 @@
       "designateConfirm": "¿Designar a este staph como admin?",
       "maxAdmins": "Máximo de admins alcanzado ({count}/{max})",
       "designatedAdmins": "Admins Designados: {count}/{max}",
+      "createStaph": "Crear Cuenta de Staph",
+      "createStaphKerb": "Kerberos de MIT",
+      "createStaphSubmit": "Crear Cuenta",
+      "createStaphSuccess": "Cuenta creada. Copia la contraseña antes de cerrar:",
+      "createStaphDone": "Listo",
+      "copy": "Copiar",
       "logs": {
         "title": "Registros",
         "noLogs": "No hay registros de actividad todavía"

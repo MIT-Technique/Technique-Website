@@ -156,7 +156,7 @@ async function createFsilgAccounts() {
           .update({
             supabase_auth_id: authData.user.id,
             role: "living_group",
-            auth_provider: "supabase_auth",
+            name: fsilg.name,
             updated_at: new Date().toISOString(),
           })
           .eq("id", existingUser.id);
@@ -173,8 +173,8 @@ async function createFsilgAccounts() {
           .insert({
             email: fsilg.email,
             role: "living_group",
+            name: fsilg.name,
             supabase_auth_id: authData.user.id,
-            auth_provider: "supabase_auth",
             is_active: true,
           })
           .select("id")

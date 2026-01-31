@@ -233,7 +233,7 @@ export async function POST(request: NextRequest) {
     session.userId = user.id;
     session.userInfo = {
       sub: user.email,
-      name: user.first_name || "",
+      name: user.name || "",
       email: user.email,
       email_verified: true,
     };

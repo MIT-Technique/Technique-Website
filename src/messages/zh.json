@@ -708,6 +708,7 @@
   "dashboard": {
     "title": "管理控制台",
     "staphTitle": "Staph 控制台",
+    "noPermissions": "您尚未被分配任何权限。请联系管理员获取访问权限。",
     "welcome": "欢迎，{name}",
     "tabs": {
       "overview": "概览",
@@ -886,8 +887,13 @@
         "role": "角色",
         "staph": "工作人员",
         "status": "状态",
-        "actions": "注册时间"
+        "actions": "注册时间",
+        "access": "访问权限",
+        "permissions": "权限"
       },
+      "accessPermissions": "响应访问权限",
+      "save": "保存",
+      "cancel": "取消",
       "active": "活跃",
       "inactive": "未激活",
       "staphYes": "工作人员",
@@ -908,6 +914,12 @@
       "designateConfirm": "将此工作人员指定为管理员？",
       "maxAdmins": "已达管理员上限 ({count}/{max})",
       "designatedAdmins": "已指定管理员: {count}/{max}",
+      "createStaph": "创建 Staph 账户",
+      "createStaphKerb": "MIT Kerberos",
+      "createStaphSubmit": "创建账户",
+      "createStaphSuccess": "账户已创建。请在关闭前复制密码：",
+      "createStaphDone": "完成",
+      "copy": "复制",
       "logs": {
         "title": "日志",
         "noLogs": "暂无活动日志"

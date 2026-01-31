@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { downloadImagesAsZip } from '../../../../../lib/utils/downloadImages';
 
@@ -9,39 +9,59 @@ const PAGE_SIZE = 10;
 export default function ResponsesClubsPage() {
   const t = useTranslations('dashboard.responses');
   const tc = useTranslations('dashboard.responses.common');
-  const [data, setData] = useState(null);
+  const [clubs, setClubs] = useState([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [stats, setStats] = useState(null);
+  const [bucketImageCount, setBucketImageCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(0);
+  const searchTimer = useRef(null);
+  const [debouncedSearch, setDebouncedSearch] = useState('');
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const res = await fetch('/api/admin/responses/clubs');
-        const json = await res.json();
-        setData(json);
-      } catch (error) {
-        console.error('Error fetching club responses:', error);
-      } finally {
-        setLoading(false);
+  const fetchPage = useCallback(async (p, s) => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams({ page: String(p), limit: String(PAGE_SIZE) });
+      if (s) params.set('search', s);
+      const res = await fetch(`/api/admin/responses/clubs?${params}`);
+      const json = await res.json();
+      setClubs(json.clubs || []);
+      setTotalCount(json.totalCount || 0);
+      if (json.stats) {
+        setStats(json.stats);
+        setBucketImageCount(json.bucketImageCount || 0);
       }
+    } catch (error) {
+      console.error('Error fetching club responses:', error);
+    } finally {
+      setLoading(false);
     }
-    fetchData();
   }, []);
 
-  const filtered = useMemo(() => {
-    if (!data) return [];
-    if (!search) return data.clubs;
-    const q = search.toLowerCase();
-    return data.clubs.filter(c => c.name?.toLowerCase().includes(q));
-  }, [data, search]);
+  // Initial load
+  useEffect(() => { fetchPage(0, ''); }, [fetchPage]);
 
-  useEffect(() => { setPage(0); }, [search]);
+  // Debounce search
+  useEffect(() => {
+    clearTimeout(searchTimer.current);
+    searchTimer.current = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(0);
+    }, 300);
+    return () => clearTimeout(searchTimer.current);
+  }, [search]);
 
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-  const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+  // Fetch on page or debounced search change (skip initial)
+  const isInitial = useRef(true);
+  useEffect(() => {
+    if (isInitial.current) { isInitial.current = false; return; }
+    fetchPage(page, debouncedSearch);
+  }, [page, debouncedSearch, fetchPage]);
+
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
   const handleExportCSV = async () => {
     setExporting(true);
@@ -72,34 +92,26 @@ export default function ResponsesClubsPage() {
     }
   };
 
-  if (loading) {
-    return <p className="text-text-secondary">{tc('loading')}</p>;
-  }
-
-  if (!data) {
-    return <p className="text-text-secondary">{tc('noData')}</p>;
-  }
-
-  const { stats, bucketImageCount } = data;
-
   return (
     <div>
       <h2 className="text-lg font-medium mb-4">{t('clubs.title')}</h2>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        {[
-          { label: t('clubs.totalClubs'), value: stats.total },
-          { label: t('clubs.withDescriptions'), value: stats.withDescriptions },
-          { label: t('clubs.withMembers'), value: stats.withMembers },
-          { label: t('clubs.totalMembers'), value: stats.totalMembers },
-        ].map((card) => (
-          <div key={card.label} className="p-4 rounded-lg border border-border bg-bg-secondary">
-            <p className="text-sm text-text-secondary">{card.label}</p>
-            <p className="text-2xl font-medium">{card.value}</p>
-          </div>
-        ))}
-      </div>
+      {stats && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          {[
+            { label: t('clubs.totalClubs'), value: stats.total },
+            { label: t('clubs.withDescriptions'), value: stats.withDescriptions },
+            { label: t('clubs.withMembers'), value: stats.withMembers },
+            { label: t('clubs.totalMembers'), value: stats.totalMembers },
+          ].map((card) => (
+            <div key={card.label} className="p-4 rounded-lg border border-border bg-bg-secondary">
+              <p className="text-sm text-text-secondary">{card.label}</p>
+              <p className="text-2xl font-medium">{card.value}</p>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Search + Pagination */}
       <div className="mb-4 flex items-center gap-3">
@@ -132,7 +144,7 @@ export default function ResponsesClubsPage() {
       </div>
 
       {/* Table */}
-      <div className="border border-border rounded-lg overflow-x-auto mb-6">
+      <div className="border border-border rounded-lg overflow-x-auto mb-6" style={{ minHeight: 41 * 11 + 41 }}>
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border bg-bg-secondary">
@@ -143,7 +155,11 @@ export default function ResponsesClubsPage() {
             </tr>
           </thead>
           <tbody>
-            {paginated.map((club) => (
+            {loading ? (
+              <tr><td colSpan={4} className="p-3 text-center text-text-secondary">{tc('loading')}</td></tr>
+            ) : clubs.length === 0 ? (
+              <tr><td colSpan={4} className="p-3 text-center text-text-secondary">{tc('noData')}</td></tr>
+            ) : clubs.map((club) => (
               <tr key={club.id} className="border-b border-border last:border-0">
                 <td className="p-3">{club.name || 'Unnamed'}</td>
                 <td className="p-3 text-center">{club.hasDescription ? tc('yes') : tc('no')}</td>
@@ -151,9 +167,6 @@ export default function ResponsesClubsPage() {
                 <td className="p-3 text-center">{club.memberCount}</td>
               </tr>
             ))}
-            {paginated.length === 0 && (
-              <tr><td colSpan={4} className="p-3 text-center text-text-secondary">{tc('noData')}</td></tr>
-            )}
           </tbody>
         </table>
       </div>

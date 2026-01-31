@@ -5,7 +5,7 @@ import { createAdminClient } from "../../../../../../lib/supabase/admin";
 export async function GET() {
   try {
     const user = await getCurrentUser();
-    if (!user || user.role !== 'admin') {
+    if (!user || (user.role !== 'admin' && !(user.is_staph && user.access?.includes('sports')))) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -20,9 +20,9 @@ export async function GET() {
 
     const { data: members } = await supabase
       .from('sports_manual_members')
-      .select('sports_id, first_name, last_name, team')
+      .select('sports_id, name, team')
       .in('sports_id', sportIds)
-      .order('last_name', { ascending: true });
+      .order('name', { ascending: true });
 
     // Build columns: for gender teams, create separate columns
     type Column = { header: string; members: string[] };
@@ -32,12 +32,12 @@ export async function GET() {
       const sportMembers = (members || []).filter(m => m.sports_id === sport.id);
 
       if (sport.has_gender_teams) {
-        const mensMembers = sportMembers.filter(m => m.team === 'mens').map(m => `${m.first_name} ${m.last_name}`);
-        const womensMembers = sportMembers.filter(m => m.team === 'womens').map(m => `${m.first_name} ${m.last_name}`);
+        const mensMembers = sportMembers.filter(m => m.team === 'mens').map(m => m.name);
+        const womensMembers = sportMembers.filter(m => m.team === 'womens').map(m => m.name);
         columns.push({ header: `${sport.name} (Men's)`, members: mensMembers });
         columns.push({ header: `${sport.name} (Women's)`, members: womensMembers });
       } else {
-        const allMembers = sportMembers.map(m => `${m.first_name} ${m.last_name}`);
+        const allMembers = sportMembers.map(m => m.name);
         columns.push({ header: sport.name, members: allMembers });
       }
     });

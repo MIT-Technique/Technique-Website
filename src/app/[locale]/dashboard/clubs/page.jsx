@@ -135,13 +135,13 @@ export default function ClubsPage() {
               >
                 <div>
                   <p className="font-medium">
-                    {request.user?.first_name} {request.user?.last_name}
+                    {request.user?.name}
                     <span className="text-text-muted font-normal"> → {t('leaderRequests.leaderOf')} </span>
                     {request.club?.name || t('unnamed')}
                   </p>
                   <p className="text-text-secondary text-sm">{request.user?.email}</p>
                   <p className="text-text-muted text-xs">
-                    {t('leaderRequests.requestedBy')}: {request.requester?.first_name} {request.requester?.last_name}
+                    {t('leaderRequests.requestedBy')}: {request.requester?.name}
                     {' • '}
                     {new Date(request.created_at).toLocaleDateString(locale)}
                   </p>

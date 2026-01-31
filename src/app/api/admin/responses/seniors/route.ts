@@ -5,7 +5,7 @@ import { createAdminClient } from "../../../../../lib/supabase/admin";
 export async function GET() {
   try {
     const user = await getCurrentUser();
-    if (!user || user.role !== 'admin') {
+    if (!user || (user.role !== 'admin' && !(user.is_staph && user.access?.includes('seniors')))) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -13,8 +13,8 @@ export async function GET() {
 
     const { data: bios, error } = await supabase
       .from('senior_bios')
-      .select('id, first_name, last_name, major, minor, second_major, quote, achievements')
-      .order('last_name', { ascending: true });
+      .select('id, name, major, minor, second_major, quote, achievements')
+      .order('name', { ascending: true });
 
     if (error) {
       console.error("Error fetching senior bios:", error);

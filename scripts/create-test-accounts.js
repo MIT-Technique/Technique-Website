@@ -60,7 +60,7 @@ const testAccounts = [
   {
     name: "Test Staph",
     email: "test-staph@mit.edu",
-    role: "student",
+    role: "staph",
     type: "staph",
   },
 ];

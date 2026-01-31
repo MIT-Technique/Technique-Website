@@ -74,7 +74,7 @@ export default function ResponsesSeniorsPage() {
           <tbody>
             {seniors.map((bio) => (
               <tr key={bio.id} className="border-b border-border last:border-0">
-                <td className="p-3 whitespace-nowrap">{bio.first_name} {bio.last_name}</td>
+                <td className="p-3 whitespace-nowrap">{bio.name}</td>
                 <td className="p-3">{bio.major || '—'}</td>
                 <td className="p-3">{bio.minor || '—'}</td>
                 <td className="p-3">{bio.second_major || '—'}</td>

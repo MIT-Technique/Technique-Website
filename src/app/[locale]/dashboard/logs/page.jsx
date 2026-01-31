@@ -58,9 +58,7 @@ export default function LogsPage() {
 
   function formatLogAction(log) {
     const actorName = log.actor
-      ? (log.actor.first_name && log.actor.last_name
-          ? `${log.actor.first_name} ${log.actor.last_name}`
-          : log.actor.email)
+      ? (log.actor.name || log.actor.email)
       : 'Unknown';
 
     const details = log.details || {};

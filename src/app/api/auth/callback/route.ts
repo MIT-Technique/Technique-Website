@@ -52,9 +52,7 @@ export async function GET(request: NextRequest) {
             .insert({
               email,
               role: 'club',
-              first_name: clubName,
-              last_name: '',
-              auth_provider: 'supabase_auth',
+              name: clubName,
               supabase_auth_id: supabaseAuthId,
               is_active: true,
             })

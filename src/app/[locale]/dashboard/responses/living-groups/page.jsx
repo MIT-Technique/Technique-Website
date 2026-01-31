@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { downloadImagesAsZip } from '../../../../../lib/utils/downloadImages';
 
@@ -13,7 +13,7 @@ export default function ResponsesLivingGroupsPage() {
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
   const [exporting, setExporting] = useState(false);
-  const [expandedLGs, setExpandedLGs] = useState(new Set());
+  const [expandedLGs, setExpandedLGs] = useState([]);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(0);
 
@@ -74,12 +74,9 @@ export default function ResponsesLivingGroupsPage() {
   };
 
   const toggleExpand = (id) => {
-    setExpandedLGs(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+    setExpandedLGs(prev =>
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+    );
   };
 
   if (loading) return <p className="text-text-secondary">{tc('loading')}</p>;
@@ -145,23 +142,23 @@ export default function ResponsesLivingGroupsPage() {
           </thead>
           <tbody>
             {paginated.map((lg) => (
-              <>
-                <tr key={lg.id} className="border-b border-border cursor-pointer hover:bg-bg-secondary/50" onClick={() => toggleExpand(lg.id)}>
+              <React.Fragment key={lg.id}>
+                <tr className={`border-b border-border ${lg.sections.length > 0 ? 'cursor-pointer hover:bg-bg-secondary/50' : ''}`} onClick={() => lg.sections.length > 0 && toggleExpand(lg.id)}>
                   <td className="p-3">
-                    <span className="mr-2">{expandedLGs.has(lg.id) ? '▼' : '▶'}</span>
+                    {lg.sections.length > 0 && <span className="mr-2">{expandedLGs.includes(lg.id) ? '▼' : '▶'}</span>}
                     {lg.name}
                   </td>
                   <td className="p-3 text-center">{lg.type}</td>
                   <td className="p-3 text-center">{lg.sections.length} sections · {lg.totalMembers} members</td>
                 </tr>
-                {expandedLGs.has(lg.id) && lg.sections.map((section) => (
+                {expandedLGs.includes(lg.id) && lg.sections.map((section) => (
                   <tr key={`${lg.id}-${section.name}`} className="border-b border-border bg-bg-secondary/30">
                     <td className="p-3 pl-10">{section.name}</td>
                     <td className="p-3 text-center">{section.hasImage ? tc('yes') : tc('no')}</td>
                     <td className="p-3 text-center">{section.memberCount}</td>
                   </tr>
                 ))}
-              </>
+              </React.Fragment>
             ))}
             {paginated.length === 0 && (
               <tr><td colSpan={3} className="p-3 text-center text-text-secondary">{tc('noData')}</td></tr>

@@ -26,3 +26,25 @@ ALTER TABLE public.living_group_manual_members DROP COLUMN IF EXISTS last_name;
 
 ALTER TABLE public.sports_manual_members DROP COLUMN IF EXISTS first_name;
 ALTER TABLE public.sports_manual_members DROP COLUMN IF EXISTS last_name;
+
+-- 5. Drop auth_provider column (never queried, only set on creation)
+ALTER TABLE public.users DROP COLUMN IF EXISTS auth_provider;
+
+-- 6. Backfill name for org users from their org tables (scripts didn't set name)
+UPDATE public.users u SET name = c.name
+FROM public.clubs c WHERE c.user_id = u.id AND (u.name IS NULL OR u.name = '');
+
+UPDATE public.users u SET name = lg.name
+FROM public.living_groups lg WHERE lg.user_id = u.id AND (u.name IS NULL OR u.name = '');
+
+UPDATE public.users u SET name = s.name
+FROM public.sports s WHERE s.user_id = u.id AND (u.name IS NULL OR u.name = '');
+
+-- 7. Rename 'student' role to 'staph' and update constraint/default
+UPDATE public.users SET role = 'staph' WHERE role = 'student';
+UPDATE public.users SET is_staph = true WHERE role = 'staph';
+
+ALTER TABLE public.users DROP CONSTRAINT IF EXISTS users_role_check;
+ALTER TABLE public.users ADD CONSTRAINT users_role_check
+  CHECK (role::text = ANY (ARRAY['admin','staph','club','living_group','sports']::text[]));
+ALTER TABLE public.users ALTER COLUMN role SET DEFAULT 'staph';

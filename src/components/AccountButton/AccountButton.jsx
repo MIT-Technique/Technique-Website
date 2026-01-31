@@ -128,7 +128,7 @@ function AccountButton({ isHomePage = false }) {
   };
 
   // Get display name
-  const displayName = user?.first_name || user?.email?.split('@')[0] || 'Account';
+  const displayName = user?.name || user?.email?.split('@')[0] || 'Account';
 
   return (
     <div className="relative" ref={dropdownRef}>

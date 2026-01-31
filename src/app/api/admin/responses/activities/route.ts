@@ -5,7 +5,7 @@ import { createAdminClient } from "../../../../../lib/supabase/admin";
 export async function GET() {
   try {
     const user = await getCurrentUser();
-    if (!user || user.role !== 'admin') {
+    if (!user || (user.role !== 'admin' && !(user.is_staph && user.access?.includes('activities')))) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
