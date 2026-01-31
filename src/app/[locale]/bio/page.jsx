@@ -14,7 +14,6 @@ import Snackbar from "@mui/material/Snackbar";
 import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import Alert from "@mui/material/Alert";
-import { useTranslations } from "next-intl";
 import CircularProgress from "@mui/material/CircularProgress";
 
 // Shared MUI text field styling
