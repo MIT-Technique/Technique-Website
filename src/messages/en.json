@@ -555,6 +555,16 @@
           "yearbookNotDelivered": "Yearbook Inquiry",
           "other": "Other"
         },
+        "yearRequested": "Year Requested",
+        "selectYear": "Select a year...",
+        "loadingYears": "Loading available years...",
+        "noYearbooksAvailable": "No yearbooks are currently available for purchase. Please check back later or contact us.",
+        "shippingTitle": "Shipping Address (optional)",
+        "shippingAddress": "Street Address",
+        "shippingAddressPlaceholder": "123 Main St, Apt 4",
+        "shippingCity": "City",
+        "shippingState": "State",
+        "shippingZip": "ZIP Code",
         "message": "Message"
       },
       "submitButton": "Submit Inquiry",
@@ -577,6 +587,16 @@
           "oldPictures": "Old Pictures",
           "other": "Other Inquiries"
         },
+        "yearRequested": "Year Requested",
+        "selectYear": "Select a year...",
+        "loadingYears": "Loading available years...",
+        "noYearbooksAvailable": "No yearbooks are currently available for purchase. Please check back later or contact us.",
+        "shippingTitle": "Shipping Address (optional)",
+        "shippingAddress": "Street Address",
+        "shippingAddressPlaceholder": "123 Main St, Apt 4",
+        "shippingCity": "City",
+        "shippingState": "State",
+        "shippingZip": "ZIP Code",
         "message": "Message"
       },
       "submitButton": "Submit Inquiry",
@@ -934,6 +954,22 @@
         "title": "System Information",
         "adminEmail": "Admin Email",
         "graduatingYear": "Graduating Year"
+      },
+      "inventory": {
+        "title": "Yearbook Inventory",
+        "description": "Manage past yearbook inventory for alumni and parent purchases.",
+        "searchPlaceholder": "Search by year...",
+        "year": "Year",
+        "quantity": "Quantity",
+        "status": "Status",
+        "actions": "Actions",
+        "inStock": "In Stock",
+        "outOfStock": "Out of Stock",
+        "edit": "Edit",
+        "save": "Save",
+        "cancel": "Cancel",
+        "noResults": "No inventory found",
+        "add": "Add"
       }
     }
   },
@@ -1320,7 +1356,7 @@
         "q1": "How do I schedule a senior portrait?",
         "a1": "Portrait sessions open on a rolling basis. Visit the Seniors page and click \"Schedule Your Portrait\" to book an available time slot.",
         "q2": "How do I submit my senior bio?",
-        "a2": "Sign in with your MIT credentials and navigate to the Senior Bio page. You can enter your name, major, and an optional quote that will appear alongside your portrait in the yearbook.",
+        "a2": "Navigate to the Senior Bio page. You can enter your name, major, and an optional quote that will appear alongside your portrait in the yearbook.",
         "q3": "What if I missed my portrait session?",
         "a3": "Contact technique@mit.edu as soon as possible. Technique has a publication deadline, so late sessions cannot always be accommodated. Your name will still appear in the yearbook regardless."
       },

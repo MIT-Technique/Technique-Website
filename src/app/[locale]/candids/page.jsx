@@ -152,11 +152,9 @@ export default function CandidsPage() {
         }
       }
 
-      formData.append('organizationName', eventName.trim());
-      formData.append('organizationType', 'event');
-      if (eventDescription.trim()) {
-        formData.append('eventDescription', eventDescription.trim());
-      }
+      formData.append('organizationName', eventName.trim()); // API expects this field name
+      formData.append('organizationType', 'event'); // API expects this field name
+      formData.append('eventDescription', eventDescription.trim());
 
       const res = await fetch('/api/candids/upload', {
         method: 'POST',

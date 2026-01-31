@@ -22,9 +22,9 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData();
     const email = formData.get('email') as string | null;
-    const organizationName = formData.get('organizationName') as string | null;
-    const organizationType = formData.get('organizationType') as string | null;
-    const livingGroupType = formData.get('livingGroupType') as string | null;
+    const eventName = formData.get('organizationName') as string | null; // Legacy field name from UI
+    const eventType = formData.get('organizationType') as string | null; // Legacy field name from UI
+    const eventDescription = formData.get('eventDescription') as string | null;
 
     // Validate email
     if (!email || typeof email !== 'string') {
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
 
     // Check for existing submission by this email — delete old images if re-submitting
     const { data: existing } = await supabase
-      .from('anonymous_candid_submissions')
+      .from('community_candids')
       .select('id, image_urls')
       .eq('email', normalizedEmail)
       .single();
@@ -84,8 +84,8 @@ export async function POST(request: NextRequest) {
     if (existing?.image_urls?.length) {
       // Delete old images from storage
       for (const url of existing.image_urls) {
-        // Try each bucket to find and delete the file
-        for (const bucket of ['club-images', 'living-group-images', 'sports-images', 'anonymous-submissions']) {
+        // Try each bucket to find and delete the file (includes legacy bucket names)
+        for (const bucket of ['community-candids', 'club-images', 'living-group-images', 'sports-images', 'anonymous-submissions']) {
           const match = url.match(new RegExp(`/${bucket}/(.+)$`));
           if (match) {
             await supabase.storage.from(bucket).remove([decodeURIComponent(match[1])]);
@@ -98,37 +98,17 @@ export async function POST(request: NextRequest) {
     const timestamp = Date.now();
     const uploadedUrls: string[] = [];
 
-    // Determine bucket and path based on organization
+    // Determine bucket and path based on event
+    const bucketName = 'community-candids';
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       const fileExt = file.name.split('.').pop() || 'jpg';
-      let bucketName: string;
       let filePath: string;
 
-      if (organizationName && organizationType) {
-        const safeName = organizationName.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '');
-
-        switch (organizationType) {
-          case 'club':
-            bucketName = 'club-images';
-            filePath = `clubs/${safeName}/Anonymous/${timestamp}_${i + 1}.${fileExt}`;
-            break;
-          case 'living_group': {
-            bucketName = 'living-group-images';
-            const subfolder = livingGroupType === 'fsilg' ? 'fsilgs' : 'dorms';
-            filePath = `${subfolder}/${safeName}/Anonymous/${timestamp}_${i + 1}.${fileExt}`;
-            break;
-          }
-          case 'sports':
-            bucketName = 'sports-images';
-            filePath = `sports/${safeName}/Anonymous/${timestamp}_${i + 1}.${fileExt}`;
-            break;
-          default:
-            bucketName = 'anonymous-submissions';
-            filePath = `misc/${timestamp}_${i + 1}.${fileExt}`;
-        }
+      if (eventName) {
+        const safeName = eventName.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '');
+        filePath = `events/${safeName}/${timestamp}_${i + 1}.${fileExt}`;
       } else {
-        bucketName = 'anonymous-submissions';
         filePath = `misc/${timestamp}_${i + 1}.${fileExt}`;
       }
 
@@ -163,21 +143,23 @@ export async function POST(request: NextRequest) {
     // Upsert submission record by email
     if (existing) {
       await supabase
-        .from('anonymous_candid_submissions')
+        .from('community_candids')
         .update({
-          organization_name: organizationName || null,
-          organization_type: organizationType || null,
+          event_name: eventName || null,
+          event_type: eventType || null,
+          event_description: eventDescription?.trim() || null,
           image_urls: uploadedUrls,
           created_at: new Date().toISOString(),
         })
         .eq('id', existing.id);
     } else {
       await supabase
-        .from('anonymous_candid_submissions')
+        .from('community_candids')
         .insert({
           email: normalizedEmail,
-          organization_name: organizationName || null,
-          organization_type: organizationType || null,
+          event_name: eventName || null,
+          event_type: eventType || null,
+          event_description: eventDescription?.trim() || null,
           image_urls: uploadedUrls,
         });
     }

@@ -533,6 +533,16 @@
           "yearbookNotDelivered": "年鉴咨询",
           "other": "其他"
         },
+        "yearRequested": "所需年份",
+        "selectYear": "选择年份...",
+        "loadingYears": "正在加载可用年份...",
+        "noYearbooksAvailable": "目前没有可购买的年鉴。请稍后再试或联系我们。",
+        "shippingTitle": "邮寄地址（选填）",
+        "shippingAddress": "街道地址",
+        "shippingAddressPlaceholder": "123 主街，公寓 4",
+        "shippingCity": "城市",
+        "shippingState": "州/省",
+        "shippingZip": "邮编",
         "message": "留言"
       },
       "submitButton": "提交咨询",
@@ -554,6 +564,16 @@
           "oldPictures": "旧照片",
           "other": "其他咨询"
         },
+        "yearRequested": "所需年份",
+        "selectYear": "选择年份...",
+        "loadingYears": "正在加载可用年份...",
+        "noYearbooksAvailable": "目前没有可购买的年鉴。请稍后再试或联系我们。",
+        "shippingTitle": "邮寄地址（选填）",
+        "shippingAddress": "街道地址",
+        "shippingAddressPlaceholder": "123 主街，公寓 4",
+        "shippingCity": "城市",
+        "shippingState": "州/省",
+        "shippingZip": "邮编",
         "message": "留言"
       },
       "submitButton": "提交咨询",
@@ -897,6 +917,22 @@
         "title": "系统信息",
         "adminEmail": "管理员邮箱",
         "graduatingYear": "毕业年份"
+      },
+      "inventory": {
+        "title": "年鉴库存",
+        "description": "管理往年年鉴库存，供校友和家长购买。",
+        "searchPlaceholder": "按年份搜索...",
+        "year": "年份",
+        "quantity": "数量",
+        "status": "状态",
+        "actions": "操作",
+        "inStock": "有库存",
+        "outOfStock": "无库存",
+        "edit": "编辑",
+        "save": "保存",
+        "cancel": "取消",
+        "noResults": "未找到库存",
+        "add": "添加"
       }
     }
   },
@@ -1280,7 +1316,7 @@
         "q1": "如何预约毕业照拍摄？",
         "a1": "拍摄预约滚动开放。请访问毕业生页面，点击\"预约毕业照\"选择可用的时间段。",
         "q2": "如何提交毕业生简介？",
-        "a2": "使用MIT凭证登录，进入毕业生简介页面。您可以输入姓名、专业和一句可选的座右铭，这些将与您的毕业照一起出现在年鉴中。",
+        "a2": "进入毕业生简介页面。您可以输入姓名、专业和一句可选的座右铭，这些将与您的毕业照一起出现在年鉴中。",
         "q3": "如果错过了拍摄怎么办？",
         "a3": "请尽快联系technique@mit.edu。Technique有出版截止日期，可能无法总是安排补拍。但无论如何，您的姓名都会出现在年鉴中。"
       },

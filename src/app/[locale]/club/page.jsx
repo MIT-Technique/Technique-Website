@@ -679,7 +679,6 @@ export default function ClubPage() {
 
               {/* Members List */}
               <div>
-                <h2 className="text-lg font-medium mb-4">{t('members.title')}</h2>
                 {membersLoading ? (
                   <p className="text-text-secondary">Loading...</p>
                 ) : manualMembers.length === 0 ? (

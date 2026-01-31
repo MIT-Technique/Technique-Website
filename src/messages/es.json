@@ -533,6 +533,16 @@
           "yearbookNotDelivered": "Consulta de Anuario",
           "other": "Otro"
         },
+        "yearRequested": "Año Solicitado",
+        "selectYear": "Seleccione un año...",
+        "loadingYears": "Cargando años disponibles...",
+        "noYearbooksAvailable": "No hay anuarios disponibles actualmente para compra. Por favor vuelva más tarde o contáctenos.",
+        "shippingTitle": "Dirección de Envío (opcional)",
+        "shippingAddress": "Dirección",
+        "shippingAddressPlaceholder": "123 Calle Principal, Apt 4",
+        "shippingCity": "Ciudad",
+        "shippingState": "Estado",
+        "shippingZip": "Código Postal",
         "message": "Mensaje"
       },
       "submitButton": "Enviar Consulta",
@@ -554,6 +564,16 @@
           "oldPictures": "Fotos Antiguas",
           "other": "Otras Consultas"
         },
+        "yearRequested": "Año Solicitado",
+        "selectYear": "Seleccione un año...",
+        "loadingYears": "Cargando años disponibles...",
+        "noYearbooksAvailable": "No hay anuarios disponibles actualmente para compra. Por favor vuelva más tarde o contáctenos.",
+        "shippingTitle": "Dirección de Envío (opcional)",
+        "shippingAddress": "Dirección",
+        "shippingAddressPlaceholder": "123 Calle Principal, Apt 4",
+        "shippingCity": "Ciudad",
+        "shippingState": "Estado",
+        "shippingZip": "Código Postal",
         "message": "Mensaje"
       },
       "submitButton": "Enviar Consulta",
@@ -897,6 +917,22 @@
         "title": "Información del Sistema",
         "adminEmail": "Email de Admin",
         "graduatingYear": "Año de Graduación"
+      },
+      "inventory": {
+        "title": "Inventario de Anuarios",
+        "description": "Administre el inventario de anuarios pasados para compras de exalumnos y padres.",
+        "searchPlaceholder": "Buscar por año...",
+        "year": "Año",
+        "quantity": "Cantidad",
+        "status": "Estado",
+        "actions": "Acciones",
+        "inStock": "En Stock",
+        "outOfStock": "Agotado",
+        "edit": "Editar",
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "noResults": "No se encontró inventario",
+        "add": "Agregar"
       }
     }
   },
@@ -1279,7 +1315,7 @@
         "q1": "¿Cómo programo mi retrato de graduación?",
         "a1": "Las sesiones de retrato se abren de forma continua. Visita la página de Graduados y haz clic en \"Programa tu Retrato\" para reservar un horario disponible.",
         "q2": "¿Cómo envío mi biografía de graduación?",
-        "a2": "Inicia sesión con tus credenciales de MIT y ve a la página de Biografía de Graduado. Puedes ingresar tu nombre, carrera y una cita opcional que aparecerá junto a tu retrato en el anuario.",
+        "a2": "Ve a la página de Biografía de Graduado. Puedes ingresar tu nombre, carrera y una cita opcional que aparecerá junto a tu retrato en el anuario.",
         "q3": "¿Qué pasa si no pude asistir a mi sesión de retrato?",
         "a3": "Contacta a technique@mit.edu lo antes posible. Technique tiene una fecha límite de publicación, por lo que no siempre se pueden acomodar sesiones tardías. Tu nombre aparecerá en el anuario de todas formas."
       },

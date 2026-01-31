@@ -151,6 +151,7 @@ Technique-Website/
 ### Active Locales
 
 Only 3 locales are active (configured in `/src/i18n/config.js`):
+
 - `en` - English (default)
 - `es` - Spanish
 - `zh` - Chinese (Simplified)
@@ -167,6 +168,7 @@ Only 3 locales are active (configured in `/src/i18n/config.js`):
 ### Translation File Structure
 
 Top-level namespaces in each JSON file:
+
 - `common` - Site metadata, branding
 - `nav` - Navigation items, dropdown menus
 - `footer` - Copyright, social links
@@ -184,7 +186,7 @@ Top-level namespaces in each JSON file:
 
 ```javascript
 // Translation file: "photoCredit": "Photo: {photographer}"
-t('photoCredit', { photographer: 'Michelle Xiang' })
+t("photoCredit", { photographer: "Michelle Xiang" });
 ```
 
 ---
@@ -193,25 +195,25 @@ t('photoCredit', { photographer: 'Michelle Xiang' })
 
 ### Public Pages
 
-| Route                | Description                          |
-| -------------------- | ------------------------------------ |
-| `/`                  | Homepage                             |
-| `/about`             | About Us / organization history      |
-| `/alumni`            | Alumni information                   |
-| `/alumni-inquiry`    | Alumni inquiry form                  |
-| `/archives`          | Yearbook archive (1885-present)      |
-| `/clubs`             | Public clubs listing                 |
-| `/contact`           | Contact information                  |
-| `/hire`              | Event photography services           |
-| `/join`              | Join/signup page                     |
-| `/parent-inquiry`    | Parent inquiry form                  |
-| `/parents`           | Parent information                   |
-| `/portfolio`         | Photography portfolio                |
-| `/privacy`           | Privacy policy                       |
-| `/resources`         | Resources page                       |
-| `/seniors`           | Senior portrait information          |
-| `/student-work-feature` | Student work showcase             |
-| `/yearbook`          | Yearbook information & ordering      |
+| Route                   | Description                     |
+| ----------------------- | ------------------------------- |
+| `/`                     | Homepage                        |
+| `/about`                | About Us / organization history |
+| `/alumni`               | Alumni information              |
+| `/alumni-inquiry`       | Alumni inquiry form             |
+| `/archives`             | Yearbook archive (1885-present) |
+| `/clubs`                | Public clubs listing            |
+| `/contact`              | Contact information             |
+| `/hire`                 | Event photography services      |
+| `/join`                 | Join/signup page                |
+| `/parent-inquiry`       | Parent inquiry form             |
+| `/parents`              | Parent information              |
+| `/portfolio`            | Photography portfolio           |
+| `/privacy`              | Privacy policy                  |
+| `/resources`            | Resources page                  |
+| `/seniors`              | Senior portrait information     |
+| `/student-work-feature` | Student work showcase           |
+| `/yearbook`             | Yearbook information & ordering |
 
 ### Auth Pages
 
@@ -224,32 +226,32 @@ t('photoCredit', { photographer: 'Michelle Xiang' })
 
 ### Role-Protected Pages
 
-| Route            | Required Role    | Description                          |
-| ---------------- | ---------------- | ------------------------------------ |
-| `/bio`           | `student`        | Senior bio form                      |
-| `/profile`       | any logged-in    | User profile                         |
-| `/club`          | `club`           | Club management dashboard            |
-| `/living-group`  | `living_group`   | Living group management dashboard    |
-| `/sports`        | `sports`         | Sports team management dashboard     |
-| `/dashboard`     | `admin`          | Admin dashboard (users, orgs, photoshoots, settings) |
-| `/invoice`       | any logged-in    | Photographer invoice submission      |
+| Route           | Required Role  | Description                                          |
+| --------------- | -------------- | ---------------------------------------------------- |
+| `/bio`          | `student`      | Senior bio form                                      |
+| `/profile`      | any logged-in  | User profile                                         |
+| `/club`         | `club`         | Club management dashboard                            |
+| `/living-group` | `living_group` | Living group management dashboard                    |
+| `/sports`       | `sports`       | Sports team management dashboard                     |
+| `/dashboard`    | `admin`        | Admin dashboard (users, orgs, photoshoots, settings) |
+| `/invoice`      | any logged-in  | Photographer invoice submission                      |
 
 ---
 
 ## Components
 
-| Component                  | Purpose                                                    |
-| -------------------------- | ---------------------------------------------------------- |
-| `AccountButton`            | Account/user button in navbar                              |
-| `ConfirmationModal`        | MUI Dialog with `isDangerous` mode (red title)             |
-| `CookieConsent`            | Cookie consent banner                                      |
-| `CoverCard`                | Yearbook cover display card (archives page)                |
-| `Footer`                   | Site footer with copyright, email, Instagram               |
-| `ImageUpload`              | Drag-and-drop image upload (5MB max, JPEG/PNG/WebP/GIF)    |
-| `LanguageSwitcher`         | Dropdown language selector                                 |
+| Component                  | Purpose                                                            |
+| -------------------------- | ------------------------------------------------------------------ |
+| `AccountButton`            | Account/user button in navbar                                      |
+| `ConfirmationModal`        | MUI Dialog with `isDangerous` mode (red title)                     |
+| `CookieConsent`            | Cookie consent banner                                              |
+| `CoverCard`                | Yearbook cover display card (archives page)                        |
+| `Footer`                   | Site footer with copyright, email, Instagram                       |
+| `ImageUpload`              | Drag-and-drop image upload (5MB max, JPEG/PNG/WebP/GIF)            |
+| `LanguageSwitcher`         | Dropdown language selector                                         |
 | `Navbar_and_Sidebar`       | Desktop navbar (`Navbar_new.jsx`) + mobile sidebar (`Sidebar.jsx`) |
-| `OrganizationAuthModal`    | Login modal for clubs, living groups, and sports teams     |
-| `PhotographerTimesSection` | Photographer booking/scheduling section                    |
+| `OrganizationAuthModal`    | Login modal for clubs, living groups, and sports teams             |
+| `PhotographerTimesSection` | Photographer booking/scheduling section                            |
 
 ---
 
@@ -259,98 +261,98 @@ Located in `/src/app/api/` - **NOT localized** (language-agnostic).
 
 ### Legacy / Standalone
 
-| Route              | Method | Purpose                                |
-| ------------------ | ------ | -------------------------------------- |
-| `/api/bio`         | GET    | Fetch senior bio data                  |
-| `/api/getUserData` | GET    | Fetch user data from MongoDB           |
-| `/api/login`       | GET    | Initiates MIT SSO login flow           |
-| `/api/logout`      | GET    | Destroys session and redirects         |
-| `/api/sendContactForm` | POST | Send contact form email            |
-| `/api/sendInvoice` | POST   | Sends photographer invoice email       |
-| `/api/session`     | GET    | Checks current session status          |
-| `/api/updateBio`   | POST   | Updates senior bio in database         |
-| `/api/userSignIn`  | GET    | Handles MIT SSO callback               |
+| Route                  | Method | Purpose                          |
+| ---------------------- | ------ | -------------------------------- |
+| `/api/bio`             | GET    | Fetch senior bio data            |
+| `/api/getUserData`     | GET    | Fetch user data from MongoDB     |
+| `/api/login`           | GET    | Initiates MIT SSO login flow     |
+| `/api/logout`          | GET    | Destroys session and redirects   |
+| `/api/sendContactForm` | POST   | Send contact form email          |
+| `/api/sendInvoice`     | POST   | Sends photographer invoice email |
+| `/api/session`         | GET    | Checks current session status    |
+| `/api/updateBio`       | POST   | Updates senior bio in database   |
+| `/api/userSignIn`      | GET    | Handles MIT SSO callback         |
 
 ### Auth (`/api/auth/`)
 
-| Route                    | Method | Purpose                              |
-| ------------------------ | ------ | ------------------------------------ |
-| `admin-login`            | POST   | Admin magic link login               |
-| `callback`               | GET    | OAuth callback handler               |
-| `change-password`        | POST   | Organization password change         |
-| `club-login`             | POST   | Club login (legacy)                  |
-| `club-signup`            | POST   | Club signup (legacy)                 |
-| `logout`                 | POST   | Technique session logout             |
-| `org-forgot-password`    | POST   | Organization password reset          |
-| `org-signin`             | POST   | Unified organization login (club, LG, sports) |
-| `org-signup`             | POST   | Organization signup                  |
-| `session`                | GET    | Technique session check (returns user + org data) |
+| Route                 | Method | Purpose                                           |
+| --------------------- | ------ | ------------------------------------------------- |
+| `admin-login`         | POST   | Admin magic link login                            |
+| `callback`            | GET    | OAuth callback handler                            |
+| `change-password`     | POST   | Organization password change                      |
+| `club-login`          | POST   | Club login (legacy)                               |
+| `club-signup`         | POST   | Club signup (legacy)                              |
+| `logout`              | POST   | Technique session logout                          |
+| `org-forgot-password` | POST   | Organization password reset                       |
+| `org-signin`          | POST   | Unified organization login (club, LG, sports)     |
+| `org-signup`          | POST   | Organization signup                               |
+| `session`             | GET    | Technique session check (returns user + org data) |
 
 ### Admin (`/api/admin/`)
 
-| Route                | Method     | Purpose                             |
-| -------------------- | ---------- | ----------------------------------- |
-| `clubs`              | GET/PUT    | Manage clubs (approve/deny)         |
-| `designate-admin`    | POST       | Promote user to admin               |
-| `form-settings`      | GET/PUT    | Freeze/unfreeze organization forms  |
-| `living-groups`      | GET/PUT    | Manage living groups                |
-| `logs`               | GET        | View admin action logs              |
-| `photoshoot-times`   | GET/POST/PUT/DELETE | Manage photoshoot time slots |
-| `promotion-requests` | GET/PUT    | Review staph/photographer requests  |
-| `toggle-staph`       | POST       | Toggle user staph status            |
-| `users`              | GET/PUT    | View and manage users               |
+| Route                | Method              | Purpose                            |
+| -------------------- | ------------------- | ---------------------------------- |
+| `clubs`              | GET/PUT             | Manage clubs (approve/deny)        |
+| `designate-admin`    | POST                | Promote user to admin              |
+| `form-settings`      | GET/PUT             | Freeze/unfreeze organization forms |
+| `living-groups`      | GET/PUT             | Manage living groups               |
+| `logs`               | GET                 | View admin action logs             |
+| `photoshoot-times`   | GET/POST/PUT/DELETE | Manage photoshoot time slots       |
+| `promotion-requests` | GET/PUT             | Review staph/photographer requests |
+| `toggle-staph`       | POST                | Toggle user staph status           |
+| `users`              | GET/PUT             | View and manage users              |
 
 ### Clubs (`/api/clubs/`)
 
-| Route            | Method         | Purpose                              |
-| ---------------- | -------------- | ------------------------------------ |
-| `demote-leader`  | POST           | Demote club leader                   |
-| `documents`      | GET/PUT        | Internal document links/notes        |
-| `email`          | GET/POST       | Contact email management             |
-| `export-members` | GET            | Export member list                    |
-| `images`         | POST/DELETE    | Image upload/delete (3 slots)        |
-| `manual-members` | GET/POST/DELETE | Manual member management            |
-| `profile`        | GET/PUT        | Club profile (name, description)     |
-| `search`         | GET            | Search clubs                         |
+| Route            | Method          | Purpose                          |
+| ---------------- | --------------- | -------------------------------- |
+| `demote-leader`  | POST            | Demote club leader               |
+| `documents`      | GET/PUT         | Internal document links/notes    |
+| `email`          | GET/POST        | Contact email management         |
+| `export-members` | GET             | Export member list               |
+| `images`         | POST/DELETE     | Image upload/delete (3 slots)    |
+| `manual-members` | GET/POST/DELETE | Manual member management         |
+| `profile`        | GET/PUT         | Club profile (name, description) |
+| `search`         | GET             | Search clubs                     |
 
 ### Living Groups (`/api/living-groups/`)
 
-| Route              | Method         | Purpose                              |
-| ------------------ | -------------- | ------------------------------------ |
-| `book`             | POST           | Book a photoshoot time               |
-| `cancel-request`   | POST           | Request photoshoot cancellation      |
-| `check-availability` | GET          | Check time slot availability         |
-| `documents`        | GET/PUT        | Internal document links/notes        |
-| `email`            | GET/POST       | Contact email management             |
-| `images`           | POST/DELETE    | Section image upload/delete          |
-| `manual-members`   | GET/POST/DELETE | Manual member management            |
-| `propose-time`     | POST           | Propose photoshoot time              |
-| `search`           | GET            | Search living groups                 |
-| `sections`         | GET/POST/PUT/DELETE | Manage dorm sections             |
-| `time-assignments` | GET/POST/DELETE | Manage time slot assignments        |
-| `times`            | GET            | View available times                 |
+| Route                | Method              | Purpose                         |
+| -------------------- | ------------------- | ------------------------------- |
+| `book`               | POST                | Book a photoshoot time          |
+| `cancel-request`     | POST                | Request photoshoot cancellation |
+| `check-availability` | GET                 | Check time slot availability    |
+| `documents`          | GET/PUT             | Internal document links/notes   |
+| `email`              | GET/POST            | Contact email management        |
+| `images`             | POST/DELETE         | Section image upload/delete     |
+| `manual-members`     | GET/POST/DELETE     | Manual member management        |
+| `propose-time`       | POST                | Propose photoshoot time         |
+| `search`             | GET                 | Search living groups            |
+| `sections`           | GET/POST/PUT/DELETE | Manage dorm sections            |
+| `time-assignments`   | GET/POST/DELETE     | Manage time slot assignments    |
+| `times`              | GET                 | View available times            |
 
 ### Sports (`/api/sports/`)
 
-| Route            | Method         | Purpose                              |
-| ---------------- | -------------- | ------------------------------------ |
-| `coaches`        | GET/POST/PUT/DELETE | Coach management (name, role, order) |
-| `documents`      | GET/PUT        | Internal document links/notes        |
-| `email`          | GET/POST       | Contact email management             |
-| `images`         | POST/DELETE    | Image upload/delete (3 slots × team) |
-| `manual-members` | GET/POST/DELETE | Manual member management (with team filter) |
-| `profile`        | GET/PUT        | Sports profile (description, gender teams toggle, achievements) |
+| Route            | Method              | Purpose                                                         |
+| ---------------- | ------------------- | --------------------------------------------------------------- |
+| `coaches`        | GET/POST/PUT/DELETE | Coach management (name, role, order)                            |
+| `documents`      | GET/PUT             | Internal document links/notes                                   |
+| `email`          | GET/POST            | Contact email management                                        |
+| `images`         | POST/DELETE         | Image upload/delete (3 slots × team)                            |
+| `manual-members` | GET/POST/DELETE     | Manual member management (with team filter)                     |
+| `profile`        | GET/PUT             | Sports profile (description, gender teams toggle, achievements) |
 
 ### Other
 
-| Route                    | Method | Purpose                     |
-| ------------------------ | ------ | --------------------------- |
-| `/api/organizations/list` | GET   | List all orgs (clubs, LGs, sports) for login modal |
-| `/api/photographer/proposals` | GET/POST | Photographer time proposals |
-| `/api/photographer/status` | GET   | Photographer permission status |
-| `/api/photographer/times` | GET    | Photographer available times |
-| `/api/user/profile`      | GET/PUT | User profile management     |
-| `/api/user/request-promotion` | POST | Request staph/photographer promotion |
+| Route                         | Method   | Purpose                                            |
+| ----------------------------- | -------- | -------------------------------------------------- |
+| `/api/organizations/list`     | GET      | List all orgs (clubs, LGs, sports) for login modal |
+| `/api/photographer/proposals` | GET/POST | Photographer time proposals                        |
+| `/api/photographer/status`    | GET      | Photographer permission status                     |
+| `/api/photographer/times`     | GET      | Photographer available times                       |
+| `/api/user/profile`           | GET/PUT  | User profile management                            |
+| `/api/user/request-promotion` | POST     | Request staph/photographer promotion               |
 
 ---
 
@@ -382,7 +384,13 @@ Located in `/src/app/api/` - **NOT localized** (language-agnostic).
 ### User Roles
 
 ```typescript
-type UserRole = 'admin' | 'staph' | 'club' | 'living_group' | 'sports' | 'student';
+type UserRole =
+  | "admin"
+  | "staph"
+  | "club"
+  | "living_group"
+  | "sports"
+  | "student";
 ```
 
 - `admin` - Full dashboard access, user management, org approval
@@ -394,36 +402,37 @@ type UserRole = 'admin' | 'staph' | 'club' | 'living_group' | 'sports' | 'studen
 
 ### Core Entities (Supabase/PostgreSQL)
 
-| Table                          | Purpose                                      |
-| ------------------------------ | -------------------------------------------- |
-| `users`                        | All users (MIT SSO + org accounts)           |
-| `sessions`                     | OAuth session storage                        |
-| `clubs`                        | Club profiles (name, description, images, documents) |
-| `club_manual_members`          | Manual member entries for clubs              |
-| `living_groups`                | Living group profiles (dorm/FSILG)           |
-| `living_group_manual_members`  | Manual member entries for LGs                |
-| `sports`                       | Sports team profiles (with gender team support) |
-| `sports_coaches`               | Coach entries (name, role, display_order)     |
-| `sports_manual_members`        | Manual member entries (with team filter: mens/womens/null) |
-| `photoshoot_times`             | Photoshoot time slots                        |
-| `time_proposals`               | Bidirectional scheduling proposals           |
-| `living_group_time_assignments`| Time slot assignments for LG sections        |
-| `form_settings`                | Form freeze/unfreeze settings                |
-| `promotion_requests`           | Staph/photographer promotion requests        |
-| `photographer_permissions`     | Photographer access permissions              |
-| `admin_logs`                   | Admin action audit trail                     |
+| Table                           | Purpose                                                    |
+| ------------------------------- | ---------------------------------------------------------- |
+| `users`                         | All users (MIT SSO + org accounts)                         |
+| `sessions`                      | OAuth session storage                                      |
+| `clubs`                         | Club profiles (name, description, images, documents)       |
+| `club_manual_members`           | Manual member entries for clubs                            |
+| `living_groups`                 | Living group profiles (dorm/FSILG)                         |
+| `living_group_manual_members`   | Manual member entries for LGs                              |
+| `sports`                        | Sports team profiles (with gender team support)            |
+| `sports_coaches`                | Coach entries (name, role, display_order)                  |
+| `sports_manual_members`         | Manual member entries (with team filter: mens/womens/null) |
+| `photoshoot_times`              | Photoshoot time slots                                      |
+| `time_proposals`                | Bidirectional scheduling proposals                         |
+| `living_group_time_assignments` | Time slot assignments for LG sections                      |
+| `form_settings`                 | Form freeze/unfreeze settings                              |
+| `promotion_requests`            | Staph/photographer promotion requests                      |
+| `photographer_permissions`      | Photographer access permissions                            |
+| `admin_logs`                    | Admin action audit trail                                   |
 
 ### Storage Buckets
 
-| Bucket               | Purpose                           | Path Pattern                                    |
-| -------------------- | --------------------------------- | ----------------------------------------------- |
-| `club-images`        | Club candid photos (3 slots)      | `clubs/{safeName}_Candid{suffix}.{ext}`         |
-| `living-group-images`| LG section photos                 | `{dorms\|fsilgs}/{safeName}_{section}_Candid.{ext}` |
-| `sports-images`      | Sports team photos (3 slots × team) | `sports/{safeName}/{mens\|womens\|}/Candid{suffix}.{ext}` |
+| Bucket                | Purpose                             | Path Pattern                                              |
+| --------------------- | ----------------------------------- | --------------------------------------------------------- |
+| `club-images`         | Club candid photos (3 slots)        | `clubs/{safeName}_Candid{suffix}.{ext}`                   |
+| `living-group-images` | LG section photos                   | `{dorms\|fsilgs}/{safeName}_{section}_Candid.{ext}`       |
+| `sports-images`       | Sports team photos (3 slots × team) | `sports/{safeName}/{mens\|womens\|}/Candid{suffix}.{ext}` |
 
 ### Sports-Specific Schema
 
 The `sports` table supports optional gender teams via `has_gender_teams` boolean:
+
 - When `false`: uses `candid_image_1-3`, `achievement_summary`, members with `team = NULL`
 - When `true`: uses `mens_candid_image_1-3`, `womens_candid_image_1-3`, `mens_achievement_summary`, `womens_achievement_summary`, members with `team = 'mens'` or `'womens'`
 - Coaches are always shared (not team-specific)
@@ -438,9 +447,9 @@ The `sports` table supports optional gender teams via `has_gender_teams` boolean
 
 This project uses **two separate iron-session cookies**. Mixing them up will break authentication.
 
-| Session             | Cookie Name         | Source File               | Purpose                                         |
-| ------------------- | ------------------- | ------------------------- | ----------------------------------------------- |
-| `next_js_session`   | `next_js_session`   | `src/lib/lib.ts`          | MIT SSO OAuth (stores `state`, `code_verifier`) |
+| Session             | Cookie Name         | Source File               | Purpose                                                |
+| ------------------- | ------------------- | ------------------------- | ------------------------------------------------------ |
+| `next_js_session`   | `next_js_session`   | `src/lib/lib.ts`          | MIT SSO OAuth (stores `state`, `code_verifier`)        |
 | `technique_session` | `technique_session` | `src/lib/auth/session.ts` | Organization login, admin magic links, role-based auth |
 
 ### Critical Import Rules
@@ -479,11 +488,11 @@ import { getSession } from "../../../lib/auth/session";
 
 ### Login Page Structure
 
-| Route            | Purpose                                | Auth Method                              |
-| ---------------- | -------------------------------------- | ---------------------------------------- |
+| Route            | Purpose                                | Auth Method                               |
+| ---------------- | -------------------------------------- | ----------------------------------------- |
 | `/login`         | Main login page                        | MIT SSO button + Organization login modal |
-| `/login/student` | Student-only login (bio form redirect) | MIT SSO only                             |
-| `/login/admin`   | Admin-only login                       | Magic link form (technique@mit.edu)      |
+| `/login/student` | Student-only login (bio form redirect) | MIT SSO only                              |
+| `/login/admin`   | Admin-only login                       | Magic link form (technique@mit.edu)       |
 
 ---
 
@@ -499,7 +508,11 @@ const nextConfig = {
   async redirects() {
     return [
       { source: "/", destination: "/en", permanent: false },
-      { source: "/portrait", destination: "https://seniors.legacystudios.com/...", permanent: false },
+      {
+        source: "/portrait",
+        destination: "https://seniors.legacystudios.com/...",
+        permanent: false,
+      },
     ];
   },
 };
@@ -508,21 +521,21 @@ export default withNextIntl(nextConfig);
 
 ### Key Dependencies
 
-| Package              | Purpose                         |
-| -------------------- | ------------------------------- |
-| `next` 14.2.3       | App framework                   |
-| `next-intl` ^4.7.0  | Internationalization            |
-| `@supabase/supabase-js` | Supabase client             |
-| `@supabase/ssr`      | Supabase SSR helpers            |
-| `iron-session`       | Encrypted session cookies       |
-| `mongodb`            | MongoDB driver (legacy bio data)|
-| `openid-client`      | MIT SSO OIDC integration        |
-| `nodemailer`         | Email sending                   |
-| `pdf-lib`            | PDF generation                  |
-| `zod`                | Schema validation               |
-| `@mui/material`      | UI components (dialogs, etc.)   |
-| `framer-motion`      | Animations                      |
-| `react-icons`        | Icon library                    |
+| Package                 | Purpose                          |
+| ----------------------- | -------------------------------- |
+| `next` 14.2.3           | App framework                    |
+| `next-intl` ^4.7.0      | Internationalization             |
+| `@supabase/supabase-js` | Supabase client                  |
+| `@supabase/ssr`         | Supabase SSR helpers             |
+| `iron-session`          | Encrypted session cookies        |
+| `mongodb`               | MongoDB driver (legacy bio data) |
+| `openid-client`         | MIT SSO OIDC integration         |
+| `nodemailer`            | Email sending                    |
+| `pdf-lib`               | PDF generation                   |
+| `zod`                   | Schema validation                |
+| `@mui/material`         | UI components (dialogs, etc.)    |
+| `framer-motion`         | Animations                       |
+| `react-icons`           | Icon library                     |
 
 ---
 
@@ -578,12 +591,6 @@ npm start         # Production server
 -- WARNING: This schema is for context only and is not meant to be run.
 -- Table order and constraints may not be valid for execution.
 
--- NOTE: The membership system has been simplified (Jan 2026).
--- The system now uses simple text lists for members (manual_members tables)
--- instead of linked accounts. Students only use MIT SSO for senior bio form.
--- Organization accounts (clubs, living groups, sports) use Supabase Auth
--- with email/password login via the OrganizationAuthModal.
-
 CREATE TABLE public.admin_logs (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 actor_id uuid NOT NULL,
@@ -595,23 +602,30 @@ created_at timestamp with time zone DEFAULT now(),
 CONSTRAINT admin_logs_pkey PRIMARY KEY (id),
 CONSTRAINT admin_logs_actor_id_fkey FOREIGN KEY (actor_id) REFERENCES public.users(id)
 );
-
 CREATE TABLE public.club_manual_members (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 club_id uuid NOT NULL,
 name text NOT NULL,
+added_at timestamp with time zone DEFAULT now(),
 first_name character varying NOT NULL,
 last_name character varying NOT NULL,
 section_name text,
-added_at timestamp with time zone DEFAULT now(),
 CONSTRAINT club_manual_members_pkey PRIMARY KEY (id),
 CONSTRAINT club_manual_members_club_id_fkey FOREIGN KEY (club_id) REFERENCES public.clubs(id)
 );
-
+CREATE TABLE public.club_memberships (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+club_id uuid NOT NULL,
+user_id uuid NOT NULL,
+role text NOT NULL DEFAULT 'member'::text CHECK (role = ANY (ARRAY['member'::text, 'leader'::text])),
+joined_at timestamp with time zone DEFAULT now(),
+CONSTRAINT club_memberships_pkey PRIMARY KEY (id),
+CONSTRAINT club_memberships_club_id_fkey FOREIGN KEY (club_id) REFERENCES public.clubs(id),
+CONSTRAINT club_memberships_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
 CREATE TABLE public.clubs (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 user_id uuid NOT NULL,
-club_id character NOT NULL UNIQUE,
 name character varying NOT NULL,
 description text,
 candid_image_1 text,
@@ -629,7 +643,16 @@ CONSTRAINT clubs_pkey PRIMARY KEY (id),
 CONSTRAINT clubs_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
 CONSTRAINT clubs_approved_by_fkey FOREIGN KEY (approved_by) REFERENCES public.users(id)
 );
-
+CREATE TABLE public.community_candids (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+email character varying NOT NULL UNIQUE,
+event_name text,
+event_type text,
+image_urls ARRAY,
+created_at timestamp with time zone DEFAULT now(),
+event_description text,
+CONSTRAINT community_candids_pkey PRIMARY KEY (id)
+);
 CREATE TABLE public.form_settings (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 form_name character varying NOT NULL UNIQUE,
@@ -644,19 +667,32 @@ CONSTRAINT form_settings_pkey PRIMARY KEY (id),
 CONSTRAINT form_settings_frozen_by_fkey FOREIGN KEY (frozen_by) REFERENCES public.users(id),
 CONSTRAINT form_settings_unfrozen_by_fkey FOREIGN KEY (unfrozen_by) REFERENCES public.users(id)
 );
-
 CREATE TABLE public.living_group_manual_members (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 living_group_id uuid NOT NULL,
 name text NOT NULL,
 section_name text,
+added_at timestamp with time zone DEFAULT now(),
 first_name character varying NOT NULL,
 last_name character varying NOT NULL,
-added_at timestamp with time zone DEFAULT now(),
 CONSTRAINT living_group_manual_members_pkey PRIMARY KEY (id),
 CONSTRAINT living_group_manual_members_living_group_id_fkey FOREIGN KEY (living_group_id) REFERENCES public.living_groups(id)
 );
-
+CREATE TABLE public.living_group_memberships (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+living_group_id uuid NOT NULL,
+user_id uuid NOT NULL,
+membership_type character varying NOT NULL CHECK (membership_type::text = ANY (ARRAY['dorm'::character varying, 'fsilg'::character varying]::text[])),
+status character varying NOT NULL DEFAULT 'active'::character varying CHECK (status::text = ANY (ARRAY['pending'::character varying, 'active'::character varying, 'removed'::character varying]::text[])),
+joined_at timestamp with time zone DEFAULT now(),
+approved_by uuid,
+approved_at timestamp with time zone,
+section_name text,
+CONSTRAINT living_group_memberships_pkey PRIMARY KEY (id),
+CONSTRAINT living_group_memberships_living_group_fkey FOREIGN KEY (living_group_id) REFERENCES public.living_groups(id),
+CONSTRAINT living_group_memberships_user_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
+CONSTRAINT living_group_memberships_approved_by_fkey FOREIGN KEY (approved_by) REFERENCES public.users(id)
+);
 CREATE TABLE public.living_group_time_assignments (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 photoshoot_time_id uuid NOT NULL,
@@ -671,7 +707,6 @@ CONSTRAINT living_group_time_assignments_photoshoot_fkey FOREIGN KEY (photoshoot
 CONSTRAINT living_group_time_assignments_living_group_fkey FOREIGN KEY (living_group_id) REFERENCES public.living_groups(id),
 CONSTRAINT living_group_time_assignments_assigned_by_fkey FOREIGN KEY (assigned_by) REFERENCES public.users(id)
 );
-
 CREATE TABLE public.living_groups (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 user_id uuid NOT NULL UNIQUE,
@@ -691,7 +726,6 @@ CONSTRAINT living_groups_pkey PRIMARY KEY (id),
 CONSTRAINT living_groups_disabled_by_fkey FOREIGN KEY (disabled_by) REFERENCES public.users(id),
 CONSTRAINT living_groups_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
 );
-
 CREATE TABLE public.photographer_permissions (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 user_id uuid NOT NULL UNIQUE,
@@ -707,7 +741,6 @@ CONSTRAINT photographer_permissions_user_id_fkey FOREIGN KEY (user_id) REFERENCE
 CONSTRAINT photographer_permissions_approved_by_fkey FOREIGN KEY (approved_by) REFERENCES public.users(id),
 CONSTRAINT photographer_permissions_revoked_by_fkey FOREIGN KEY (revoked_by) REFERENCES public.users(id)
 );
-
 CREATE TABLE public.photoshoot_times (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 date date NOT NULL,
@@ -732,24 +765,20 @@ CONSTRAINT photoshoot_times_booked_by_fkey FOREIGN KEY (booked_by) REFERENCES pu
 CONSTRAINT photoshoot_times_cancelled_by_fkey FOREIGN KEY (cancelled_by) REFERENCES public.users(id),
 CONSTRAINT photoshoot_times_created_by_fkey FOREIGN KEY (created_by) REFERENCES public.users(id)
 );
-
-CREATE TABLE public.promotion_requests (
+CREATE TABLE public.senior_bios (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
-user_id uuid NOT NULL,
-request_type character varying NOT NULL CHECK (request_type::text = ANY (ARRAY['staph_request'::text, 'photographer_request'::text])),
-status character varying DEFAULT 'pending'::character varying CHECK (status::text = ANY (ARRAY['pending'::character varying, 'approved'::character varying, 'denied'::character varying]::text[])),
-request_reason text,
-living_group_name character varying,
-reviewed_by uuid,
-reviewed_at timestamp with time zone,
-review_notes text,
+email character varying NOT NULL UNIQUE,
+first_name character varying,
+last_name character varying,
+major character varying,
+second_major character varying,
+quote text,
+achievements text,
 created_at timestamp with time zone DEFAULT now(),
 updated_at timestamp with time zone DEFAULT now(),
-CONSTRAINT promotion_requests_pkey PRIMARY KEY (id),
-CONSTRAINT promotion_requests_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
-CONSTRAINT promotion_requests_reviewed_by_fkey FOREIGN KEY (reviewed_by) REFERENCES public.users(id)
+minor text,
+CONSTRAINT senior_bios_pkey PRIMARY KEY (id)
 );
-
 CREATE TABLE public.sessions (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 user_id uuid NOT NULL,
@@ -762,7 +791,6 @@ updated_at timestamp with time zone DEFAULT now(),
 CONSTRAINT sessions_pkey PRIMARY KEY (id),
 CONSTRAINT sessions_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
 );
-
 CREATE TABLE public.sports (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 user_id uuid NOT NULL,
@@ -788,7 +816,6 @@ updated_at timestamp with time zone DEFAULT now(),
 CONSTRAINT sports_pkey PRIMARY KEY (id),
 CONSTRAINT sports_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
 );
-
 CREATE TABLE public.sports_coaches (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 sports_id uuid NOT NULL,
@@ -797,21 +824,31 @@ role text NOT NULL,
 display_order integer DEFAULT 0,
 added_at timestamp with time zone DEFAULT now(),
 CONSTRAINT sports_coaches_pkey PRIMARY KEY (id),
-CONSTRAINT sports_coaches_sports_id_fkey FOREIGN KEY (sports_id) REFERENCES public.sports(id) ON DELETE CASCADE
+CONSTRAINT sports_coaches_sports_id_fkey FOREIGN KEY (sports_id) REFERENCES public.sports(id)
 );
-
 CREATE TABLE public.sports_manual_members (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 sports_id uuid NOT NULL,
 first_name text NOT NULL,
 last_name text NOT NULL,
 name text NOT NULL,
-team text CHECK (team IS NULL OR team IN ('mens', 'womens')),
+team text CHECK (team IS NULL OR (team = ANY (ARRAY['mens'::text, 'womens'::text]))),
 added_at timestamp with time zone DEFAULT now(),
 CONSTRAINT sports_manual_members_pkey PRIMARY KEY (id),
-CONSTRAINT sports_manual_members_sports_id_fkey FOREIGN KEY (sports_id) REFERENCES public.sports(id) ON DELETE CASCADE
+CONSTRAINT sports_manual_members_sports_id_fkey FOREIGN KEY (sports_id) REFERENCES public.sports(id)
 );
-
+CREATE TABLE public.student_work_submissions (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+email character varying NOT NULL UNIQUE,
+members ARRAY NOT NULL,
+additional_credits text,
+project_title text NOT NULL,
+project_description text NOT NULL,
+links text,
+image_urls ARRAY,
+created_at timestamp with time zone DEFAULT now(),
+CONSTRAINT student_work_submissions_pkey PRIMARY KEY (id)
+);
 CREATE TABLE public.time_proposals (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 living_group_id uuid NOT NULL,
@@ -835,7 +872,6 @@ CONSTRAINT time_proposals_proposed_by_fkey FOREIGN KEY (proposed_by) REFERENCES 
 CONSTRAINT time_proposals_accepted_by_fkey FOREIGN KEY (accepted_by) REFERENCES public.users(id),
 CONSTRAINT time_proposals_declined_by_fkey FOREIGN KEY (declined_by) REFERENCES public.users(id)
 );
-
 CREATE TABLE public.users (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 email character varying NOT NULL UNIQUE,
@@ -855,6 +891,15 @@ updated_at timestamp with time zone DEFAULT now(),
 is_staph boolean DEFAULT false,
 CONSTRAINT users_pkey PRIMARY KEY (id),
 CONSTRAINT users_supabase_auth_id_fkey FOREIGN KEY (supabase_auth_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.yearbook_inventory (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+year integer NOT NULL UNIQUE,
+quantity integer NOT NULL DEFAULT 0,
+updated_at timestamp with time zone DEFAULT now(),
+updated_by uuid,
+CONSTRAINT yearbook_inventory_pkey PRIMARY KEY (id),
+CONSTRAINT yearbook_inventory_updated_by_fkey FOREIGN KEY (updated_by) REFERENCES public.users(id)
 );
 
 ---
