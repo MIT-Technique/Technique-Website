@@ -748,13 +748,16 @@
     "welcome": "Welcome, {name}",
     "tabs": {
       "overview": "Overview",
+      "organizations": "Organizations",
       "photoshoots": "Photoshoots",
       "clubs": "Clubs",
       "livingGroups": "Living Groups",
       "users": "Users",
       "sports": "Sports",
       "logs": "Logs",
-      "settings": "Settings"
+      "settings": "Settings",
+      "forms": "Forms",
+      "yearbookInventory": "Yearbook Inventory"
     },
     "stats": {
       "clubs": "Clubs",
@@ -862,8 +865,14 @@
         "upcoming": "Upcoming Photoshoots"
       },
       "noLivingGroups": "No living groups found",
+      "noResults": "No results found",
       "dorms": "Dorms",
       "fsilgs": "FSILGs",
+      "searchDormsPlaceholder": "Search dorms...",
+      "searchFsilgsPlaceholder": "Search FSILGs...",
+      "pageOf": "Page {current} of {total}",
+      "previousPage": "Previous page",
+      "nextPage": "Next page",
       "status": {
         "active": "Active",
         "disabled": "Disabled"
@@ -890,6 +899,9 @@
       "searchPlaceholder": "Search by email or name",
       "filters": {
         "allRoles": "All Roles",
+        "allUsers": "All",
+        "individual": "Individual",
+        "orgsOnly": "Orgs",
         "student": "Student",
         "staph": "Staph",
         "club": "Club",

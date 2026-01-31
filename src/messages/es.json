@@ -711,13 +711,16 @@
     "welcome": "Bienvenido, {name}",
     "tabs": {
       "overview": "Resumen",
+      "organizations": "Organizaciones",
       "photoshoots": "Sesiones de Fotos",
       "clubs": "Clubes",
       "livingGroups": "Grupos de Vivienda",
       "users": "Usuarios",
       "sports": "Deportes",
       "logs": "Registros",
-      "settings": "Configuración"
+      "settings": "Configuración",
+      "forms": "Formularios",
+      "yearbookInventory": "Inventario del Anuario"
     },
     "stats": {
       "clubs": "Clubes",
@@ -825,8 +828,14 @@
         "upcoming": "Próximas Sesiones"
       },
       "noLivingGroups": "No se encontraron grupos",
+      "noResults": "No se encontraron resultados",
       "dorms": "Dormitorios",
       "fsilgs": "FSILGs",
+      "searchDormsPlaceholder": "Buscar dormitorios...",
+      "searchFsilgsPlaceholder": "Buscar FSILGs...",
+      "pageOf": "Página {current} de {total}",
+      "previousPage": "Página anterior",
+      "nextPage": "Página siguiente",
       "status": {
         "active": "Activo",
         "disabled": "Deshabilitado"
@@ -853,6 +862,9 @@
       "searchPlaceholder": "Buscar por email o nombre",
       "filters": {
         "allRoles": "Todos los Roles",
+        "allUsers": "Todos",
+        "individual": "Individual",
+        "orgsOnly": "Orgs",
         "student": "Estudiante",
         "staph": "Staph",
         "club": "Club",

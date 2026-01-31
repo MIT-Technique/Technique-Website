@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
 const ITEMS_PER_PAGE = 5;
 
@@ -92,52 +91,43 @@ export default function LivingGroupsPage() {
     </div>
   );
 
-  const renderPagination = (currentPage, totalPages, setPage) => {
-    if (totalPages <= 1) return null;
-    return (
-      <div className="flex items-center justify-center gap-3 mt-4">
-        <button
-          onClick={() => setPage(p => Math.max(1, p - 1))}
-          disabled={currentPage === 1}
-          className="p-2 rounded-lg border border-border hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          aria-label={t('previousPage')}
-        >
-          <FaChevronLeft className="w-3 h-3" />
-        </button>
-        <span className="text-sm text-text-secondary">
-          {t('pageOf', { current: currentPage, total: totalPages })}
-        </span>
-        <button
-          onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-          disabled={currentPage === totalPages}
-          className="p-2 rounded-lg border border-border hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          aria-label={t('nextPage')}
-        >
-          <FaChevronRight className="w-3 h-3" />
-        </button>
-      </div>
-    );
-  };
-
-  const renderColumn = (title, items, paginatedItems, search, setSearch, currentPage, totalPages, setPage, placeholder) => (
+  const renderColumn = (title, paginatedItems, search, setSearch, currentPage, totalPages, setPage, placeholder) => (
     <div className="flex-1 min-w-0">
       <h2 className="text-lg font-medium mb-3">{title}</h2>
-      <input
-        type="text"
-        placeholder={placeholder}
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="px-3 py-2 border border-border rounded-lg w-full text-sm mb-4"
-      />
+      <div className="flex items-center gap-2 mb-4">
+        <input
+          type="text"
+          placeholder={placeholder}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="px-3 py-2 border border-border rounded-lg flex-1 min-w-0 text-sm"
+        />
+        <div className="flex items-center gap-1 shrink-0">
+          <button
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="px-2 py-1 text-sm border border-border rounded disabled:opacity-30 hover:bg-bg-secondary"
+          >
+            ←
+          </button>
+          <span className="text-sm text-text-muted px-2">
+            {currentPage} / {totalPages || 1}
+          </span>
+          <button
+            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            className="px-2 py-1 text-sm border border-border rounded disabled:opacity-30 hover:bg-bg-secondary"
+          >
+            →
+          </button>
+        </div>
+      </div>
       {paginatedItems.length === 0 ? (
         <p className="text-text-secondary text-sm">{t('noResults')}</p>
       ) : (
-        <>
-          <div className="space-y-2">
-            {paginatedItems.map(renderCard)}
-          </div>
-          {renderPagination(currentPage, totalPages, setPage)}
-        </>
+        <div className="space-y-2">
+          {paginatedItems.map(renderCard)}
+        </div>
       )}
     </div>
   );
@@ -150,7 +140,6 @@ export default function LivingGroupsPage() {
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       {renderColumn(
         t('dorms'),
-        filteredDorms,
         paginatedDorms,
         dormSearch,
         setDormSearch,
@@ -161,7 +150,6 @@ export default function LivingGroupsPage() {
       )}
       {renderColumn(
         t('fsilgs'),
-        filteredFsilgs,
         paginatedFsilgs,
         fsilgSearch,
         setFsilgSearch,

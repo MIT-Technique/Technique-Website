@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 15;
 
 export default function UsersPage() {
   const t = useTranslations('dashboard.users');
@@ -12,6 +13,8 @@ export default function UsersPage() {
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [page, setPage] = useState(0);
+  const searchParams = useSearchParams();
+  const userTypeFilter = searchParams.get('type') || 'all';
 
   // Admin designation state
   const [adminCount, setAdminCount] = useState(0);
@@ -129,8 +132,14 @@ export default function UsersPage() {
     }
   }
 
-  const totalPages = Math.ceil(users.length / PAGE_SIZE);
-  const paginatedUsers = users.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+  const ORG_ROLES = ['club', 'living_group', 'sports'];
+  const filteredUsers = userTypeFilter === 'individual'
+    ? users.filter(u => !ORG_ROLES.includes(u.role))
+    : userTypeFilter === 'orgs'
+    ? users.filter(u => ORG_ROLES.includes(u.role))
+    : users;
+  const totalPages = Math.ceil(filteredUsers.length / PAGE_SIZE);
+  const paginatedUsers = filteredUsers.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
   return (
     <div>
@@ -179,7 +188,7 @@ export default function UsersPage() {
       {/* Users List */}
       {loading ? (
         <p className="text-text-secondary">Loading...</p>
-      ) : users.length === 0 ? (
+      ) : filteredUsers.length === 0 ? (
         <p className="text-text-secondary">{t('noUsers')}</p>
       ) : (
         <div className="overflow-x-auto">

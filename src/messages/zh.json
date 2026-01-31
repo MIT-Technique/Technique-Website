@@ -711,13 +711,16 @@
     "welcome": "欢迎，{name}",
     "tabs": {
       "overview": "概览",
+      "organizations": "组织",
       "photoshoots": "拍摄时间",
       "clubs": "社团",
       "livingGroups": "宿舍",
       "users": "用户",
       "sports": "体育",
       "logs": "日志",
-      "settings": "设置"
+      "settings": "设置",
+      "forms": "表单",
+      "yearbookInventory": "年鉴库存"
     },
     "stats": {
       "clubs": "社团",
@@ -825,8 +828,14 @@
         "upcoming": "即将拍摄"
       },
       "noLivingGroups": "未找到宿舍",
+      "noResults": "未找到结果",
       "dorms": "宿舍",
       "fsilgs": "FSILGs",
+      "searchDormsPlaceholder": "搜索宿舍...",
+      "searchFsilgsPlaceholder": "搜索FSILGs...",
+      "pageOf": "第 {current} 页，共 {total} 页",
+      "previousPage": "上一页",
+      "nextPage": "下一页",
       "status": {
         "active": "活跃",
         "disabled": "已禁用"
@@ -853,6 +862,9 @@
       "searchPlaceholder": "按邮箱或姓名搜索",
       "filters": {
         "allRoles": "所有角色",
+        "allUsers": "全部",
+        "individual": "个人",
+        "orgsOnly": "组织",
         "student": "学生",
         "staph": "工作人员",
         "club": "社团",
