@@ -13,7 +13,7 @@ export async function GET() {
 
     const { data: bios, error } = await supabase
       .from('senior_bios')
-      .select('id, name, major, minor, second_major, quote, achievements')
+      .select('id, first_name, last_name, email, major, minor, second_major, quote, achievements')
       .order('name', { ascending: true });
 
     if (error) {
