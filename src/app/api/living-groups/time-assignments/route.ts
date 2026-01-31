@@ -84,8 +84,8 @@ export async function GET(request: NextRequest) {
  * - photoshootTimeId: UUID of photoshoot time
  * - livingGroupId: UUID of living group
  * - sectionName: Name of section (optional, null = unassigned)
- * - slotStart: Start time (HH:MM, must be XX:00 or XX:30)
- * - slotEnd: End time (HH:MM, must be XX:00 or XX:30)
+ * - slotStart: Start time (HH:MM, must be XX:00, XX:15, XX:30, or XX:45)
+ * - slotEnd: End time (HH:MM, must be XX:00, XX:15, XX:30, or XX:45)
  */
 export async function POST(request: NextRequest) {
   try {
@@ -105,10 +105,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validation: Time slots on 30-min boundaries
+    // Validation: Time slots on 15-min boundaries
     if (!isValidTimeSlot(slotStart) || !isValidTimeSlot(slotEnd)) {
       return NextResponse.json(
-        { error: "Time slots must be on 30-minute boundaries (XX:00 or XX:30)" },
+        { error: "Time slots must be on 15-minute boundaries (XX:00, XX:15, XX:30, or XX:45)" },
         { status: 400 }
       );
     }

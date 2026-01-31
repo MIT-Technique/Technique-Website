@@ -1,21 +1,21 @@
 /**
- * Time utility functions for 30-minute boundary validation
+ * Time utility functions for 15-minute boundary validation
  */
 
 /**
- * Validate that a time string is on a 30-minute boundary (XX:00 or XX:30)
+ * Validate that a time string is on a 15-minute boundary (XX:00, XX:15, XX:30, or XX:45)
  * @param time - Time string in HH:mm format
- * @returns true if on 30-minute boundary
+ * @returns true if on 15-minute boundary
  */
 export function isValidTimeSlot(time: string): boolean {
   const parts = time.split(':');
   if (parts.length < 2) return false;
   const minutes = parseInt(parts[1], 10);
-  return minutes === 0 || minutes === 30;
+  return minutes === 0 || minutes === 15 || minutes === 30 || minutes === 45;
 }
 
 /**
- * Round a time to the nearest 30-minute boundary
+ * Round a time to the nearest 15-minute boundary
  * @param time - Time string in HH:mm format
  * @returns Rounded time string in HH:mm format
  */
@@ -27,10 +27,14 @@ export function roundToSlot(time: string): string {
   const minutes = parseInt(parts[1], 10);
 
   let roundedMinutes: number;
-  if (minutes < 15) {
+  if (minutes < 8) {
     roundedMinutes = 0;
-  } else if (minutes < 45) {
+  } else if (minutes < 23) {
+    roundedMinutes = 15;
+  } else if (minutes < 38) {
     roundedMinutes = 30;
+  } else if (minutes < 53) {
+    roundedMinutes = 45;
   } else {
     roundedMinutes = 0;
     hours = hours + 1;
@@ -45,10 +49,10 @@ export function roundToSlot(time: string): string {
 }
 
 /**
- * Generate 30-minute time slots between start and end times
+ * Generate 15-minute time slots between start and end times
  * @param start - Start time in HH:mm format
  * @param end - End time in HH:mm format
- * @returns Array of slot strings like ["14:00-14:30", "14:30-15:00"]
+ * @returns Array of slot objects like [{start: "14:00", end: "14:15"}, ...]
  */
 export function generateTimeSlots(start: string, end: string): { start: string; end: string }[] {
   const slots: { start: string; end: string }[] = [];
@@ -63,11 +67,10 @@ export function generateTimeSlots(start: string, end: string): { start: string; 
   const endH = parseInt(endParts[0], 10);
   const endM = parseInt(endParts[1], 10);
 
-  // Round start to nearest 30-minute boundary if needed
-  if (m !== 0 && m !== 30) {
-    if (m < 30) {
-      m = 30;
-    } else {
+  // Round start to nearest 15-minute boundary if needed
+  if (m % 15 !== 0) {
+    m = Math.ceil(m / 15) * 15;
+    if (m >= 60) {
       m = 0;
       h++;
     }
@@ -76,8 +79,8 @@ export function generateTimeSlots(start: string, end: string): { start: string; 
   while (h < endH || (h === endH && m < endM)) {
     const slotStart = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 
-    // Advance by 30 minutes
-    m += 30;
+    // Advance by 15 minutes
+    m += 15;
     if (m >= 60) {
       m = 0;
       h++;
@@ -89,7 +92,7 @@ export function generateTimeSlots(start: string, end: string): { start: string; 
     if (h < endH || (h === endH && m <= endM)) {
       slots.push({ start: slotStart, end: slotEnd });
     } else if (h === endH && m > endM) {
-      // Handle case where end time is not on a 30-min boundary
+      // Handle case where end time is not on a 15-min boundary
       // Still include the partial slot
       slots.push({ start: slotStart, end: slotEnd });
       break;

@@ -122,10 +122,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate 30-minute time boundaries
+    // Validate 15-minute time boundaries
     if (!isValidTimeSlot(start_time) || !isValidTimeSlot(end_time)) {
       return NextResponse.json(
-        { error: "Times must be on 30-minute boundaries (XX:00 or XX:30)" },
+        { error: "Times must be on 15-minute boundaries (XX:00, XX:15, XX:30, or XX:45)" },
         { status: 400 }
       );
     }

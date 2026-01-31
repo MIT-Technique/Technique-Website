@@ -126,15 +126,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate 30-minute time boundaries
+    // Validate 15-minute time boundaries
     if (!isValidTimeSlot(start_time) || !isValidTimeSlot(end_time)) {
       return NextResponse.json(
-        { error: "Times must be on 30-minute boundaries (XX:00 or XX:30)" },
+        { error: "Times must be on 15-minute boundaries (XX:00, XX:15, XX:30, or XX:45)" },
         { status: 400 }
       );
     }
 
-    // Create the proposal
+    // Create the proposal (pending until a photographer accepts)
     const { data, error } = await supabase
       .from("time_proposals")
       .insert({
@@ -231,11 +231,51 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    if (proposal.status !== "pending") {
+    if (proposal.status !== "pending" && proposal.status !== "accepted") {
       return NextResponse.json(
-        { error: "Can only cancel pending proposals" },
+        { error: "Can only cancel pending or accepted proposals" },
         { status: 400 }
       );
+    }
+
+    // If proposal was accepted, clean up the associated photoshoot_times entry
+    if (proposal.status === "accepted") {
+      const { data: proposalDetails } = await supabase
+        .from("time_proposals")
+        .select("date, start_time, end_time, living_group_id")
+        .eq("id", proposalId)
+        .single();
+
+      if (proposalDetails) {
+        const { data: matchingTime } = await supabase
+          .from("photoshoot_times")
+          .select("id")
+          .eq("living_group_id", proposalDetails.living_group_id)
+          .eq("date", proposalDetails.date)
+          .eq("start_time", proposalDetails.start_time)
+          .eq("end_time", proposalDetails.end_time)
+          .is("cancelled_at", null)
+          .maybeSingle();
+
+        if (matchingTime) {
+          await supabase
+            .from("living_group_time_assignments")
+            .delete()
+            .eq("photoshoot_time_id", matchingTime.id);
+
+          await supabase
+            .from("photoshoot_times")
+            .update({
+              cancelled_at: new Date().toISOString(),
+              cancelled_by: user.id,
+              living_group_id: null,
+              booked_at: null,
+              booked_by: null,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", matchingTime.id);
+        }
+      }
     }
 
     // Update status to cancelled

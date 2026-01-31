@@ -53,6 +53,7 @@ export default function PhotographerTimesSection() {
   const [expandedProposalIds, setExpandedProposalIds] = useState(new Set());
 
   const [message, setMessage] = useState({ type: '', text: '' });
+  const [messageFading, setMessageFading] = useState(false);
 
   // Toggle expansion for a time slot
   function toggleTimeExpanded(timeId) {
@@ -84,6 +85,16 @@ export default function PhotographerTimesSection() {
     fetchTimes();
     fetchProposals();
   }, []);
+
+  // Auto-fade success messages
+  useEffect(() => {
+    if (message.type === 'success' && message.text) {
+      setMessageFading(false);
+      const fadeTimer = setTimeout(() => setMessageFading(true), 3500);
+      const clearTimer = setTimeout(() => { setMessage({ type: '', text: '' }); setMessageFading(false); }, 4000);
+      return () => { clearTimeout(fadeTimer); clearTimeout(clearTimer); };
+    }
+  }, [message]);
 
   async function fetchTimes() {
     try {
@@ -239,9 +250,12 @@ export default function PhotographerTimesSection() {
   return (
     <div className="space-y-8">
       {message.text && (
-        <div className={`p-4 rounded ${
-          message.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
-        }`}>
+        <div
+          className={`p-4 rounded ${
+            message.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
+          }`}
+          style={{ transition: 'opacity 500ms ease-out', opacity: messageFading ? 0 : 1 }}
+        >
           {message.text}
         </div>
       )}

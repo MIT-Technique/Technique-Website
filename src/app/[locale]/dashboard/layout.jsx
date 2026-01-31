@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useUser } from '../../../hooks/useUser';
 
-export default function DashboardLayout({ children }) {
+function DashboardLayoutInner({ children }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -146,5 +146,19 @@ export default function DashboardLayout({ children }) {
         {children}
       </div>
     </main>
+  );
+}
+
+export default function DashboardLayout({ children }) {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen pt-24 lg:pt-32">
+        <div className="container-text text-center">
+          <p className="text-text-secondary">Loading...</p>
+        </div>
+      </main>
+    }>
+      <DashboardLayoutInner>{children}</DashboardLayoutInner>
+    </Suspense>
   );
 }

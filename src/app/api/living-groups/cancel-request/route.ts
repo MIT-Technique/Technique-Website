@@ -70,19 +70,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (currentBooking.cancellation_requested) {
-      return NextResponse.json(
-        { error: "Cancellation has already been requested for this booking" },
-        { status: 409 }
-      );
-    }
+    // Delete any time assignments for this photoshoot
+    await supabase
+      .from('living_group_time_assignments')
+      .delete()
+      .eq('photoshoot_time_id', currentBooking.id);
 
-    // Mark the booking as cancellation requested
+    // Directly cancel the booking
     const { data: updatedBooking, error: updateError } = await supabase
       .from('photoshoot_times')
       .update({
-        cancellation_requested: true,
-        cancellation_request_reason: reason || null,
+        living_group_id: null,
+        booked_at: null,
+        booked_by: null,
+        cancelled_at: new Date().toISOString(),
+        cancelled_by: user.id,
+        cancellation_requested: false,
+        cancellation_request_reason: null,
         updated_at: new Date().toISOString(),
       })
       .eq('id', currentBooking.id)
@@ -90,15 +94,15 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (updateError) {
-      console.error("Cancel request error:", updateError);
+      console.error("Cancel booking error:", updateError);
       return NextResponse.json(
-        { error: "Failed to request cancellation" },
+        { error: "Failed to cancel booking" },
         { status: 500 }
       );
     }
 
-    // Log the cancellation request
-    await createLog(user.id, "cancellation_requested", "photoshoot_time", currentBooking.id, {
+    // Log the cancellation
+    await createLog(user.id, "booking_cancelled", "photoshoot_time", currentBooking.id, {
       living_group_name: livingGroup.name,
       date: currentBooking.date,
       start_time: currentBooking.start_time,
@@ -108,7 +112,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: "Cancellation request submitted. An admin will review your request.",
+      message: "Booking cancelled successfully.",
       booking: updatedBooking,
     });
   } catch (error) {

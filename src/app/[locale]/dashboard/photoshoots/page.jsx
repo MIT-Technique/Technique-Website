@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { useUser } from '../../../../hooks/useUser';
+import ConfirmationModal from '../../../../components/ConfirmationModal/ConfirmationModal';
 
 // Format 24-hour time to 12-hour AM/PM format
 function formatTime(time24) {
@@ -13,13 +15,53 @@ function formatTime(time24) {
   return `${hour12}:${minutes} ${ampm}`;
 }
 
+// Generate 15-minute time slot options (06:00 to 23:45)
+function generateTimeOptions() {
+  const options = [];
+  for (let h = 6; h <= 23; h++) {
+    for (let m = 0; m < 60; m += 15) {
+      const time = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+      options.push(time);
+    }
+  }
+  return options;
+}
+
+const TIME_OPTIONS = generateTimeOptions();
+
+function getDefaultStartTime() {
+  const now = new Date();
+  let hours = now.getHours();
+  let minutes = now.getMinutes();
+  minutes = Math.ceil(minutes / 15) * 15;
+  if (minutes >= 60) { hours += 1; minutes = 0; }
+  if (hours < 6) { hours = 6; minutes = 0; }
+  else if (hours >= 24) { hours = 6; minutes = 0; }
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+}
+
+function getDefaultEndTime(startTime) {
+  if (!startTime) return '07:00';
+  const [h, m] = startTime.split(':').map(Number);
+  let endH = h + 1;
+  if (endH > 23) endH = 23;
+  return `${String(endH).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+}
+
 export default function PhotoshootsPage() {
   const t = useTranslations('dashboard.photoshoots');
+  const { user } = useUser();
+  const isAdmin = user?.role === 'admin';
   const [times, setTimes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const [showAddForm, setShowAddForm] = useState(false);
-  const [newTime, setNewTime] = useState({ date: '', startTime: '', endTime: '', notes: '' });
+  const [newTime, setNewTime] = useState(() => {
+    const start = getDefaultStartTime();
+    return { date: new Date().toISOString().split('T')[0], startTime: start, endTime: getDefaultEndTime(start), notes: '' };
+  });
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState(null);
 
   useEffect(() => {
     fetchTimes();
@@ -31,7 +73,6 @@ export default function PhotoshootsPage() {
       let url = '/api/admin/photoshoot-times';
       if (filter === 'booked') url += '?booked=true';
       if (filter === 'available') url += '?available=true';
-      if (filter === 'cancellation') url += '?cancellation_requested=true';
 
       const res = await fetch(url);
       const data = await res.json();
@@ -53,7 +94,8 @@ export default function PhotoshootsPage() {
       });
 
       if (res.ok) {
-        setNewTime({ date: '', startTime: '', endTime: '', notes: '' });
+        const start = getDefaultStartTime();
+        setNewTime({ date: new Date().toISOString().split('T')[0], startTime: start, endTime: getDefaultEndTime(start), notes: '' });
         setShowAddForm(false);
         fetchTimes();
       }
@@ -62,24 +104,15 @@ export default function PhotoshootsPage() {
     }
   }
 
-  async function handleCancellationAction(timeId, action) {
-    try {
-      const res = await fetch('/api/admin/photoshoot-times', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ timeId, action }),
-      });
-
-      if (res.ok) {
-        fetchTimes();
-      }
-    } catch (error) {
-      console.error('Error processing cancellation:', error);
-    }
+  function handleDeleteClick(timeId) {
+    setDeleteTargetId(timeId);
+    setDeleteModalOpen(true);
   }
 
-  async function handleDelete(timeId) {
-    if (!confirm(t('confirmDelete'))) return;
+  async function handleDeleteConfirm() {
+    const timeId = deleteTargetId;
+    setDeleteModalOpen(false);
+    setDeleteTargetId(null);
 
     try {
       const res = await fetch('/api/admin/photoshoot-times', {
@@ -118,29 +151,38 @@ export default function PhotoshootsPage() {
                 type="date"
                 value={newTime.date}
                 onChange={(e) => setNewTime({ ...newTime, date: e.target.value })}
+                min={new Date().toISOString().split('T')[0]}
                 className="w-full border border-border rounded px-3 py-2 text-sm"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">{t('form.startTime')}</label>
-              <input
-                type="time"
+              <label className="block text-sm font-medium mb-1">{t('form.startTime')} (EST)</label>
+              <select
                 value={newTime.startTime}
                 onChange={(e) => setNewTime({ ...newTime, startTime: e.target.value })}
                 className="w-full border border-border rounded px-3 py-2 text-sm"
                 required
-              />
+              >
+                <option value="">Select time</option>
+                {TIME_OPTIONS.map((time) => (
+                  <option key={time} value={time}>{formatTime(time)}</option>
+                ))}
+              </select>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">{t('form.endTime')}</label>
-              <input
-                type="time"
+              <label className="block text-sm font-medium mb-1">{t('form.endTime')} (EST)</label>
+              <select
                 value={newTime.endTime}
                 onChange={(e) => setNewTime({ ...newTime, endTime: e.target.value })}
                 className="w-full border border-border rounded px-3 py-2 text-sm"
                 required
-              />
+              >
+                <option value="">Select time</option>
+                {TIME_OPTIONS.map((time) => (
+                  <option key={time} value={time}>{formatTime(time)}</option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">{t('form.notes')}</label>
@@ -161,7 +203,7 @@ export default function PhotoshootsPage() {
 
       {/* Filters */}
       <div className="flex gap-2 mb-4">
-        {['all', 'available', 'booked', 'cancellation'].map((f) => (
+        {['all', 'available', 'booked'].map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
@@ -187,9 +229,7 @@ export default function PhotoshootsPage() {
             <div
               key={time.id}
               className={`p-4 border rounded-lg ${
-                time.cancellation_requested
-                  ? 'border-red-200 bg-red-50'
-                  : time.living_group_id
+                time.living_group_id
                   ? 'border-green-200 bg-green-50'
                   : 'border-border'
               }`}
@@ -199,54 +239,54 @@ export default function PhotoshootsPage() {
                   <p className="font-medium">
                     {new Date(time.date).toLocaleDateString()} &middot; {formatTime(time.start_time)} - {formatTime(time.end_time)} EST
                   </p>
-                  {time.living_group && (
-                    <p className="text-sm text-text-secondary mt-1">
-                      {t('bookedBy')}: {time.living_group.name}
+                  <p className="text-sm text-text-secondary mt-1">
+                    {time.created_by_user?.email && (
+                      <span>Created by: <a href={`mailto:${time.created_by_user.email}`} className="text-accent hover:underline">{time.created_by_user.email}</a></span>
+                    )}
+                    {time.created_by_user?.email && time.living_group && (
+                      <span> &middot; </span>
+                    )}
+                    {time.living_group && (
+                      <span>
+                        {t('bookedBy')}: {time.living_group.name}
+                        {time.living_group.user?.email && (
+                          <span> (<a href={`mailto:${time.living_group.user.email}`} className="text-accent hover:underline">{time.living_group.user.email}</a>)</span>
+                        )}
+                      </span>
+                    )}
+                  </p>
+                  {(time.location || time.notes) && (
+                    <p className="text-sm text-text-muted mt-1">
+                      {time.location && <span>{t('location')}: {time.location}</span>}
+                      {time.location && time.notes && <span> &middot; </span>}
+                      {time.notes && <span>{time.notes}</span>}
                     </p>
-                  )}
-                  {time.location && (
-                    <p className="text-sm text-text-secondary mt-1">
-                      {t('location')}: {time.location}
-                    </p>
-                  )}
-                  {time.cancellation_requested && (
-                    <p className="text-sm text-red-600 mt-1">
-                      {t('cancellationRequested')}: {time.cancellation_request_reason || t('noReason')}
-                    </p>
-                  )}
-                  {time.notes && (
-                    <p className="text-sm text-text-muted mt-1">{time.notes}</p>
                   )}
                 </div>
-                <div className="flex gap-2">
-                  {time.cancellation_requested && (
-                    <>
-                      <button
-                        onClick={() => handleCancellationAction(time.id, 'approve_cancellation')}
-                        className="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700"
-                      >
-                        {t('approve')}
-                      </button>
-                      <button
-                        onClick={() => handleCancellationAction(time.id, 'deny_cancellation')}
-                        className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700"
-                      >
-                        {t('deny')}
-                      </button>
-                    </>
-                  )}
-                  <button
-                    onClick={() => handleDelete(time.id)}
-                    className="px-3 py-1 text-sm text-red-600 border border-red-200 rounded hover:bg-red-50"
-                  >
-                    {t('delete')}
-                  </button>
-                </div>
+                {isAdmin && (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleDeleteClick(time.id)}
+                      className="px-3 py-1 text-sm text-red-600 border border-red-200 rounded hover:bg-red-50"
+                    >
+                      {t('delete')}
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           ))}
         </div>
       )}
+      <ConfirmationModal
+        open={deleteModalOpen}
+        title={t('delete')}
+        message={t('confirmDelete')}
+        confirmText={t('delete')}
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => { setDeleteModalOpen(false); setDeleteTargetId(null); }}
+        isDangerous
+      />
     </div>
   );
 }

@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
   try {
     const user = await getCurrentUser();
 
-    if (!user || user.role !== 'admin') {
+    if (!user || user.role !== 'admin' && !user.is_staph) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
@@ -27,7 +27,9 @@ export async function GET(request: NextRequest) {
       .from('photoshoot_times')
       .select(`
         *,
-        living_group:living_groups(id, name, user_id)
+        living_group:living_groups(id, name, user_id, user:users!living_groups_user_id_fkey(email)),
+        booked_by_user:users!photoshoot_times_booked_by_fkey(email),
+        created_by_user:users!photoshoot_times_created_by_fkey(email)
       `)
       .is('cancelled_at', null)
       .order('date', { ascending: true })
@@ -74,7 +76,7 @@ export async function POST(request: NextRequest) {
   try {
     const user = await getCurrentUser();
 
-    if (!user || user.role !== 'admin') {
+    if (!user || user.role !== 'admin' && !user.is_staph) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
@@ -91,10 +93,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate 30-minute time boundaries
+    // Validate date is not in the past
+    const today = new Date().toISOString().split('T')[0];
+    if (date < today) {
+      return NextResponse.json(
+        { error: "Cannot create photoshoot times for past dates" },
+        { status: 400 }
+      );
+    }
+
+    // Validate 15-minute time boundaries
     if (!isValidTimeSlot(startTime) || !isValidTimeSlot(endTime)) {
       return NextResponse.json(
-        { error: "Times must be on 30-minute boundaries (XX:00 or XX:30)" },
+        { error: "Times must be on 15-minute boundaries (XX:00, XX:15, XX:30, or XX:45)" },
         { status: 400 }
       );
     }
@@ -166,7 +177,7 @@ export async function PUT(request: NextRequest) {
   try {
     const user = await getCurrentUser();
 
-    if (!user || user.role !== 'admin') {
+    if (!user || user.role !== 'admin' && !user.is_staph) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
@@ -305,15 +316,15 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-// DELETE - Delete a photoshoot time (soft delete by setting cancelled_at)
+// DELETE - Delete a photoshoot time (soft delete by setting cancelled_at) - admin only
 export async function DELETE(request: NextRequest) {
   try {
     const user = await getCurrentUser();
 
     if (!user || user.role !== 'admin') {
       return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
+        { error: "Only admins can delete photoshoot times" },
+        { status: 403 }
       );
     }
 

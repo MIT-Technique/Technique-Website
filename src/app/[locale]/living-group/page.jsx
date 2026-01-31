@@ -13,11 +13,11 @@ import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import { generateTimeSlots, formatTimeDisplay as formatTimeUtil } from '../../../lib/utils/time';
 
-// Generate 30-minute time slot options (06:00 to 23:30)
+// Generate 15-minute time slot options (06:00 to 23:45)
 function generateTimeOptions() {
   const options = [];
   for (let h = 6; h <= 23; h++) {
-    for (let m = 0; m < 60; m += 30) {
+    for (let m = 0; m < 60; m += 15) {
       const time = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
       options.push(time);
     }
@@ -36,21 +36,20 @@ function formatTimeDisplay(time) {
 
 const TIME_OPTIONS = generateTimeOptions();
 
-// Get the next 30-minute time slot from now
+// Get the next 15-minute time slot from now
 function getDefaultStartTime() {
   const now = new Date();
   let hours = now.getHours();
   let minutes = now.getMinutes();
 
-  // Round up to next 30-minute interval
-  if (minutes > 30) {
+  // Round up to next 15-minute interval
+  minutes = Math.ceil(minutes / 15) * 15;
+  if (minutes >= 60) {
     hours += 1;
     minutes = 0;
-  } else if (minutes > 0) {
-    minutes = 30;
   }
 
-  // Ensure within TIME_OPTIONS range (06:00 - 23:30)
+  // Ensure within TIME_OPTIONS range (06:00 - 23:45)
   if (hours < 6) {
     hours = 6;
     minutes = 0;
@@ -86,6 +85,30 @@ const textFieldSx = {
   },
   "& .MuiInputLabel-root.Mui-focused": { color: "#750014" },
 };
+
+// Auto-dismissing message with fade-out
+function FadeMessage({ message, onClear, duration = 4000, className = 'mb-6 p-4 rounded' }) {
+  const [fading, setFading] = useState(false);
+
+  useEffect(() => {
+    if (!message.text) { setFading(false); return; }
+    if (message.type !== 'success') return;
+    setFading(false);
+    const fadeTimer = setTimeout(() => setFading(true), duration - 500);
+    const clearTimer = setTimeout(() => onClear({ type: '', text: '' }), duration);
+    return () => { clearTimeout(fadeTimer); clearTimeout(clearTimer); };
+  }, [message, duration, onClear]);
+
+  if (!message.text) return null;
+  return (
+    <div
+      className={`${className} ${message.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}
+      style={{ transition: 'opacity 500ms ease-out', opacity: fading ? 0 : 1 }}
+    >
+      {message.text}
+    </div>
+  );
+}
 
 export default function LivingGroupPage() {
   const router = useRouter();
@@ -196,42 +219,9 @@ export default function LivingGroupPage() {
     }
   }, [isLoggedIn, user, userLoading, router, locale]);
 
-  // Auto-fade success messages after 4 seconds
-  useEffect(() => {
-    if (message.type === 'success' && message.text) {
-      const timer = setTimeout(() => {
-        setMessage({ type: '', text: '' });
-      }, 4000);
-      return () => clearTimeout(timer);
-    }
-  }, [message]);
-
-  useEffect(() => {
-    if (membersMessage.type === 'success' && membersMessage.text) {
-      const timer = setTimeout(() => {
-        setMembersMessage({ type: '', text: '' });
-      }, 4000);
-      return () => clearTimeout(timer);
-    }
-  }, [membersMessage]);
-
-  useEffect(() => {
-    if (sectionsMessage.type === 'success' && sectionsMessage.text) {
-      const timer = setTimeout(() => {
-        setSectionsMessage({ type: '', text: '' });
-      }, 4000);
-      return () => clearTimeout(timer);
-    }
-  }, [sectionsMessage]);
-
-  useEffect(() => {
-    if (documentsMessage.type === 'success' && documentsMessage.text) {
-      const timer = setTimeout(() => {
-        setDocumentsMessage({ type: '', text: '' });
-      }, 4000);
-      return () => clearTimeout(timer);
-    }
-  }, [documentsMessage]);
+  // Track recently cancelled proposal IDs for fade-out
+  const [fadingProposals, setFadingProposals] = useState(new Set());
+  const [hiddenProposals, setHiddenProposals] = useState(new Set());
 
   useEffect(() => {
     if (isLoggedIn && user?.role === 'living_group') {
@@ -317,8 +307,7 @@ export default function LivingGroupPage() {
   async function handleCancelRequest(timeId) {
     if (isFrozen) return;
 
-    const reason = prompt(t('cancelReason'));
-    if (reason === null) return;
+    if (!confirm(t('confirmCancel'))) return;
 
     setCancelling(true);
     setMessage({ type: '', text: '' });
@@ -327,19 +316,19 @@ export default function LivingGroupPage() {
       const res = await fetch('/api/living-groups/cancel-request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reason, timeId }),
+        body: JSON.stringify({ timeId }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        setMessage({ type: 'success', text: t('cancelRequestSuccess') });
+        setMessage({ type: 'success', text: t('cancelSuccess') });
         fetchTimes();
       } else {
-        setMessage({ type: 'error', text: data.error || t('cancelRequestError') });
+        setMessage({ type: 'error', text: data.error || t('cancelError') });
       }
     } catch (error) {
-      setMessage({ type: 'error', text: t('cancelRequestError') });
+      setMessage({ type: 'error', text: t('cancelError') });
     } finally {
       setCancelling(false);
     }
@@ -821,6 +810,8 @@ export default function LivingGroupPage() {
           location: '',
           notes: '',
         });
+        // Refresh booked times since proposal is now auto-confirmed
+        fetchTimes();
       } else {
         setMessage({ type: 'error', text: data.error || t('proposeTime.submitError') });
       }
@@ -845,6 +836,11 @@ export default function LivingGroupPage() {
         setProposals(prev => prev.map(p =>
           p.id === proposalId ? { ...p, status: 'cancelled' } : p
         ));
+        // Fade out cancelled proposal after 4.5s, hide after 5s
+        setTimeout(() => setFadingProposals(prev => new Set([...prev, proposalId])), 4500);
+        setTimeout(() => setHiddenProposals(prev => new Set([...prev, proposalId])), 5000);
+        // Refresh booked times since the associated booking was also cancelled
+        fetchTimes();
       } else {
         const data = await res.json();
         setMessage({ type: 'error', text: data.error || t('proposeTime.cancelError') });
@@ -907,13 +903,7 @@ export default function LivingGroupPage() {
             </div>
           )}
 
-          {message.text && (
-            <div className={`mb-6 p-4 rounded ${
-              message.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
-            }`}>
-              {message.text}
-            </div>
-          )}
+          <FadeMessage message={message} onClear={setMessage} />
 
           {/* Tabs */}
           <div className="flex gap-4 mb-8 border-b border-border">
@@ -968,11 +958,7 @@ export default function LivingGroupPage() {
                   <h2 className="text-lg font-medium mb-4">{t('currentBooking')}</h2>
                   <div className="space-y-3">
                     {bookedTimes.map((bookedTime) => (
-                      <div key={bookedTime.id} className={`p-4 border rounded-lg ${
-                        bookedTime.cancellation_requested
-                          ? 'border-yellow-200 bg-yellow-50'
-                          : 'border-green-200 bg-green-50'
-                      }`}>
+                      <div key={bookedTime.id} className="p-4 border rounded-lg border-green-200 bg-green-50">
                         <div className="flex justify-between items-start gap-4 mb-2">
                           <div>
                             <p className="font-medium">
@@ -987,19 +973,16 @@ export default function LivingGroupPage() {
                               {formatTime(bookedTime.start_time)} - {formatTime(bookedTime.end_time)} EST
                             </p>
                           </div>
-                          {!bookedTime.cancellation_requested && !isDisabled && !isFrozen && (
+                          {!isDisabled && !isFrozen && (
                             <button
                               onClick={() => handleCancelRequest(bookedTime.id)}
                               disabled={cancelling}
                               className="px-4 py-2 text-sm text-red-600 border border-red-200 rounded hover:bg-red-50 whitespace-nowrap"
                             >
-                              {cancelling ? t('requesting') : t('requestCancel')}
+                              {cancelling ? t('cancelling') : t('cancelBooking')}
                             </button>
                           )}
                         </div>
-                        {bookedTime.cancellation_requested && (
-                          <p className="text-yellow-600 text-sm">{t('cancellationPending')}</p>
-                        )}
                       </div>
                     ))}
                   </div>
@@ -1195,46 +1178,56 @@ export default function LivingGroupPage() {
                       <p className="text-text-secondary text-sm">{t('proposeTime.noProposals')}</p>
                     ) : (
                       <div className="space-y-3">
-                        {proposals.map((proposal) => (
+                        {proposals.filter(p => !hiddenProposals.has(p.id)).map((proposal) => (
                           <div
                             key={proposal.id}
                             className={`p-4 border rounded-lg ${
                               proposal.status === 'pending'
-                                ? 'border-yellow-200 bg-yellow-50'
+                                ? 'border-blue-200 bg-blue-50'
                                 : proposal.status === 'accepted'
                                 ? 'border-green-200 bg-green-50'
                                 : proposal.status === 'declined'
                                 ? 'border-red-200 bg-red-50'
                                 : 'border-gray-200 bg-gray-50'
                             }`}
+                            style={{ transition: 'opacity 500ms ease-out', opacity: fadingProposals.has(proposal.id) ? 0 : 1 }}
                           >
                             <div className="flex justify-between items-start">
                               <div>
-                                <p className="font-medium">
-                                  {new Date(proposal.date).toLocaleDateString(locale, {
-                                    weekday: 'long',
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric',
-                                  })}
-                                </p>
+                                <div className="flex items-baseline gap-2">
+                                  <p className="font-medium">
+                                    {new Date(proposal.date).toLocaleDateString(locale, {
+                                      weekday: 'long',
+                                      year: 'numeric',
+                                      month: 'long',
+                                      day: 'numeric',
+                                    })}
+                                  </p>
+                                  <span className={`text-xs px-2 py-0.5 rounded whitespace-nowrap ${
+                                    proposal.status === 'pending'
+                                      ? 'bg-blue-200 text-blue-800'
+                                      : proposal.status === 'accepted'
+                                      ? 'bg-green-200 text-green-800'
+                                      : proposal.status === 'declined'
+                                      ? 'bg-red-200 text-red-800'
+                                      : 'bg-gray-200 text-gray-800'
+                                  }`}>
+                                    {proposal.status === 'pending' ? t('proposeTime.status.posted') : t(`proposeTime.status.${proposal.status}`)}
+                                  </span>
+                                </div>
                                 <p className="text-text-secondary text-sm">
                                   {formatTime(proposal.start_time)} - {formatTime(proposal.end_time)} EST
                                 </p>
-                                {proposal.location && (
-                                  <p className="text-text-muted text-xs mt-1">{proposal.location}</p>
+                                {(proposal.location || proposal.notes) && (
+                                  <div className={`mt-1 ${proposal.location && proposal.notes ? 'grid grid-cols-2 gap-4' : ''}`}>
+                                    {proposal.location && (
+                                      <p className="text-text-muted text-xs"><span className="text-text-muted">Location:</span> {proposal.location}</p>
+                                    )}
+                                    {proposal.notes && (
+                                      <p className="text-text-muted text-xs"><span className="text-text-muted">Notes:</span> {proposal.notes}</p>
+                                    )}
+                                  </div>
                                 )}
-                                <span className={`inline-block mt-2 text-xs px-2 py-0.5 rounded ${
-                                  proposal.status === 'pending'
-                                    ? 'bg-yellow-200 text-yellow-800'
-                                    : proposal.status === 'accepted'
-                                    ? 'bg-green-200 text-green-800'
-                                    : proposal.status === 'declined'
-                                    ? 'bg-red-200 text-red-800'
-                                    : 'bg-gray-200 text-gray-800'
-                                }`}>
-                                  {t(`proposeTime.status.${proposal.status}`)}
-                                </span>
                                 {proposal.status === 'declined' && proposal.decline_reason && (
                                   <p className="text-red-600 text-xs mt-1">{proposal.decline_reason}</p>
                                 )}
@@ -1246,7 +1239,7 @@ export default function LivingGroupPage() {
                                   </p>
                                 )}
                               </div>
-                              {proposal.status === 'pending' && !isFrozen && (
+                              {(proposal.status === 'pending' || proposal.status === 'accepted') && !isFrozen && (
                                 <button
                                   onClick={() => handleCancelProposal(proposal.id)}
                                   disabled={cancellingProposalId === proposal.id}
@@ -1325,15 +1318,11 @@ export default function LivingGroupPage() {
                             </p>
                           </div>
                           {/* Assignment saved message - right of date */}
-                          {sectionsMessage.text && (
-                            <span className={`text-xs px-2 py-1 rounded whitespace-nowrap ${
-                              sectionsMessage.type === 'success'
-                                ? 'text-green-700 bg-green-50'
-                                : 'text-red-700 bg-red-50'
-                            }`}>
-                              {sectionsMessage.text}
-                            </span>
-                          )}
+                          <FadeMessage
+                            message={sectionsMessage}
+                            onClear={setSectionsMessage}
+                            className="text-xs px-2 py-1 rounded whitespace-nowrap"
+                          />
                         </div>
 
                         {/* Slot grid */}
@@ -1410,13 +1399,7 @@ export default function LivingGroupPage() {
                   </button>
                 </form>
 
-                {imageMessage.text && (
-                  <div className={`mb-4 p-4 rounded ${
-                    imageMessage.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
-                  }`}>
-                    {imageMessage.text}
-                  </div>
-                )}
+                <FadeMessage message={imageMessage} onClear={setImageMessage} className="mb-4 p-4 rounded" />
 
                 {/* Sections List - Compact */}
                 {sectionsLoading ? (
@@ -1512,13 +1495,7 @@ export default function LivingGroupPage() {
           {/* Members Tab */}
           {activeTab === 'members' && (
             <div>
-              {membersMessage.text && (
-                <div className={`mb-6 p-4 rounded ${
-                  membersMessage.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
-                }`}>
-                  {membersMessage.text}
-                </div>
-              )}
+              <FadeMessage message={membersMessage} onClear={setMembersMessage} />
 
               {/* Mode Switcher */}
               <div className="mb-4 flex gap-2">
@@ -1836,13 +1813,7 @@ export default function LivingGroupPage() {
             <div>
               <p className="text-text-secondary text-sm mb-6">{t('documents.description')}</p>
 
-              {documentsMessage.text && (
-                <div className={`mb-6 p-4 rounded ${
-                  documentsMessage.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
-                }`}>
-                  {documentsMessage.text}
-                </div>
-              )}
+              <FadeMessage message={documentsMessage} onClear={setDocumentsMessage} />
 
               {documentsLoading ? (
                 <p className="text-text-secondary">Loading...</p>
