@@ -23,8 +23,10 @@
     "cryptr": "^6.4.0",
     "csv-parse": "^6.1.0",
     "dotenv": "^17.2.3",
+    "file-saver": "^2.0.5",
     "framer-motion": "^11.2.10",
     "iron-session": "^8.0.4",
+    "jszip": "^3.10.1",
     "mongodb": "^6.17.0",
     "next": "14.2.3",
     "next-intl": "^4.7.0",
@@ -41,6 +43,7 @@
     "zod": "^3.25.67"
   },
   "devDependencies": {
+    "@types/file-saver": "^2.0.7",
     "@types/node": "22.15.29",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",

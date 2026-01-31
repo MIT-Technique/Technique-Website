@@ -5,8 +5,7 @@
  */
 
 export interface ParsedName {
-  firstName: string;
-  lastName: string;
+  name: string;
   original: string;
 }
 
@@ -90,17 +89,14 @@ function splitNames(text: string): string[] {
 }
 
 /**
- * Parses a single name into first and last name
+ * Parses a single name string and normalizes it to "First Last" format.
  * Handles formats:
- * - "First Last" → first: "First", last: "Last"
- * - "Last, First" → first: "First", last: "Last"
- * - "First Middle Last" → first: "First Middle", last: "Last"
- * - "SingleName" → first: "", last: "SingleName"
+ * - "First Last" → "First Last"
+ * - "Last, First" → "First Last"
+ * - "First Middle Last" → "First Middle Last"
+ * - "SingleName" → "SingleName"
  */
-function parseIndividualName(nameStr: string): {
-  firstName: string;
-  lastName: string;
-} {
+function parseIndividualName(nameStr: string): string {
   const trimmed = nameStr.trim();
 
   // Handle empty
@@ -111,62 +107,32 @@ function parseIndividualName(nameStr: string): {
   // Handle "Last, First" format (comma inside the name string)
   if (trimmed.includes(',')) {
     const parts = trimmed.split(',').map((p) => p.trim());
-    if (parts.length === 2) {
-      return {
-        firstName: parts[1], // First name after comma
-        lastName: parts[0], // Last name before comma
-      };
+    if (parts.length === 2 && parts[0] && parts[1]) {
+      return `${parts[1]} ${parts[0]}`;
     }
     // If multiple commas, treat as malformed
     throw new Error('Invalid comma-separated format');
   }
 
-  // Handle "First Last" or "First Middle Last" format
-  const words = trimmed.split(/\s+/).filter((w) => w.length > 0);
-
-  if (words.length === 0) {
-    throw new Error('Empty name');
-  }
-
-  if (words.length === 1) {
-    // Single word - treat as last name only
-    return {
-      firstName: '',
-      lastName: words[0],
-    };
-  }
-
-  // Multiple words: last word is last name, everything else is first name
-  const lastName = words[words.length - 1];
-  const firstName = words.slice(0, -1).join(' ');
-
-  return { firstName, lastName };
+  // Already in "First Last" or single-word format
+  return trimmed;
 }
 
 /**
- * Validates a parsed name
+ * Validates a name string
  */
-function validateName(
-  firstName: string,
-  lastName: string
-): { valid: boolean; error?: string } {
-  // Last name is required
-  if (!lastName || lastName.trim().length === 0) {
-    return { valid: false, error: 'Last name is required' };
+function validateName(name: string): { valid: boolean; error?: string } {
+  if (!name || name.trim().length === 0) {
+    return { valid: false, error: 'Name is required' };
   }
 
-  // Check length limits (100 chars each as per DB schema)
-  if (firstName.length > 100) {
-    return { valid: false, error: 'First name exceeds 100 characters' };
+  if (name.length > 200) {
+    return { valid: false, error: 'Name exceeds 200 characters' };
   }
 
-  if (lastName.length > 100) {
-    return { valid: false, error: 'Last name exceeds 100 characters' };
-  }
-
-  // Check for invalid characters (optional - adjust based on requirements)
+  // Check for invalid characters
   const invalidChars = /[<>{}[\]\\]/;
-  if (invalidChars.test(firstName) || invalidChars.test(lastName)) {
+  if (invalidChars.test(name)) {
     return { valid: false, error: 'Name contains invalid characters' };
   }
 
@@ -190,10 +156,10 @@ export function parseBulkNames(text: string): ParseResult {
 
   nameStrings.forEach((nameStr, index) => {
     try {
-      const { firstName, lastName } = parseIndividualName(nameStr);
+      const name = parseIndividualName(nameStr);
 
       // Validate
-      const validation = validateName(firstName, lastName);
+      const validation = validateName(name);
       if (!validation.valid) {
         result.errors.push({
           line: index + 1,
@@ -205,9 +171,7 @@ export function parseBulkNames(text: string): ParseResult {
 
       // Check for duplicates within this batch (case-insensitive)
       const isDuplicate = result.success.some(
-        (name) =>
-          name.firstName.toLowerCase() === firstName.toLowerCase() &&
-          name.lastName.toLowerCase() === lastName.toLowerCase()
+        (existing) => existing.name.toLowerCase() === name.toLowerCase()
       );
 
       if (isDuplicate) {
@@ -220,8 +184,7 @@ export function parseBulkNames(text: string): ParseResult {
       }
 
       result.success.push({
-        firstName: firstName.trim(),
-        lastName: lastName.trim(),
+        name: name.trim(),
         original: nameStr,
       });
     } catch (err) {
@@ -234,32 +197,4 @@ export function parseBulkNames(text: string): ParseResult {
   });
 
   return result;
-}
-
-/**
- * Formats a name for display
- */
-export function formatName(firstName: string, lastName: string): string {
-  if (!firstName || firstName.trim().length === 0) {
-    return lastName;
-  }
-  return `${firstName} ${lastName}`;
-}
-
-/**
- * Sorts names by last name, then first name
- */
-export function sortByName<T extends { firstName: string; lastName: string }>(
-  members: T[]
-): T[] {
-  return [...members].sort((a, b) => {
-    const lastNameCompare = a.lastName.localeCompare(b.lastName, undefined, {
-      sensitivity: 'base',
-    });
-    if (lastNameCompare !== 0) return lastNameCompare;
-
-    return a.firstName.localeCompare(b.firstName, undefined, {
-      sensitivity: 'base',
-    });
-  });
 }

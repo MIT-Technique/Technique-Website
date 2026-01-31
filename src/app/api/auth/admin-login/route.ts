@@ -55,9 +55,7 @@ export async function POST(request: NextRequest) {
           .insert({
             email: ADMIN_EMAIL,
             role: "admin",
-            first_name: "Technique",
-            last_name: "Admin",
-            auth_provider: "supabase_auth",
+            name: "Technique Admin",
             supabase_auth_id: authData.user.id,
             is_active: true,
           })
@@ -122,7 +120,7 @@ export async function POST(request: NextRequest) {
     session.userId = user.id;
     session.userInfo = {
       sub: loginEmail,
-      name: user.first_name || (user.role === "admin" ? "Admin" : "Staph"),
+      name: user.name || (user.role === "admin" ? "Admin" : "Staph"),
       email: loginEmail,
       email_verified: true,
     };

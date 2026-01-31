@@ -38,11 +38,10 @@ export async function GET(request: NextRequest) {
     // Get all manual members
     const { data: members, error } = await supabase
       .from("living_group_manual_members")
-      .select("id, first_name, last_name, section_name, added_at")
+      .select("id, name, section_name, added_at")
       .eq("living_group_id", livingGroup.id)
       .order("section_name")
-      .order("last_name")
-      .order("first_name");
+      .order("name");
 
     if (error) {
       console.error("Get manual members error:", error);
@@ -79,7 +78,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { firstName, lastName, bulkText, section_name } = body;
+    const { name, bulkText, section_name } = body;
 
     const supabase = createAdminClient();
 
@@ -123,18 +122,17 @@ export async function POST(request: NextRequest) {
       // Check for duplicates against existing members
       const { data: existingMembers } = await supabase
         .from("living_group_manual_members")
-        .select("first_name, last_name")
+        .select("name")
         .eq("living_group_id", livingGroup.id);
 
       const duplicates: string[] = [];
       const toInsert = parseResult.success.filter((parsed) => {
         const isDuplicate = existingMembers?.some(
           (existing) =>
-            existing.first_name.toLowerCase() === parsed.firstName.toLowerCase() &&
-            existing.last_name.toLowerCase() === parsed.lastName.toLowerCase()
+            existing.name.toLowerCase() === parsed.name.toLowerCase()
         );
         if (isDuplicate) {
-          duplicates.push(`${parsed.firstName} ${parsed.lastName}`.trim());
+          duplicates.push(parsed.name);
         }
         return !isDuplicate;
       });
@@ -156,12 +154,8 @@ export async function POST(request: NextRequest) {
         .insert(
           toInsert.map((parsed) => ({
             living_group_id: livingGroup.id,
-            first_name: parsed.firstName,
-            last_name: parsed.lastName,
             section_name: trimmedSection,
-            name: parsed.firstName
-              ? `${parsed.lastName}, ${parsed.firstName}`
-              : parsed.lastName,
+            name: parsed.name,
           }))
         )
         .select();
@@ -183,26 +177,25 @@ export async function POST(request: NextRequest) {
     }
 
     // SINGLE ADD MODE
-    if (firstName === undefined || lastName === undefined) {
+    if (name === undefined) {
       return NextResponse.json(
-        { error: "First name and last name are required" },
+        { error: "Name is required" },
         { status: 400 }
       );
     }
 
-    const trimmedFirst = String(firstName).trim();
-    const trimmedLast = String(lastName).trim();
+    const trimmedName = String(name).trim();
 
-    if (!trimmedLast || trimmedLast.length === 0) {
+    if (!trimmedName || trimmedName.length === 0) {
       return NextResponse.json(
-        { error: "Last name is required" },
+        { error: "Name is required" },
         { status: 400 }
       );
     }
 
-    if (trimmedFirst.length > 100 || trimmedLast.length > 100) {
+    if (trimmedName.length > 200) {
       return NextResponse.json(
-        { error: "Name fields must be 100 characters or less" },
+        { error: "Name must be 200 characters or less" },
         { status: 400 }
       );
     }
@@ -212,8 +205,7 @@ export async function POST(request: NextRequest) {
       .from("living_group_manual_members")
       .select("id")
       .eq("living_group_id", livingGroup.id)
-      .eq("first_name", trimmedFirst)
-      .eq("last_name", trimmedLast)
+      .eq("name", trimmedName)
       .maybeSingle();
 
     if (duplicate) {
@@ -228,12 +220,8 @@ export async function POST(request: NextRequest) {
       .from("living_group_manual_members")
       .insert({
         living_group_id: livingGroup.id,
-        first_name: trimmedFirst,
-        last_name: trimmedLast,
         section_name: trimmedSection,
-        name: trimmedFirst
-          ? `${trimmedLast}, ${trimmedFirst}`
-          : trimmedLast,
+        name: trimmedName,
       })
       .select()
       .single();

@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
         target_id,
         details,
         created_at,
-        actor:users!admin_logs_actor_id_fkey(id, email, first_name, last_name, role, is_staph)
+        actor:actor_id(id, email, name, role, is_staph)
       `,
         { count: "exact" }
       )

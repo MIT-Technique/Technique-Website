@@ -708,6 +708,7 @@
   "dashboard": {
     "title": "管理控制台",
     "staphTitle": "Staph 控制台",
+    "noPermissions": "您尚未被分配任何权限。请联系管理员获取访问权限。",
     "welcome": "欢迎，{name}",
     "tabs": {
       "overview": "概览",
@@ -720,7 +721,14 @@
       "logs": "日志",
       "settings": "设置",
       "forms": "表单",
-      "yearbookInventory": "年鉴库存"
+      "yearbookInventory": "年鉴库存",
+      "reset": "重置",
+      "responses": "提交数据",
+      "respClubs": "社团",
+      "respLivingGroups": "宿舍",
+      "respSports": "体育",
+      "respActivities": "活动",
+      "respSeniors": "毕业生"
     },
     "stats": {
       "clubs": "社团",
@@ -880,8 +888,13 @@
         "role": "角色",
         "staph": "工作人员",
         "status": "状态",
-        "actions": "注册时间"
+        "actions": "注册时间",
+        "access": "访问权限",
+        "permissions": "权限"
       },
+      "accessPermissions": "响应访问权限",
+      "save": "保存",
+      "cancel": "取消",
       "active": "活跃",
       "inactive": "未激活",
       "staphYes": "工作人员",
@@ -902,6 +915,12 @@
       "designateConfirm": "将此工作人员指定为管理员？",
       "maxAdmins": "已达管理员上限 ({count}/{max})",
       "designatedAdmins": "已指定管理员: {count}/{max}",
+      "createStaph": "创建 Staph 账户",
+      "createStaphKerb": "MIT Kerberos",
+      "createStaphSubmit": "创建账户",
+      "createStaphSuccess": "账户已创建。请在关闭前复制密码：",
+      "createStaphDone": "完成",
+      "copy": "复制",
       "logs": {
         "title": "日志",
         "noLogs": "暂无活动日志"
@@ -945,6 +964,134 @@
         "cancel": "取消",
         "noResults": "未找到库存",
         "add": "添加"
+      },
+      "reset": {
+        "title": "重置数据",
+        "description": "永久删除数据库中的数据。这些操作无法撤消。",
+        "resetButton": "重置",
+        "cleared": "已清除",
+        "error": "错误",
+        "confirmTitle": "确认重置",
+        "confirmButton": "重置",
+        "cancelButton": "取消",
+        "clearBookingTimes": {
+          "label": "清除预约时间",
+          "description": "删除所有提议的预约时间、时间分配，并清除所有已预约的拍摄时间段。",
+          "confirmMessage": "这将删除所有时间提议、时间分配，并取消所有拍摄预约。此操作无法撤消。"
+        },
+        "clearSeniorBios": {
+          "label": "清除毕业生简历",
+          "description": "删除所有毕业生简历表单回复。",
+          "confirmMessage": "这将永久删除所有毕业生简历提交。此操作无法撤消。"
+        },
+        "clearCommunityCandids": {
+          "label": "清除社区抓拍照片",
+          "description": "删除所有社区抓拍照片提交及其上传的图片。",
+          "confirmMessage": "这将永久删除所有社区抓拍照片提交及其图片。此操作无法撤消。"
+        },
+        "clearStudentWork": {
+          "label": "清除学生作品",
+          "description": "删除所有学生作品展示提交及其上传的图片。",
+          "confirmMessage": "这将永久删除所有学生作品提交及其图片。此操作无法撤消。"
+        },
+        "clearOrgImages": {
+          "label": "清除组织图片",
+          "description": "删除社团、宿舍和体育队上传的所有图片。",
+          "confirmMessage": "这将永久删除社团、宿舍和体育队的所有组织图片。此操作无法撤消。"
+        }
+      }
+    },
+    "responses": {
+      "common": {
+        "exportCSV": "导出CSV",
+        "downloadImages": "下载图片",
+        "totalSubmissions": "总提交数",
+        "noData": "未找到数据",
+        "loading": "加载中...",
+        "downloading": "下载中...",
+        "exporting": "导出中...",
+        "imageCount": "{count} 张图片",
+        "yes": "✓",
+        "no": "✗",
+        "total": "总计"
+      },
+      "clubs": {
+        "title": "社团提交数据",
+        "totalClubs": "社团总数",
+        "withDescriptions": "有描述",
+        "withMembers": "已添加成员",
+        "totalMembers": "总成员数",
+        "clubName": "社团名称",
+        "description": "描述?",
+        "images": "图片",
+        "members": "成员",
+        "exportMembers": "导出社团成员CSV",
+        "downloadImages": "下载社团图片"
+      },
+      "livingGroups": {
+        "title": "宿舍提交数据",
+        "totalLGs": "宿舍总数",
+        "withBookings": "已预约拍摄",
+        "totalMembers": "总成员数",
+        "lgName": "宿舍名称",
+        "type": "类型",
+        "sections": "分区",
+        "candids": "抓拍照片",
+        "booked": "已预约",
+        "sectionName": "分区",
+        "sectionImage": "图片?",
+        "sectionMembers": "成员",
+        "members": "成员",
+        "autoBooked": "自动",
+        "manualBooked": "手动",
+        "exportMembers": "导出宿舍成员CSV",
+        "downloadImages": "下载宿舍图片"
+      },
+      "sports": {
+        "title": "体育提交数据",
+        "totalTeams": "运动队总数",
+        "withAchievements": "有成就",
+        "withMembers": "已添加成员",
+        "totalMembers": "总成员数",
+        "totalCoaches": "教练总数",
+        "teamName": "队名",
+        "description": "描述?",
+        "achievement": "成就?",
+        "mensAchievement": "男队成就?",
+        "womensAchievement": "女队成就?",
+        "mensImages": "男队图片",
+        "womensImages": "女队图片",
+        "mensMembers": "男队成员",
+        "womensMembers": "女队成员",
+        "coaches": "教练",
+        "exportMembers": "导出运动员CSV",
+        "downloadImages": "下载体育图片"
+      },
+      "activities": {
+        "title": "活动提交数据",
+        "candidsTitle": "社区照片",
+        "studentWorkTitle": "学生作品",
+        "totalCandids": "照片提交总数",
+        "uniqueEvents": "独立活动数",
+        "totalStudentWork": "作品总数",
+        "email": "邮箱",
+        "eventName": "活动名称",
+        "eventDescription": "活动描述",
+        "projectTitle": "项目标题",
+        "projectMembers": "成员",
+        "downloadCandidImages": "下载社区照片",
+        "downloadStudentWorkImages": "下载学生作品图片"
+      },
+      "seniors": {
+        "title": "毕业生简介",
+        "totalBios": "简介总数",
+        "name": "姓名",
+        "major": "专业",
+        "minor": "辅修",
+        "secondMajor": "第二专业",
+        "quote": "引言",
+        "achievements": "成就",
+        "exportBios": "导出简介CSV"
       }
     }
   },
@@ -1409,6 +1556,7 @@
       "unifiedTeam": "队员",
       "addSingle": "单个添加",
       "bulkImport": "批量导入",
+      "namePlaceholder": "输入成员姓名",
       "firstNamePlaceholder": "名",
       "lastNamePlaceholder": "姓",
       "add": "添加",

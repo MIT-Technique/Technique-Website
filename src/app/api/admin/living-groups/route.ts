@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
       .from('living_groups')
       .select(`
         *,
-        user:users!living_groups_user_id_fkey(id, email, first_name, last_name)
+        user:users!living_groups_user_id_fkey(id, email, name)
       `)
       .order('name', { ascending: true });
 
@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
       // Rollback user role
       await supabase
         .from('users')
-        .update({ role: 'student', updated_at: new Date().toISOString() })
+        .update({ role: 'staph', updated_at: new Date().toISOString() })
         .eq('id', userId);
 
       return NextResponse.json(

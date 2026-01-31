@@ -45,7 +45,7 @@ export default function SportsPage() {
   const [membersLoading, setMembersLoading] = useState(true);
   const [membersMessage, setMembersMessage] = useState({ type: '', text: '' });
   const [inputMode, setInputMode] = useState('single');
-  const [singleMember, setSingleMember] = useState({ firstName: '', lastName: '' });
+  const [singleMember, setSingleMember] = useState({ name: '' });
   const [bulkText, setBulkText] = useState('');
   const [parsePreview, setParsePreview] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
@@ -315,7 +315,7 @@ export default function SportsPage() {
 
   async function handleAddSingleMember(e) {
     e.preventDefault();
-    if (!singleMember.lastName.trim()) return;
+    if (!singleMember.name.trim()) return;
     setAddingMember(true);
     setMembersMessage({ type: '', text: '' });
     const team = formData.has_gender_teams ? activeTeamTab : null;
@@ -324,13 +324,12 @@ export default function SportsPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          firstName: singleMember.firstName.trim(),
-          lastName: singleMember.lastName.trim(),
+          name: singleMember.name.trim(),
           team,
         }),
       });
       if (res.ok) {
-        setSingleMember({ firstName: '', lastName: '' });
+        setSingleMember({ name: '' });
         setMembersMessage({ type: 'success', text: t('members.addSuccess') });
         fetchMembers();
       } else {
@@ -455,7 +454,7 @@ export default function SportsPage() {
       <div className="space-y-2">
         {filtered.map((member) => (
           <div key={member.id} className="px-3 py-2 border border-border rounded-lg flex justify-between items-center">
-            <span>{member.last_name}, {member.first_name || '(no first name)'}</span>
+            <span>{member.name}</span>
             <button
               onClick={() => handleRemoveMember(member.id)}
               disabled={removingMemberId === member.id}
@@ -798,22 +797,15 @@ export default function SportsPage() {
                   <div className="flex gap-2 flex-wrap">
                     <input
                       type="text"
-                      value={singleMember.firstName}
-                      onChange={(e) => setSingleMember({ ...singleMember, firstName: e.target.value })}
-                      placeholder={t('members.firstNamePlaceholder')}
-                      className="flex-1 min-w-[150px] border border-border rounded px-4 py-2"
-                    />
-                    <input
-                      type="text"
-                      value={singleMember.lastName}
-                      onChange={(e) => setSingleMember({ ...singleMember, lastName: e.target.value })}
-                      placeholder={t('members.lastNamePlaceholder')}
+                      value={singleMember.name}
+                      onChange={(e) => setSingleMember({ ...singleMember, name: e.target.value })}
+                      placeholder={t('members.namePlaceholder')}
                       className="flex-1 min-w-[150px] border border-border rounded px-4 py-2"
                       required
                     />
                     <button
                       type="submit"
-                      disabled={addingMember || !singleMember.lastName.trim()}
+                      disabled={addingMember || !singleMember.name.trim()}
                       className="btn-primary whitespace-nowrap"
                     >
                       {addingMember ? t('members.adding') : t('members.add')}
@@ -865,7 +857,7 @@ export default function SportsPage() {
                           </p>
                           <div className="max-h-40 overflow-y-auto bg-white p-2 rounded border text-sm">
                             {parsePreview.success.map((name, i) => (
-                              <div key={i} className="py-1">{name.lastName}, {name.firstName || '(no first name)'}</div>
+                              <div key={i} className="py-1">{name.name}</div>
                             ))}
                           </div>
                         </div>

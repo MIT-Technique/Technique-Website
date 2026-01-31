@@ -138,7 +138,7 @@ export default function LivingGroupPage() {
   const [membersLoading, setMembersLoading] = useState(true);
   const [membersMessage, setMembersMessage] = useState({ type: '', text: '' });
   const [inputMode, setInputMode] = useState('single'); // 'single' or 'bulk'
-  const [singleMember, setSingleMember] = useState({ firstName: '', lastName: '' });
+  const [singleMember, setSingleMember] = useState({ name: '' });
   const [bulkText, setBulkText] = useState('');
   const [parsePreview, setParsePreview] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
@@ -209,7 +209,7 @@ export default function LivingGroupPage() {
   function getCreatorLabel(time) {
     if (!time?.creator) return t('unknownCreator');
     if (time.creator.role === 'admin') return 'TNQ Photo';
-    const name = `${time.creator.first_name || ''} ${time.creator.last_name || ''}`.trim();
+    const name = time.creator.name || '';
     return name || time.creator.email || t('unknownCreator');
   }
 
@@ -350,7 +350,7 @@ export default function LivingGroupPage() {
 
   async function handleAddSingleMember(e) {
     e.preventDefault();
-    if (!singleMember.lastName.trim() || !livingGroup?.id) return;
+    if (!singleMember.name.trim() || !livingGroup?.id) return;
 
     setAddingMember(true);
     setMembersMessage({ type: '', text: '' });
@@ -360,14 +360,13 @@ export default function LivingGroupPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          firstName: singleMember.firstName.trim(),
-          lastName: singleMember.lastName.trim(),
+          name: singleMember.name.trim(),
           section_name: newMemberSection || null,
         }),
       });
 
       if (res.ok) {
-        setSingleMember({ firstName: '', lastName: '' });
+        setSingleMember({ name: '' });
         setNewMemberSection('');
         setMembersMessage({ type: 'success', text: t('members.addSuccess') });
         fetchMembers();
@@ -446,9 +445,7 @@ export default function LivingGroupPage() {
     setRemovingMemberId(memberToRemove.id);
     setMembersMessage({ type: '', text: '' });
 
-    const memberName = memberToRemove.first_name
-      ? `${memberToRemove.last_name}, ${memberToRemove.first_name}`
-      : memberToRemove.last_name;
+    const memberName = memberToRemove.name;
 
     try {
       const res = await fetch(`/api/living-groups/manual-members?id=${memberToRemove.id}`, {
@@ -1234,7 +1231,7 @@ export default function LivingGroupPage() {
                                 {proposal.status === 'accepted' && proposal.accepter && (
                                   <p className="text-green-600 text-xs mt-1">
                                     {t('proposeTime.acceptedBy', {
-                                      name: `${proposal.accepter.first_name || ''} ${proposal.accepter.last_name || ''}`.trim() || proposal.accepter.email,
+                                      name: proposal.accepter.name || proposal.accepter.email,
                                     })}
                                   </p>
                                 )}
@@ -1527,16 +1524,9 @@ export default function LivingGroupPage() {
                   <div className="flex gap-2 flex-wrap">
                     <input
                       type="text"
-                      value={singleMember.firstName}
-                      onChange={(e) => setSingleMember({ ...singleMember, firstName: e.target.value })}
-                      placeholder={t('members.firstNamePlaceholder')}
-                      className="flex-1 min-w-[150px] border border-border rounded px-4 py-2"
-                    />
-                    <input
-                      type="text"
-                      value={singleMember.lastName}
-                      onChange={(e) => setSingleMember({ ...singleMember, lastName: e.target.value })}
-                      placeholder={t('members.lastNamePlaceholder')}
+                      value={singleMember.name}
+                      onChange={(e) => setSingleMember({ ...singleMember, name: e.target.value })}
+                      placeholder={t('members.namePlaceholder')}
                       className="flex-1 min-w-[150px] border border-border rounded px-4 py-2"
                       required
                     />
@@ -1554,7 +1544,7 @@ export default function LivingGroupPage() {
                     )}
                     <button
                       type="submit"
-                      disabled={addingMember || !singleMember.lastName.trim()}
+                      disabled={addingMember || !singleMember.name.trim()}
                       className="btn-primary whitespace-nowrap"
                     >
                       {addingMember ? t('members.adding') : t('members.add')}
@@ -1625,7 +1615,7 @@ export default function LivingGroupPage() {
                           <div className="max-h-40 overflow-y-auto bg-white p-2 rounded border text-sm">
                             {parsePreview.success.map((name, i) => (
                               <div key={i} className="py-1">
-                                {name.lastName}, {name.firstName || '(no first name)'}
+                                {name.name}
                               </div>
                             ))}
                           </div>
@@ -1682,7 +1672,7 @@ export default function LivingGroupPage() {
                               className="py-2 px-3 border border-border rounded-lg flex justify-between items-center gap-2"
                             >
                               <p className="flex-1">
-                                {member.last_name}, {member.first_name || '(no first name)'}
+                                {member.name}
                               </p>
                               <select
                                 value={member.section_name || ''}
@@ -1725,7 +1715,7 @@ export default function LivingGroupPage() {
                               className="py-2 px-3 border border-border rounded-lg flex justify-between items-center gap-2"
                             >
                               <p className="flex-1">
-                                {member.last_name}, {member.first_name || '(no first name)'}
+                                {member.name}
                               </p>
                               <select
                                 value={member.section_name || ''}
@@ -1761,7 +1751,7 @@ export default function LivingGroupPage() {
                       className="px-4 border border-border rounded-lg flex justify-between items-center"
                     >
                       <p>
-                        {member.last_name}, {member.first_name || '(no first name)'}
+                        {member.name}
                       </p>
                       <button
                         onClick={() => handleRemoveManualMember(member)}
@@ -1784,7 +1774,7 @@ export default function LivingGroupPage() {
                       {t('members.confirmRemove')}
                       <br />
                       <span className="font-medium">
-                        {memberToRemove.last_name}, {memberToRemove.first_name || '(no first name)'}
+                        {memberToRemove.name}
                       </span>
                     </p>
                     <div className="flex gap-2 justify-end">

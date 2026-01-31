@@ -470,7 +470,7 @@ function Sidebar({ pathname }) {
                       sx={{ px: 3, py: 1.5 }}
                     >
                       <ListItemText
-                        primary={sports?.name || club?.name || livingGroup?.name || user?.first_name || user?.email?.split('@')[0] || tAccount('login')}
+                        primary={sports?.name || club?.name || livingGroup?.name || user?.name || user?.email?.split('@')[0] || tAccount('login')}
                         primaryTypographyProps={{
                           sx: {
                             fontSize: "0.75rem",

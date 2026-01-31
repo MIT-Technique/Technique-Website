@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
       .from('sports')
       .select(`
         *,
-        user:users(id, email, first_name, last_name)
+        user:users(id, email, name)
       `)
       .order('name', { ascending: true });
 

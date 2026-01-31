@@ -228,7 +228,7 @@ t("photoCredit", { photographer: "Michelle Xiang" });
 
 | Route           | Required Role  | Description                                          |
 | --------------- | -------------- | ---------------------------------------------------- |
-| `/bio`          | `student`      | Senior bio form                                      |
+| `/bio`          | `staph`        | Senior bio form                                      |
 | `/profile`      | any logged-in  | User profile                                         |
 | `/club`         | `club`         | Club management dashboard                            |
 | `/living-group` | `living_group` | Living group management dashboard                    |
@@ -389,16 +389,14 @@ type UserRole =
   | "staph"
   | "club"
   | "living_group"
-  | "sports"
-  | "student";
+  | "sports";
 ```
 
 - `admin` - Full dashboard access, user management, org approval
-- `staph` - Staff member access
+- `staph` - Default role for individual users (MIT SSO), profile/bio access, dashboard access with permissions
 - `club` - Club management dashboard
 - `living_group` - Living group management dashboard
 - `sports` - Sports team management dashboard
-- `student` - Default role, profile/bio access
 
 ### Core Entities (Supabase/PostgreSQL)
 
@@ -607,8 +605,6 @@ id uuid NOT NULL DEFAULT gen_random_uuid(),
 club_id uuid NOT NULL,
 name text NOT NULL,
 added_at timestamp with time zone DEFAULT now(),
-first_name character varying NOT NULL,
-last_name character varying NOT NULL,
 section_name text,
 CONSTRAINT club_manual_members_pkey PRIMARY KEY (id),
 CONSTRAINT club_manual_members_club_id_fkey FOREIGN KEY (club_id) REFERENCES public.clubs(id)
@@ -673,8 +669,6 @@ living_group_id uuid NOT NULL,
 name text NOT NULL,
 section_name text,
 added_at timestamp with time zone DEFAULT now(),
-first_name character varying NOT NULL,
-last_name character varying NOT NULL,
 CONSTRAINT living_group_manual_members_pkey PRIMARY KEY (id),
 CONSTRAINT living_group_manual_members_living_group_id_fkey FOREIGN KEY (living_group_id) REFERENCES public.living_groups(id)
 );
@@ -768,8 +762,6 @@ CONSTRAINT photoshoot_times_created_by_fkey FOREIGN KEY (created_by) REFERENCES 
 CREATE TABLE public.senior_bios (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 email character varying NOT NULL UNIQUE,
-first_name character varying,
-last_name character varying,
 major character varying,
 second_major character varying,
 quote text,
@@ -777,6 +769,7 @@ achievements text,
 created_at timestamp with time zone DEFAULT now(),
 updated_at timestamp with time zone DEFAULT now(),
 minor text,
+name text,
 CONSTRAINT senior_bios_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.sessions (
@@ -829,8 +822,6 @@ CONSTRAINT sports_coaches_sports_id_fkey FOREIGN KEY (sports_id) REFERENCES publ
 CREATE TABLE public.sports_manual_members (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 sports_id uuid NOT NULL,
-first_name text NOT NULL,
-last_name text NOT NULL,
 name text NOT NULL,
 team text CHECK (team IS NULL OR (team = ANY (ARRAY['mens'::text, 'womens'::text]))),
 added_at timestamp with time zone DEFAULT now(),
@@ -875,20 +866,14 @@ CONSTRAINT time_proposals_declined_by_fkey FOREIGN KEY (declined_by) REFERENCES 
 CREATE TABLE public.users (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 email character varying NOT NULL UNIQUE,
-role character varying NOT NULL DEFAULT 'student'::character varying CHECK (role::text = ANY (ARRAY['admin'::text, 'staph'::text, 'club'::text, 'living_group'::text, 'student'::text, 'sports'::text])),
-first_name character varying,
-last_name character varying,
-major character varying,
-second_major character varying,
-quote text,
-achievements text,
-school_year integer,
-auth_provider character varying NOT NULL DEFAULT 'mit_sso'::character varying CHECK (auth_provider::text = ANY (ARRAY['mit_sso'::character varying, 'supabase_auth'::character varying]::text[])),
+role character varying NOT NULL DEFAULT 'staph'::character varying CHECK (role::text = ANY (ARRAY['admin'::text, 'staph'::text, 'club'::text, 'living_group'::text, 'sports'::text])),
 supabase_auth_id uuid,
 is_active boolean DEFAULT true,
 created_at timestamp with time zone DEFAULT now(),
 updated_at timestamp with time zone DEFAULT now(),
 is_staph boolean DEFAULT false,
+access ARRAY DEFAULT '{}'::text[],
+name text,
 CONSTRAINT users_pkey PRIMARY KEY (id),
 CONSTRAINT users_supabase_auth_id_fkey FOREIGN KEY (supabase_auth_id) REFERENCES auth.users(id)
 );

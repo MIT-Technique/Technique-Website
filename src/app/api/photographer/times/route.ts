@@ -67,7 +67,7 @@ export async function GET() {
         created_at,
         created_by,
         living_group:living_groups(id, name),
-        creator:users!photoshoot_times_created_by_fkey(id, email, first_name, last_name, role)
+        creator:users!photoshoot_times_created_by_fkey(id, email, name, role)
       `
       )
       .order("date", { ascending: true })

@@ -708,6 +708,7 @@
   "dashboard": {
     "title": "Panel de Administración",
     "staphTitle": "Panel de Staph",
+    "noPermissions": "No tienes permisos asignados. Por favor contacta a un administrador para obtener acceso.",
     "welcome": "Bienvenido, {name}",
     "tabs": {
       "overview": "Resumen",
@@ -720,7 +721,14 @@
       "logs": "Registros",
       "settings": "Configuración",
       "forms": "Formularios",
-      "yearbookInventory": "Inventario del Anuario"
+      "yearbookInventory": "Inventario del Anuario",
+      "reset": "Restablecer",
+      "responses": "Respuestas",
+      "respClubs": "Clubes",
+      "respLivingGroups": "Grupos de Vivienda",
+      "respSports": "Deportes",
+      "respActivities": "Actividades",
+      "respSeniors": "Seniors"
     },
     "stats": {
       "clubs": "Clubes",
@@ -880,8 +888,13 @@
         "role": "Rol",
         "staph": "Staph",
         "status": "Estado",
-        "actions": "Registrado"
+        "actions": "Registrado",
+        "access": "Acceso",
+        "permissions": "Permisos"
       },
+      "accessPermissions": "Acceso a Respuestas",
+      "save": "Guardar",
+      "cancel": "Cancelar",
       "active": "Activo",
       "inactive": "Inactivo",
       "staphYes": "Staph",
@@ -902,6 +915,12 @@
       "designateConfirm": "¿Designar a este staph como admin?",
       "maxAdmins": "Máximo de admins alcanzado ({count}/{max})",
       "designatedAdmins": "Admins Designados: {count}/{max}",
+      "createStaph": "Crear Cuenta de Staph",
+      "createStaphKerb": "Kerberos de MIT",
+      "createStaphSubmit": "Crear Cuenta",
+      "createStaphSuccess": "Cuenta creada. Copia la contraseña antes de cerrar:",
+      "createStaphDone": "Listo",
+      "copy": "Copiar",
       "logs": {
         "title": "Registros",
         "noLogs": "No hay registros de actividad todavía"
@@ -945,6 +964,134 @@
         "cancel": "Cancelar",
         "noResults": "No se encontró inventario",
         "add": "Agregar"
+      },
+      "reset": {
+        "title": "Restablecer Datos",
+        "description": "Eliminar datos permanentemente de la base de datos. Estas acciones no se pueden deshacer.",
+        "resetButton": "Restablecer",
+        "cleared": "Eliminado",
+        "error": "Error",
+        "confirmTitle": "Confirmar Restablecimiento",
+        "confirmButton": "Restablecer",
+        "cancelButton": "Cancelar",
+        "clearBookingTimes": {
+          "label": "Eliminar Horarios de Reserva",
+          "description": "Eliminar todos los horarios propuestos, asignaciones de tiempo y liberar todas las sesiones fotográficas reservadas.",
+          "confirmMessage": "Esto eliminará todas las propuestas de horarios, asignaciones de tiempo y liberará todas las sesiones fotográficas. No se puede deshacer."
+        },
+        "clearSeniorBios": {
+          "label": "Eliminar Biografías de Seniors",
+          "description": "Eliminar todas las respuestas del formulario de biografías de seniors.",
+          "confirmMessage": "Esto eliminará permanentemente todas las biografías de seniors. No se puede deshacer."
+        },
+        "clearCommunityCandids": {
+          "label": "Eliminar Fotos Candid Comunitarias",
+          "description": "Eliminar todas las fotos candid comunitarias y sus imágenes subidas.",
+          "confirmMessage": "Esto eliminará permanentemente todas las fotos candid comunitarias y sus imágenes. No se puede deshacer."
+        },
+        "clearStudentWork": {
+          "label": "Eliminar Trabajos Estudiantiles",
+          "description": "Eliminar todas las presentaciones de trabajos estudiantiles y sus imágenes subidas.",
+          "confirmMessage": "Esto eliminará permanentemente todas las presentaciones de trabajos estudiantiles y sus imágenes. No se puede deshacer."
+        },
+        "clearOrgImages": {
+          "label": "Eliminar Imágenes de Organizaciones",
+          "description": "Eliminar todas las imágenes subidas de clubes, grupos de vivienda y equipos deportivos.",
+          "confirmMessage": "Esto eliminará permanentemente todas las imágenes de organizaciones. No se puede deshacer."
+        }
+      }
+    },
+    "responses": {
+      "common": {
+        "exportCSV": "Exportar CSV",
+        "downloadImages": "Descargar Imágenes",
+        "totalSubmissions": "Total de Envíos",
+        "noData": "No se encontraron datos",
+        "loading": "Cargando...",
+        "downloading": "Descargando...",
+        "exporting": "Exportando...",
+        "imageCount": "{count} imágenes",
+        "yes": "✓",
+        "no": "✗",
+        "total": "Total"
+      },
+      "clubs": {
+        "title": "Respuestas de Clubes",
+        "totalClubs": "Total de Clubes",
+        "withDescriptions": "Con Descripciones",
+        "withMembers": "Con Miembros",
+        "totalMembers": "Total de Miembros",
+        "clubName": "Nombre del Club",
+        "description": "¿Descripción?",
+        "images": "Imágenes",
+        "members": "Miembros",
+        "exportMembers": "Exportar Miembros de Clubes CSV",
+        "downloadImages": "Descargar Imágenes de Clubes"
+      },
+      "livingGroups": {
+        "title": "Respuestas de Grupos de Vivienda",
+        "totalLGs": "Total de Grupos",
+        "withBookings": "Con Reservas de Sesiones",
+        "totalMembers": "Total de Miembros",
+        "lgName": "Nombre del Grupo",
+        "type": "Tipo",
+        "sections": "Secciones",
+        "candids": "Fotos Candid",
+        "booked": "Reservado",
+        "sectionName": "Sección",
+        "sectionImage": "¿Imagen?",
+        "sectionMembers": "Miembros",
+        "members": "Miembros",
+        "autoBooked": "Auto",
+        "manualBooked": "Manual",
+        "exportMembers": "Exportar Miembros CSV",
+        "downloadImages": "Descargar Imágenes"
+      },
+      "sports": {
+        "title": "Respuestas de Deportes",
+        "totalTeams": "Total de Equipos",
+        "withAchievements": "Con Logros",
+        "withMembers": "Con Miembros",
+        "totalMembers": "Total de Miembros",
+        "totalCoaches": "Total de Entrenadores",
+        "teamName": "Nombre del Equipo",
+        "description": "¿Descripción?",
+        "achievement": "¿Logro?",
+        "mensAchievement": "¿Logro Masc.?",
+        "womensAchievement": "¿Logro Fem.?",
+        "mensImages": "Imágenes Masc.",
+        "womensImages": "Imágenes Fem.",
+        "mensMembers": "Miembros Masc.",
+        "womensMembers": "Miembros Fem.",
+        "coaches": "Entrenadores",
+        "exportMembers": "Exportar Miembros CSV",
+        "downloadImages": "Descargar Imágenes"
+      },
+      "activities": {
+        "title": "Respuestas de Actividades",
+        "candidsTitle": "Fotos Comunitarias",
+        "studentWorkTitle": "Trabajos Estudiantiles",
+        "totalCandids": "Total de Fotos",
+        "uniqueEvents": "Eventos Únicos",
+        "totalStudentWork": "Total de Trabajos",
+        "email": "Email",
+        "eventName": "Nombre del Evento",
+        "eventDescription": "Descripción del Evento",
+        "projectTitle": "Título del Proyecto",
+        "projectMembers": "Miembros",
+        "downloadCandidImages": "Descargar Fotos Comunitarias",
+        "downloadStudentWorkImages": "Descargar Imágenes de Trabajos"
+      },
+      "seniors": {
+        "title": "Biografías de Seniors",
+        "totalBios": "Total de Biografías",
+        "name": "Nombre",
+        "major": "Carrera",
+        "minor": "Minor",
+        "secondMajor": "2da Carrera",
+        "quote": "Cita",
+        "achievements": "Logros",
+        "exportBios": "Exportar Biografías CSV"
       }
     }
   },
@@ -1408,6 +1555,7 @@
       "unifiedTeam": "Miembros del Equipo",
       "addSingle": "Agregar Individual",
       "bulkImport": "Importar en Masa",
+      "namePlaceholder": "Ingrese nombre del miembro",
       "firstNamePlaceholder": "Nombre",
       "lastNamePlaceholder": "Apellido",
       "add": "Agregar",

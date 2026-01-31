@@ -745,6 +745,7 @@
   "dashboard": {
     "title": "Admin Dashboard",
     "staphTitle": "Staph Dashboard",
+    "noPermissions": "You don't have any permissions set. Please contact an admin for additional access.",
     "welcome": "Welcome, {name}",
     "tabs": {
       "overview": "Overview",
@@ -757,7 +758,14 @@
       "logs": "Logs",
       "settings": "Settings",
       "forms": "Forms",
-      "yearbookInventory": "Yearbook Inventory"
+      "yearbookInventory": "Yearbook Inventory",
+      "reset": "Reset",
+      "responses": "Responses",
+      "respClubs": "Clubs",
+      "respLivingGroups": "Living Groups",
+      "respSports": "Sports",
+      "respActivities": "Activities",
+      "respSeniors": "Seniors"
     },
     "stats": {
       "clubs": "Clubs",
@@ -917,8 +925,13 @@
         "role": "Role",
         "staph": "Staph",
         "status": "Status",
-        "actions": "Joined"
+        "actions": "Joined",
+        "access": "Access",
+        "permissions": "Permissions"
       },
+      "accessPermissions": "Response Access",
+      "save": "Save",
+      "cancel": "Cancel",
       "active": "Active",
       "inactive": "Inactive",
       "staphYes": "Staph",
@@ -939,6 +952,12 @@
       "designateConfirm": "Designate this staph member as admin?",
       "maxAdmins": "Max admins reached ({count}/{max})",
       "designatedAdmins": "Designated Admins: {count}/{max}",
+      "createStaph": "Create Staph Account",
+      "createStaphKerb": "MIT Kerberos",
+      "createStaphSubmit": "Create Account",
+      "createStaphSuccess": "Account created. Copy the password before closing:",
+      "createStaphDone": "Done",
+      "copy": "Copy",
       "logs": {
         "title": "Logs",
         "noLogs": "No activity logs yet"
@@ -982,6 +1001,134 @@
         "cancel": "Cancel",
         "noResults": "No inventory found",
         "add": "Add"
+      },
+      "reset": {
+        "title": "Reset Data",
+        "description": "Permanently delete data from the database. These actions cannot be undone.",
+        "resetButton": "Reset",
+        "cleared": "Cleared",
+        "error": "Error",
+        "confirmTitle": "Confirm Reset",
+        "confirmButton": "Reset",
+        "cancelButton": "Cancel",
+        "clearBookingTimes": {
+          "label": "Clear Booking Times",
+          "description": "Remove all proposed booking times, time assignments, and clear all booked photoshoot slots.",
+          "confirmMessage": "This will delete all time proposals, time assignments, and unbook all photoshoot times. This cannot be undone."
+        },
+        "clearSeniorBios": {
+          "label": "Clear Senior Bios",
+          "description": "Remove all senior bio form responses.",
+          "confirmMessage": "This will permanently delete all senior bio submissions. This cannot be undone."
+        },
+        "clearCommunityCandids": {
+          "label": "Clear Community Candids",
+          "description": "Remove all community candid submissions and their uploaded images.",
+          "confirmMessage": "This will permanently delete all community candid submissions and their images. This cannot be undone."
+        },
+        "clearStudentWork": {
+          "label": "Clear Student Work",
+          "description": "Remove all student work feature submissions and their uploaded images.",
+          "confirmMessage": "This will permanently delete all student work submissions and their images. This cannot be undone."
+        },
+        "clearOrgImages": {
+          "label": "Clear Organization Images",
+          "description": "Remove all uploaded images from clubs, living groups, and sports teams.",
+          "confirmMessage": "This will permanently delete all organization images from clubs, living groups, and sports teams. This cannot be undone."
+        }
+      }
+    },
+    "responses": {
+      "common": {
+        "exportCSV": "Export CSV",
+        "downloadImages": "Download Images",
+        "totalSubmissions": "Total Submissions",
+        "noData": "No data found",
+        "loading": "Loading...",
+        "downloading": "Downloading...",
+        "exporting": "Exporting...",
+        "imageCount": "{count} images",
+        "yes": "✓",
+        "no": "✗",
+        "total": "Total"
+      },
+      "clubs": {
+        "title": "Club Responses",
+        "totalClubs": "Total Clubs",
+        "withDescriptions": "With Descriptions",
+        "withMembers": "Added Members",
+        "totalMembers": "Total Members",
+        "clubName": "Club Name",
+        "description": "Description?",
+        "images": "Images",
+        "members": "Members",
+        "exportMembers": "Export Club Members CSV",
+        "downloadImages": "Download Club Images"
+      },
+      "livingGroups": {
+        "title": "Living Group Responses",
+        "totalLGs": "Total Living Groups",
+        "withBookings": "With Photoshoot Bookings",
+        "totalMembers": "Total Members",
+        "lgName": "LG Name",
+        "type": "Type",
+        "sections": "Sections",
+        "candids": "Candids",
+        "booked": "Booked",
+        "sectionName": "Section",
+        "sectionImage": "Image?",
+        "sectionMembers": "Members",
+        "members": "Members",
+        "autoBooked": "Auto",
+        "manualBooked": "Manual",
+        "exportMembers": "Export LG Members CSV",
+        "downloadImages": "Download LG Images"
+      },
+      "sports": {
+        "title": "Sports Responses",
+        "totalTeams": "Total Sports Teams",
+        "withAchievements": "With Achievements",
+        "withMembers": "Added Members",
+        "totalMembers": "Total Members",
+        "totalCoaches": "Total Coaches",
+        "teamName": "Team Name",
+        "description": "Description?",
+        "achievement": "Achievement?",
+        "mensAchievement": "Men's Ach.?",
+        "womensAchievement": "Women's Ach.?",
+        "mensImages": "Men's Images",
+        "womensImages": "Women's Images",
+        "mensMembers": "Men's Members",
+        "womensMembers": "Women's Members",
+        "coaches": "Coaches",
+        "exportMembers": "Export Sport Members CSV",
+        "downloadImages": "Download Sports Images"
+      },
+      "activities": {
+        "title": "Activities Responses",
+        "candidsTitle": "Community Candids",
+        "studentWorkTitle": "Student Work Submissions",
+        "totalCandids": "Total Candid Submissions",
+        "uniqueEvents": "Unique Events",
+        "totalStudentWork": "Total Student Work",
+        "email": "Email",
+        "eventName": "Event Name",
+        "eventDescription": "Event Description",
+        "projectTitle": "Project Title",
+        "projectMembers": "Members",
+        "downloadCandidImages": "Download Community Candid Images",
+        "downloadStudentWorkImages": "Download Student Work Images"
+      },
+      "seniors": {
+        "title": "Senior Bios",
+        "totalBios": "Total Senior Bios",
+        "name": "Name",
+        "major": "Major",
+        "minor": "Minor",
+        "secondMajor": "2nd Major",
+        "quote": "Quote",
+        "achievements": "Achievements",
+        "exportBios": "Export Senior Bios CSV"
       }
     }
   },
@@ -1450,6 +1597,7 @@
       "unifiedTeam": "Team Members",
       "addSingle": "Add Single",
       "bulkImport": "Bulk Import",
+      "namePlaceholder": "Enter member name",
       "firstNamePlaceholder": "First name",
       "lastNamePlaceholder": "Last name",
       "add": "Add",
