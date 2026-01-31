@@ -10,7 +10,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     if (!email) {
       return NextResponse.json({
         data: {
-          name: '',
+          firstName: '',
+          lastName: '',
           major: '',
           minor: '',
           second_major: '',
@@ -24,13 +25,14 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     const { data: bio } = await supabase
       .from('senior_bios')
-      .select('name, major, minor, second_major, quote, achievements')
+      .select('first_name, last_name, major, minor, second_major, quote, achievements')
       .eq('email', email)
       .single();
 
     return NextResponse.json({
       data: {
-        name: bio?.name || '',
+        firstName: bio?.first_name || '',
+        lastName: bio?.last_name || '',
         major: bio?.major || '',
         minor: bio?.minor || '',
         second_major: bio?.second_major || '',
@@ -51,7 +53,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 export async function PUT(request: NextRequest): Promise<NextResponse> {
   try {
     const body = await request.json();
-    const { email, name, major, minor, second_major, quote, achievements } = body;
+    const { email, firstName, lastName, major, minor, second_major, quote, achievements } = body;
 
     // Validate email
     if (!email || typeof email !== 'string') {
@@ -70,9 +72,9 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
     }
 
     // Validate required fields
-    if (!name || !major) {
+    if (!firstName || !lastName || !major) {
       return NextResponse.json(
-        { error: "Name and major are required" },
+        { error: "First name, last name, and major are required" },
         { status: 400 }
       );
     }
@@ -92,7 +94,8 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
       .from('senior_bios')
       .upsert({
         email: normalizedEmail,
-        name,
+        first_name: firstName,
+        last_name: lastName,
         major: major || null,
         minor: minor || null,
         second_major: second_major || null,
