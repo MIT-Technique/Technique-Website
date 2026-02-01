@@ -11,10 +11,8 @@ function AccountButton({ isHomePage = false }) {
   const t = useTranslations('account');
   const { isLoggedIn, user, loading, logout } = useUser();
   const [isOpen, setIsOpen] = useState(false);
-  const [loginDropdownOpen, setLoginDropdownOpen] = useState(false);
   const [orgModalOpen, setOrgModalOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const loginDropdownRef = useRef(null);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -42,73 +40,19 @@ function AccountButton({ isHomePage = false }) {
     );
   }
 
-  function handleOrganizationLogin() {
-    setLoginDropdownOpen(false);
-    setOrgModalOpen(true);
-  }
-
-  function handleStaphLogin() {
-    setLoginDropdownOpen(false);
-    window.location.href = `/${locale}/login/admin`;
-  }
-
   if (!isLoggedIn) {
     return (
       <>
-        <div
-          className="relative"
-          ref={loginDropdownRef}
-          onMouseEnter={() => setLoginDropdownOpen(true)}
-          onMouseLeave={() => setLoginDropdownOpen(false)}
+        <button
+          onClick={() => setOrgModalOpen(true)}
+          className={`px-4 py-2 text-xs uppercase tracking-widest font-medium border rounded transition-colors ${
+            isHomePage
+              ? 'border-white/50 text-white/70 hover:border-white hover:text-white'
+              : 'border-border text-text-secondary hover:border-accent hover:text-accent'
+          }`}
         >
-          <button
-            className={`px-4 py-2 text-xs uppercase tracking-widest font-medium border rounded transition-colors ${
-              isHomePage
-                ? 'border-white/50 text-white/70 hover:border-white hover:text-white'
-                : 'border-border text-text-secondary hover:border-accent hover:text-accent'
-            }`}
-          >
-            {t('login')}
-          </button>
-
-          {/* Login Dropdown Menu */}
-          <div
-            className={`absolute top-full right-0 mt-2 transition-all duration-200 z-50 ${
-              loginDropdownOpen
-                ? 'opacity-100 visible translate-y-0'
-                : 'opacity-0 invisible -translate-y-2'
-            }`}
-          >
-            <div
-              className={`min-w-[160px] py-2 rounded shadow-lg ${
-                isHomePage
-                  ? 'bg-black/90 backdrop-blur-sm'
-                  : 'bg-white border border-border'
-              }`}
-            >
-              <button
-                onClick={handleOrganizationLogin}
-                className={`block w-full text-left px-4 py-2 text-xs uppercase tracking-wider transition-colors ${
-                  isHomePage
-                    ? 'text-white/70 hover:text-white hover:bg-white/10'
-                    : 'text-text-secondary hover:text-text-primary hover:bg-bg-secondary'
-                }`}
-              >
-                {t('organization')}
-              </button>
-              <button
-                onClick={handleStaphLogin}
-                className={`block w-full text-left px-4 py-2 text-xs uppercase tracking-wider transition-colors ${
-                  isHomePage
-                    ? 'text-white/70 hover:text-white hover:bg-white/10'
-                    : 'text-text-secondary hover:text-text-primary hover:bg-bg-secondary'
-                }`}
-              >
-                {t('staph')}
-              </button>
-            </div>
-          </div>
-        </div>
+          {t('login')}
+        </button>
 
         <OrganizationAuthModal
           open={orgModalOpen}

@@ -182,7 +182,9 @@
       "org": {
         "title": "Organization Login",
         "signIn": "Sign In",
-        "signInTitle": "Organization Sign In",
+        "signInTitle": "Sign In",
+        "organizationTab": "Organization",
+        "staphTab": "Staph",
         "selectOrganization": "Organization",
         "searchOrganization": "Search for your organization...",
         "organizationRequired": "Please select an organization",
@@ -1482,6 +1484,7 @@
   },
 
   "calendarView": {
+    "noPastDates": "Cannot schedule in the past",
     "calendar": "Calendar",
     "list": "List",
     "today": "Today",

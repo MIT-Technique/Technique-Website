@@ -48,9 +48,19 @@ const linkButtonSx = {
   "&:hover": { backgroundColor: "transparent", textDecoration: "underline" },
 };
 
-export default function OrganizationAuthModal({ open, onClose }) {
+export default function OrganizationAuthModal({ open, onClose, defaultTab = "organization" }) {
   const t = useTranslations("pages.login.org");
+  const tAdmin = useTranslations("pages.login.admin");
   const locale = useLocale();
+
+  // Tab state
+  const [activeTab, setActiveTab] = useState(defaultTab);
+
+  // Staph login state
+  const [staphEmail, setStaphEmail] = useState("");
+  const [staphPassword, setStaphPassword] = useState("");
+  const [staphLoading, setStaphLoading] = useState(false);
+  const [staphMessage, setStaphMessage] = useState({ type: "", text: "" });
 
   // Organizations list
   const [organizations, setOrganizations] = useState([]);
@@ -120,6 +130,13 @@ export default function OrganizationAuthModal({ open, onClose }) {
     return t("livingGroupsGroup");
   };
 
+  // Reset tab to defaultTab when modal opens
+  useEffect(() => {
+    if (open) {
+      setActiveTab(defaultTab);
+    }
+  }, [open, defaultTab]);
+
   const resetForm = () => {
     setSelectedOrg(null);
     setInputValue("");
@@ -133,6 +150,10 @@ export default function OrganizationAuthModal({ open, onClose }) {
     setTouched({});
     setShowDropdown(false);
     setDropdownSearch("");
+    setStaphEmail("");
+    setStaphPassword("");
+    setStaphLoading(false);
+    setStaphMessage({ type: "", text: "" });
   };
 
   const handleClose = () => {
@@ -288,6 +309,44 @@ export default function OrganizationAuthModal({ open, onClose }) {
     }
   };
 
+  const handleStaphLogin = async (e) => {
+    e.preventDefault();
+    if (!staphPassword) {
+      setStaphMessage({ type: "error", text: tAdmin("passwordRequired") });
+      return;
+    }
+    setStaphLoading(true);
+    setStaphMessage({ type: "", text: "" });
+    try {
+      const res = await fetch("/api/auth/admin-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: staphEmail || undefined, password: staphPassword }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setStaphMessage({ type: "success", text: tAdmin("success") });
+        setTimeout(() => {
+          window.location.href = data.redirectUrl;
+        }, 500);
+      } else {
+        setStaphMessage({ type: "error", text: data.error || tAdmin("error") });
+      }
+    } catch (err) {
+      setStaphMessage({ type: "error", text: tAdmin("error") });
+    } finally {
+      setStaphLoading(false);
+    }
+  };
+
+  // Switch tab and clear errors
+  const handleTabSwitch = (tab) => {
+    setActiveTab(tab);
+    setError("");
+    setSuccess("");
+    setStaphMessage({ type: "", text: "" });
+  };
+
   // Custom Paper component for Autocomplete dropdown with max 3 visible items
   const CustomPaper = (props) => (
     <Paper
@@ -431,6 +490,19 @@ export default function OrganizationAuthModal({ open, onClose }) {
     );
   }
 
+  const tabStyle = (tab) => ({
+    flex: 1,
+    py: 1.5,
+    fontSize: "0.75rem",
+    fontWeight: 600,
+    letterSpacing: "0.08em",
+    textTransform: "uppercase",
+    borderBottom: activeTab === tab ? "2px solid #750014" : "2px solid transparent",
+    color: activeTab === tab ? "#750014" : "#999",
+    borderRadius: 0,
+    "&:hover": { backgroundColor: "transparent", color: activeTab === tab ? "#750014" : "#666" },
+  });
+
   return (
     <Dialog
       open={open}
@@ -447,263 +519,319 @@ export default function OrganizationAuthModal({ open, onClose }) {
           <CloseIcon />
         </IconButton>
       </DialogTitle>
+
+      {/* Tabs */}
+      <Box sx={{ display: "flex", borderBottom: "1px solid #e0e0e0", px: 3 }}>
+        <Button disableRipple onClick={() => handleTabSwitch("organization")} sx={tabStyle("organization")}>
+          {t("organizationTab")}
+        </Button>
+        <Button disableRipple onClick={() => handleTabSwitch("staph")} sx={tabStyle("staph")}>
+          {t("staphTab")}
+        </Button>
+      </Box>
+
       <DialogContent>
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
-        {success && (
-          <Alert severity="success" sx={{ mb: 2 }}>
-            {success}
-          </Alert>
-        )}
-
-        <Box component="form" onSubmit={handleSignIn} sx={{ mt: 1 }}>
-          {/* Organization Input with Dropdown Button */}
-          <Box sx={{ display: "flex", gap: 1, alignItems: "flex-start" }} ref={dropdownAnchorRef}>
-            <TextField
-              fullWidth
-              label={t("selectOrganization")}
-              placeholder={t("searchOrganization")}
-              value={inputValue}
-              onChange={(e) => {
-                setInputValue(e.target.value);
-                // Clear selectedOrg if user manually edits
-                if (selectedOrg && e.target.value !== selectedOrg.name) {
-                  setSelectedOrg(null);
-                }
-                setFieldErrors((prev) => ({ ...prev, organization: null }));
-              }}
-              onBlur={() => handleBlur("organization", inputValue)}
-              error={touched.organization && !!fieldErrors.organization}
-              sx={textFieldSx}
-              disabled={loading}
-              autoComplete="organization"
-              name="organization"
-            />
-            <IconButton
-              onClick={() => {
-                setShowDropdown(!showDropdown);
-                setDropdownSearch("");
-              }}
-              disabled={loading || loadingOrgs}
-              sx={{
-                border: "1px solid #E5E5E5",
-                borderRadius: 1,
-                width: 56,
-                height: 56,
-                flexShrink: 0,
-                "&:hover": { borderColor: "#D0D0D0", backgroundColor: "#f5f5f5" },
-              }}
-            >
-              {loadingOrgs ? (
-                <CircularProgress size={20} />
-              ) : (
-                <ArrowDropDownIcon />
-              )}
-            </IconButton>
-          </Box>
-          {/* Error message outside the flexbox */}
-          {touched.organization && fieldErrors.organization && (
-            <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.75, display: "block" }}>
-              {fieldErrors.organization}
-            </Typography>
-          )}
-          <Box sx={{ mb: 2 }} />
-
-          {/* Dropdown Popper */}
-          <Popper
-            open={showDropdown}
-            anchorEl={dropdownAnchorRef.current}
-            placement="bottom-start"
-            style={{ zIndex: 1301, width: dropdownAnchorRef.current?.offsetWidth || 300 }}
-          >
-            <ClickAwayListener onClickAway={() => setShowDropdown(false)}>
-              <Paper sx={{ maxHeight: 300, overflow: "auto", boxShadow: 3 }}>
-                {/* Search within dropdown */}
-                <Box sx={{ p: 1, borderBottom: "1px solid #e0e0e0" }}>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    placeholder={t("searchOrganization")}
-                    value={dropdownSearch}
-                    onChange={(e) => setDropdownSearch(e.target.value)}
-                    autoFocus
-                    sx={textFieldSx}
-                  />
-                </Box>
-
-                {/* Grouped organizations list */}
-                {filteredDropdownOrgs.length === 0 ? (
-                  <Typography sx={{ p: 2, color: "#666" }}>
-                    {t("noOrganizationsFound")}
-                  </Typography>
-                ) : (
-                  <>
-                    {/* Clubs */}
-                    {filteredDropdownOrgs.filter(o => o.type === "club").length > 0 && (
-                      <>
-                        <Typography
-                          sx={{
-                            position: "sticky",
-                            top: 0,
-                            padding: "8px 12px",
-                            backgroundColor: "#f5f5f5",
-                            fontWeight: 600,
-                            fontSize: "0.75rem",
-                            textTransform: "uppercase",
-                            letterSpacing: "0.05em",
-                            color: "#666",
-                            borderBottom: "1px solid #e0e0e0",
-                          }}
-                        >
-                          {t("clubsGroup")}
-                        </Typography>
-                        {filteredDropdownOrgs
-                          .filter(o => o.type === "club")
-                          .map((org) => (
-                            <Box
-                              key={org.id}
-                              onClick={() => handleSelectOrg(org)}
-                              sx={{
-                                px: 2,
-                                pt: 2,
-                                mb: 0,
-                                cursor: "pointer",
-                                "&:hover": { backgroundColor: "#f5f5f5" },
-                                backgroundColor: selectedOrg?.id === org.id ? "#e3f2fd" : "transparent",
-                              }}
-                            >
-                              <Typography variant="body1">{org.name}</Typography>
-                            </Box>
-                          ))}
-                      </>
-                    )}
-
-                    {/* Living Groups */}
-                    {filteredDropdownOrgs.filter(o => o.type === "living_group").length > 0 && (
-                      <>
-                        <Typography
-                          sx={{
-                            position: "sticky",
-                            top: 0,
-                            padding: "8px 16px",
-                            backgroundColor: "#f5f5f5",
-                            fontWeight: 600,
-                            fontSize: "0.75rem",
-                            textTransform: "uppercase",
-                            letterSpacing: "0.05em",
-                            color: "#666",
-                            borderBottom: "1px solid #e0e0e0",
-                          }}
-                        >
-                          {t("livingGroupsGroup")}
-                        </Typography>
-                        {filteredDropdownOrgs
-                          .filter(o => o.type === "living_group")
-                          .map((org) => (
-                            <Box
-                              key={org.id}
-                              onClick={() => handleSelectOrg(org)}
-                              sx={{
-                                px: 2,
-                                pt: 2,
-                                pb: 0,
-                                cursor: "pointer",
-                                "&:hover": { backgroundColor: "#f5f5f5" },
-                                backgroundColor: selectedOrg?.id === org.id ? "#e3f2fd" : "transparent",
-                              }}
-                            >
-                              <Typography variant="body1">{org.name}</Typography>
-                            </Box>
-                          ))}
-                      </>
-                    )}
-
-                    {/* Sports */}
-                    {filteredDropdownOrgs.filter(o => o.type === "sports").length > 0 && (
-                      <>
-                        <Typography
-                          sx={{
-                            position: "sticky",
-                            top: 0,
-                            padding: "8px 16px",
-                            backgroundColor: "#f5f5f5",
-                            fontWeight: 600,
-                            fontSize: "0.75rem",
-                            textTransform: "uppercase",
-                            letterSpacing: "0.05em",
-                            color: "#666",
-                            borderBottom: "1px solid #e0e0e0",
-                          }}
-                        >
-                          {t("sportsGroup")}
-                        </Typography>
-                        {filteredDropdownOrgs
-                          .filter(o => o.type === "sports")
-                          .map((org) => (
-                            <Box
-                              key={org.id}
-                              onClick={() => handleSelectOrg(org)}
-                              sx={{
-                                px: 2,
-                                pt: 2,
-                                pb: 0,
-                                cursor: "pointer",
-                                "&:hover": { backgroundColor: "#f5f5f5" },
-                                backgroundColor: selectedOrg?.id === org.id ? "#e3f2fd" : "transparent",
-                              }}
-                            >
-                              <Typography variant="body1">{org.name}</Typography>
-                            </Box>
-                          ))}
-                      </>
-                    )}
-                  </>
-                )}
-              </Paper>
-            </ClickAwayListener>
-          </Popper>
-
-          <TextField
-            fullWidth
-            type="password"
-            label={t("password")}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            onBlur={() => handleBlur("password", password)}
-            error={touched.password && !!fieldErrors.password}
-            helperText={touched.password && fieldErrors.password}
-            sx={{ ...textFieldSx, mb: 3 }}
-            disabled={loading}
-          />
-
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            disabled={loading}
-            sx={buttonSx}
-          >
-            {loading ? (
-              <CircularProgress size={24} sx={{ color: "white" }} />
-            ) : (
-              t("signInButton")
+        {activeTab === "organization" ? (
+          <>
+            {error && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {error}
+              </Alert>
             )}
-          </Button>
+            {success && (
+              <Alert severity="success" sx={{ mb: 2 }}>
+                {success}
+              </Alert>
+            )}
 
-          {/* Forgot Password */}
-          <Box sx={{ textAlign: "center", mt: 2 }}>
-            <Button
-              size="small"
-              onClick={() => window.open('mailto:tnq-exec@mit.edu', '_blank')}
-              sx={linkButtonSx}
-            >
-              {t("unexpectedIssues")}
-            </Button>
-          </Box>
-        </Box>
+            <Box component="form" onSubmit={handleSignIn} sx={{ mt: 1 }}>
+              {/* Organization Input with Dropdown Button */}
+              <Box sx={{ display: "flex", gap: 1, alignItems: "flex-start" }} ref={dropdownAnchorRef}>
+                <TextField
+                  fullWidth
+                  label={t("selectOrganization")}
+                  placeholder={t("searchOrganization")}
+                  value={inputValue}
+                  onChange={(e) => {
+                    setInputValue(e.target.value);
+                    if (selectedOrg && e.target.value !== selectedOrg.name) {
+                      setSelectedOrg(null);
+                    }
+                    setFieldErrors((prev) => ({ ...prev, organization: null }));
+                  }}
+                  onBlur={() => handleBlur("organization", inputValue)}
+                  error={touched.organization && !!fieldErrors.organization}
+                  sx={textFieldSx}
+                  disabled={loading}
+                  autoComplete="organization"
+                  name="organization"
+                />
+                <IconButton
+                  onClick={() => {
+                    setShowDropdown(!showDropdown);
+                    setDropdownSearch("");
+                  }}
+                  disabled={loading || loadingOrgs}
+                  sx={{
+                    border: "1px solid #E5E5E5",
+                    borderRadius: 1,
+                    width: 56,
+                    height: 56,
+                    flexShrink: 0,
+                    "&:hover": { borderColor: "#D0D0D0", backgroundColor: "#f5f5f5" },
+                  }}
+                >
+                  {loadingOrgs ? (
+                    <CircularProgress size={20} />
+                  ) : (
+                    <ArrowDropDownIcon />
+                  )}
+                </IconButton>
+              </Box>
+              {touched.organization && fieldErrors.organization && (
+                <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.75, display: "block" }}>
+                  {fieldErrors.organization}
+                </Typography>
+              )}
+              <Box sx={{ mb: 2 }} />
+
+              {/* Dropdown Popper */}
+              <Popper
+                open={showDropdown}
+                anchorEl={dropdownAnchorRef.current}
+                placement="bottom-start"
+                style={{ zIndex: 1301, width: dropdownAnchorRef.current?.offsetWidth || 300 }}
+              >
+                <ClickAwayListener onClickAway={() => setShowDropdown(false)}>
+                  <Paper sx={{ maxHeight: 300, overflow: "auto", boxShadow: 3 }}>
+                    <Box sx={{ p: 1, borderBottom: "1px solid #e0e0e0" }}>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        placeholder={t("searchOrganization")}
+                        value={dropdownSearch}
+                        onChange={(e) => setDropdownSearch(e.target.value)}
+                        autoFocus
+                        sx={textFieldSx}
+                      />
+                    </Box>
+
+                    {filteredDropdownOrgs.length === 0 ? (
+                      <Typography sx={{ p: 2, color: "#666" }}>
+                        {t("noOrganizationsFound")}
+                      </Typography>
+                    ) : (
+                      <>
+                        {filteredDropdownOrgs.filter(o => o.type === "club").length > 0 && (
+                          <>
+                            <Typography
+                              sx={{
+                                position: "sticky",
+                                top: 0,
+                                padding: "8px 12px",
+                                backgroundColor: "#f5f5f5",
+                                fontWeight: 600,
+                                fontSize: "0.75rem",
+                                textTransform: "uppercase",
+                                letterSpacing: "0.05em",
+                                color: "#666",
+                                borderBottom: "1px solid #e0e0e0",
+                              }}
+                            >
+                              {t("clubsGroup")}
+                            </Typography>
+                            {filteredDropdownOrgs
+                              .filter(o => o.type === "club")
+                              .map((org) => (
+                                <Box
+                                  key={org.id}
+                                  onClick={() => handleSelectOrg(org)}
+                                  sx={{
+                                    px: 2,
+                                    pt: 2,
+                                    mb: 0,
+                                    cursor: "pointer",
+                                    "&:hover": { backgroundColor: "#f5f5f5" },
+                                    backgroundColor: selectedOrg?.id === org.id ? "#e3f2fd" : "transparent",
+                                  }}
+                                >
+                                  <Typography variant="body1">{org.name}</Typography>
+                                </Box>
+                              ))}
+                          </>
+                        )}
+
+                        {filteredDropdownOrgs.filter(o => o.type === "living_group").length > 0 && (
+                          <>
+                            <Typography
+                              sx={{
+                                position: "sticky",
+                                top: 0,
+                                padding: "8px 16px",
+                                backgroundColor: "#f5f5f5",
+                                fontWeight: 600,
+                                fontSize: "0.75rem",
+                                textTransform: "uppercase",
+                                letterSpacing: "0.05em",
+                                color: "#666",
+                                borderBottom: "1px solid #e0e0e0",
+                              }}
+                            >
+                              {t("livingGroupsGroup")}
+                            </Typography>
+                            {filteredDropdownOrgs
+                              .filter(o => o.type === "living_group")
+                              .map((org) => (
+                                <Box
+                                  key={org.id}
+                                  onClick={() => handleSelectOrg(org)}
+                                  sx={{
+                                    px: 2,
+                                    pt: 2,
+                                    pb: 0,
+                                    cursor: "pointer",
+                                    "&:hover": { backgroundColor: "#f5f5f5" },
+                                    backgroundColor: selectedOrg?.id === org.id ? "#e3f2fd" : "transparent",
+                                  }}
+                                >
+                                  <Typography variant="body1">{org.name}</Typography>
+                                </Box>
+                              ))}
+                          </>
+                        )}
+
+                        {filteredDropdownOrgs.filter(o => o.type === "sports").length > 0 && (
+                          <>
+                            <Typography
+                              sx={{
+                                position: "sticky",
+                                top: 0,
+                                padding: "8px 16px",
+                                backgroundColor: "#f5f5f5",
+                                fontWeight: 600,
+                                fontSize: "0.75rem",
+                                textTransform: "uppercase",
+                                letterSpacing: "0.05em",
+                                color: "#666",
+                                borderBottom: "1px solid #e0e0e0",
+                              }}
+                            >
+                              {t("sportsGroup")}
+                            </Typography>
+                            {filteredDropdownOrgs
+                              .filter(o => o.type === "sports")
+                              .map((org) => (
+                                <Box
+                                  key={org.id}
+                                  onClick={() => handleSelectOrg(org)}
+                                  sx={{
+                                    px: 2,
+                                    pt: 2,
+                                    pb: 0,
+                                    cursor: "pointer",
+                                    "&:hover": { backgroundColor: "#f5f5f5" },
+                                    backgroundColor: selectedOrg?.id === org.id ? "#e3f2fd" : "transparent",
+                                  }}
+                                >
+                                  <Typography variant="body1">{org.name}</Typography>
+                                </Box>
+                              ))}
+                          </>
+                        )}
+                      </>
+                    )}
+                  </Paper>
+                </ClickAwayListener>
+              </Popper>
+
+              <TextField
+                fullWidth
+                type="password"
+                label={t("password")}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onBlur={() => handleBlur("password", password)}
+                error={touched.password && !!fieldErrors.password}
+                helperText={touched.password && fieldErrors.password}
+                sx={{ ...textFieldSx, mb: 3 }}
+                disabled={loading}
+              />
+
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                disabled={loading}
+                sx={buttonSx}
+              >
+                {loading ? (
+                  <CircularProgress size={24} sx={{ color: "white" }} />
+                ) : (
+                  t("signInButton")
+                )}
+              </Button>
+
+              <Box sx={{ textAlign: "center", mt: 2 }}>
+                <Button
+                  size="small"
+                  onClick={() => window.open('mailto:tnq-exec@mit.edu', '_blank')}
+                  sx={linkButtonSx}
+                >
+                  {t("unexpectedIssues")}
+                </Button>
+              </Box>
+            </Box>
+          </>
+        ) : (
+          /* Staph Login Tab */
+          <>
+            {staphMessage.text && (
+              <Alert severity={staphMessage.type === "success" ? "success" : "error"} sx={{ mb: 2 }}>
+                {staphMessage.text}
+              </Alert>
+            )}
+
+            <Box component="form" onSubmit={handleStaphLogin} sx={{ mt: 1 }}>
+              <TextField
+                fullWidth
+                type="email"
+                label={tAdmin("emailLabel")}
+                placeholder={tAdmin("emailPlaceholder")}
+                value={staphEmail}
+                onChange={(e) => setStaphEmail(e.target.value)}
+                sx={{ ...textFieldSx, mb: 2 }}
+                disabled={staphLoading}
+                InputLabelProps={{ shrink: true }}
+              />
+
+              <TextField
+                fullWidth
+                type="password"
+                label={tAdmin("passwordLabel")}
+                placeholder={tAdmin("passwordPlaceholder")}
+                value={staphPassword}
+                onChange={(e) => setStaphPassword(e.target.value)}
+                sx={{ ...textFieldSx, mb: 3 }}
+                disabled={staphLoading}
+                InputLabelProps={{ shrink: true }}
+              />
+
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                disabled={staphLoading || !staphPassword}
+                sx={buttonSx}
+              >
+                {staphLoading ? (
+                  <CircularProgress size={24} sx={{ color: "white" }} />
+                ) : (
+                  tAdmin("signInButton")
+                )}
+              </Button>
+            </Box>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   );

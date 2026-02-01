@@ -170,7 +170,9 @@
       "org": {
         "title": "组织登录",
         "signIn": "登录",
-        "signInTitle": "组织登录",
+        "signInTitle": "登录",
+        "organizationTab": "组织",
+        "staphTab": "Staph",
         "selectOrganization": "组织",
         "searchOrganization": "搜索您的组织...",
         "organizationRequired": "请选择一个组织",
@@ -1445,6 +1447,7 @@
     }
   },
   "calendarView": {
+    "noPastDates": "不能安排过去的时间",
     "calendar": "日历",
     "list": "列表",
     "today": "今天",

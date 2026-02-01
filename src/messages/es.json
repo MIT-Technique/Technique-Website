@@ -170,7 +170,9 @@
       "org": {
         "title": "Acceso de Organización",
         "signIn": "Iniciar Sesión",
-        "signInTitle": "Inicio de Sesión de Organización",
+        "signInTitle": "Iniciar Sesión",
+        "organizationTab": "Organización",
+        "staphTab": "Staph",
         "selectOrganization": "Organización",
         "searchOrganization": "Buscar tu organización...",
         "organizationRequired": "Por favor selecciona una organización",
@@ -1442,6 +1444,7 @@
     }
   },
   "calendarView": {
+    "noPastDates": "No se puede programar en el pasado",
     "calendar": "Calendario",
     "list": "Lista",
     "today": "Hoy",

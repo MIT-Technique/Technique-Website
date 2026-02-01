@@ -538,42 +538,27 @@ function Sidebar({ pathname }) {
                   </Collapse>
                 </>
               ) : (
-                <>
-                  <ListItem disablePadding sx={{ mt: 1 }}>
-                    <ListItemButton
-                      onClick={() => {
-                        setIsOpen(false);
-                        setOrgModalOpen(true);
+                <ListItem disablePadding sx={{ mt: 1 }}>
+                  <ListItemButton
+                    onClick={() => {
+                      setIsOpen(false);
+                      setOrgModalOpen(true);
+                    }}
+                    sx={{ px: 3, py: 1.5 }}
+                  >
+                    <ListItemText
+                      primary={tAccount('login')}
+                      primaryTypographyProps={{
+                        sx: {
+                          fontSize: "0.75rem",
+                          fontWeight: 500,
+                          letterSpacing: "0.1em",
+                          color: textColor,
+                        },
                       }}
-                      sx={{ px: 3, py: 1.5 }}
-                    >
-                      <ListItemText
-                        primary={tAccount('organizationLogin')}
-                        primaryTypographyProps={{
-                          sx: {
-                            fontSize: "0.75rem",
-                            fontWeight: 500,
-                            letterSpacing: "0.1em",
-                            color: textColor,
-                          },
-                        }}
-                      />
-                    </ListItemButton>
-                  </ListItem>
-                  <ListItem disablePadding sx={{ px: 3, pt: 0.5 }}>
-                    <Link
-                      href={`/${locale}/login/admin`}
-                      onClick={() => setIsOpen(false)}
-                      style={{
-                        fontSize: "0.65rem",
-                        color: mutedColor,
-                        textDecoration: "none",
-                      }}
-                    >
-                      {tAccount('staph')}
-                    </Link>
-                  </ListItem>
-                </>
+                    />
+                  </ListItemButton>
+                </ListItem>
               )
             )}
           </List>
