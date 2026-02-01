@@ -127,7 +127,7 @@ export default function WeekView({
       )}
       {/* Column headers */}
       <div
-        className="sticky top-0 z-10 bg-white border-b border-border"
+        className="sticky top-0 z-30 bg-white border-b border-border"
         style={{
           display: 'grid',
           gridTemplateColumns: '50px repeat(7, 1fr)',
