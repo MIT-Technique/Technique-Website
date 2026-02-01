@@ -6,6 +6,12 @@ import { useUser } from '../../../../hooks/useUser';
 import ConfirmationModal from '../../../../components/ConfirmationModal/ConfirmationModal';
 import CalendarView from '../../../../components/CalendarView/CalendarView';
 
+// Parse a date string (YYYY-MM-DD) without timezone shift
+function parseLocalDate(dateStr) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
 // Format 24-hour time to 12-hour AM/PM format
 function formatTime(time24) {
   if (!time24) return '';
@@ -78,7 +84,7 @@ export default function PhotoshootsPage() {
       setLoading(true);
       let url = '/api/admin/photoshoot-times';
       if (filter === 'booked') url += '?booked=true';
-      if (filter === 'available') url += '?available=true';
+      if (filter === 'available' || filter === 'proposed') url += '?available=true';
 
       const res = await fetch(url);
       const data = await res.json();
@@ -334,8 +340,19 @@ export default function PhotoshootsPage() {
 
           {/* Filters */}
           <div className="flex items-center justify-between mb-4">
-            <div className="flex gap-2">
-              {['all', 'available', 'booked'].map((f) => (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setFilter('all')}
+                className={`px-3 py-1 text-sm rounded ${
+                  filter === 'all'
+                    ? 'bg-accent text-white'
+                    : 'bg-bg-secondary text-text-secondary hover:bg-bg-secondary/80'
+                }`}
+              >
+                {t('filters.all')}
+              </button>
+              <span className="border-l border-border h-4" />
+              {['available', 'proposed', 'booked'].map((f) => (
                 <button
                   key={f}
                   onClick={() => setFilter(f)}
@@ -357,8 +374,57 @@ export default function PhotoshootsPage() {
             </button>
           </div>
 
+          {/* Proposed Times (shown for 'proposed' and 'all' filters) */}
+          {(filter === 'proposed' || filter === 'all') && proposals.filter(p => p.status === 'pending').length > 0 && (
+            <div className="mb-6">
+              <h3 className="text-sm font-medium text-text-secondary mb-3">Proposed Times</h3>
+              <div className="space-y-3">
+                {proposals.filter(p => p.status === 'pending').map((proposal) => (
+                  <div
+                    key={proposal.id}
+                    className="p-4 border border-blue-200 bg-blue-50 rounded-lg"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">
+                            {parseLocalDate(proposal.date).toLocaleDateString()} &middot; {formatTime(proposal.start_time)} - {formatTime(proposal.end_time)} EST
+                          </span>
+                          <span className="text-xs px-1.5 py-0.5 bg-blue-200 text-blue-800 rounded font-medium leading-none">Proposed</span>
+                        </div>
+                        <p className="text-sm text-text-secondary mt-1">
+                          {proposal.living_group?.name || 'Unknown group'}
+                          {proposal.location && <span> &middot; {proposal.location}</span>}
+                        </p>
+                        {proposal.notes && (
+                          <p className="text-sm text-text-muted mt-1">{proposal.notes}</p>
+                        )}
+                      </div>
+                      {isAdmin && (
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleAcceptProposal(proposal.id)}
+                            className="px-3 py-1 text-sm text-green-700 border border-green-200 rounded hover:bg-green-50"
+                          >
+                            {t('approve')}
+                          </button>
+                          <button
+                            onClick={() => handleDeclineProposal(proposal.id, '')}
+                            className="px-3 py-1 text-sm text-red-600 border border-red-200 rounded hover:bg-red-50"
+                          >
+                            {t('deny')}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Times List */}
-          {loading ? (
+          {filter === 'proposed' ? null : loading ? (
             <p className="text-text-secondary">Loading...</p>
           ) : times.length === 0 ? (
             <p className="text-text-secondary">{t('noTimes')}</p>
@@ -381,7 +447,7 @@ export default function PhotoshootsPage() {
                     <div>
                       <div className="flex items-center gap-2">
                         <p className="font-medium">
-                          {new Date(time.date).toLocaleDateString()} &middot; {formatTime(time.start_time)} - {formatTime(time.end_time)} EST
+                          {parseLocalDate(time.date).toLocaleDateString()} &middot; {formatTime(time.start_time)} - {formatTime(time.end_time)} EST
                         </p>
                         {isPending && (
                           <span className="text-xs px-1.5 py-0.5 bg-yellow-200 text-yellow-800 rounded font-medium">{t('pendingLocation')}</span>
@@ -448,6 +514,81 @@ export default function PhotoshootsPage() {
           )}
         </>
       )}
+      {/* Your Times section for admin */}
+      {isAdmin && (() => {
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+        const yourTimes = times.filter(t => t.created_by === user?.id);
+        const upcomingTimes = yourTimes.filter(t => parseLocalDate(t.date) >= now);
+        const pastTimes = yourTimes.filter(t => parseLocalDate(t.date) < now);
+        if (yourTimes.length === 0) return null;
+
+        const renderTimeCard = (time) => {
+          const isPending = time.booking_status === 'pending_location';
+          const isConfirmed = time.booking_status === 'confirmed';
+          const borderClass = isPending
+            ? 'border-yellow-200 bg-yellow-50'
+            : time.living_group_id
+              ? 'border-green-200 bg-green-50'
+              : 'border-blue-200 bg-blue-50';
+          return (
+            <div key={time.id} className={`p-4 border rounded-lg ${borderClass}`}>
+              <div className="flex justify-between items-start">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">
+                      {parseLocalDate(time.date).toLocaleDateString()} &middot; {formatTime(time.start_time)} - {formatTime(time.end_time)} EST
+                    </span>
+                    {isPending && (
+                      <span className="text-xs px-1.5 py-0.5 bg-yellow-200 text-yellow-800 rounded font-medium leading-none">{t('pendingLocation')}</span>
+                    )}
+                  </div>
+                  {time.living_group && (
+                    <p className="text-sm text-text-secondary mt-1">
+                      {t('bookedBy')}: {time.living_group.name}
+                    </p>
+                  )}
+                  {isConfirmed && time.location && (
+                    <p className="text-sm text-text-muted mt-1">{t('location')}: {time.location}</p>
+                  )}
+                  {time.notes && (
+                    <p className="text-sm text-text-muted mt-1">{time.notes}</p>
+                  )}
+                </div>
+                <button
+                  onClick={() => handleDeleteClick(time.id)}
+                  className="px-3 py-1 text-sm text-red-600 border border-red-200 rounded hover:bg-red-50 flex-shrink-0"
+                >
+                  {t('delete')}
+                </button>
+              </div>
+            </div>
+          );
+        };
+
+        return (
+          <div className="mt-8 pt-6 border-t border-border">
+            <h2 className="text-lg font-medium mb-4">Your Times</h2>
+            {upcomingTimes.length > 0 && (
+              <div className="space-y-3">
+                {upcomingTimes.map(renderTimeCard)}
+              </div>
+            )}
+            {upcomingTimes.length === 0 && (
+              <p className="text-text-secondary text-sm mb-4">No upcoming times</p>
+            )}
+            {pastTimes.length > 0 && (
+              <div className="mt-6">
+                <h3 className="text-sm font-medium text-text-muted uppercase tracking-wider mb-3">Past</h3>
+                <div className="space-y-3 opacity-60">
+                  {pastTimes.map(renderTimeCard)}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })()}
+
       <ConfirmationModal
         open={deleteModalOpen}
         title={t('delete')}

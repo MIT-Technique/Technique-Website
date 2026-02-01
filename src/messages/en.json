@@ -801,6 +801,7 @@
       "filters": {
         "all": "All",
         "available": "Available",
+        "proposed": "Proposed",
         "booked": "Booked",
         "cancellation": "Cancellation Requests"
       },
@@ -813,7 +814,7 @@
       "deny": "Deny",
       "delete": "Delete",
       "confirmDelete": "Are you sure you want to delete this time slot?",
-      "pendingLocation": "Pending location",
+      "pendingLocation": "Proposed",
       "selectLocation": "Select a location:",
       "confirmLocation": "Confirm"
     },
@@ -1205,6 +1206,16 @@
       "bulkImport": "Bulk Import",
       "addManualPlaceholder": "Enter member name",
       "addPlaceholder": "Enter member name",
+      "namePlaceholder": "Enter member name",
+      "rolePlaceholder": "Role (optional)",
+      "roles": {
+        "president": "President",
+        "vicePresident": "Vice-President",
+        "secretary": "Secretary",
+        "treasurer": "Treasurer",
+        "socialChair": "Social Chair",
+        "publicityChair": "Publicity Chair"
+      },
       "firstNamePlaceholder": "First name",
       "lastNamePlaceholder": "Last name (required)",
       "bulkInputLabel": "Paste member names",
@@ -1477,7 +1488,7 @@
     "noSlots": "No time slots for this day",
     "available": "Available",
     "booked": "Booked",
-    "pending": "Pending",
+    "pending": "Proposed",
     "slots": "slots",
     "proposals": "proposals",
     "addSlot": "Add Time Slot",
@@ -1515,7 +1526,7 @@
     "proposeLocations": "Proposed Location(s)",
     "addLocation": "Add another location",
     "confirmBook": "Confirm Booking",
-    "pendingLocation": "Pending",
+    "pendingLocation": "Proposed",
     "selectLocation": "Select a location:",
     "yourLocations": "Proposed locations"
   },
@@ -1644,7 +1655,7 @@
       "rolePlaceholder": "Role (e.g. Head Coach)",
       "headCoach": "Head Coach",
       "assistantCoach": "Assistant Coach",
-      "director": "Director",
+      "volunteerAssistantCoach": "Volunteer Assistant Coach",
       "noCoaches": "No coaches added yet",
       "remove": "Remove",
       "addSuccess": "Coach added",
@@ -1659,6 +1670,11 @@
       "addSingle": "Add Single",
       "bulkImport": "Bulk Import",
       "namePlaceholder": "Enter member name",
+      "rolePlaceholder": "Role (optional)",
+      "roles": {
+        "captain": "Captain",
+        "squadLeader": "Squad Leader"
+      },
       "firstNamePlaceholder": "First name",
       "lastNamePlaceholder": "Last name",
       "add": "Add",

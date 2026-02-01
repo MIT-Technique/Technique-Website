@@ -764,6 +764,7 @@
       "filters": {
         "all": "Todos",
         "available": "Disponibles",
+        "proposed": "Propuestos",
         "booked": "Reservados",
         "cancellation": "Solicitudes de Cancelación"
       },
@@ -776,7 +777,7 @@
       "deny": "Rechazar",
       "delete": "Eliminar",
       "confirmDelete": "¿Está seguro de que desea eliminar este horario?",
-      "pendingLocation": "Ubicación pendiente",
+      "pendingLocation": "Propuesto",
       "selectLocation": "Seleccionar una ubicación:",
       "confirmLocation": "Confirmar"
     },
@@ -1167,6 +1168,16 @@
       "bulkImport": "Importación Masiva",
       "addManualPlaceholder": "Ingrese nombre del miembro",
       "addPlaceholder": "Ingrese nombre del miembro",
+      "namePlaceholder": "Nombre del miembro",
+      "rolePlaceholder": "Cargo (opcional)",
+      "roles": {
+        "president": "Presidente",
+        "vicePresident": "Vicepresidente",
+        "secretary": "Secretario/a",
+        "treasurer": "Tesorero/a",
+        "socialChair": "Director/a Social",
+        "publicityChair": "Director/a de Publicidad"
+      },
       "firstNamePlaceholder": "Nombre",
       "lastNamePlaceholder": "Apellido (requerido)",
       "bulkInputLabel": "Pegue nombres de miembros",
@@ -1437,7 +1448,7 @@
     "noSlots": "No hay horarios para este día",
     "available": "Disponible",
     "booked": "Reservado",
-    "pending": "Pendiente",
+    "pending": "Propuesto",
     "slots": "horarios",
     "proposals": "propuestas",
     "addSlot": "Agregar Horario",
@@ -1475,7 +1486,7 @@
     "proposeLocations": "Ubicación(es) Propuesta(s)",
     "addLocation": "Agregar otra ubicación",
     "confirmBook": "Confirmar Reserva",
-    "pendingLocation": "Pendiente",
+    "pendingLocation": "Propuesto",
     "selectLocation": "Seleccionar una ubicación:",
     "yourLocations": "Ubicaciones propuestas"
   },
@@ -1602,7 +1613,7 @@
       "rolePlaceholder": "Rol (ej. Entrenador Principal)",
       "headCoach": "Entrenador Principal",
       "assistantCoach": "Entrenador Asistente",
-      "director": "Director",
+      "volunteerAssistantCoach": "Entrenador Asistente Voluntario",
       "noCoaches": "No hay entrenadores agregados",
       "remove": "Eliminar",
       "addSuccess": "Entrenador agregado",
@@ -1617,6 +1628,11 @@
       "addSingle": "Agregar Individual",
       "bulkImport": "Importar en Masa",
       "namePlaceholder": "Ingrese nombre del miembro",
+      "rolePlaceholder": "Rol (opcional)",
+      "roles": {
+        "captain": "Capitán",
+        "squadLeader": "Líder de Escuadrón"
+      },
       "firstNamePlaceholder": "Nombre",
       "lastNamePlaceholder": "Apellido",
       "add": "Agregar",

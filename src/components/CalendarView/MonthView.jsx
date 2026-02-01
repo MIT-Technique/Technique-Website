@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useRef, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 
 function getDaysInMonth(year, month) {
@@ -23,11 +24,29 @@ export default function MonthView({
 }) {
   const t = useTranslations('calendarView');
   const today = new Date();
+  const todayStr = today.toISOString().split('T')[0];
+  const [flashError, setFlashError] = useState(null);
+  const flashTimer = useRef(null);
+
+  function showFlashError(msg) {
+    if (flashTimer.current) clearTimeout(flashTimer.current);
+    setFlashError(msg);
+    flashTimer.current = setTimeout(() => setFlashError(null), 2000);
+  }
+
+  useEffect(() => () => { if (flashTimer.current) clearTimeout(flashTimer.current); }, []);
   const daysInMonth = getDaysInMonth(viewYear, viewMonth);
   const firstDay = getFirstDayOfWeek(viewYear, viewMonth);
 
   return (
-    <>
+    <div className="relative">
+      {flashError && (
+        <div className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none">
+          <div className="bg-red-600 text-white text-xs font-medium px-3 py-1.5 rounded-full shadow-lg animate-fade-in-out">
+            {flashError}
+          </div>
+        </div>
+      )}
       {/* Day names header */}
       <div className="grid grid-cols-7 mb-1">
         {dayNames.map((name) => (
@@ -66,7 +85,10 @@ export default function MonthView({
             return (
               <div
                 key={day}
-                onClick={() => onDayClick(dateStr)}
+                onClick={() => {
+                  if (isPast) { showFlashError(t('noPastDates')); return; }
+                  onDayClick(dateStr);
+                }}
                 className={`border-r border-b border-border min-h-[80px] p-1.5 cursor-pointer transition-colors ${
                   isSelected
                     ? 'bg-accent/5 ring-2 ring-accent ring-inset'
@@ -114,6 +136,6 @@ export default function MonthView({
           )}
         </div>
       )}
-    </>
+    </div>
   );
 }

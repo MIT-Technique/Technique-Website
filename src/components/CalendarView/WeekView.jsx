@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useRef, useCallback } from 'react';
+import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import TimelineSlot, { timeToRow } from './TimelineSlot';
 
@@ -8,7 +8,7 @@ const HOUR_START = 0;
 const HOUR_END = 24;
 const TOTAL_HOURS = HOUR_END - HOUR_START;
 const ROWS = TOTAL_HOURS * 4;
-const ROW_HEIGHT = 15;
+const ROW_HEIGHT = 12;
 
 function formatHourLabel(hour) {
   const ampm = hour >= 12 ? 'PM' : 'AM';
@@ -52,6 +52,16 @@ export default function WeekView({
   const today = new Date();
   const todayStr = toDateStr(today);
   const gridRef = useRef(null);
+  const [flashError, setFlashError] = useState(null);
+  const flashTimer = useRef(null);
+
+  function showFlashError(msg) {
+    if (flashTimer.current) clearTimeout(flashTimer.current);
+    setFlashError(msg);
+    flashTimer.current = setTimeout(() => setFlashError(null), 2000);
+  }
+
+  useEffect(() => () => { if (flashTimer.current) clearTimeout(flashTimer.current); }, []);
 
   const weekDates = useMemo(() => getWeekDates(weekStart), [weekStart]);
 
@@ -88,7 +98,10 @@ export default function WeekView({
     const colIdx = Math.floor((x - 50) / colWidth);
     if (colIdx < 0 || colIdx > 6) return;
     const dateStr = toDateStr(weekDates[colIdx]);
-    if (new Date(dateStr) < new Date(todayStr)) return;
+    if (new Date(dateStr) < new Date(todayStr)) {
+      showFlashError(t('noPastDates'));
+      return;
+    }
     const row = Math.floor(y / ROW_HEIGHT);
     const hour = Math.floor(row / 4) + HOUR_START;
     const min = (row % 4) * 15;
@@ -97,14 +110,21 @@ export default function WeekView({
     const endHour = hour + 1;
     const endTime = endHour >= 24 ? '23:45' : `${String(endHour).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
     onGridTimeClick({ date: dateStr, startTime, endTime });
-  }, [weekDates, todayStr, onGridTimeClick]);
+  }, [weekDates, todayStr, onGridTimeClick, t]);
 
   if (loading) {
     return <div className="py-12 text-center text-text-secondary text-sm">Loading...</div>;
   }
 
   return (
-    <div className="overflow-y-auto border border-border rounded-lg" style={{ maxHeight: '600px' }}>
+    <div className="overflow-y-auto border border-border rounded-lg relative" style={{ maxHeight: '600px' }}>
+      {flashError && (
+        <div className="sticky top-1/2 z-30 flex justify-center pointer-events-none">
+          <div className="bg-red-600 text-white text-xs font-medium px-3 py-1.5 rounded-full shadow-lg animate-fade-in-out">
+            {flashError}
+          </div>
+        </div>
+      )}
       {/* Column headers */}
       <div
         className="sticky top-0 z-10 bg-white border-b border-border"

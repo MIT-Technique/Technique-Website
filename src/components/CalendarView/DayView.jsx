@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo, useRef, useCallback } from 'react';
+import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { AnimatePresence } from 'framer-motion';
 import DaySidePanel from './DaySidePanel';
 import TimelineSlot, { timeToRow } from './TimelineSlot';
@@ -9,7 +10,7 @@ const HOUR_START = 0;
 const HOUR_END = 24;
 const TOTAL_HOURS = HOUR_END - HOUR_START; // 24
 const ROWS = TOTAL_HOURS * 4; // 96 quarter-hour rows
-const ROW_HEIGHT = 15; // px per quarter-hour
+const ROW_HEIGHT = 12; // px per quarter-hour
 
 function formatHourLabel(hour) {
   const ampm = hour >= 12 ? 'PM' : 'AM';
@@ -35,9 +36,20 @@ export default function DayView({
   onPropose,
   timeAssignments = {},
 }) {
+  const t = useTranslations('calendarView');
   const [showPanel, setShowPanel] = useState(false);
   const [prefillTimes, setPrefillTimes] = useState(null);
   const gridRef = useRef(null);
+  const [flashError, setFlashError] = useState(null);
+  const flashTimer = useRef(null);
+
+  function showFlashError(msg) {
+    if (flashTimer.current) clearTimeout(flashTimer.current);
+    setFlashError(msg);
+    flashTimer.current = setTimeout(() => setFlashError(null), 2000);
+  }
+
+  useEffect(() => () => { if (flashTimer.current) clearTimeout(flashTimer.current); }, []);
 
   const isPast = new Date(date) < new Date(new Date().toISOString().split('T')[0]);
   const isToday = date === new Date().toISOString().split('T')[0];
@@ -55,7 +67,10 @@ export default function DayView({
     : null;
 
   const handleGridClick = useCallback((e) => {
-    if (isPast) return;
+    if (isPast) {
+      showFlashError(t('noPastDates'));
+      return;
+    }
     if (e.target.closest('[data-slot]')) return;
     const grid = gridRef.current;
     if (!grid) return;
@@ -70,7 +85,7 @@ export default function DayView({
     const endTime = endHour >= 24 ? '23:45' : `${String(endHour).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
     setPrefillTimes({ startTime, endTime });
     setShowPanel(true);
-  }, [isPast]);
+  }, [isPast, t]);
 
   if (loading) {
     return <div className="py-12 text-center text-text-secondary text-sm">Loading...</div>;
@@ -79,7 +94,14 @@ export default function DayView({
   return (
     <div className="relative">
       {/* Timeline */}
-      <div className={`overflow-y-auto border border-border rounded-lg ${isPast ? 'opacity-40' : ''}`} style={{ maxHeight: '600px' }}>
+      <div className={`overflow-y-auto border border-border rounded-lg relative ${isPast ? 'opacity-40' : ''}`} style={{ maxHeight: '600px' }}>
+        {flashError && (
+          <div className="sticky top-1/2 z-30 flex justify-center pointer-events-none">
+            <div className="bg-red-600 text-white text-xs font-medium px-3 py-1.5 rounded-full shadow-lg animate-fade-in-out">
+              {flashError}
+            </div>
+          </div>
+        )}
         <div
           ref={gridRef}
           onClick={handleGridClick}

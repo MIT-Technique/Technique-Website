@@ -20,7 +20,7 @@ export async function GET() {
 
     const { data: members } = await supabase
       .from('club_manual_members')
-      .select('club_id, name')
+      .select('club_id, name, role')
       .in('club_id', clubIds)
       .order('name', { ascending: true });
 
@@ -29,7 +29,7 @@ export async function GET() {
     (clubs || []).forEach(c => { membersByClub[c.id] = []; });
     (members || []).forEach(m => {
       if (membersByClub[m.club_id]) {
-        membersByClub[m.club_id].push(m.name);
+        membersByClub[m.club_id].push(m.role ? `${m.name} (${m.role})` : m.name);
       }
     });
 

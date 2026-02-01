@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
-import { generateTimeSlots, formatTimeDisplay } from '../../lib/utils/time';
+import { formatTimeDisplay } from '../../lib/utils/time';
 import { SECTION_COLORS } from './SectionAssignmentTimeline';
 
 const HOUR_START = 0;
@@ -103,16 +103,97 @@ export default function TimelineSlot({
     await handleAction(onDeclineProposal, slot.id, reason);
   }
 
+  // Compute colored bands for section assignments (used in both compact and expanded views)
+  const sectionBands = useMemo(() => {
+    if (!sectionAssignments || Object.keys(sectionAssignments).length === 0) return null;
+    const allSections = [...new Set(Object.values(sectionAssignments).filter(Boolean))].sort();
+    if (allSections.length === 0) return null;
+
+    const [sH, sM] = slot.start_time.slice(0, 5).split(':').map(Number);
+    const [eH, eM] = slot.end_time.slice(0, 5).split(':').map(Number);
+    const totalStart = sH * 60 + sM;
+    const totalEnd = eH * 60 + eM;
+    const totalDuration = totalEnd - totalStart;
+    if (totalDuration <= 0) return null;
+
+    const entries = [];
+    for (const [key, section] of Object.entries(sectionAssignments)) {
+      if (!section) continue;
+      const [startStr, endStr] = key.split('-');
+      const [bsH, bsM] = startStr.split(':').map(Number);
+      const [beH, beM] = endStr.split(':').map(Number);
+      entries.push({ section, startMin: bsH * 60 + bsM, endMin: beH * 60 + beM, startStr, endStr });
+    }
+    entries.sort((a, b) => a.startMin - b.startMin);
+
+    const merged = [];
+    for (const e of entries) {
+      const last = merged.length > 0 ? merged[merged.length - 1] : null;
+      if (last && last.section === e.section && last.endMin === e.startMin) {
+        last.endMin = e.endMin;
+        last.endStr = e.endStr;
+      } else {
+        merged.push({ ...e });
+      }
+    }
+
+    const bands = merged.map((r) => {
+      const top = ((r.startMin - totalStart) / totalDuration) * 100;
+      const height = ((r.endMin - r.startMin) / totalDuration) * 100;
+      const isFirst = r.startMin === totalStart;
+      const isLast = r.endMin === totalEnd;
+      const sectionIdx = allSections.indexOf(r.section);
+      const color = SECTION_COLORS[sectionIdx % SECTION_COLORS.length];
+      return { top, height, color, section: r.section, isFirst, isLast, key: `${r.startStr}-${r.endStr}` };
+    });
+
+    const sectionRanges = {};
+    for (const r of merged) {
+      if (!sectionRanges[r.section]) sectionRanges[r.section] = [];
+      sectionRanges[r.section].push({ start: r.startStr, end: r.endStr });
+    }
+    const legend = allSections.map((section) => ({
+      section,
+      color: SECTION_COLORS[allSections.indexOf(section) % SECTION_COLORS.length],
+      ranges: sectionRanges[section] || [],
+    }));
+
+    return { bands, legend };
+  }, [sectionAssignments, slot.start_time, slot.end_time]);
+
   if (compact) {
     return (
       <div
-        className={`border rounded text-[10px] px-1 py-0.5 overflow-hidden leading-tight cursor-pointer h-full ${styles}${isOwn ? ' !border-l-[3px] !border-l-accent' : ''}`}
+        className={`border rounded text-[10px] px-1 py-0.5 overflow-hidden leading-tight cursor-pointer h-full relative ${styles}${isOwn ? ' !border-l-[3px] !border-l-accent' : ''}`}
       >
-        <span className="font-medium">
+        {sectionBands && sectionBands.bands.map((b) => (
+          <div
+            key={b.key}
+            className={`absolute right-0 w-1 ${b.color?.chip || 'bg-green-500'} opacity-70`}
+            style={{
+              top: `${b.top}%`,
+              height: `${b.height}%`,
+              borderRadius: `${b.isFirst ? '2px' : '0'} ${b.isFirst ? '2px' : '0'} ${b.isLast ? '2px' : '0'} ${b.isLast ? '2px' : '0'}`,
+            }}
+          />
+        ))}
+        <span className="font-medium relative">
           {formatTime(slot.start_time)}
         </span>
         {getLg()?.name && (
-          <span className="block truncate opacity-75">{getLg().name}</span>
+          <span className="block truncate opacity-75 relative">{getLg().name}</span>
+        )}
+        {sectionBands && (
+          <div className="relative mt-0.5 space-y-0">
+            {sectionBands.legend.map(({ section, color, ranges }) => (
+              <div key={section} className="flex items-start gap-1 leading-tight">
+                <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 mt-[3px] ${color?.chip || 'bg-green-500'}`} />
+                <span className="opacity-75 break-words min-w-0">
+                  <span className="font-medium">{section}</span>{ranges.length > 0 && <span className="opacity-60">{' – '}{ranges.map(r => `${formatTimeDisplay(r.start).replace(/AM|PM/, s => s.toLowerCase())}–${formatTimeDisplay(r.end).replace(/AM|PM/, s => s.toLowerCase())}`).join(', ')}</span>}
+                </span>
+              </div>
+            ))}
+          </div>
         )}
       </div>
     );
@@ -120,8 +201,19 @@ export default function TimelineSlot({
 
   return (
     <div
-      className={`border rounded-lg px-3 py-1.5 overflow-hidden text-sm h-full ${styles}${isOwn ? ' !border-l-[3px] !border-l-accent' : ''}`}
+      className={`border rounded-lg px-3 py-1.5 overflow-hidden text-sm h-full relative ${styles}${isOwn ? ' !border-l-[3px] !border-l-accent' : ''}`}
     >
+      {sectionBands && sectionBands.bands.map((b) => (
+        <div
+          key={b.key}
+          className={`absolute right-0 w-1 ${b.color?.chip || 'bg-green-500'} opacity-70`}
+          style={{
+            top: `${b.top}%`,
+            height: `${b.height}%`,
+            borderRadius: `${b.isFirst ? '2px' : '0'} ${b.isFirst ? '2px' : '0'} ${b.isLast ? '2px' : '0'} ${b.isLast ? '2px' : '0'}`,
+          }}
+        />
+      ))}
       <div className="flex justify-between items-center gap-2">
         <div className="flex items-center gap-2 min-w-0">
           <span className="font-medium whitespace-nowrap">
@@ -208,61 +300,70 @@ export default function TimelineSlot({
       </p>
       {/* Section assignments for admin/staph on booked slots */}
       {type === 'booked' && isAdminOrPhotographer && sectionAssignments && Object.keys(sectionAssignments).length > 0 && (
-        <SectionRows assignments={sectionAssignments} startTime={slot.start_time} endTime={slot.end_time} />
+        <SectionRows assignments={sectionAssignments} />
       )}
     </div>
   );
 }
 
-// Compact section assignment rows for admin view
-function SectionRows({ assignments, startTime, endTime }) {
-  const slots = useMemo(() => generateTimeSlots(startTime, endTime), [startTime, endTime]);
+// Section assignment legend for admin view (expanded day/month slots)
+function SectionRows({ assignments }) {
+  const legend = useMemo(() => {
+    const allSections = [...new Set(Object.values(assignments).filter(Boolean))].sort();
+    if (allSections.length === 0) return [];
 
-  // Group consecutive slots with the same section
-  const groups = useMemo(() => {
-    const result = [];
-    let current = null;
-    for (const slot of slots) {
-      const key = `${slot.start}-${slot.end}`;
-      const section = assignments[key] || null;
-      if (current && current.section === section) {
-        current.end = slot.end;
+    // Collect entries with minute values
+    const entries = [];
+    for (const [key, section] of Object.entries(assignments)) {
+      if (!section) continue;
+      const [startStr, endStr] = key.split('-');
+      const [bsH, bsM] = startStr.split(':').map(Number);
+      const [beH, beM] = endStr.split(':').map(Number);
+      entries.push({ section, startMin: bsH * 60 + bsM, endMin: beH * 60 + beM, startStr, endStr });
+    }
+    entries.sort((a, b) => a.startMin - b.startMin);
+
+    // Merge consecutive same-section entries
+    const merged = [];
+    for (const e of entries) {
+      const last = merged.length > 0 ? merged[merged.length - 1] : null;
+      if (last && last.section === e.section && last.endMin === e.startMin) {
+        last.endMin = e.endMin;
+        last.endStr = e.endStr;
       } else {
-        if (current) result.push(current);
-        current = { section, start: slot.start, end: slot.end };
+        merged.push({ ...e });
       }
     }
-    if (current) result.push(current);
-    return result;
-  }, [slots, assignments]);
 
-  // All unique sections for consistent coloring
-  const allSections = useMemo(() => {
-    const s = new Set();
-    Object.values(assignments).forEach(v => { if (v) s.add(v); });
-    return [...s].sort();
+    // Group ranges by section
+    const sectionRanges = {};
+    for (const r of merged) {
+      if (!sectionRanges[r.section]) sectionRanges[r.section] = [];
+      sectionRanges[r.section].push({ start: r.startStr, end: r.endStr });
+    }
+
+    return allSections.map((section) => ({
+      section,
+      color: SECTION_COLORS[allSections.indexOf(section) % SECTION_COLORS.length],
+      ranges: sectionRanges[section] || [],
+    }));
   }, [assignments]);
+
+  if (legend.length === 0) return null;
 
   return (
     <div className="mt-1.5 pt-1.5 border-t border-green-200/60 space-y-0">
-      {groups.map((g, i) => {
-        const sectionIdx = g.section ? allSections.indexOf(g.section) : -1;
-        const color = sectionIdx >= 0 ? SECTION_COLORS[sectionIdx % SECTION_COLORS.length] : null;
-        return (
-          <div key={i} className="flex items-center gap-1.5 text-[10px] leading-tight">
-            <span className="text-green-700/60 font-mono flex-shrink-0 whitespace-nowrap">
-              {formatTimeDisplay(g.start)}–{formatTimeDisplay(g.end)}
-            </span>
-            {g.section ? (
-              <span className={`${color?.text || 'text-green-800'} font-medium truncate`}>
-                {g.section}
-              </span>
-            ) : (
-              <span className="text-green-700/40 italic">—</span>
+      {legend.map(({ section, color, ranges }) => (
+        <div key={section} className="flex items-start gap-1.5 text-[10px] leading-tight">
+          <span className={`w-2 h-2 rounded-full flex-shrink-0 mt-[2px] ${color?.chip || 'bg-green-500'}`} />
+          <span className="min-w-0">
+            <span className={`${color?.text || 'text-green-800'} font-medium`}>{section}</span>
+            {ranges.length > 0 && (
+              <span className="text-green-700/50">{' – '}{ranges.map(r => `${formatTimeDisplay(r.start).replace(/AM|PM/, s => s.toLowerCase())}–${formatTimeDisplay(r.end).replace(/AM|PM/, s => s.toLowerCase())}`).join(', ')}</span>
             )}
-          </div>
-        );
-      })}
+          </span>
+        </div>
+      ))}
     </div>
   );
 }

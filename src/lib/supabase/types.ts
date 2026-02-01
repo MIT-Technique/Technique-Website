@@ -172,6 +172,7 @@ export interface ClubManualMember {
   id: string;
   club_id: string;
   name: string;
+  role: string | null;
   added_at: string;
 }
 
@@ -308,6 +309,7 @@ export interface SportsManualMember {
   id: string;
   sports_id: string;
   name: string;
+  role: string | null;
   team: SportsTeam;
   added_at: string;
 }

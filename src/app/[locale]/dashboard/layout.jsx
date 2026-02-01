@@ -81,8 +81,8 @@ function DashboardLayoutInner({ children }) {
 
   const allTabs = [
     { id: 'overview', label: t('tabs.overview'), href: `/${locale}/dashboard`, adminOnly: true },
-    { id: 'organizations', label: t('tabs.organizations'), href: `/${locale}/dashboard/clubs`, adminOnly: true },
     { id: 'photoshoots', label: t('tabs.photoshoots'), href: `/${locale}/dashboard/photoshoots`, adminOnly: false },
+    { id: 'organizations', label: t('tabs.organizations'), href: `/${locale}/dashboard/clubs`, adminOnly: true },
     { id: 'responses', label: t('tabs.responses'), href: responsesSubTabs[0]?.href || `/${locale}/dashboard/responses/clubs`, adminOnly: false, requiresAccess: true },
     { id: 'settings', label: t('tabs.settings'), href: `/${locale}/dashboard/users`, adminOnly: true },
   ];

@@ -125,6 +125,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const {
       name,
+      role,
       bulkText,
       clubId: clubIdParam,
     } = body;
@@ -255,11 +256,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Add manual member
+    const trimmedRole = role ? String(role).trim() : null;
     const { data, error } = await supabase
       .from("club_manual_members")
       .insert({
         club_id: clubId,
         name: trimmedName,
+        ...(trimmedRole && { role: trimmedRole }),
       })
       .select()
       .single();
