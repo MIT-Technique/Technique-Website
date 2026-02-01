@@ -5,7 +5,7 @@ import { useState, useRef, useEffect } from 'react';
 const MAX_SIZE = 20 * 1024 * 1024; // 20MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
-export default function ImageUpload({ imageUrl, onUpload, onDelete, disabled, label, fileName }) {
+export default function ImageUpload({ imageUrl, onUpload, onDelete, disabled, label, fileName, size = 'md' }) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [dragOver, setDragOver] = useState(false);
@@ -69,6 +69,7 @@ export default function ImageUpload({ imageUrl, onUpload, onDelete, disabled, la
   }
 
   const displayUrl = localUrl || imageUrl;
+  const sizeClass = size === 'sm' ? 'w-20 h-20' : 'w-32 h-32';
 
   if (displayUrl) {
     return (
@@ -79,7 +80,7 @@ export default function ImageUpload({ imageUrl, onUpload, onDelete, disabled, la
             src={displayUrl}
             alt={label || 'Uploaded image'}
             title={fileName || ''}
-            className="w-32 h-32 object-cover rounded border border-border"
+            className={`${sizeClass} object-cover rounded border border-border`}
           />
           {!disabled && (
             <button
@@ -106,7 +107,7 @@ export default function ImageUpload({ imageUrl, onUpload, onDelete, disabled, la
         onDragLeave={() => setDragOver(false)}
         onDrop={handleDrop}
         onClick={() => !disabled && !uploading && inputRef.current?.click()}
-        className={`w-32 h-32 border-2 border-dashed rounded flex items-center justify-center cursor-pointer transition-colors ${
+        className={`${sizeClass} border-2 border-dashed rounded flex items-center justify-center cursor-pointer transition-colors ${
           disabled ? 'opacity-50 cursor-not-allowed border-gray-300' :
           dragOver ? 'border-[#750014] bg-red-50' :
           'border-gray-300 hover:border-gray-400'
@@ -126,7 +127,7 @@ export default function ImageUpload({ imageUrl, onUpload, onDelete, disabled, la
           <span className="text-xs text-text-muted text-center px-2">Click or drop image</span>
         )}
       </div>
-      {error && <p className="text-xs text-red-600 max-w-[128px]">{error}</p>}
+      {error && <p className={`text-xs text-red-600 ${size === 'sm' ? 'max-w-[80px]' : 'max-w-[128px]'}`}>{error}</p>}
     </div>
   );
 }

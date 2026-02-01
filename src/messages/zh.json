@@ -777,7 +777,10 @@
       "approve": "批准",
       "deny": "拒绝",
       "delete": "删除",
-      "confirmDelete": "确定要删除此时间段吗？"
+      "confirmDelete": "确定要删除此时间段吗？",
+      "pendingLocation": "待确认地点",
+      "selectLocation": "选择地点：",
+      "confirmLocation": "确认"
     },
     "clubs": {
       "title": "社团管理",
@@ -1289,6 +1292,15 @@
     "bookError": "预约失败",
     "postedBy": "发布者：{name}",
     "unknownCreator": "未知",
+    "confirmBook": "确认预约",
+    "proposeLocations": "建议地点",
+    "proposeLocationsHint": "输入一个或多个拍摄地点选项。Technique将确认最终地点。",
+    "locationPlaceholder": "例如：Baker House主休息室",
+    "addLocation": "添加其他地点",
+    "locationRequired": "至少需要一个地点",
+    "pendingLocation": "待确认 — 等待地点确认",
+    "confirmedLocation": "已确认地点",
+    "yourLocations": "您建议的地点",
     "assign": {
       "title": "管理区域",
       "description": "创建区域以组织成员（例如：楼层、翼楼、建筑）。成员可以被分配到区域。",
@@ -1445,7 +1457,7 @@
     "unknown": "未知",
     "startTime": "开始时间",
     "endTime": "结束时间",
-    "locationPlaceholder": "地点（可选）",
+    "locationPlaceholder": "例如：Baker House主休息室",
     "notesPlaceholder": "备注（可选）",
     "createSlot": "创建",
     "fieldsRequired": "开始时间和结束时间为必填",
@@ -1462,7 +1474,13 @@
     "otherProposals": "其他提议",
     "clearBrush": "清除",
     "dragToClear": "拖动以清除分配",
-    "dragToAssign": "拖动以分配\"{section}\""
+    "dragToAssign": "拖动以分配\"{section}\"",
+    "proposeLocations": "建议地点",
+    "addLocation": "添加其他地点",
+    "confirmBook": "确认预约",
+    "pendingLocation": "待确认",
+    "selectLocation": "选择地点：",
+    "yourLocations": "建议的地点"
   },
 
   "photographerTimes": {

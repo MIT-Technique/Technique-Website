@@ -775,7 +775,10 @@
       "approve": "Aprobar",
       "deny": "Rechazar",
       "delete": "Eliminar",
-      "confirmDelete": "¿Está seguro de que desea eliminar este horario?"
+      "confirmDelete": "¿Está seguro de que desea eliminar este horario?",
+      "pendingLocation": "Ubicación pendiente",
+      "selectLocation": "Seleccionar una ubicación:",
+      "confirmLocation": "Confirmar"
     },
     "clubs": {
       "title": "Gestión de Clubes",
@@ -1287,6 +1290,15 @@
     "bookError": "Error al reservar horario",
     "postedBy": "Publicado por {name}",
     "unknownCreator": "Desconocido",
+    "confirmBook": "Confirmar Reserva",
+    "proposeLocations": "Ubicación(es) Propuesta(s)",
+    "proposeLocationsHint": "Ingrese una o más opciones de ubicación para la sesión de fotos. Technique confirmará la ubicación final.",
+    "locationPlaceholder": "ej., Salón Principal de Baker House",
+    "addLocation": "Agregar otra ubicación",
+    "locationRequired": "Se requiere al menos una ubicación",
+    "pendingLocation": "Pendiente — esperando confirmación de ubicación",
+    "confirmedLocation": "Ubicación confirmada",
+    "yourLocations": "Sus ubicaciones propuestas",
     "assign": {
       "title": "Gestionar Secciones",
       "description": "Crea secciones para organizar miembros (ej: pisos, alas, edificios). Los miembros pueden asignarse a secciones.",
@@ -1442,7 +1454,7 @@
     "unknown": "Desconocido",
     "startTime": "Hora de Inicio",
     "endTime": "Hora de Fin",
-    "locationPlaceholder": "Ubicación (opcional)",
+    "locationPlaceholder": "ej., Salón Principal de Baker House",
     "notesPlaceholder": "Notas (opcional)",
     "createSlot": "Crear",
     "fieldsRequired": "La hora de inicio y fin son obligatorias",
@@ -1459,7 +1471,13 @@
     "otherProposals": "Otras Propuestas",
     "clearBrush": "Borrar",
     "dragToClear": "Arrastra sobre los espacios para borrar asignaciones",
-    "dragToAssign": "Arrastra sobre los espacios para asignar \"{section}\""
+    "dragToAssign": "Arrastra sobre los espacios para asignar \"{section}\"",
+    "proposeLocations": "Ubicación(es) Propuesta(s)",
+    "addLocation": "Agregar otra ubicación",
+    "confirmBook": "Confirmar Reserva",
+    "pendingLocation": "Pendiente",
+    "selectLocation": "Seleccionar una ubicación:",
+    "yourLocations": "Ubicaciones propuestas"
   },
 
   "photographerTimes": {

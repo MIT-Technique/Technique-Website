@@ -121,6 +121,10 @@ export default function LivingGroupPage() {
   const [showListProposeForm, setShowListProposeForm] = useState(false);
   const [proposing, setProposing] = useState(false);
 
+  // Booking location form state
+  const [bookingTimeId, setBookingTimeId] = useState(null);
+  const [proposedLocations, setProposedLocations] = useState(['']);
+
   // Toggle expansion for a time slot
   function toggleTimeExpanded(timeId) {
     setExpandedTimeIds(prev => {
@@ -203,7 +207,7 @@ export default function LivingGroupPage() {
     }
   }
 
-  async function handleBook(timeId) {
+  async function handleBook(timeId, locations) {
     if (isFrozen) return;
 
     setBooking(true);
@@ -213,13 +217,15 @@ export default function LivingGroupPage() {
       const res = await fetch('/api/living-groups/book', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ timeId }),
+        body: JSON.stringify({ timeId, proposed_locations: locations }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
         setMessage({ type: 'success', text: t('bookSuccess') });
+        setBookingTimeId(null);
+        setProposedLocations(['']);
         fetchTimes();
         refetch();
       } else {
@@ -815,34 +821,53 @@ export default function LivingGroupPage() {
                 <div className="mb-8">
                   <h2 className="text-lg font-medium mb-4">{t('currentBooking')}</h2>
                   <div className="space-y-3">
-                    {bookedTimes.map((bookedTime) => (
-                      <div key={bookedTime.id} className="p-4 border rounded-lg border-green-200 bg-green-50">
-                        <div className="flex justify-between items-start gap-4 mb-2">
-                          <div>
-                            <p className="font-medium">
-                              {new Date(bookedTime.date + 'T12:00:00').toLocaleDateString(locale, {
-                                weekday: 'long',
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric',
-                              })}
-                            </p>
-                            <p className="text-text-secondary">
-                              {formatTime(bookedTime.start_time)} - {formatTime(bookedTime.end_time)} EST
-                            </p>
+                    {bookedTimes.map((bookedTime) => {
+                      const isPending = bookedTime.booking_status === 'pending_location';
+                      const isConfirmed = bookedTime.booking_status === 'confirmed';
+                      return (
+                        <div key={bookedTime.id} className={`p-4 border rounded-lg ${isPending ? 'border-yellow-200 bg-yellow-50' : 'border-green-200 bg-green-50'}`}>
+                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-2">
+                            <div>
+                              <p className="font-medium">
+                                {new Date(bookedTime.date + 'T12:00:00').toLocaleDateString(locale, {
+                                  weekday: 'long',
+                                  year: 'numeric',
+                                  month: 'long',
+                                  day: 'numeric',
+                                })}
+                              </p>
+                              <p className="text-text-secondary">
+                                {formatTime(bookedTime.start_time)} - {formatTime(bookedTime.end_time)} EST
+                              </p>
+                              {isPending && (
+                                <p className="text-yellow-700 text-sm mt-1 font-medium">
+                                  {t('pendingLocation')}
+                                </p>
+                              )}
+                              {isPending && bookedTime.proposed_locations?.length > 0 && (
+                                <p className="text-text-muted text-xs mt-0.5">
+                                  {t('yourLocations')}: {bookedTime.proposed_locations.join(', ')}
+                                </p>
+                              )}
+                              {isConfirmed && bookedTime.location && (
+                                <p className="text-green-700 text-sm mt-1">
+                                  {t('confirmedLocation')}: {bookedTime.location}
+                                </p>
+                              )}
+                            </div>
+                            {!isDisabled && !isFrozen && (
+                              <button
+                                onClick={() => handleCancelRequest(bookedTime.id)}
+                                disabled={cancelling}
+                                className="px-4 py-2 text-sm text-red-600 border border-red-200 rounded hover:bg-red-50 whitespace-nowrap w-full sm:w-auto"
+                              >
+                                {cancelling ? t('cancelling') : t('cancelBooking')}
+                              </button>
+                            )}
                           </div>
-                          {!isDisabled && !isFrozen && (
-                            <button
-                              onClick={() => handleCancelRequest(bookedTime.id)}
-                              disabled={cancelling}
-                              className="px-4 py-2 text-sm text-red-600 border border-red-200 rounded hover:bg-red-50 whitespace-nowrap"
-                            >
-                              {cancelling ? t('cancelling') : t('cancelBooking')}
-                            </button>
-                          )}
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -904,7 +929,7 @@ export default function LivingGroupPage() {
                       proposals={proposals}
                       loading={loading}
                       frozen={isFrozen}
-                      onBook={async (timeId) => { await handleBook(timeId); }}
+                      onBook={async (timeId, locations) => { await handleBook(timeId, locations); }}
                       onCancelBooking={async (timeId) => { await handleCancelRequest(timeId); }}
                       onPropose={async (proposalData) => {
                         const res = await fetch('/api/living-groups/propose-time', {
@@ -933,16 +958,17 @@ export default function LivingGroupPage() {
                       ) : (
                         <div className="space-y-2">
                           {availableTimes.slice(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE).map((time) => {
-                            const hasDetails = time.location || time.notes;
+                            const hasDetails = time.notes;
                             const isExpanded = expandedTimeIds.has(time.id);
+                            const isBookingThis = bookingTimeId === time.id;
                             return (
                               <div
                                 key={time.id}
-                                className={`px-3 py-2 border border-border rounded-lg ${hasDetails ? 'cursor-pointer' : ''}`}
-                                onClick={hasDetails ? () => toggleTimeExpanded(time.id) : undefined}
+                                className={`px-3 py-2 border border-border rounded-lg ${hasDetails && !isBookingThis ? 'cursor-pointer' : ''}`}
+                                onClick={hasDetails && !isBookingThis ? () => toggleTimeExpanded(time.id) : undefined}
                               >
-                                <div className="flex justify-between items-center">
-                                  <div className="flex items-center gap-4 flex-1 min-w-0">
+                                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 min-w-0">
                                     <div className="flex items-center gap-2 flex-shrink-0">
                                       {hasDetails && (
                                         <svg
@@ -965,22 +991,92 @@ export default function LivingGroupPage() {
                                         {formatTime(time.start_time)} - {formatTime(time.end_time)} EST
                                       </span>
                                     </div>
-                                    <span className="text-text-muted text-xs">
+                                    <span className="text-text-muted text-xs truncate">
                                       {t('postedBy', { name: getCreatorLabel(time) })}
                                     </span>
                                   </div>
-                                  <button
-                                    onClick={(e) => { e.stopPropagation(); handleBook(time.id); }}
-                                    disabled={booking || isFrozen}
-                                    className="btn-primary text-sm flex-shrink-0"
-                                  >
-                                    {booking ? t('booking') : t('book')}
-                                  </button>
+                                  {!isBookingThis && (
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setBookingTimeId(time.id);
+                                        setProposedLocations(['']);
+                                      }}
+                                      disabled={booking || isFrozen}
+                                      className="btn-primary text-sm flex-shrink-0 w-full sm:w-auto"
+                                    >
+                                      {t('book')}
+                                    </button>
+                                  )}
                                 </div>
+                                {/* Booking location form */}
+                                {isBookingThis && (
+                                  <div className="mt-3 pt-3 border-t border-border/50" onClick={(e) => e.stopPropagation()}>
+                                    <p className="text-sm font-medium mb-2">{t('proposeLocations')}</p>
+                                    <p className="text-xs text-text-muted mb-2">{t('proposeLocationsHint')}</p>
+                                    <div className="space-y-2">
+                                      {proposedLocations.map((loc, i) => (
+                                        <div key={i} className="flex gap-2">
+                                          <input
+                                            type="text"
+                                            value={loc}
+                                            onChange={(e) => {
+                                              const updated = [...proposedLocations];
+                                              updated[i] = e.target.value;
+                                              setProposedLocations(updated);
+                                            }}
+                                            placeholder={t('locationPlaceholder')}
+                                            className="flex-1 border border-border rounded px-2 py-1.5 text-sm"
+                                            maxLength={200}
+                                          />
+                                          {proposedLocations.length > 1 && (
+                                            <button
+                                              type="button"
+                                              onClick={() => setProposedLocations(proposedLocations.filter((_, j) => j !== i))}
+                                              className="text-red-500 text-sm px-2 hover:text-red-700"
+                                            >
+                                              ×
+                                            </button>
+                                          )}
+                                        </div>
+                                      ))}
+                                      {proposedLocations.length < 5 && (
+                                        <button
+                                          type="button"
+                                          onClick={() => setProposedLocations([...proposedLocations, ''])}
+                                          className="text-xs text-accent hover:underline"
+                                        >
+                                          + {t('addLocation')}
+                                        </button>
+                                      )}
+                                    </div>
+                                    <div className="flex gap-2 mt-3">
+                                      <button
+                                        onClick={() => {
+                                          const cleaned = proposedLocations.map(l => l.trim()).filter(l => l.length > 0);
+                                          if (cleaned.length === 0) {
+                                            setMessage({ type: 'error', text: t('locationRequired') });
+                                            return;
+                                          }
+                                          handleBook(time.id, cleaned);
+                                        }}
+                                        disabled={booking}
+                                        className="btn-primary text-sm"
+                                      >
+                                        {booking ? t('booking') : t('confirmBook')}
+                                      </button>
+                                      <button
+                                        onClick={() => { setBookingTimeId(null); setProposedLocations(['']); }}
+                                        className="text-sm text-text-secondary hover:text-text-primary"
+                                      >
+                                        {tc('cancel')}
+                                      </button>
+                                    </div>
+                                  </div>
+                                )}
                                 {/* Expandable details */}
-                                {isExpanded && hasDetails && (
+                                {isExpanded && hasDetails && !isBookingThis && (
                                   <div className="mt-2 pt-2 border-t border-border/50 text-xs text-text-muted space-y-0.5">
-                                    {time.location && <p><span className="font-medium">{t('locationLabel')}:</span> {time.location}</p>}
                                     {time.notes && <p><span className="font-medium">{t('notesLabel')}:</span> {time.notes}</p>}
                                   </div>
                                 )}
@@ -1004,7 +1100,6 @@ export default function LivingGroupPage() {
                                   const date = form.proposeDate.value;
                                   const start_time = form.proposeStart.value;
                                   const end_time = form.proposeEnd.value;
-                                  const location = form.proposeLocation.value;
                                   const notes = form.proposeNotes.value;
                                   if (!date || !start_time || !end_time) return;
                                   if (start_time >= end_time) {
@@ -1016,7 +1111,7 @@ export default function LivingGroupPage() {
                                     const res = await fetch('/api/living-groups/propose-time', {
                                       method: 'POST',
                                       headers: { 'Content-Type': 'application/json' },
-                                      body: JSON.stringify({ date, start_time, end_time, location, notes }),
+                                      body: JSON.stringify({ date, start_time, end_time, notes }),
                                     });
                                     const data = await res.json();
                                     if (res.ok) {
@@ -1067,15 +1162,9 @@ export default function LivingGroupPage() {
                                     />
                                   </div>
                                 </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                  <div>
-                                    <label className="block text-xs font-medium mb-1">{t('proposeTime.location')}</label>
-                                    <input type="text" name="proposeLocation" className="w-full border border-border rounded px-2 py-1.5 text-sm" />
-                                  </div>
-                                  <div>
-                                    <label className="block text-xs font-medium mb-1">{t('proposeTime.notes')}</label>
-                                    <input type="text" name="proposeNotes" className="w-full border border-border rounded px-2 py-1.5 text-sm" />
-                                  </div>
+                                <div>
+                                  <label className="block text-xs font-medium mb-1">{t('proposeTime.notes')}</label>
+                                  <input type="text" name="proposeNotes" className="w-full border border-border rounded px-2 py-1.5 text-sm" />
                                 </div>
                                 <div className="flex gap-2">
                                   <button type="submit" disabled={proposing} className="btn-primary text-sm">
@@ -1144,11 +1233,9 @@ export default function LivingGroupPage() {
                                     {proposal.status === 'pending' ? t('proposeTime.status.posted') : t(`proposeTime.status.${proposal.status}`)}
                                   </span>
                                 </div>
-                                {(proposal.location || proposal.notes) && (
+                                {proposal.notes && (
                                   <p className="text-text-muted text-xs mt-0.5">
-                                    {proposal.location && <>{proposal.location}</>}
-                                    {proposal.location && proposal.notes && <>{' · '}</>}
-                                    {proposal.notes && <span className="italic">{proposal.notes}</span>}
+                                    <span className="italic">{proposal.notes}</span>
                                   </p>
                                 )}
                                 {proposal.status === 'declined' && proposal.decline_reason && (
@@ -1318,31 +1405,18 @@ export default function LivingGroupPage() {
                 ) : sections.length === 0 ? (
                   <p className="text-text-secondary">{t('assign.noSections')}</p>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {sections.map((section) => {
                       const memberCount = manualMembers.filter(m => m.section_name === section).length;
                       return (
                         <div
                           key={section}
-                          className="px-4 py-3 border border-border rounded-lg space-y-2"
+                          className="px-3 py-3 border border-border rounded-lg flex items-start gap-3"
                         >
-                          <div className="flex justify-between items-center gap-4">
-                            <span className="font-medium">{section}</span>
-                            <span className="text-sm text-text-muted">
-                              {t('assign.memberCount', { count: memberCount })}
-                            </span>
-                            <button
-                              onClick={() => handleRemoveSection(section)}
-                              disabled={removingSectionName === section}
-                              className="text-sm text-red-600 hover:text-red-700 whitespace-nowrap ml-auto"
-                            >
-                              {removingSectionName === section ? t('assign.removing') : t('assign.removeSection')}
-                            </button>
-                          </div>
                           <ImageUpload
                             imageUrl={livingGroup?.section_images?.[section] || null}
-                            label={t('assign.sectionImage')}
                             fileName={`${(livingGroup?.name || '').replace(/\s+/g, '_')}_${section.replace(/\s+/g, '_')}_Candid`}
+                            size="sm"
                             disabled={isFrozen}
                             onUpload={async (file) => {
                               setImageMessage({ type: '', text: '' });
@@ -1367,6 +1441,21 @@ export default function LivingGroupPage() {
                               }
                             }}
                           />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex justify-between items-start gap-2">
+                              <span className="font-medium">{section}</span>
+                              <button
+                                onClick={() => handleRemoveSection(section)}
+                                disabled={removingSectionName === section}
+                                className="text-xs text-red-600 hover:text-red-700 whitespace-nowrap"
+                              >
+                                {removingSectionName === section ? t('assign.removing') : t('assign.removeSection')}
+                              </button>
+                            </div>
+                            <span className="text-xs text-text-muted">
+                              {t('assign.memberCount', { count: memberCount })}
+                            </span>
+                          </div>
                         </div>
                       );
                     })}

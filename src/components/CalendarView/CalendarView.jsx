@@ -41,6 +41,7 @@ export default function CalendarView({
   onDeclineProposal,
   onCancelBooking,
   onPropose,
+  onConfirmLocation,
   frozen = false,
   loading = false,
   timeAssignments = {},
@@ -158,7 +159,7 @@ export default function CalendarView({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            <span className="font-medium text-lg px-1">{getHeaderLabel()}</span>
+            <span className="font-medium text-sm sm:text-lg px-1">{getHeaderLabel()}</span>
             <button
               onClick={() => navigate(1)}
               className="w-8 h-8 flex items-center justify-center rounded hover:bg-bg-secondary text-text-secondary"
@@ -295,6 +296,7 @@ export default function CalendarView({
             onDeclineProposal={onDeclineProposal}
             onCancelBooking={onCancelBooking}
             onPropose={(...args) => { setPrefillTimes(null); return onPropose?.(...args); }}
+            onConfirmLocation={onConfirmLocation}
             frozen={frozen}
             formatTime={formatTime}
             initialStartTime={prefillTimes?.startTime || ''}

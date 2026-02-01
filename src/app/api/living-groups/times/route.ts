@@ -39,6 +39,9 @@ export async function GET(request: NextRequest) {
         start_time,
         end_time,
         notes,
+        location,
+        proposed_locations,
+        booking_status,
         created_by,
         creator:users!photoshoot_times_created_by_fkey(id, email, name, role)
       `)

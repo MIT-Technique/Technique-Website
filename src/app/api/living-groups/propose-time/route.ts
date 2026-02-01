@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { date, start_time, end_time, location, notes } = body;
+    const { date, start_time, end_time, notes } = body;
 
     if (!date || !start_time || !end_time) {
       return NextResponse.json(
@@ -144,7 +144,6 @@ export async function POST(request: NextRequest) {
         date,
         start_time,
         end_time,
-        location: location || null,
         notes: notes || null,
         status: "pending",
       })

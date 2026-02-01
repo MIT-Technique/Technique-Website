@@ -253,12 +253,12 @@ t("photoCredit", { photographer: "Michelle Xiang" });
 
 ### Auth Pages
 
-| Route            | Description                            |
-| ---------------- | -------------------------------------- |
-| `/login`         | Main login (organization login modal)  |
-| `/login/admin`   | Admin/staph login (email + password)   |
-| `/login/club`    | Club login (legacy)                    |
-| `/logout`        | Logout page                            |
+| Route          | Description                           |
+| -------------- | ------------------------------------- |
+| `/login`       | Main login (organization login modal) |
+| `/login/admin` | Admin/staph login (email + password)  |
+| `/login/club`  | Club login (legacy)                   |
+| `/logout`      | Logout page                           |
 
 ### Role-Protected Pages
 
@@ -502,9 +502,9 @@ The `sports` table supports optional gender teams via `has_gender_teams` boolean
 
 All authentication uses a single iron-session cookie:
 
-| Session             | Cookie Name         | Source File               | TTL   | Purpose                          |
-| ------------------- | ------------------- | ------------------------- | ----- | -------------------------------- |
-| `technique_session` | `technique_session` | `src/lib/auth/session.ts` | 7 days | All auth (orgs, admin, staph)   |
+| Session             | Cookie Name         | Source File               | TTL    | Purpose                       |
+| ------------------- | ------------------- | ------------------------- | ------ | ----------------------------- |
+| `technique_session` | `technique_session` | `src/lib/auth/session.ts` | 7 days | All auth (orgs, admin, staph) |
 
 **Session data:** `{ isLoggedIn, access_token, userId, userInfo: { sub, name, email, email_verified } }`
 
@@ -531,11 +531,11 @@ import { getSession } from "../../../lib/auth/session";
 
 ### Login Page Structure
 
-| Route            | Purpose                      | Auth Method                 |
-| ---------------- | ---------------------------- | --------------------------- |
-| `/login`         | Main login page              | Organization login modal    |
-| `/login/admin`   | Admin/staph login            | Email + password form       |
-| `/login/club`    | Club login (legacy)          | Club-specific login         |
+| Route          | Purpose             | Auth Method              |
+| -------------- | ------------------- | ------------------------ |
+| `/login`       | Main login page     | Organization login modal |
+| `/login/admin` | Admin/staph login   | Email + password form    |
+| `/login/club`  | Club login (legacy) | Club-specific login      |
 
 ### Staph Access Permissions
 
@@ -679,6 +679,7 @@ All public forms use **upsert with email as unique key**: bio, candids, student 
 ### Form Freeze System
 
 Dual-layer protection:
+
 1. **Client-side**: `useFormFrozen(formName)` hook or direct `/api/form-status` fetch; shows red banner and disables form
 2. **Server-side**: API routes check `form_settings.is_frozen` and return 403 if frozen
 
@@ -705,12 +706,12 @@ Success messages auto-fade after 4 seconds using the `FadeMessage` component pat
 4. **Keep API routes separate** - they are NOT localized
 5. **Follow existing patterns** - use `useTranslations` hook consistently
 6. **Single session system** - all auth uses `technique_session` via `src/lib/auth/session.ts`
-8. **Update Times Properly** - All posted times should be in EST, and all times shown should explicitly mention EST
-9. **Organization pattern** - clubs, living groups, and sports all follow similar patterns: profile, email, documents, images, manual-members API routes + a dashboard page
-10. **Sports gender teams** - the `has_gender_teams` toggle affects members, photos, and achievements (coaches are always shared)
-11. **"Achievements" → "Extracurriculars"** - The UI displays "extracurriculars" but the database field is still `achievements` in `senior_bios`. Do not rename the DB column.
-12. **Staph access permissions** - Staph users access dashboard tabs via `user.access` array. Use `/api/admin/update-access` to modify.
-13. **Form freeze system** - Forms can be frozen/unfrozen via admin settings. Check freeze status with `/api/form-status?form=<form_name>`. Frozen forms show a red banner and disable submission.
+7. **Update Times Properly** - All posted times should be in EST, and all times shown should explicitly mention EST
+8. **Organization pattern** - clubs, living groups, and sports all follow similar patterns: profile, email, documents, images, manual-members API routes + a dashboard page
+9. **Sports gender teams** - the `has_gender_teams` toggle affects members, photos, and achievements (coaches are always shared)
+10. **"Achievements" → "Extracurriculars"** - The UI displays "extracurriculars" but the database field is still `achievements` in `senior_bios`. Do not rename the DB column.
+11. **Staph access permissions** - Staph users access dashboard tabs via `user.access` array. Use `/api/admin/update-access` to modify.
+12. **Form freeze system** - Forms can be frozen/unfrozen via admin settings. Check freeze status with `/api/form-status?form=<form_name>`. Frozen forms show a red banner and disable submission.
 
 ---
 
@@ -886,6 +887,8 @@ notes text,
 created_at timestamp with time zone DEFAULT now(),
 updated_at timestamp with time zone DEFAULT now(),
 location text,
+proposed_locations ARRAY,
+booking_status character varying CHECK (booking_status IS NULL OR (booking_status::text = ANY (ARRAY['pending_location'::character varying, 'confirmed'::character varying]::text[]))),
 CONSTRAINT photoshoot_times_pkey PRIMARY KEY (id),
 CONSTRAINT photoshoot_times_living_group_id_fkey FOREIGN KEY (living_group_id) REFERENCES public.living_groups(id),
 CONSTRAINT photoshoot_times_booked_by_fkey FOREIGN KEY (booked_by) REFERENCES public.users(id),

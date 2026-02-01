@@ -29,7 +29,6 @@ export default function CreateSlotForm({ date, onSubmit, onCancel, submitLabel, 
   const [form, setForm] = useState({
     startTime: initialStartTime,
     endTime: initialEndTime,
-    location: '',
     notes: '',
   });
   const [submitting, setSubmitting] = useState(false);
@@ -53,10 +52,9 @@ export default function CreateSlotForm({ date, onSubmit, onCancel, submitLabel, 
         date,
         startTime: form.startTime,
         endTime: form.endTime,
-        location: form.location,
         notes: form.notes,
       });
-      setForm({ startTime: '', endTime: '', location: '', notes: '' });
+      setForm({ startTime: '', endTime: '', notes: '' });
     } catch (err) {
       setError(err.message || t('createError'));
     } finally {
@@ -96,13 +94,6 @@ export default function CreateSlotForm({ date, onSubmit, onCancel, submitLabel, 
           </select>
         </div>
       </div>
-      <input
-        type="text"
-        value={form.location}
-        onChange={(e) => setForm({ ...form, location: e.target.value })}
-        placeholder={t('locationPlaceholder')}
-        className="w-full text-sm border border-border rounded px-2 py-1.5"
-      />
       <input
         type="text"
         value={form.notes}

@@ -207,7 +207,6 @@ export default function PhotoshootsPage() {
         startTime: formData.startTime,
         endTime: formData.endTime,
         notes: formData.notes || '',
-        location: formData.location || '',
       }),
     });
     if (!res.ok) {
@@ -215,6 +214,15 @@ export default function PhotoshootsPage() {
       throw new Error(data.error || 'Failed to create');
     }
     fetchTimes();
+  }
+
+  async function handleConfirmLocation(timeId, location) {
+    const res = await fetch('/api/admin/photoshoot-times/confirm-location', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ timeId, location }),
+    });
+    if (res.ok) fetchTimes();
   }
 
   async function handleCalendarDelete(timeId) {
@@ -260,6 +268,7 @@ export default function PhotoshootsPage() {
           onDelete={handleCalendarDelete}
           onAcceptProposal={handleAcceptProposal}
           onDeclineProposal={handleDeclineProposal}
+          onConfirmLocation={handleConfirmLocation}
         />
       ) : (
         <>
@@ -355,20 +364,29 @@ export default function PhotoshootsPage() {
             <p className="text-text-secondary">{t('noTimes')}</p>
           ) : (
             <div className="space-y-3">
-              {times.map((time) => (
+              {times.map((time) => {
+                const isPending = time.booking_status === 'pending_location';
+                const isConfirmed = time.booking_status === 'confirmed';
+                const borderClass = isPending
+                  ? 'border-yellow-200 bg-yellow-50'
+                  : time.living_group_id
+                    ? 'border-green-200 bg-green-50'
+                    : 'border-border';
+                return (
                 <div
                   key={time.id}
-                  className={`p-4 border rounded-lg ${
-                    time.living_group_id
-                      ? 'border-green-200 bg-green-50'
-                      : 'border-border'
-                  }`}
+                  className={`p-4 border rounded-lg ${borderClass}`}
                 >
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="font-medium">
-                        {new Date(time.date).toLocaleDateString()} &middot; {formatTime(time.start_time)} - {formatTime(time.end_time)} EST
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium">
+                          {new Date(time.date).toLocaleDateString()} &middot; {formatTime(time.start_time)} - {formatTime(time.end_time)} EST
+                        </p>
+                        {isPending && (
+                          <span className="text-xs px-1.5 py-0.5 bg-yellow-200 text-yellow-800 rounded font-medium">{t('pendingLocation')}</span>
+                        )}
+                      </div>
                       <p className="text-sm text-text-secondary mt-1">
                         {time.created_by_user?.email && (
                           <span>Created by: <a href={`mailto:${time.created_by_user.email}`} className="text-accent hover:underline">{time.created_by_user.email}</a></span>
@@ -385,12 +403,31 @@ export default function PhotoshootsPage() {
                           </span>
                         )}
                       </p>
-                      {(time.location || time.notes) && (
+                      {isConfirmed && time.location && (
                         <p className="text-sm text-text-muted mt-1">
-                          {time.location && <span>{t('location')}: {time.location}</span>}
-                          {time.location && time.notes && <span> &middot; </span>}
-                          {time.notes && <span>{time.notes}</span>}
+                          <span>{t('location')}: {time.location}</span>
+                          {time.notes && <span> &middot; {time.notes}</span>}
                         </p>
+                      )}
+                      {!isConfirmed && time.notes && (
+                        <p className="text-sm text-text-muted mt-1">{time.notes}</p>
+                      )}
+                      {/* Location selector for pending bookings */}
+                      {isPending && time.proposed_locations?.length > 0 && (
+                        <div className="mt-2">
+                          <p className="text-sm font-medium mb-1">{t('selectLocation')}</p>
+                          <div className="flex flex-wrap gap-2">
+                            {time.proposed_locations.map((loc, i) => (
+                              <button
+                                key={i}
+                                onClick={() => handleConfirmLocation(time.id, loc)}
+                                className="text-sm px-3 py-1 bg-white border border-yellow-300 rounded hover:bg-yellow-100"
+                              >
+                                {loc}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
                       )}
                     </div>
                     {isAdmin && (
@@ -405,7 +442,8 @@ export default function PhotoshootsPage() {
                     )}
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </>
