@@ -2,7 +2,7 @@
 import Footer from "../../../components/Footer/Footer";
 import { useState, useCallback } from "react";
 import * as React from "react";
-import { useTranslations } from 'next-intl';
+import { useTranslations } from "next-intl";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import InputLabel from "@mui/material/InputLabel";
@@ -33,7 +33,7 @@ const selectSx = {
 };
 
 export default function BioPage() {
-  const t = useTranslations('pages.bio');
+  const t = useTranslations("pages.bio");
 
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -48,55 +48,72 @@ export default function BioPage() {
   const [error, setError] = useState(false);
   const [snackMessage, setSnackMessage] = useState("");
   const [dataLoaded, setDataLoaded] = useState(false);
+  const [disableEmail, setDisabledEmail] = useState(false);
 
   const vertical = "top";
   const horizontal = "center";
 
   // Fetch existing bio when email is entered, with fallback to users table
-  const fetchBioByEmail = useCallback(async (emailValue) => {
-    const trimmed = emailValue.trim().toLowerCase();
-    if (!trimmed) return;
-    // Normalize: if no @, append @mit.edu
-    const normalized = trimmed.includes('@') ? trimmed : `${trimmed}@mit.edu`;
-    if (!normalized.endsWith('@mit.edu')) return;
+  const fetchBioByEmail = useCallback(
+    async (emailValue) => {
+      const trimmed = emailValue.trim().toLowerCase();
+      if (!trimmed) return;
+      // Normalize: if no @, append @mit.edu
+      const normalized = trimmed.includes("@") ? trimmed : `${trimmed}@mit.edu`;
+      if (!normalized.endsWith("@mit.edu")) return;
 
-    try {
-      // First try senior_bios
-      const res = await fetch(`/api/bio?email=${encodeURIComponent(normalized)}`);
-      if (res.ok) {
-        const json = await res.json();
-        if (json.data.firstName) setFirstName(json.data.firstName);
-        if (json.data.lastName) setLastName(json.data.lastName);
-        if (json.data.major) setMajor(json.data.major);
-        if (json.data.minor) setMinor(json.data.minor);
-        if (json.data.second_major) setSecondMajor(json.data.second_major);
-        if (json.data.quote) setQuote(json.data.quote);
-        if (json.data.achievements) setExtracurriculars(json.data.achievements);
-
-        // If we got name/major from senior_bios, we're done
-        if (json.data.firstName && json.data.lastName && json.data.major) {
-          setDataLoaded(true);
-          return;
+      try {
+        // First try senior_bios
+        const res = await fetch(
+          `/api/bio?email=${encodeURIComponent(normalized)}`,
+        );
+        if (res.ok) {
+          const json = await res.json();
+          if (json.data.firstName) setFirstName(json.data.firstName);
+          if (json.data.lastName) setLastName(json.data.lastName);
+          if (json.data.major) setMajor(json.data.major);
+          if (json.data.minor) setMinor(json.data.minor);
+          if (json.data.second_major) setSecondMajor(json.data.second_major);
+          if (json.data.quote) setQuote(json.data.quote);
+          if (json.data.achievements)
+            setExtracurriculars(json.data.achievements);
+          // If we got name/major from senior_bios, we're done
+          if (json.data.firstName && json.data.lastName && json.data.major) {
+            setDataLoaded(true);
+            setDisabledEmail(true);
+            return;
+          }
         }
-      }
 
-      // Fallback: fetch from users table for missing fields
-      const userRes = await fetch(`/api/user/lookup?email=${encodeURIComponent(normalized)}`);
-      if (userRes.ok) {
-        const userJson = await userRes.json();
-        if (userJson.data) {
-          if (!firstName && userJson.data.firstName) setFirstName(userJson.data.firstName);
-          if (!lastName && userJson.data.lastName) setLastName(userJson.data.lastName);
-          if (!major && userJson.data.major) setMajor(userJson.data.major);
-          if (!secondMajor && userJson.data.secondMajor) setSecondMajor(userJson.data.secondMajor);
+        // Fallback: fetch from users table for missing fields
+        const userRes = await fetch(
+          `/api/user/lookup?email=${encodeURIComponent(normalized)}`,
+        );
+        if (userRes.ok) {
+          const userJson = await userRes.json();
+          if (userJson.data) {
+            if (!firstName && userJson.data.firstName)
+              setFirstName(userJson.data.firstName);
+            if (!lastName && userJson.data.lastName)
+              setLastName(userJson.data.lastName);
+            if (!major && userJson.data.major) setMajor(userJson.data.major);
+            if (!secondMajor && userJson.data.secondMajor)
+              setSecondMajor(userJson.data.secondMajor);
+          } else {
+            console.error("No user found matching kerb");
+            return;
+          }
+          console.log(userRes);
         }
-      }
 
-      setDataLoaded(true);
-    } catch {
-      // Ignore fetch errors
-    }
-  }, [firstName, lastName, major, secondMajor]);
+        setDataLoaded(true);
+        setDisabledEmail(true);
+      } catch {
+        // Ignore fetch errors
+      }
+    },
+    [firstName, lastName, major, secondMajor],
+  );
 
   function handleClose() {
     setOpen(false);
@@ -105,9 +122,9 @@ export default function BioPage() {
 
   function normalizeEmail(value) {
     const trimmed = value.trim().toLowerCase();
-    if (!trimmed) return '';
+    if (!trimmed) return "";
     // If no @ symbol, assume it's just the kerb and append @mit.edu
-    if (!trimmed.includes('@')) {
+    if (!trimmed.includes("@")) {
       return `${trimmed}@mit.edu`;
     }
     return trimmed;
@@ -116,11 +133,11 @@ export default function BioPage() {
   function validateEmail(value) {
     const normalized = normalizeEmail(value);
     if (!normalized) {
-      setEmailError(t('emailRequired'));
+      setEmailError(t("emailRequired"));
       return false;
     }
-    if (!normalized.endsWith('@mit.edu')) {
-      setEmailError(t('emailMitOnly'));
+    if (!normalized.endsWith("@mit.edu")) {
+      setEmailError(t("emailMitOnly"));
       return false;
     }
     setEmailError("");
@@ -155,16 +172,16 @@ export default function BioPage() {
 
       if (!response.ok) {
         const data = await response.json();
-        setSnackMessage(data.error || t('error'));
+        setSnackMessage(data.error || t("error"));
         setOpen(true);
         setError(true);
       } else {
-        setSnackMessage(t('success'));
+        setSnackMessage(t("success"));
         setOpen(true);
         setError(false);
       }
     } catch {
-      setSnackMessage(t('error'));
+      setSnackMessage(t("error"));
       setError(true);
       setOpen(true);
     }
@@ -173,34 +190,43 @@ export default function BioPage() {
   const majors = [
     { name: "Civil and Environmental Engineering", course: "1-ENG" },
     { name: "Climate System Science and Engineering", course: "1-12" },
-    { name: "Mechanical Engineering", course: "2 & 2-A" },
+    { name: "Mechanical Engineering", course: "2" },
+    { name: "Mechanical Engineering", course: "2-A" },
     { name: "Mechanical and Ocean Engineering", course: "2-OE" },
-    { name: "Materials Science and Engineering", course: "3 & 3-A" },
+    { name: "Materials Science and Engineering", course: "3" },
+    { name: "Materials Science and Engineering", course: "3-A" },
     { name: "Archaeology and Materials", course: "3-C" },
     { name: "Architecture", course: "4" },
     { name: "Art and Design", course: "4-B" },
     { name: "Chemistry", course: "5" },
     { name: "Chemistry and Biology", course: "5-7" },
+    { name: "Electrical Science and Engineering", course: "6-1" },
+    { name: "Electrical Engineering and Computer Science", course: "6-P" },
+    { name: "Electrical Engineering and Computer Science", course: "6-2" },
+    { name: "Electrical Engineering and Computer Science", course: "6-2A" },
     { name: "Computer Science and Engineering", course: "6-3" },
     { name: "Artificial Intelligence and Decision Making", course: "6-4" },
     { name: "Electrical Engineering and Computing", course: "6-5" },
     { name: "Computer Science and Molecular Biology", course: "6-7" },
     { name: "Computation and Cognition", course: "6-9" },
-    { name: "Data Science", course: "6-14" },
+    { name: "Computer Science, Economics and Data Science", course: "6-14" },
     { name: "Biology", course: "7" },
     { name: "Physics", course: "8" },
     { name: "Brain and Cognitive Sciences", course: "9" },
-    { name: "Chemical Engineering", course: "10, 10-C, 10-ENG" },
+    { name: "Chemical Engineering", course: "10" },
+    { name: "Chemical Engineering", course: "10-C" },
+    { name: "Chemical Engineering", course: "10-ENG" },
     { name: "Chemical-Biological Engineering", course: "10-B" },
     { name: "Planning", course: "11" },
     { name: "Urban Science and Planning with CS", course: "11-6" },
     { name: "Earth, Atmospheric, and Planetary Sciences", course: "12" },
-    { name: "Economics", course: "14" },
+    { name: "Economics", course: "14-1" },
     { name: "Mathematical Economics", course: "14-2" },
     { name: "Management", course: "15-1" },
     { name: "Business Analytics", course: "15-2" },
     { name: "Finance", course: "15-3" },
-    { name: "Aerospace Engineering", course: "16 & 16-ENG" },
+    { name: "Aerospace Engineering", course: "16" },
+    { name: "Aerospace Engineering", course: "16-ENG" },
     { name: "Political Science", course: "17" },
     { name: "Mathematics", course: "18" },
     { name: "Mathematics with Computer Science", course: "18-C" },
@@ -219,14 +245,14 @@ export default function BioPage() {
     { name: "History", course: "21H" },
     { name: "Literature", course: "21L" },
     { name: "Music", course: "21M" },
-    { name: "Theater Arts", course: "21M" },
+    { name: "Theater Arts", course: "21T" },
     { name: "Humanities and Science", course: "21S" },
     { name: "Writing", course: "21W" },
     { name: "Nuclear Science and Engineering", course: "22" },
     { name: "Flexible Nuclear Science", course: "22-ENG" },
     { name: "Philosophy", course: "24-1" },
     { name: "Linguistics", course: "24-2" },
-    { name: "Comparative Media Studies", course: "CMS" },
+    { name: "Comparative Media Studies", course: "21CMS" },
     { name: "Science, Technology and Society", course: "STS" },
   ];
 
@@ -234,25 +260,32 @@ export default function BioPage() {
     { name: "Civil and Environmental Systems", course: "1" },
     { name: "Civil Engineering", course: "1" },
     { name: "Environmental Engineering Science", course: "1" },
-    { name: "Mechanical Engineering", course: "2 & 2-A" },
-    { name: "Materials Science and Engineering", course: "3 & 3-A" },
+    { name: "Mechanical Engineering", course: "2" },
+    { name: "Mechanical Engineering", course: "2-A" },
+    { name: "Materials Science and Engineering", course: "3" },
+    { name: "Materials Science and Engineering", course: "3-A" },
     { name: "Archaeology and Materials", course: "3-C" },
     { name: "Architecture", course: "4" },
     { name: "Art, Culture and Technology", course: "4" },
     { name: "Design", course: "4" },
     { name: "History of Architecture, Art and Design", course: "4" },
     { name: "Chemistry", course: "5" },
+    { name: "Electrical Science and Engineering", course: "6-1" },
+    { name: "Electrical Engineering and Computer Science", course: "6-P" },
+    { name: "Electrical Engineering and Computer Science", course: "6-2" },
+    { name: "Electrical Engineering and Computer Science", course: "6-2A" },
     { name: "Computer Science and Engineering", course: "6-3" },
     { name: "Biology", course: "7" },
-    { name: "Astronomy", course: "8 or 12" },
+    { name: "Astronomy", course: "8" },
     { name: "Physics", course: "8" },
     { name: "Brain and Cognitive Sciences", course: "9" },
     { name: "International Development", course: "11" },
     { name: "Urban Studies and Planning", course: "11" },
+    { name: "Astronomy", course: "12" },
     { name: "Atmospheric Chemistry", course: "12" },
     { name: "Earth, Atmospheric, and Planetary Sciences", course: "12" },
     { name: "Energy Studies", course: "12" },
-    { name: "Economics", course: "14" },
+    { name: "Economics", course: "14-1" },
     { name: "Management", course: "15-1" },
     { name: "Business Analytics", course: "15-2" },
     { name: "Finance", course: "15-3" },
@@ -278,12 +311,12 @@ export default function BioPage() {
     { name: "History", course: "21H" },
     { name: "Literature", course: "21L" },
     { name: "Music", course: "21M" },
-    { name: "Theater Arts", course: "21M" },
+    { name: "Theater Arts", course: "21T" },
     { name: "Writing", course: "21W" },
     { name: "Nuclear Science and Engineering", course: "22" },
     { name: "Philosophy", course: "24-1" },
     { name: "Linguistics", course: "24-2" },
-    { name: "Comparative Media Studies", course: "CMS" },
+    { name: "Comparative Media Studies", course: "21CMS" },
     { name: "Entrepreneurship & Innovation", course: "E&I" },
     { name: "Statistics and Data Science", course: "IDSS" },
     { name: "Environment and Sustainability", course: "Inter-school" },
@@ -296,7 +329,7 @@ export default function BioPage() {
       <main className="min-h-screen pt-24 lg:pt-32">
         <section className="section-tight container-narrow">
           <div className="text-center mb-8">
-            <h1 className="mb-2">{t('title')}</h1>
+            <h1 className="mb-2">{t("title")}</h1>
           </div>
 
           <Box
@@ -315,7 +348,7 @@ export default function BioPage() {
             {/* Email Field */}
             <TextField
               required
-              label={t('fields.email')}
+              label={t("fields.email")}
               variant="outlined"
               InputLabelProps={{ shrink: true }}
               value={email}
@@ -330,192 +363,211 @@ export default function BioPage() {
               name="email"
               placeholder="kerb"
               error={!!emailError}
-              helperText={emailError || t('fields.emailAutofillHint')}
+              helperText={emailError || t("fields.emailAutofillHint")}
               sx={textFieldSx}
               fullWidth
               InputProps={{
-                endAdornment: <span style={{ color: '#666', marginLeft: 4 }}>@mit.edu</span>,
+                endAdornment: (
+                  <span style={{ color: "#666", marginLeft: 4 }}>@mit.edu</span>
+                ),
               }}
+              disabled={disableEmail}
             />
 
-            <div className="grid grid-cols-2 gap-4">
-              <TextField
-                required
-                label={t('fields.firstName')}
-                variant="outlined"
-                InputLabelProps={{ shrink: true }}
-                value={firstName}
-                onChange={(event) => setFirstName(event.target.value)}
-                name="firstName"
-                sx={textFieldSx}
-              />
-              <TextField
-                required
-                label={t('fields.lastName')}
-                variant="outlined"
-                InputLabelProps={{ shrink: true }}
-                value={lastName}
-                onChange={(event) => setLastName(event.target.value)}
-                name="lastName"
-                sx={textFieldSx}
-              />
-            </div>
+            {dataLoaded ? (
+              <>
+                <div className="grid grid-cols-2 gap-4">
+                  <TextField
+                    required
+                    label={t("fields.firstName")}
+                    variant="outlined"
+                    InputLabelProps={{ shrink: true }}
+                    value={firstName}
+                    onChange={(event) => setFirstName(event.target.value)}
+                    name="firstName"
+                    sx={textFieldSx}
+                  />
+                  <TextField
+                    required
+                    label={t("fields.lastName")}
+                    variant="outlined"
+                    InputLabelProps={{ shrink: true }}
+                    value={lastName}
+                    onChange={(event) => setLastName(event.target.value)}
+                    name="lastName"
+                    sx={textFieldSx}
+                  />
+                </div>
 
-            <FormControl fullWidth>
-              <InputLabel
-                id="major-label"
-                shrink
-                sx={{
-                  "&.Mui-focused": { color: "#750014" },
-                }}
-              >
-                {t('fields.major')} *
-              </InputLabel>
-              <Select
-                labelId="major-label"
-                id="major-select"
-                value={major}
-                label={`${t('fields.major')} *`}
-                notched
-                required
-                displayEmpty
-                onChange={(event) => setMajor(event.target.value)}
-                sx={selectSx}
-              >
-                <MenuItem value="" disabled>
-                  Select...
-                </MenuItem>
-                {majors.map((m) => (
-                  <MenuItem key={`${m.course}-${m.name}`} value={`${m.course}, ${m.name}`}>
-                    {m.course}, {m.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            <div className="grid grid-cols-2 gap-4">
-              <FormControl fullWidth>
-                <InputLabel
-                  id="minor-label"
-                  shrink
-                  sx={{
-                    "&.Mui-focused": { color: "#750014" },
-                  }}
-                >
-                  {t('fields.minor')}
-                </InputLabel>
-                <Select
-                  labelId="minor-label"
-                  id="minor-select"
-                  value={minor}
-                  label={t('fields.minor')}
-                  notched
-                  displayEmpty
-                  onChange={(event) => setMinor(event.target.value)}
-                  sx={selectSx}
-                >
-                  <MenuItem value="">
-                    Select...
-                  </MenuItem>
-                  {minors.map((m) => (
-                    <MenuItem key={`${m.course}-${m.name}`} value={`${m.course}, ${m.name}`}>
-                      {m.course}, {m.name}
+                <FormControl fullWidth>
+                  <InputLabel
+                    id="major-label"
+                    shrink
+                    sx={{
+                      "&.Mui-focused": { color: "#750014" },
+                    }}
+                  >
+                    {t("fields.major")} *
+                  </InputLabel>
+                  <Select
+                    labelId="major-label"
+                    id="major-select"
+                    value={major}
+                    label={`${t("fields.major")} *`}
+                    notched
+                    required
+                    displayEmpty
+                    onChange={(event) => setMajor(event.target.value)}
+                    sx={selectSx}
+                  >
+                    <MenuItem value="" disabled>
+                      Select...
                     </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+                    {majors.map((m) => (
+                      <MenuItem
+                        key={`${m.course}-${m.name}`}
+                        value={`${m.course}, ${m.name}`}
+                      >
+                        {m.course}, {m.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
 
-              <FormControl fullWidth>
-                <InputLabel
-                  id="second-major-label"
-                  shrink
+                <div className="grid grid-cols-2 gap-4">
+                  <FormControl fullWidth>
+                    <InputLabel
+                      id="minor-label"
+                      shrink
+                      sx={{
+                        "&.Mui-focused": { color: "#750014" },
+                      }}
+                    >
+                      {t("fields.minor")}
+                    </InputLabel>
+                    <Select
+                      labelId="minor-label"
+                      id="minor-select"
+                      value={minor}
+                      label={t("fields.minor")}
+                      notched
+                      displayEmpty
+                      onChange={(event) => setMinor(event.target.value)}
+                      sx={selectSx}
+                    >
+                      <MenuItem value="">Select...</MenuItem>
+                      {minors.map((m) => (
+                        <MenuItem
+                          key={`${m.course}-${m.name}`}
+                          value={`${m.course}, ${m.name}`}
+                        >
+                          {m.course}, {m.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+
+                  <FormControl fullWidth>
+                    <InputLabel
+                      id="second-major-label"
+                      shrink
+                      sx={{
+                        "&.Mui-focused": { color: "#750014" },
+                      }}
+                    >
+                      {t("fields.secondMajor")}
+                    </InputLabel>
+                    <Select
+                      labelId="second-major-label"
+                      id="second-major-select"
+                      value={secondMajor}
+                      label={t("fields.secondMajor")}
+                      notched
+                      displayEmpty
+                      onChange={(event) => setSecondMajor(event.target.value)}
+                      sx={selectSx}
+                    >
+                      <MenuItem value="">Select...</MenuItem>
+                      {majors.map((m) => (
+                        <MenuItem
+                          key={`second-${m.course}-${m.name}`}
+                          value={`${m.course}, ${m.name}`}
+                        >
+                          {m.course}, {m.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </div>
+
+                <TextField
+                  label={t("fields.quote")}
+                  variant="outlined"
+                  InputLabelProps={{ shrink: true }}
+                  value={quote}
+                  onChange={(event) => setQuote(event.target.value)}
+                  name="quote"
+                  multiline
+                  minRows={3}
+                  maxRows={8}
+                  sx={textFieldSx}
+                  fullWidth
+                  placeholder={t("fields.quotePlaceholder")}
+                />
+
+                <TextField
+                  label="Achievements"
+                  variant="outlined"
+                  InputLabelProps={{ shrink: true }}
+                  value={extracurriculars}
+                  onChange={(event) => setExtracurriculars(event.target.value)}
+                  name="extracurriculars"
+                  multiline
+                  minRows={3}
+                  maxRows={8}
+                  sx={textFieldSx}
+                  fullWidth
+                  placeholder="Achievements you would like to highlight"
+                />
+
+                <Button
+                  type="submit"
+                  variant="contained"
                   sx={{
-                    "&.Mui-focused": { color: "#750014" },
+                    mt: 2,
+                    backgroundColor: "#750014",
+                    "&:hover": {
+                      backgroundColor: "#5C0010",
+                    },
+                    "&:active": {
+                      backgroundColor: "#5C0010",
+                      transform: "translateY(1px)",
+                    },
+                    transition: "all 0.2s ease",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    fontWeight: 500,
+                    py: 1.5,
+                    boxShadow: "none",
                   }}
+                  fullWidth
                 >
-                  {t('fields.secondMajor')}
-                </InputLabel>
-                <Select
-                  labelId="second-major-label"
-                  id="second-major-select"
-                  value={secondMajor}
-                  label={t('fields.secondMajor')}
-                  notched
-                  displayEmpty
-                  onChange={(event) => setSecondMajor(event.target.value)}
-                  sx={selectSx}
-                >
-                  <MenuItem value="">
-                    Select...
-                  </MenuItem>
-                  {majors.map((m) => (
-                    <MenuItem key={`second-${m.course}-${m.name}`} value={`${m.course}, ${m.name}`}>
-                      {m.course}, {m.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </div>
-
-            <TextField
-              label={t('fields.quote')}
-              variant="outlined"
-              InputLabelProps={{ shrink: true }}
-              value={quote}
-              onChange={(event) => setQuote(event.target.value)}
-              name="quote"
-              multiline
-              minRows={3}
-              maxRows={8}
-              sx={textFieldSx}
-              fullWidth
-              placeholder={t('fields.quotePlaceholder')}
-            />
-
-            <TextField
-              label="Achievements"
-              variant="outlined"
-              InputLabelProps={{ shrink: true }}
-              value={extracurriculars}
-              onChange={(event) => setExtracurriculars(event.target.value)}
-              name="extracurriculars"
-              multiline
-              minRows={3}
-              maxRows={8}
-              sx={textFieldSx}
-              fullWidth
-              placeholder="Achievements you would like to highlight"
-            />
-
-            <Button
-              type="submit"
-              variant="contained"
-              sx={{
-                mt: 2,
-                backgroundColor: "#750014",
-                "&:hover": {
-                  backgroundColor: "#5C0010",
-                },
-                "&:active": {
-                  backgroundColor: "#5C0010",
-                  transform: "translateY(1px)",
-                },
-                transition: "all 0.2s ease",
-                textTransform: "uppercase",
-                letterSpacing: "0.05em",
-                fontWeight: 500,
-                py: 1.5,
-                boxShadow: "none",
-              }}
-              fullWidth
-            >
-              {t('submitButton')}
-            </Button>
+                  {t("submitButton")}
+                </Button>
+              </>
+            ) : (
+              <></>
+            )}
+            {/* <>
+            </> */}
 
             {/* Contact mailto */}
             <p className="text-xs text-text-muted text-center mt-4">
-              {t('contactText')}{' '}
-              <a href="mailto:technique@mit.edu" className="text-primary hover:underline">
+              {t("contactText")}{" "}
+              <a
+                href="mailto:technique@mit.edu"
+                className="text-primary hover:underline"
+              >
                 technique@mit.edu
               </a>
             </p>
@@ -545,7 +597,7 @@ export default function BioPage() {
           variant="filled"
           sx={{ width: "100%" }}
         >
-          {snackMessage || (error ? t('error') : t('success'))}
+          {snackMessage || (error ? t("error") : t("success"))}
         </Alert>
       </Snackbar>
       <Footer />
