@@ -1,6 +1,6 @@
 # MIT Technique Website - Project Documentation
 
-**Last Updated:** January 29, 2026
+**Last Updated:** February 1, 2026
 **Tech Stack:** Next.js 14.2.3 (App Router) + next-intl 4.7.0 + Supabase
 **Internationalization:** 3 active languages (en, es, zh)
 
@@ -29,7 +29,7 @@ The MIT Technique website is a multilingual Next.js application serving as the o
 
 - **3 Language Support:** English, Spanish, Chinese (Simplified)
 - **Dynamic Locale Routing:** URL-based language selection (`/en/about`, `/es/about`, etc.)
-- **Dual Auth:** MIT SSO for students + Supabase Auth for organizations (clubs, living groups, sports)
+- **Supabase Auth:** Organization password login + admin/staph password login
 - **Organization Dashboards:** Clubs, living groups, and sports teams each have management pages
 - **Admin Dashboard:** Full admin panel for managing users, organizations, photoshoots, and settings
 - **Supabase Backend:** PostgreSQL database with storage buckets for images
@@ -50,14 +50,21 @@ Technique-Website/
 │   └── fonts/                      # Custom fonts
 │
 ├── scripts/                         # Utility scripts
+│   ├── create-admin-account.js     # Create admin accounts
+│   ├── create-club-accounts-2026.js # 2026 club account creation
+│   ├── create-dorm-accounts.js     # Create dorm LG accounts
+│   ├── create-fsilg-accounts.js    # Create FSILG accounts
 │   ├── create-org-accounts.js      # Create club/LG accounts
-│   ├── create-living-group-accounts.js
 │   ├── create-sports-accounts.js   # Create sports team accounts
+│   ├── create-staph-accounts.js    # Create staph accounts in bulk
+│   ├── create-test-accounts.js     # Test account creation
+│   ├── create-yearbook-inventory.sql # Yearbook inventory seed data
+│   ├── decrypt-senior-bios.js      # Senior bio decryption utility
 │   └── download-images.js          # Image downloader
 │
 ├── src/
 │   ├── app/
-│   │   ├── [locale]/               # Localized pages (27 pages)
+│   │   ├── [locale]/               # Localized pages (28 pages)
 │   │   │   ├── page.js            # Homepage
 │   │   │   ├── layout.js          # Root layout with locale support
 │   │   │   ├── about/             # About page
@@ -65,16 +72,29 @@ Technique-Website/
 │   │   │   ├── alumni-inquiry/    # Alumni inquiry form
 │   │   │   ├── archives/          # Yearbook archives (1885-present)
 │   │   │   ├── bio/               # Senior bio form (requires login)
+│   │   │   ├── candids/           # Community candids submission (public)
 │   │   │   ├── club/              # Club dashboard (role: club)
 │   │   │   ├── clubs/             # Clubs listing (public)
 │   │   │   ├── contact/           # Contact information
-│   │   │   ├── dashboard/         # Admin dashboard (role: admin)
+│   │   │   ├── dashboard/         # Admin/staph dashboard (nested tabs)
+│   │   │   │   ├── clubs/         # Club management tab
+│   │   │   │   ├── living-groups/ # LG management tab
+│   │   │   │   ├── sports/        # Sports management tab
+│   │   │   │   ├── photoshoots/   # Photoshoot scheduling tab
+│   │   │   │   ├── responses/     # Form responses tabs
+│   │   │   │   │   ├── clubs/
+│   │   │   │   │   ├── living-groups/
+│   │   │   │   │   ├── sports/
+│   │   │   │   │   ├── activities/  # Candids + student work responses
+│   │   │   │   │   └── seniors/
+│   │   │   │   ├── users/         # User management
+│   │   │   │   ├── logs/          # Admin action logs
+│   │   │   │   └── settings/      # Form settings, yearbook inventory, reset
 │   │   │   ├── hire/              # Event photography services
 │   │   │   ├── invoice/           # Photographer invoice submission
 │   │   │   ├── join/              # Join/signup page
 │   │   │   ├── living-group/      # Living group dashboard (role: living_group)
-│   │   │   ├── login/             # Login pages (main, student, admin)
-│   │   │   ├── logout/            # Logout page
+│   │   │   ├── login/             # Login pages (main, student, admin, club)
 │   │   │   ├── parent-inquiry/    # Parent inquiry form
 │   │   │   ├── parents/           # Parent information
 │   │   │   ├── portfolio/         # Photography portfolio
@@ -83,7 +103,7 @@ Technique-Website/
 │   │   │   ├── resources/         # Resources page
 │   │   │   ├── seniors/           # Senior portrait information
 │   │   │   ├── sports/            # Sports team dashboard (role: sports)
-│   │   │   ├── student-work-feature/ # Student work showcase
+│   │   │   ├── student-work-feature/ # Student work submission
 │   │   │   └── yearbook/          # Yearbook information & ordering
 │   │   │
 │   │   ├── api/                    # API routes (see API Routes section)
@@ -92,11 +112,19 @@ Technique-Website/
 │   │
 │   ├── components/
 │   │   ├── AccountButton/          # Account/user button
+│   │   ├── CalendarView/           # Photoshoot scheduling calendar system
+│   │   │   ├── CalendarView.jsx   # Main container (month/week/day views)
+│   │   │   ├── MonthView.jsx      # Month calendar grid
+│   │   │   ├── WeekView.jsx       # Week timeline view
+│   │   │   ├── DayView.jsx        # Day detail view
+│   │   │   ├── DaySidePanel.jsx   # Side panel for booking/proposals
+│   │   │   ├── TimelineSlot.jsx   # Time slot display
+│   │   │   └── CreateSlotForm.jsx # New time slot form
 │   │   ├── ConfirmationModal/      # MUI confirmation dialog (isDangerous mode)
 │   │   ├── CookieConsent/          # Cookie consent banner
 │   │   ├── CoverCard/              # Yearbook cover card
 │   │   ├── Footer/                 # Site footer
-│   │   ├── ImageUpload/            # Drag-and-drop image upload (5MB, JPEG/PNG/WebP/GIF)
+│   │   ├── ImageUpload/            # Drag-and-drop image upload (20MB, JPEG/PNG/WebP/GIF)
 │   │   ├── LanguageSwitcher/       # Language dropdown selector
 │   │   ├── Navbar_and_Sidebar/     # Navigation (Navbar_new.jsx, Sidebar.jsx)
 │   │   ├── OrganizationAuthModal/  # Organization login modal (clubs, LGs, sports)
@@ -113,7 +141,7 @@ Technique-Website/
 │   ├── lib/
 │   │   ├── admin-logs.ts           # Admin action logging
 │   │   ├── db.ts                   # Database utilities
-│   │   ├── lib.ts                  # General utilities + next_js_session config
+│   │   ├── lib.ts                  # General utilities (Cryptr encryption)
 │   │   ├── studentSchema.ts        # Zod validation for student data
 │   │   ├── auth/
 │   │   │   └── session.ts          # technique_session config
@@ -137,8 +165,14 @@ Technique-Website/
 │       ├── ko.json                 # Korean (inactive)
 │       └── pt.json                 # Portuguese (inactive)
 │
+│   └── __tests__/                   # Test files (vitest)
+│       ├── setup.ts                # Test setup
+│       ├── auth/                   # Auth tests (logout, org-signin, session)
+│       └── components/             # Component tests (OrganizationAuthModal)
+│
 ├── middleware.js                   # Next.js middleware for locale routing
 ├── next.config.mjs                 # Next.js configuration
+├── vitest.config.ts               # Vitest test configuration
 ├── tailwind.config.js             # Tailwind CSS configuration
 ├── package.json                    # Dependencies
 └── .env                           # Environment variables
@@ -174,13 +208,14 @@ Top-level namespaces in each JSON file:
 - `footer` - Copyright, social links
 - `languageSwitcher` - Language selector label
 - `carousel` - Photo credits
-- `pages.*` - Page-specific translations (home, about, yearbook, contact, hire, invoice, login, portfolio, seniors, bio, archives)
+- `pages.*` - Page-specific translations (home, about, yearbook, contact, hire, invoice, login, portfolio, seniors, bio, archives, candids, studentWorkFeature)
 - `clubPage` - Club dashboard translations
 - `livingGroupPage` - Living group dashboard translations
 - `sportsPage` - Sports dashboard translations (profile, coaches, members, achievements, photos, documents tabs)
 - `organizationAuth` - Organization login modal translations
 - `profilePage` - User profile translations
-- `dashboardPage` - Admin dashboard translations
+- `dashboardPage` - Admin dashboard translations (overview, organizations, photoshoots, responses, settings, yearbook inventory, reset)
+- `calendarView` - Calendar scheduling component translations
 
 ### Translation Interpolation
 
@@ -202,6 +237,7 @@ t("photoCredit", { photographer: "Michelle Xiang" });
 | `/alumni`               | Alumni information              |
 | `/alumni-inquiry`       | Alumni inquiry form             |
 | `/archives`             | Yearbook archive (1885-present) |
+| `/candids`              | Community candids submission    |
 | `/clubs`                | Public clubs listing            |
 | `/contact`              | Contact information             |
 | `/hire`                 | Event photography services      |
@@ -212,46 +248,47 @@ t("photoCredit", { photographer: "Michelle Xiang" });
 | `/privacy`              | Privacy policy                  |
 | `/resources`            | Resources page                  |
 | `/seniors`              | Senior portrait information     |
-| `/student-work-feature` | Student work showcase           |
+| `/student-work-feature` | Student work/project submission |
 | `/yearbook`             | Yearbook information & ordering |
 
 ### Auth Pages
 
 | Route            | Description                            |
 | ---------------- | -------------------------------------- |
-| `/login`         | Main login (MIT SSO + org login modal) |
-| `/login/student` | Student-only login (bio form redirect) |
-| `/login/admin`   | Admin-only login (magic link)          |
+| `/login`         | Main login (organization login modal)  |
+| `/login/admin`   | Admin/staph login (email + password)   |
+| `/login/club`    | Club login (legacy)                    |
 | `/logout`        | Logout page                            |
 
 ### Role-Protected Pages
 
-| Route           | Required Role  | Description                                          |
-| --------------- | -------------- | ---------------------------------------------------- |
-| `/bio`          | `staph`        | Senior bio form                                      |
-| `/profile`      | any logged-in  | User profile                                         |
-| `/club`         | `club`         | Club management dashboard                            |
-| `/living-group` | `living_group` | Living group management dashboard                    |
-| `/sports`       | `sports`       | Sports team management dashboard                     |
-| `/dashboard`    | `admin`        | Admin dashboard (users, orgs, photoshoots, settings) |
-| `/invoice`      | any logged-in  | Photographer invoice submission                      |
+| Route           | Required Role   | Description                                                  |
+| --------------- | --------------- | ------------------------------------------------------------ |
+| `/bio`          | `staph`         | Senior bio form                                              |
+| `/profile`      | any logged-in   | User profile                                                 |
+| `/club`         | `club`          | Club management dashboard                                    |
+| `/living-group` | `living_group`  | Living group management dashboard                            |
+| `/sports`       | `sports`        | Sports team management dashboard                             |
+| `/dashboard`    | `admin`/`staph` | Dashboard (overview, orgs, photoshoots, responses, settings) |
+| `/invoice`      | any logged-in   | Photographer invoice submission                              |
 
 ---
 
 ## Components
 
-| Component                  | Purpose                                                            |
-| -------------------------- | ------------------------------------------------------------------ |
-| `AccountButton`            | Account/user button in navbar                                      |
-| `ConfirmationModal`        | MUI Dialog with `isDangerous` mode (red title)                     |
-| `CookieConsent`            | Cookie consent banner                                              |
-| `CoverCard`                | Yearbook cover display card (archives page)                        |
-| `Footer`                   | Site footer with copyright, email, Instagram                       |
-| `ImageUpload`              | Drag-and-drop image upload (5MB max, JPEG/PNG/WebP/GIF)            |
-| `LanguageSwitcher`         | Dropdown language selector                                         |
-| `Navbar_and_Sidebar`       | Desktop navbar (`Navbar_new.jsx`) + mobile sidebar (`Sidebar.jsx`) |
-| `OrganizationAuthModal`    | Login modal for clubs, living groups, and sports teams             |
-| `PhotographerTimesSection` | Photographer booking/scheduling section                            |
+| Component                  | Purpose                                                                   |
+| -------------------------- | ------------------------------------------------------------------------- |
+| `AccountButton`            | Account/user button in navbar                                             |
+| `CalendarView`             | Photoshoot scheduling calendar (month/week/day views, booking, proposals) |
+| `ConfirmationModal`        | MUI Dialog with `isDangerous` mode (red title)                            |
+| `CookieConsent`            | Cookie consent banner                                                     |
+| `CoverCard`                | Yearbook cover display card (archives page)                               |
+| `Footer`                   | Site footer with copyright, email, Instagram                              |
+| `ImageUpload`              | Drag-and-drop image upload (20MB max, JPEG/PNG/WebP/GIF)                  |
+| `LanguageSwitcher`         | Dropdown language selector                                                |
+| `Navbar_and_Sidebar`       | Desktop navbar (`Navbar_new.jsx`) + mobile sidebar (`Sidebar.jsx`)        |
+| `OrganizationAuthModal`    | Login modal for clubs, living groups, and sports teams                    |
+| `PhotographerTimesSection` | Photographer booking/scheduling section                                   |
 
 ---
 
@@ -265,20 +302,16 @@ Located in `/src/app/api/` - **NOT localized** (language-agnostic).
 | ---------------------- | ------ | -------------------------------- |
 | `/api/bio`             | GET    | Fetch senior bio data            |
 | `/api/getUserData`     | GET    | Fetch user data from MongoDB     |
-| `/api/login`           | GET    | Initiates MIT SSO login flow     |
-| `/api/logout`          | GET    | Destroys session and redirects   |
 | `/api/sendContactForm` | POST   | Send contact form email          |
 | `/api/sendInvoice`     | POST   | Sends photographer invoice email |
-| `/api/session`         | GET    | Checks current session status    |
 | `/api/updateBio`       | POST   | Updates senior bio in database   |
-| `/api/userSignIn`      | GET    | Handles MIT SSO callback         |
 
 ### Auth (`/api/auth/`)
 
 | Route                 | Method | Purpose                                           |
 | --------------------- | ------ | ------------------------------------------------- |
-| `admin-login`         | POST   | Admin magic link login                            |
-| `callback`            | GET    | OAuth callback handler                            |
+| `admin-login`         | POST   | Admin/staph password login                        |
+| `callback`            | GET    | Supabase OAuth callback (club signup)             |
 | `change-password`     | POST   | Organization password change                      |
 | `club-login`          | POST   | Club login (legacy)                               |
 | `club-signup`         | POST   | Club signup (legacy)                              |
@@ -290,17 +323,33 @@ Located in `/src/app/api/` - **NOT localized** (language-agnostic).
 
 ### Admin (`/api/admin/`)
 
-| Route                | Method              | Purpose                            |
-| -------------------- | ------------------- | ---------------------------------- |
-| `clubs`              | GET/PUT             | Manage clubs (approve/deny)        |
-| `designate-admin`    | POST                | Promote user to admin              |
-| `form-settings`      | GET/PUT             | Freeze/unfreeze organization forms |
-| `living-groups`      | GET/PUT             | Manage living groups               |
-| `logs`               | GET                 | View admin action logs             |
-| `photoshoot-times`   | GET/POST/PUT/DELETE | Manage photoshoot time slots       |
-| `promotion-requests` | GET/PUT             | Review staph/photographer requests |
-| `toggle-staph`       | POST                | Toggle user staph status           |
-| `users`              | GET/PUT             | View and manage users              |
+| Route                            | Method              | Purpose                            |
+| -------------------------------- | ------------------- | ---------------------------------- |
+| `clubs`                          | GET/PUT             | Manage clubs (approve/deny)        |
+| `create-staph`                   | POST                | Create staph accounts              |
+| `designate-admin`                | POST                | Promote user to admin              |
+| `form-settings`                  | GET/PUT             | Freeze/unfreeze organization forms |
+| `living-groups`                  | GET/PUT             | Manage living groups               |
+| `logs`                           | GET                 | View admin action logs             |
+| `overview-stats`                 | GET                 | Dashboard statistics               |
+| `photoshoot-times`               | GET/POST/PUT/DELETE | Manage photoshoot time slots       |
+| `promotion-requests`             | GET/PUT             | Review staph/photographer requests |
+| `reset`                          | POST                | Database reset operations          |
+| `responses/activities`           | GET                 | Candids + student work responses   |
+| `responses/clubs`                | GET                 | Club form responses                |
+| `responses/living-groups`        | GET                 | LG form responses                  |
+| `responses/living-groups/book`   | POST                | Book on behalf of LG               |
+| `responses/seniors`              | GET                 | Senior bio responses               |
+| `responses/sports`               | GET                 | Sports form responses              |
+| `responses/export/images`        | GET                 | Export all org images              |
+| `responses/export/club-members`  | GET                 | Export club members                |
+| `responses/export/lg-members`    | GET                 | Export LG members                  |
+| `responses/export/sport-members` | GET                 | Export sport members               |
+| `responses/export/senior-bios`   | GET                 | Export senior bios                 |
+| `toggle-staph`                   | POST                | Toggle user staph status           |
+| `update-access`                  | POST                | Update staph access permissions    |
+| `users`                          | GET/PUT             | View and manage users              |
+| `yearbook-inventory`             | GET/PUT/POST        | Manage yearbook stock by year      |
 
 ### Clubs (`/api/clubs/`)
 
@@ -343,6 +392,15 @@ Located in `/src/app/api/` - **NOT localized** (language-agnostic).
 | `manual-members` | GET/POST/DELETE     | Manual member management (with team filter)                     |
 | `profile`        | GET/PUT             | Sports profile (description, gender teams toggle, achievements) |
 
+### Candids & Student Work
+
+| Route                              | Method   | Purpose                                 |
+| ---------------------------------- | -------- | --------------------------------------- |
+| `/api/candids/upload`              | GET/POST | Community candids submission            |
+| `/api/student-work-feature/submit` | GET/POST | Student work/project submission         |
+| `/api/form-status`                 | GET      | Check if a form is frozen (query: form) |
+| `/api/yearbook-inventory`          | GET      | Public yearbook availability            |
+
 ### Other
 
 | Route                         | Method   | Purpose                                            |
@@ -351,6 +409,7 @@ Located in `/src/app/api/` - **NOT localized** (language-agnostic).
 | `/api/photographer/proposals` | GET/POST | Photographer time proposals                        |
 | `/api/photographer/status`    | GET      | Photographer permission status                     |
 | `/api/photographer/times`     | GET      | Photographer available times                       |
+| `/api/user/lookup`            | GET      | Lookup user by email (autofill)                    |
 | `/api/user/profile`           | GET/PUT  | User profile management                            |
 | `/api/user/request-promotion` | POST     | Request staph/photographer promotion               |
 
@@ -365,7 +424,7 @@ Located in `/src/app/api/` - **NOT localized** (language-agnostic).
 
 ### Utility Libraries
 
-- **`/src/lib/lib.ts`** - `next_js_session` iron-session config, MIT SSO client config
+- **`/src/lib/lib.ts`** - General utilities (Cryptr encryption)
 - **`/src/lib/auth/session.ts`** - `technique_session` iron-session config
 - **`/src/lib/db.ts`** - MongoDB connection
 - **`/src/lib/admin-logs.ts`** - Admin action logging helper
@@ -388,7 +447,7 @@ type UserRole = "admin" | "staph" | "club" | "living_group" | "sports";
 ```
 
 - `admin` - Full dashboard access, user management, org approval
-- `staph` - Default role for individual users (MIT SSO), profile/bio access, dashboard access with permissions
+- `staph` - Staff role with dashboard access based on `user.access` array permissions
 - `club` - Club management dashboard
 - `living_group` - Living group management dashboard
 - `sports` - Sports team management dashboard
@@ -397,8 +456,8 @@ type UserRole = "admin" | "staph" | "club" | "living_group" | "sports";
 
 | Table                           | Purpose                                                    |
 | ------------------------------- | ---------------------------------------------------------- |
-| `users`                         | All users (MIT SSO + org accounts)                         |
-| `sessions`                      | OAuth session storage                                      |
+| `users`                         | All users (org + admin/staph accounts)                     |
+| `sessions`                      | Session storage                                            |
 | `clubs`                         | Club profiles (name, description, images, documents)       |
 | `club_manual_members`           | Manual member entries for clubs                            |
 | `living_groups`                 | Living group profiles (dorm/FSILG)                         |
@@ -413,6 +472,9 @@ type UserRole = "admin" | "staph" | "club" | "living_group" | "sports";
 | `promotion_requests`            | Staph/photographer promotion requests                      |
 | `photographer_permissions`      | Photographer access permissions                            |
 | `admin_logs`                    | Admin action audit trail                                   |
+| `community_candids`             | Community event candid submissions                         |
+| `student_work_submissions`      | Student work/project submissions                           |
+| `yearbook_inventory`            | Yearbook stock tracking by year                            |
 
 ### Storage Buckets
 
@@ -421,6 +483,8 @@ type UserRole = "admin" | "staph" | "club" | "living_group" | "sports";
 | `club-images`         | Club candid photos (3 slots)        | `clubs/{safeName}_Candid{suffix}.{ext}`                   |
 | `living-group-images` | LG section photos                   | `{dorms\|fsilgs}/{safeName}_{section}_Candid.{ext}`       |
 | `sports-images`       | Sports team photos (3 slots × team) | `sports/{safeName}/{mens\|womens\|}/Candid{suffix}.{ext}` |
+| `community-candids`   | Community event candid photos       | `{safeName}_{timestamp}.{ext}`                            |
+| `student-work-images` | Student work project images         | `{safeName}_{timestamp}.{ext}`                            |
 
 ### Sports-Specific Schema
 
@@ -434,58 +498,62 @@ The `sports` table supports optional gender teams via `has_gender_teams` boolean
 
 ## Authentication System
 
-### CRITICAL: Dual Session System
+### Session System
 
-⚠️ **DO NOT MODIFY WITHOUT EXTREME CARE** ⚠️
+All authentication uses a single iron-session cookie:
 
-This project uses **two separate iron-session cookies**. Mixing them up will break authentication.
+| Session             | Cookie Name         | Source File               | TTL   | Purpose                          |
+| ------------------- | ------------------- | ------------------------- | ----- | -------------------------------- |
+| `technique_session` | `technique_session` | `src/lib/auth/session.ts` | 7 days | All auth (orgs, admin, staph)   |
 
-| Session             | Cookie Name         | Source File               | Purpose                                                |
-| ------------------- | ------------------- | ------------------------- | ------------------------------------------------------ |
-| `next_js_session`   | `next_js_session`   | `src/lib/lib.ts`          | MIT SSO OAuth (stores `state`, `code_verifier`)        |
-| `technique_session` | `technique_session` | `src/lib/auth/session.ts` | Organization login, admin magic links, role-based auth |
+**Session data:** `{ isLoggedIn, access_token, userId, userInfo: { sub, name, email, email_verified } }`
 
-### Critical Import Rules
-
-**For MIT SSO OAuth callback (`/api/userSignIn`):**
+**Import rule for all auth routes:**
 
 ```typescript
-// ✅ CORRECT - MIT SSO uses next_js_session
-import { getClientConfig, getSession } from "../../../lib/lib";
-
-// ❌ WRONG - This will cause OAuth state mismatch errors
 import { getSession } from "../../../lib/auth/session";
 ```
-
-**For admin/role-based auth (`/api/auth/*`):**
-
-```typescript
-// ✅ CORRECT - Admin magic links use technique_session
-import { getSession } from "../../../lib/auth/session";
-```
-
-### MIT SSO OAuth Flow
-
-1. `/api/login` stores `state` and `code_verifier` in `next_js_session` (via `lib/lib.ts`)
-2. User authenticates with MIT SSO
-3. `/api/userSignIn` reads `state` and `code_verifier` from `next_js_session` to validate OAuth response
-4. If step 3 uses wrong `getSession`, you get: `OperationProcessingError: unexpected "state" response parameter`
 
 ### Organization Login Flow
 
 1. User clicks "Organization Login" on login page → opens `OrganizationAuthModal`
 2. Modal fetches org list from `/api/organizations/list` (clubs, living groups, sports)
-3. User selects org, enters password → POST to `/api/auth/org-signin`
-4. On success, redirects to org dashboard (`/club`, `/living-group`, or `/sports`)
-5. "Unexpected issues?" link opens mailto to `tnq-exec@mit.edu`
+3. User selects org by name (searchable dropdown), enters password
+4. POST to `/api/auth/org-signin` → authenticates via Supabase Auth
+5. On success, creates `technique_session` and redirects to org dashboard (`/club`, `/living-group`, or `/sports`)
+
+### Admin/Staph Login Flow
+
+1. User navigates to `/login/admin`
+2. Enters email and password → POST to `/api/auth/admin-login`
+3. Authenticates via Supabase Auth, requires `admin` or `staph` role
+4. Redirects to `/en/dashboard`
 
 ### Login Page Structure
 
-| Route            | Purpose                                | Auth Method                               |
-| ---------------- | -------------------------------------- | ----------------------------------------- |
-| `/login`         | Main login page                        | MIT SSO button + Organization login modal |
-| `/login/student` | Student-only login (bio form redirect) | MIT SSO only                              |
-| `/login/admin`   | Admin-only login                       | Magic link form (technique@mit.edu)       |
+| Route            | Purpose                      | Auth Method                 |
+| ---------------- | ---------------------------- | --------------------------- |
+| `/login`         | Main login page              | Organization login modal    |
+| `/login/admin`   | Admin/staph login            | Email + password form       |
+| `/login/club`    | Club login (legacy)          | Club-specific login         |
+
+### Staph Access Permissions
+
+Staph users have a `user.access` text[] array that grants access to specific dashboard tabs:
+
+- `clubs` - View/manage club responses
+- `living_groups` - View/manage LG responses, book photoshoots
+- `sports` - View/manage sports responses
+- `activities` - View/manage candids + student work
+- `seniors` - View/manage senior bio responses
+
+| Dashboard Tab | Admin | Staph (with access) | Staph (without) |
+| ------------- | ----- | ------------------- | --------------- |
+| Overview      | ✓     | ✗                   | ✗               |
+| Organizations | ✓     | ✗                   | ✗               |
+| Photoshoots   | ✓     | ✓                   | ✓               |
+| Responses     | ✓     | ✓ (filtered)        | ✗               |
+| Settings      | ✓     | ✗                   | ✗               |
 
 ---
 
@@ -506,6 +574,18 @@ const nextConfig = {
         destination: "https://seniors.legacystudios.com/...",
         permanent: false,
       },
+      {
+        source: "/:locale/purchase",
+        destination: "https://engage.mit.edu/technique/rsvp_boot?id=916938",
+        permanent: false,
+      },
+      {
+        source: "/purchase",
+        destination: "https://engage.mit.edu/technique/rsvp_boot?id=916938",
+        permanent: false,
+      },
+      { source: "/bio", destination: "/en/bio", permanent: false },
+      { source: "/admin", destination: "/en/login/admin", permanent: false },
     ];
   },
 };
@@ -522,13 +602,13 @@ export default withNextIntl(nextConfig);
 | `@supabase/ssr`         | Supabase SSR helpers             |
 | `iron-session`          | Encrypted session cookies        |
 | `mongodb`               | MongoDB driver (legacy bio data) |
-| `openid-client`         | MIT SSO OIDC integration         |
 | `nodemailer`            | Email sending                    |
 | `pdf-lib`               | PDF generation                   |
 | `zod`                   | Schema validation                |
 | `@mui/material`         | UI components (dialogs, etc.)    |
 | `framer-motion`         | Animations                       |
 | `react-icons`           | Icon library                     |
+| `vitest`                | Test framework                   |
 
 ---
 
@@ -541,6 +621,7 @@ npm install
 npm run dev       # http://localhost:3000
 npm run build     # Production build
 npm start         # Production server
+npm test          # Run vitest tests
 ```
 
 ### Adding a New Translation
@@ -564,6 +645,58 @@ npm start         # Production server
 
 ---
 
+## Edge Cases & Page Optimization
+
+### Data Fetching
+
+- **`cache: "no-store"`** is used on bio page fetches and in the Supabase admin client (`src/lib/supabase/admin.ts`) to prevent stale data causing data erasure
+- **Client-side fetching** with loading states is the dominant pattern (bio, candids, dashboard, org pages)
+- **`useCallback`** wraps fetch functions (e.g. `fetchBioByEmail`, `fetchCandidsByEmail`) to prevent unnecessary re-renders
+- **`useMemo`** used in OrganizationAuthModal for filtering large org lists
+
+### Email Validation
+
+All forms enforce `@mit.edu` emails. The normalization pattern auto-appends `@mit.edu` if no `@` is present:
+
+```javascript
+const normalized = trimmed.includes("@") ? trimmed : `${trimmed}@mit.edu`;
+if (!normalized.endsWith("@mit.edu")) return;
+```
+
+This validation happens both client-side (immediate feedback) and server-side (API routes return 400).
+
+### Duplicate Submission Prevention
+
+All public forms use **upsert with email as unique key**: bio, candids, student work. Submitting again with the same email updates the existing record rather than creating a duplicate.
+
+### Bio Page Protections
+
+- **Auto-clear fields on email change** before fetching — prevents showing stale data from a previous email
+- **Required field validation** — first name, last name, and major are required
+- **Quote length limit** — 300 characters max (server-enforced)
+- **Prevents non-senior submissions** via email validation
+
+### Form Freeze System
+
+Dual-layer protection:
+1. **Client-side**: `useFormFrozen(formName)` hook or direct `/api/form-status` fetch; shows red banner and disables form
+2. **Server-side**: API routes check `form_settings.is_frozen` and return 403 if frozen
+
+Protected forms: `candids_form`, `student_work_form`, club/sports profile forms.
+
+### Auto-Dismiss Messages
+
+Success messages auto-fade after 4 seconds using the `FadeMessage` component pattern (used on living group page). Error messages persist until manually dismissed.
+
+### Image Upload
+
+- Max size: **20MB** (not 5MB)
+- Allowed types: JPEG, PNG, WebP, GIF
+- Client-side validation before upload with local preview
+- Candids: max 3 images; Student work: max 5 images; Clubs/sports: 3 slots per team
+
+---
+
 ## Notes for AI Assistants
 
 1. **Always preserve locale structure** - pages must be in `[locale]` directory
@@ -571,11 +704,13 @@ npm start         # Production server
 3. **Use locale-aware routing** - include `/${locale}/` prefix in all links
 4. **Keep API routes separate** - they are NOT localized
 5. **Follow existing patterns** - use `useTranslations` hook consistently
-6. **NEVER change `getSession` imports in `/api/userSignIn`** - must use `lib/lib.ts`
-7. **Understand the dual session system** - see Authentication System section
+6. **Single session system** - all auth uses `technique_session` via `src/lib/auth/session.ts`
 8. **Update Times Properly** - All posted times should be in EST, and all times shown should explicitly mention EST
 9. **Organization pattern** - clubs, living groups, and sports all follow similar patterns: profile, email, documents, images, manual-members API routes + a dashboard page
 10. **Sports gender teams** - the `has_gender_teams` toggle affects members, photos, and achievements (coaches are always shared)
+11. **"Achievements" → "Extracurriculars"** - The UI displays "extracurriculars" but the database field is still `achievements` in `senior_bios`. Do not rename the DB column.
+12. **Staph access permissions** - Staph users access dashboard tabs via `user.access` array. Use `/api/admin/update-access` to modify.
+13. **Form freeze system** - Forms can be frozen/unfrozen via admin settings. Check freeze status with `/api/form-status?form=<form_name>`. Frozen forms show a red banner and disable submission.
 
 ---
 
@@ -769,6 +904,7 @@ updated_at timestamp with time zone DEFAULT now(),
 minor text,
 first_name text,
 last_name text,
+major_backup text,
 CONSTRAINT senior_bios_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.sessions (
@@ -885,8 +1021,6 @@ updated_by uuid,
 CONSTRAINT yearbook_inventory_pkey PRIMARY KEY (id),
 CONSTRAINT yearbook_inventory_updated_by_fkey FOREIGN KEY (updated_by) REFERENCES public.users(id)
 );
-
----
 
 ## Contact & Support
 
