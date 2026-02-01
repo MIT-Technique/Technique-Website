@@ -56,6 +56,13 @@ export default function BioPage() {
   // Fetch existing bio when email is entered, with fallback to users table
   const fetchBioByEmail = useCallback(
     async (emailValue) => {
+      setFirstName("");
+      setLastName("");
+      setMajor("");
+      setMinor("");
+      setSecondMajor("");
+      setQuote("");
+      setExtracurriculars("");
       const trimmed = emailValue.trim().toLowerCase();
       if (!trimmed) return;
       // Normalize: if no @, append @mit.edu
@@ -66,6 +73,7 @@ export default function BioPage() {
         // First try senior_bios
         const res = await fetch(
           `/api/bio?email=${encodeURIComponent(normalized)}`,
+          { cache: "no-store" },
         );
         if (res.ok) {
           const json = await res.json();
@@ -86,28 +94,28 @@ export default function BioPage() {
         }
 
         // Fallback: fetch from users table for missing fields
-        const userRes = await fetch(
-          `/api/user/lookup?email=${encodeURIComponent(normalized)}`,
-        );
-        if (userRes.ok) {
-          const userJson = await userRes.json();
-          if (userJson.data) {
-            if (!firstName && userJson.data.firstName)
-              setFirstName(userJson.data.firstName);
-            if (!lastName && userJson.data.lastName)
-              setLastName(userJson.data.lastName);
-            if (!major && userJson.data.major) setMajor(userJson.data.major);
-            if (!secondMajor && userJson.data.secondMajor)
-              setSecondMajor(userJson.data.secondMajor);
-          } else {
-            console.error("No user found matching kerb");
-            return;
-          }
-          console.log(userRes);
-        }
+        // const userRes = await fetch(
+        //   `/api/user/lookup?email=${encodeURIComponent(normalized)}`,
+        // );
+        // if (userRes.ok) {
+        //   const userJson = await userRes.json();
+        //   if (userJson.data) {
+        //     if (!firstName && userJson.data.firstName)
+        //       setFirstName(userJson.data.firstName);
+        //     if (!lastName && userJson.data.lastName)
+        //       setLastName(userJson.data.lastName);
+        //     if (!major && userJson.data.major) setMajor(userJson.data.major);
+        //     if (!secondMajor && userJson.data.secondMajor)
+        //       setSecondMajor(userJson.data.secondMajor);
+        //   } else {
+        //     console.error("No user found matching kerb");
+        //     return;
+        //   }
+        //   console.log(userRes);
+        // }
 
-        setDataLoaded(true);
-        setDisabledEmail(true);
+        // setDataLoaded(true);
+        // setDisabledEmail(true);
       } catch {
         // Ignore fetch errors
       }
@@ -275,6 +283,7 @@ export default function BioPage() {
     { name: "Electrical Engineering and Computer Science", course: "6-2" },
     { name: "Electrical Engineering and Computer Science", course: "6-2A" },
     { name: "Computer Science and Engineering", course: "6-3" },
+    { name: "Computer Science, Economics and Data Science", course: "6-14" },
     { name: "Biology", course: "7" },
     { name: "Astronomy", course: "8" },
     { name: "Physics", course: "8" },
