@@ -33,6 +33,7 @@ export default function DayView({
   onDeclineProposal,
   onCancelBooking,
   onPropose,
+  timeAssignments = {},
 }) {
   const [showPanel, setShowPanel] = useState(false);
   const [prefillTimes, setPrefillTimes] = useState(null);
@@ -164,6 +165,7 @@ export default function DayView({
                 formatTime={formatTime}
                 onCancelBooking={onCancelBooking}
                 onDelete={onDelete}
+                sectionAssignments={timeAssignments[slot.id]}
               />
             </div>
             );

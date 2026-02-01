@@ -1444,6 +1444,7 @@
       "yourProposals": "Your Proposals",
       "noProposals": "No proposals yet",
       "cancel": "Cancel",
+      "confirmCancel": "Confirm?",
       "cancelSuccess": "Proposal cancelled",
       "cancelError": "Failed to cancel proposal",
       "acceptedBy": "Accepted by {name}",
@@ -1476,7 +1477,8 @@
     "accept": "Accept",
     "decline": "Decline",
     "postedBy": "Posted by",
-    "bookedBy": "Booked by {name}",
+    "proposedBy": "Proposed by",
+    "bookedBy": "Booked by",
     "unknown": "Unknown",
     "startTime": "Start Time",
     "endTime": "End Time",
@@ -1494,7 +1496,10 @@
     "proposeSlot": "Propose",
     "proposeError": "Failed to propose time",
     "availableTooltip": "Click on dates and the calendar grid to set or propose time slots",
-    "otherProposals": "Other Proposals"
+    "otherProposals": "Other Proposals",
+    "clearBrush": "Clear",
+    "dragToClear": "Drag across slots to clear assignments",
+    "dragToAssign": "Drag across slots to assign \"{section}\""
   },
 
   "photographerTimes": {

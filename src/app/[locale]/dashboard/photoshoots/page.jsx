@@ -66,6 +66,7 @@ export default function PhotoshootsPage() {
   });
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState(null);
+  const [timeAssignments, setTimeAssignments] = useState({});
 
   useEffect(() => {
     fetchTimes();
@@ -81,11 +82,39 @@ export default function PhotoshootsPage() {
 
       const res = await fetch(url);
       const data = await res.json();
-      setTimes(data.times || []);
+      const timesList = data.times || [];
+      setTimes(timesList);
+      fetchTimeAssignments(timesList);
     } catch (error) {
       console.error('Error fetching times:', error);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function fetchTimeAssignments(timesList) {
+    try {
+      const bookedIds = (timesList || times)
+        .filter((t) => t.living_group_id && !t.cancelled_at)
+        .map((t) => t.id);
+      if (bookedIds.length === 0) { setTimeAssignments({}); return; }
+      const results = await Promise.all(
+        bookedIds.map((id) =>
+          fetch(`/api/living-groups/time-assignments?photoshootTimeId=${id}`)
+            .then((r) => r.ok ? r.json() : { assignments: [] })
+        )
+      );
+      const map = {};
+      results.forEach((data) => {
+        (data.assignments || []).forEach((a) => {
+          if (!a.sectionName) return;
+          if (!map[a.photoshootTimeId]) map[a.photoshootTimeId] = {};
+          map[a.photoshootTimeId][`${a.slotStart.slice(0, 5)}-${a.slotEnd.slice(0, 5)}`] = a.sectionName;
+        });
+      });
+      setTimeAssignments(map);
+    } catch (error) {
+      console.error('Error fetching time assignments:', error);
     }
   }
 
@@ -226,6 +255,7 @@ export default function PhotoshootsPage() {
           times={times}
           proposals={proposals}
           loading={loading}
+          timeAssignments={timeAssignments}
           onCreate={handleCalendarCreate}
           onDelete={handleCalendarDelete}
           onAcceptProposal={handleAcceptProposal}

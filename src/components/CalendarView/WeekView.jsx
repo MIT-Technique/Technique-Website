@@ -45,6 +45,7 @@ export default function WeekView({
   onAcceptProposal,
   onDeclineProposal,
   onGridTimeClick,
+  timeAssignments = {},
 }) {
   const locale = useLocale();
   const t = useTranslations('calendarView');
@@ -255,6 +256,7 @@ export default function WeekView({
                   formatTime={formatTime}
                   onCancelBooking={onCancelBooking}
                   onDelete={onDelete}
+                  sectionAssignments={timeAssignments[slot.id]}
                 />
               </div>
               );

@@ -62,7 +62,7 @@ export async function GET() {
         notes,
         status,
         created_at,
-        living_group:living_groups(id, name),
+        living_group:living_groups(id, name, user:users!living_groups_user_id_fkey(email)),
         proposer:users!time_proposals_proposed_by_fkey(id, email, name)
       `
       )

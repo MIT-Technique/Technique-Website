@@ -1405,6 +1405,7 @@
       "yourProposals": "Tus Propuestas",
       "noProposals": "Sin propuestas aún",
       "cancel": "Cancelar",
+      "confirmCancel": "¿Confirmar?",
       "cancelSuccess": "Propuesta cancelada",
       "cancelError": "Error al cancelar propuesta",
       "acceptedBy": "Aceptado por {name}",
@@ -1436,7 +1437,8 @@
     "accept": "Aceptar",
     "decline": "Rechazar",
     "postedBy": "Publicado por",
-    "bookedBy": "Reservado por {name}",
+    "proposedBy": "Propuesto por",
+    "bookedBy": "Reservado por",
     "unknown": "Desconocido",
     "startTime": "Hora de Inicio",
     "endTime": "Hora de Fin",
@@ -1454,7 +1456,10 @@
     "proposeSlot": "Proponer",
     "proposeError": "Error al proponer horario",
     "availableTooltip": "Haz clic en las fechas y la cuadrícula del calendario para establecer o proponer horarios",
-    "otherProposals": "Otras Propuestas"
+    "otherProposals": "Otras Propuestas",
+    "clearBrush": "Borrar",
+    "dragToClear": "Arrastra sobre los espacios para borrar asignaciones",
+    "dragToAssign": "Arrastra sobre los espacios para asignar \"{section}\""
   },
 
   "photographerTimes": {

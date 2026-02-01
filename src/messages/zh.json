@@ -1408,6 +1408,7 @@
       "yourProposals": "您的提议",
       "noProposals": "暂无提议",
       "cancel": "取消",
+      "confirmCancel": "确认？",
       "cancelSuccess": "提议已取消",
       "cancelError": "取消提议失败",
       "acceptedBy": "由{name}接受",
@@ -1439,7 +1440,8 @@
     "accept": "接受",
     "decline": "拒绝",
     "postedBy": "发布者",
-    "bookedBy": "已被{name}预约",
+    "proposedBy": "提议者",
+    "bookedBy": "预约者",
     "unknown": "未知",
     "startTime": "开始时间",
     "endTime": "结束时间",
@@ -1457,7 +1459,10 @@
     "proposeSlot": "提议",
     "proposeError": "提议时间失败",
     "availableTooltip": "点击日期和日历网格来设置或提议时间段",
-    "otherProposals": "其他提议"
+    "otherProposals": "其他提议",
+    "clearBrush": "清除",
+    "dragToClear": "拖动以清除分配",
+    "dragToAssign": "拖动以分配\"{section}\""
   },
 
   "photographerTimes": {

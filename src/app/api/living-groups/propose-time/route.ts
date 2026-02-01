@@ -53,6 +53,7 @@ export async function GET() {
         declined_by,
         declined_at,
         decline_reason,
+        living_group:living_groups(id, name),
         accepter:users!time_proposals_accepted_by_fkey(id, email, name)
       `
       )

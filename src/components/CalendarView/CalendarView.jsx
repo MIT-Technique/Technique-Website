@@ -43,6 +43,7 @@ export default function CalendarView({
   onPropose,
   frozen = false,
   loading = false,
+  timeAssignments = {},
 }) {
   const locale = useLocale();
   const t = useTranslations('calendarView');
@@ -241,6 +242,7 @@ export default function CalendarView({
             frozen={frozen}
             loading={loading}
             formatTime={formatTime}
+            timeAssignments={timeAssignments}
             onBook={onBook}
             onDelete={onDelete}
             onCancelBooking={onCancelBooking}
@@ -263,6 +265,7 @@ export default function CalendarView({
             frozen={frozen}
             loading={loading}
             formatTime={formatTime}
+            timeAssignments={timeAssignments}
             onBook={onBook}
             onCreate={onCreate}
             onDelete={onDelete}

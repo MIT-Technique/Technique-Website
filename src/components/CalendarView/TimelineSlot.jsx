@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
+import { generateTimeSlots, formatTimeDisplay } from '../../lib/utils/time';
+import { SECTION_COLORS } from './SectionAssignmentTimeline';
 
 const HOUR_START = 0;
 
@@ -37,10 +39,12 @@ export default function TimelineSlot({
   onAcceptProposal,
   onDeclineProposal,
   onCancelBooking,
+  sectionAssignments,
 }) {
   const t = useTranslations('calendarView');
   const [processing, setProcessing] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [confirmCancel, setConfirmCancel] = useState(false);
 
   const isAdmin = role === 'admin';
   const isAdminOrPhotographer = role === 'admin' || role === 'photographer';
@@ -54,14 +58,23 @@ export default function TimelineSlot({
   function getCreatorLabel() {
     const creator = slot?.creator || slot?.created_by_user;
     if (!creator) return t('unknown');
-    if (creator.role === 'admin') return 'TNQ Photo';
     return creator.name || creator.email || t('unknown');
   }
 
-  function getBookerLabel() {
-    const booker = slot?.booked_by_user || slot?.created_by_user || slot?.creator;
-    if (!booker) return t('unknown');
-    return booker.email || t('unknown');
+  function getCreatorEmail() {
+    const creator = slot?.creator || slot?.created_by_user;
+    return creator?.email || null;
+  }
+
+  function getLg() {
+    const lg = slot?.living_group;
+    return Array.isArray(lg) ? lg[0] : lg;
+  }
+
+  function getLivingGroupEmail() {
+    const lg = getLg();
+    const user = Array.isArray(lg?.user) ? lg.user[0] : lg?.user;
+    return user?.email || null;
   }
 
   async function handleAction(fn, ...args) {
@@ -98,8 +111,8 @@ export default function TimelineSlot({
         <span className="font-medium">
           {formatTime(slot.start_time)}
         </span>
-        {slot.living_group?.name && (
-          <span className="block truncate opacity-75">{slot.living_group.name}</span>
+        {getLg()?.name && (
+          <span className="block truncate opacity-75">{getLg().name}</span>
         )}
       </div>
     );
@@ -130,11 +143,19 @@ export default function TimelineSlot({
           )}
           {type === 'booked' && isLivingGroup && !frozen && (
             <button
-              onClick={() => handleAction(onCancelBooking, slot.id)}
+              onClick={() => {
+                if (!confirmCancel) {
+                  setConfirmCancel(true);
+                  setTimeout(() => setConfirmCancel(false), 3000);
+                  return;
+                }
+                setConfirmCancel(false);
+                handleAction(onCancelBooking, slot.id);
+              }}
               disabled={processing}
-              className="text-xs text-red-600 hover:text-red-700"
+              className={`text-xs ${confirmCancel ? 'text-red-700 font-medium' : 'text-red-600 hover:text-red-700'}`}
             >
-              {processing ? '...' : t('cancel')}
+              {processing ? '...' : confirmCancel ? t('confirmAction') : t('cancel')}
             </button>
           )}
           {type === 'available' && isAdminOrPhotographer && (isAdmin || slot.created_by === currentUserId) && (
@@ -177,14 +198,71 @@ export default function TimelineSlot({
       </div>
       <p className="text-xs opacity-75 mt-0.5 leading-snug truncate">
         {type === 'proposal'
-          ? <span className="font-medium">{slot.living_group?.name || t('unknown')}</span>
+          ? <>{t('proposedBy')}{' '}{isAdminOrPhotographer && getLivingGroupEmail() ? <a href={`mailto:${getLivingGroupEmail()}`} className="font-medium hover:underline">{getLg()?.name || t('unknown')}</a> : <span className="font-medium">{getLg()?.name || t('unknown')}</span>}</>
           : type === 'booked'
-            ? <><span className="font-medium">{slot.living_group?.name || t('booked')}</span>{' · '}{t('bookedBy', { name: getBookerLabel() })}</>
-            : <>{t('postedBy')} {getCreatorLabel()}</>
+            ? <>{t('postedBy')}{' '}{isLivingGroup && getCreatorEmail() ? <a href={`mailto:${getCreatorEmail()}`} className="font-medium hover:underline">{getCreatorLabel()}</a> : <span className="font-medium">{getCreatorLabel()}</span>}{' · '}{t('bookedBy')}{' '}{isAdminOrPhotographer && getLivingGroupEmail() ? <a href={`mailto:${getLivingGroupEmail()}`} className="font-medium text-green-700 hover:underline">{getLg()?.name || t('booked')}</a> : <span className="font-medium text-green-700">{getLg()?.name || t('booked')}</span>}</>
+            : <>{t('postedBy')}{' '}{isLivingGroup && getCreatorEmail() ? <a href={`mailto:${getCreatorEmail()}`} className="font-medium hover:underline">{getCreatorLabel()}</a> : getCreatorLabel()}</>
         }
         {slot.location && <>{' · '}{slot.location}</>}
         {slot.notes && <>{' · '}<span className="italic">{slot.notes}</span></>}
       </p>
+      {/* Section assignments for admin/staph on booked slots */}
+      {type === 'booked' && isAdminOrPhotographer && sectionAssignments && Object.keys(sectionAssignments).length > 0 && (
+        <SectionRows assignments={sectionAssignments} startTime={slot.start_time} endTime={slot.end_time} />
+      )}
+    </div>
+  );
+}
+
+// Compact section assignment rows for admin view
+function SectionRows({ assignments, startTime, endTime }) {
+  const slots = useMemo(() => generateTimeSlots(startTime, endTime), [startTime, endTime]);
+
+  // Group consecutive slots with the same section
+  const groups = useMemo(() => {
+    const result = [];
+    let current = null;
+    for (const slot of slots) {
+      const key = `${slot.start}-${slot.end}`;
+      const section = assignments[key] || null;
+      if (current && current.section === section) {
+        current.end = slot.end;
+      } else {
+        if (current) result.push(current);
+        current = { section, start: slot.start, end: slot.end };
+      }
+    }
+    if (current) result.push(current);
+    return result;
+  }, [slots, assignments]);
+
+  // All unique sections for consistent coloring
+  const allSections = useMemo(() => {
+    const s = new Set();
+    Object.values(assignments).forEach(v => { if (v) s.add(v); });
+    return [...s].sort();
+  }, [assignments]);
+
+  return (
+    <div className="mt-1.5 pt-1.5 border-t border-green-200/60 space-y-0">
+      {groups.map((g, i) => {
+        const sectionIdx = g.section ? allSections.indexOf(g.section) : -1;
+        const color = sectionIdx >= 0 ? SECTION_COLORS[sectionIdx % SECTION_COLORS.length] : null;
+        return (
+          <div key={i} className="flex items-center gap-1.5 text-[10px] leading-tight">
+            <span className="text-green-700/60 font-mono flex-shrink-0 whitespace-nowrap">
+              {formatTimeDisplay(g.start)}–{formatTimeDisplay(g.end)}
+            </span>
+            {g.section ? (
+              <span className={`${color?.text || 'text-green-800'} font-medium truncate`}>
+                {g.section}
+              </span>
+            ) : (
+              <span className="text-green-700/40 italic">—</span>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

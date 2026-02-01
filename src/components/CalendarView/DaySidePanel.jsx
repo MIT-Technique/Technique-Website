@@ -106,17 +106,26 @@ export default function DaySidePanel({
     }
   }
 
+  function getLg(item) {
+    const lg = item?.living_group;
+    return Array.isArray(lg) ? lg[0] : lg;
+  }
+
   function getCreatorLabel(time) {
     const creator = time?.creator || time?.created_by_user;
     if (!creator) return t('unknown');
-    if (creator.role === 'admin') return 'TNQ Photo';
     return creator.name || creator.email || t('unknown');
   }
 
-  function getBookerLabel(time) {
-    const booker = time?.booked_by_user || time?.created_by_user || time?.creator;
-    if (!booker) return t('unknown');
-    return booker.email || t('unknown');
+  function getCreatorEmail(time) {
+    const creator = time?.creator || time?.created_by_user;
+    return creator?.email || null;
+  }
+
+  function getLivingGroupEmail(item) {
+    const lg = getLg(item);
+    const user = Array.isArray(lg?.user) ? lg.user[0] : lg?.user;
+    return user?.email || null;
   }
 
   async function handleCreate(formData) {
@@ -220,8 +229,18 @@ export default function DaySidePanel({
                     </div>
                   </div>
                   <p className="text-xs text-text-muted mt-0.5 leading-snug">
-                    <span className="text-green-700 font-medium">{time.living_group?.name || t('booked')}</span>
-                    {' · '}{t('bookedBy', { name: getBookerLabel(time) })}
+                    {t('postedBy')}{' '}
+                    {isLivingGroup && getCreatorEmail(time) ? (
+                      <a href={`mailto:${getCreatorEmail(time)}`} className="text-accent hover:underline font-medium">{getCreatorLabel(time)}</a>
+                    ) : (
+                      <span className="font-medium">{getCreatorLabel(time)}</span>
+                    )}
+                    {' · '}{t('bookedBy')}{' '}
+                    {isAdminOrPhotographer && getLivingGroupEmail(time) ? (
+                      <a href={`mailto:${getLivingGroupEmail(time)}`} className="text-green-700 hover:underline font-medium">{getLg(time)?.name || t('booked')}</a>
+                    ) : (
+                      <span className="text-green-700 font-medium">{getLg(time)?.name || t('booked')}</span>
+                    )}
                     {time.location && <>{' · '}{time.location}</>}
                     {time.notes && <>{' · '}<span className="italic">{time.notes}</span></>}
                   </p>
@@ -273,7 +292,12 @@ export default function DaySidePanel({
                     </div>
                   </div>
                   <p className="text-xs text-text-muted mt-0.5 leading-snug">
-                    {t('postedBy')} {getCreatorLabel(time)}
+                    {t('postedBy')}{' '}
+                    {isLivingGroup && getCreatorEmail(time) ? (
+                      <a href={`mailto:${getCreatorEmail(time)}`} className="text-accent hover:underline font-medium">{getCreatorLabel(time)}</a>
+                    ) : (
+                      <span className="font-medium">{getCreatorLabel(time)}</span>
+                    )}
                     {time.location && <>{' · '}{time.location}</>}
                     {time.notes && <>{' · '}<span className="italic">{time.notes}</span></>}
                   </p>
@@ -343,7 +367,12 @@ export default function DaySidePanel({
                     </div>
                   </div>
                   <p className="text-xs text-text-muted mt-0.5 leading-snug">
-                    <span className={`${proposalNameColor} font-medium`}>{proposal.living_group?.name || t('unknown')}</span>
+                    {t('proposedBy')}{' '}
+                    {isAdminOrPhotographer && getLivingGroupEmail(proposal) ? (
+                      <a href={`mailto:${getLivingGroupEmail(proposal)}`} className={`${proposalNameColor} hover:underline font-medium`}>{getLg(proposal)?.name || t('unknown')}</a>
+                    ) : (
+                      <span className={`${proposalNameColor} font-medium`}>{getLg(proposal)?.name || t('unknown')}</span>
+                    )}
                     {proposal.location && <>{' · '}{proposal.location}</>}
                     {proposal.notes && <>{' · '}<span className="italic">{proposal.notes}</span></>}
                   </p>

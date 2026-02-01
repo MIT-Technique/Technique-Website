@@ -6,8 +6,9 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useUser } from '../../../hooks/useUser';
 import Footer from '../../../components/Footer/Footer';
 import ImageUpload from '../../../components/ImageUpload/ImageUpload';
-import { generateTimeSlots, formatTimeDisplay as formatTimeUtil } from '../../../lib/utils/time';
+import { generateTimeSlots } from '../../../lib/utils/time';
 import CalendarView from '../../../components/CalendarView/CalendarView';
+import SectionAssignmentTimeline from '../../../components/CalendarView/SectionAssignmentTimeline';
 
 // Format 24-hour time to 12-hour AM/PM (e.g., "14:30:00" -> "2:30 PM")
 function formatTime(time) {
@@ -107,6 +108,7 @@ export default function LivingGroupPage() {
   // Time proposal state
   const [proposals, setProposals] = useState([]);
   const [cancellingProposalId, setCancellingProposalId] = useState(null);
+  const [confirmCancelProposalId, setConfirmCancelProposalId] = useState(null);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(0);
@@ -525,7 +527,7 @@ export default function LivingGroupPage() {
         if (!assignmentsMap[a.photoshootTimeId]) {
           assignmentsMap[a.photoshootTimeId] = {};
         }
-        const slotKey = `${a.slotStart}-${a.slotEnd}`;
+        const slotKey = `${a.slotStart.slice(0, 5)}-${a.slotEnd.slice(0, 5)}`;
         assignmentsMap[a.photoshootTimeId][slotKey] = a.sectionName || '';
       });
       setTimeAssignments(assignmentsMap);
@@ -1099,11 +1101,11 @@ export default function LivingGroupPage() {
                   )}
 
                   {/* Your Proposals */}
-                  {proposals.filter(p => !hiddenProposals.has(p.id)).length > 0 && (
+                  {proposals.filter(p => !hiddenProposals.has(p.id) && !(p.status === 'cancelled' && !p.accepted_by)).length > 0 && (
                     <div className="mt-6 pt-4 border-t border-border">
                       <h4 className="text-xs font-medium text-text-muted uppercase mb-2">{t('proposeTime.yourProposals')}</h4>
                       <div className="space-y-2">
-                        {proposals.filter(p => !hiddenProposals.has(p.id)).map((proposal) => (
+                        {proposals.filter(p => !hiddenProposals.has(p.id) && !(p.status === 'cancelled' && !p.accepted_by)).map((proposal) => (
                           <div
                             key={proposal.id}
                             className={`px-3 py-2 border rounded-lg text-sm ${
@@ -1162,11 +1164,19 @@ export default function LivingGroupPage() {
                               </div>
                               {(proposal.status === 'pending' || proposal.status === 'accepted') && !isFrozen && (
                                 <button
-                                  onClick={() => handleCancelProposal(proposal.id)}
+                                  onClick={() => {
+                                    if (confirmCancelProposalId !== proposal.id) {
+                                      setConfirmCancelProposalId(proposal.id);
+                                      setTimeout(() => setConfirmCancelProposalId((prev) => prev === proposal.id ? null : prev), 3000);
+                                      return;
+                                    }
+                                    setConfirmCancelProposalId(null);
+                                    handleCancelProposal(proposal.id);
+                                  }}
                                   disabled={cancellingProposalId === proposal.id}
-                                  className="text-xs text-red-600 hover:text-red-700 flex-shrink-0 ml-2"
+                                  className={`text-xs flex-shrink-0 ml-2 ${confirmCancelProposalId === proposal.id ? 'text-red-700 font-medium' : 'text-red-600 hover:text-red-700'}`}
                                 >
-                                  {cancellingProposalId === proposal.id ? '...' : t('proposeTime.cancel')}
+                                  {cancellingProposalId === proposal.id ? '...' : confirmCancelProposalId === proposal.id ? t('proposeTime.confirmCancel') : t('proposeTime.cancel')}
                                 </button>
                               )}
                             </div>
@@ -1193,21 +1203,36 @@ export default function LivingGroupPage() {
 
                   {/* Unassigned sections warning */}
                   {(() => {
+                    if (sections.length === 0) return null;
+
                     const allAssignedSections = new Set();
+                    let totalSlots = 0;
+                    let assignedSlots = 0;
                     bookedTimes.forEach(bt => {
                       const assignments = timeAssignments[bt.id] || {};
-                      Object.values(assignments).forEach(sectionName => {
-                        if (sectionName) allAssignedSections.add(sectionName);
+                      const slots = generateTimeSlots(bt.start_time, bt.end_time);
+                      totalSlots += slots.length;
+                      slots.forEach(slot => {
+                        const key = `${slot.start}-${slot.end}`;
+                        if (assignments[key]) {
+                          assignedSlots++;
+                          allAssignedSections.add(assignments[key]);
+                        }
                       });
                     });
                     const unassigned = sections.filter(s => !allAssignedSections.has(s));
 
-                    if (unassigned.length > 0) {
+                    if (unassigned.length > 0 || assignedSlots < totalSlots) {
                       return (
                         <div className="mb-6 p-3 bg-yellow-50 border border-yellow-200 rounded">
                           <p className="text-sm text-yellow-800">
-                            <span className="font-medium">{t('assign.timeSlots.unassignedSections')}:</span>{' '}
-                            {unassigned.join(', ')}
+                            {unassigned.length > 0 && (
+                              <><span className="font-medium">{t('assign.timeSlots.unassignedSections')}:</span>{' '}{unassigned.join(', ')}</>
+                            )}
+                            {unassigned.length > 0 && assignedSlots < totalSlots && <br />}
+                            {assignedSlots < totalSlots && (
+                              <span>{assignedSlots}/{totalSlots} slots assigned</span>
+                            )}
                           </p>
                         </div>
                       );
@@ -1219,7 +1244,7 @@ export default function LivingGroupPage() {
                     );
                   })()}
 
-                  {/* Assignment grid for each booked time */}
+                  {/* Assignment timeline for each booked time */}
                   <div className="space-y-4">
                     {bookedTimes.map((bookedTime) => (
                       <div key={bookedTime.id} className="bg-white border border-border rounded-lg p-6">
@@ -1238,7 +1263,6 @@ export default function LivingGroupPage() {
                               {formatTime(bookedTime.start_time)} - {formatTime(bookedTime.end_time)} EST
                             </p>
                           </div>
-                          {/* Assignment saved message - right of date */}
                           <FadeMessage
                             message={sectionsMessage}
                             onClear={setSectionsMessage}
@@ -1246,51 +1270,17 @@ export default function LivingGroupPage() {
                           />
                         </div>
 
-                        {/* Slot grid */}
                         {assignmentsLoading ? (
                           <p className="text-text-muted text-sm">Loading...</p>
                         ) : (
-                          <div className="space-y-2">
-                            {/* Header row */}
-                            <div className="grid grid-cols-[120px_1fr] gap-2 text-xs font-medium text-text-muted uppercase mb-2">
-                              <span>{t('assign.timeSlots.slot')}</span>
-                              <span>{t('assign.timeSlots.section')}</span>
-                            </div>
-
-                            {/* Slot rows */}
-                            {generateTimeSlots(bookedTime.start_time, bookedTime.end_time).map((slot) => {
-                              const slotKey = `${slot.start}-${slot.end}`;
-                              const currentAssignment = timeAssignments[bookedTime.id]?.[slotKey] || '';
-                              const isSaving = savingSlot === `${bookedTime.id}-${slotKey}`;
-
-                              return (
-                                <div key={slotKey} className="grid grid-cols-[120px_1fr] gap-2 items-center">
-                                  <span className="text-sm font-medium">
-                                    {formatTimeUtil(slot.start)} - {formatTimeUtil(slot.end)}
-                                  </span>
-                                  <div className="flex items-center gap-2">
-                                    <select
-                                      value={currentAssignment}
-                                      onChange={(e) => handleAssignSection(
-                                        bookedTime.id,
-                                        slot.start,
-                                        slot.end,
-                                        e.target.value
-                                      )}
-                                      disabled={isSaving}
-                                      className="flex-1 px-3 py-1.5 border border-border rounded text-sm disabled:opacity-50"
-                                    >
-                                      <option value="">{t('assign.timeSlots.notAssigned')}</option>
-                                      {sections.map((section) => (
-                                        <option key={section} value={section}>{section}</option>
-                                      ))}
-                                    </select>
-                                    {isSaving && <span className="text-xs text-text-muted">{t('assign.timeSlots.saving')}</span>}
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
+                          <SectionAssignmentTimeline
+                            bookedTime={bookedTime}
+                            sections={sections}
+                            assignments={timeAssignments[bookedTime.id] || {}}
+                            onAssign={handleAssignSection}
+                            formatTime={formatTime}
+                            saving={!!savingSlot}
+                          />
                         )}
                       </div>
                     ))}
