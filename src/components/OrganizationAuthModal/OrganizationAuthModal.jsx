@@ -212,6 +212,7 @@ export default function OrganizationAuthModal({ open, onClose }) {
         password,
         orgType: orgToUse?.type || "club", // Default to club, API will handle validation
         name: inputValue.trim(),
+        locale,
       };
 
       const res = await fetch("/api/auth/org-signin", {
@@ -236,9 +237,7 @@ export default function OrganizationAuthModal({ open, onClose }) {
       }
 
       setSuccess(t("successRedirecting"));
-      if (data.redirectUrl) {
-        window.location.href = data.redirectUrl;
-      }
+      window.location.href = data.redirectUrl || `/${locale}/`;
     } catch (err) {
       setError(t("invalidCredentials"));
     } finally {
