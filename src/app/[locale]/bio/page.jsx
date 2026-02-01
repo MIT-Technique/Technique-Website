@@ -525,7 +525,7 @@ export default function BioPage() {
                 />
 
                 <TextField
-                  label="Achievements"
+                  label="Extracurriculars"
                   variant="outlined"
                   InputLabelProps={{ shrink: true }}
                   value={extracurriculars}
@@ -536,7 +536,7 @@ export default function BioPage() {
                   maxRows={8}
                   sx={textFieldSx}
                   fullWidth
-                  placeholder="Achievements you would like to highlight"
+                  placeholder="Extracurriculars you would like to highlight"
                 />
 
                 <Button
