@@ -120,7 +120,7 @@ export default function BioPage() {
         // Ignore fetch errors
       }
     },
-    [firstName, lastName, major, secondMajor],
+    [email],
   );
 
   function handleClose() {

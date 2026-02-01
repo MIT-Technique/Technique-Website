@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createAdminClient } from "../../../lib/supabase/admin";
+import { createAdminClientForSeniors } from "../../../lib/supabase/admin";
 
 // GET - Fetch senior bio by email
 export async function GET(request: NextRequest): Promise<NextResponse> {
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       }, { status: 200 });
     }
 
-    const supabase = createAdminClient();
+    const supabase = createAdminClientForSeniors();
 
     const { data: bio } = await supabase
       .from('senior_bios')
@@ -87,7 +87,7 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    const supabase = createAdminClient();
+    const supabase = createAdminClientForSeniors();
 
     // Upsert senior bio by email
     const { error: bioError } = await supabase
