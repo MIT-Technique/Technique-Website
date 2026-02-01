@@ -33,10 +33,12 @@ function groupLogsByBucket(logs) {
 
 export default function LogsPage() {
   const t = useTranslations('dashboard.users');
-  const [logs, setLogs] = useState([]);
+  const [allLogs, setAllLogs] = useState([]);
+  const [visibleCount, setVisibleCount] = useState(20);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     fetchLogs();
@@ -47,8 +49,9 @@ export default function LogsPage() {
       setLoading(true);
       const res = await fetch(`/api/admin/logs?page=${page}&limit=50&days=90`);
       const data = await res.json();
-      setLogs(data.logs || []);
+      setAllLogs(data.logs || []);
       setTotalPages(data.totalPages || 0);
+      setVisibleCount(20);
     } catch (error) {
       console.error('Error fetching logs:', error);
     } finally {
@@ -97,14 +100,52 @@ export default function LogsPage() {
     }
   }
 
-  const grouped = groupLogsByBucket(logs);
+  const filteredLogs = search.trim()
+    ? allLogs.filter((log) => formatLogAction(log).toLowerCase().includes(search.toLowerCase()))
+    : allLogs;
+
+  const truncatedLogs = filteredLogs.slice(0, visibleCount);
+  const hasMore = visibleCount < filteredLogs.length;
+  const grouped = groupLogsByBucket(truncatedLogs);
 
   return (
     <div>
+      {/* Search bar with pagination arrows */}
+      <div className="flex items-center gap-3 mb-4">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => { setSearch(e.target.value); setVisibleCount(20); }}
+          placeholder="Search logs..."
+          className="flex-1 border border-border rounded px-3 py-1.5 text-sm"
+        />
+        {totalPages > 1 && (
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <button
+              onClick={() => setPage(p => Math.max(0, p - 1))}
+              disabled={page === 0}
+              className="px-2 py-1 text-sm border border-border rounded disabled:opacity-30 hover:bg-bg-secondary"
+            >
+              ←
+            </button>
+            <span className="text-sm text-text-muted">
+              {page + 1} / {totalPages}
+            </span>
+            <button
+              onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+              disabled={page >= totalPages - 1}
+              className="px-2 py-1 text-sm border border-border rounded disabled:opacity-30 hover:bg-bg-secondary"
+            >
+              →
+            </button>
+          </div>
+        )}
+      </div>
+
       {loading ? (
         <p className="text-text-secondary">Loading...</p>
-      ) : logs.length === 0 ? (
-        <p className="text-text-secondary">{t('logs.noLogs')}</p>
+      ) : filteredLogs.length === 0 ? (
+        <p className="text-text-secondary">{search ? 'No matching logs' : t('logs.noLogs')}</p>
       ) : (
         <div>
           {grouped.map((group) => (
@@ -130,24 +171,13 @@ export default function LogsPage() {
             </div>
           ))}
 
-          {totalPages > 1 && (
-            <div className="flex justify-center items-center gap-4 mt-4">
+          {hasMore && (
+            <div className="flex justify-center mt-4">
               <button
-                onClick={() => setPage(p => Math.max(0, p - 1))}
-                disabled={page === 0}
-                className="px-2 py-1 text-sm border border-border rounded disabled:opacity-30 hover:bg-bg-secondary"
+                onClick={() => setVisibleCount(c => c + 20)}
+                className="px-4 py-2 text-sm border border-border rounded hover:bg-bg-secondary text-text-secondary"
               >
-                ←
-              </button>
-              <span className="text-sm text-text-muted">
-                {page + 1} / {totalPages}
-              </span>
-              <button
-                onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
-                disabled={page >= totalPages - 1}
-                className="px-2 py-1 text-sm border border-border rounded disabled:opacity-30 hover:bg-bg-secondary"
-              >
-                →
+                Load more
               </button>
             </div>
           )}

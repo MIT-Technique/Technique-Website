@@ -41,6 +41,17 @@ module.exports = {
         18: "4.5rem",
         22: "5.5rem",
       },
+      keyframes: {
+        'fade-in-out': {
+          '0%': { opacity: '0', transform: 'scale(0.95)' },
+          '10%': { opacity: '1', transform: 'scale(1)' },
+          '80%': { opacity: '1', transform: 'scale(1)' },
+          '100%': { opacity: '0', transform: 'scale(0.95)' },
+        },
+      },
+      animation: {
+        'fade-in-out': 'fade-in-out 2s ease-in-out forwards',
+      },
     },
   },
   plugins: [],

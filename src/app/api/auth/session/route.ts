@@ -1,30 +1,19 @@
 import { NextResponse } from "next/server";
-import { getSession as getNewSession } from "../../../../lib/auth/session";
-import { getSession as getOriginalSession } from "../../../../lib/lib";
+import { getSession } from "../../../../lib/auth/session";
 import { createAdminClient } from "../../../../lib/supabase/admin";
 
 export async function GET() {
   try {
-    // Check new session first (for admin magic link, club signup)
-    const newSession = await getNewSession();
+    const session = await getSession();
 
-    // Check original MIT SSO session
-    const originalSession = await getOriginalSession();
-
-    // Determine which session is active
-    const isNewSessionActive = newSession.isLoggedIn && newSession.userInfo?.email;
-    const isOriginalSessionActive = originalSession.isLoggedIn && originalSession.userInfo?.email;
-
-    if (!isNewSessionActive && !isOriginalSessionActive) {
+    if (!session.isLoggedIn || !session.userInfo?.email) {
       return NextResponse.json({
         isLoggedIn: false,
         user: null,
       });
     }
 
-    // Use whichever session is active (prefer new session if both)
-    const activeSession = isNewSessionActive ? newSession : originalSession;
-    const userEmail = activeSession.userInfo!.email;
+    const userEmail = session.userInfo.email;
 
     // Get full user data from Supabase
     const supabase = createAdminClient();
@@ -38,7 +27,7 @@ export async function GET() {
       return NextResponse.json({
         isLoggedIn: true,
         user: null,
-        userInfo: activeSession.userInfo,
+        userInfo: session.userInfo,
       });
     }
 

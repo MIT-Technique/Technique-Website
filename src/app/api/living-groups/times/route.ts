@@ -39,6 +39,9 @@ export async function GET(request: NextRequest) {
         start_time,
         end_time,
         notes,
+        location,
+        proposed_locations,
+        booking_status,
         created_by,
         creator:users!photoshoot_times_created_by_fkey(id, email, name, role)
       `)
@@ -63,7 +66,8 @@ export async function GET(request: NextRequest) {
         .from('photoshoot_times')
         .select(`
           *,
-          creator:users!photoshoot_times_created_by_fkey(id, email, name, role)
+          creator:users!photoshoot_times_created_by_fkey(id, email, name, role),
+          booked_by_user:users!photoshoot_times_booked_by_fkey(email, name, role)
         `)
         .eq('living_group_id', livingGroup.id)
         .is('cancelled_at', null)

@@ -20,7 +20,7 @@ export async function GET() {
 
     const { data: members } = await supabase
       .from('sports_manual_members')
-      .select('sports_id, name, team')
+      .select('sports_id, name, role, team')
       .in('sports_id', sportIds)
       .order('name', { ascending: true });
 
@@ -31,13 +31,16 @@ export async function GET() {
     (sports || []).forEach(sport => {
       const sportMembers = (members || []).filter(m => m.sports_id === sport.id);
 
+      const formatMember = (m: { name: string; role?: string | null }) =>
+        m.role ? `${m.name} (${m.role})` : m.name;
+
       if (sport.has_gender_teams) {
-        const mensMembers = sportMembers.filter(m => m.team === 'mens').map(m => m.name);
-        const womensMembers = sportMembers.filter(m => m.team === 'womens').map(m => m.name);
+        const mensMembers = sportMembers.filter(m => m.team === 'mens').map(formatMember);
+        const womensMembers = sportMembers.filter(m => m.team === 'womens').map(formatMember);
         columns.push({ header: `${sport.name} (Men's)`, members: mensMembers });
         columns.push({ header: `${sport.name} (Women's)`, members: womensMembers });
       } else {
-        const allMembers = sportMembers.map(m => m.name);
+        const allMembers = sportMembers.map(formatMember);
         columns.push({ header: sport.name, members: allMembers });
       }
     });

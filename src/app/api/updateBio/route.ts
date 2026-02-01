@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "../../../lib/db";
-import { getSession, getCryptr } from "../../../lib/lib";
+import { getSession } from "../../../lib/auth/session";
+import { getCryptr } from "../../../lib/lib";
 import { studentSchema } from "../../../lib/studentSchema";
 import z from "zod/v4";
 

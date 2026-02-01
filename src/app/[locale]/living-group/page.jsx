@@ -1,90 +1,23 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { useUser } from '../../../hooks/useUser';
 import Footer from '../../../components/Footer/Footer';
 import ImageUpload from '../../../components/ImageUpload/ImageUpload';
-import TextField from "@mui/material/TextField";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import { generateTimeSlots, formatTimeDisplay as formatTimeUtil } from '../../../lib/utils/time';
+import { generateTimeSlots } from '../../../lib/utils/time';
+import CalendarView from '../../../components/CalendarView/CalendarView';
+import SectionAssignmentTimeline from '../../../components/CalendarView/SectionAssignmentTimeline';
 
-// Generate 15-minute time slot options (06:00 to 23:45)
-function generateTimeOptions() {
-  const options = [];
-  for (let h = 6; h <= 23; h++) {
-    for (let m = 0; m < 60; m += 15) {
-      const time = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-      options.push(time);
-    }
-  }
-  return options;
-}
-
-// Format time for display (14:30 -> 2:30 PM)
-function formatTimeDisplay(time) {
-  if (!time) return '';
-  const [hours, minutes] = time.split(':').map(Number);
-  const ampm = hours >= 12 ? 'PM' : 'AM';
-  const displayHours = hours % 12 || 12;
-  return `${displayHours}:${String(minutes).padStart(2, '0')} ${ampm}`;
-}
-
-const TIME_OPTIONS = generateTimeOptions();
-
-// Get the next 15-minute time slot from now
-function getDefaultStartTime() {
-  const now = new Date();
-  let hours = now.getHours();
-  let minutes = now.getMinutes();
-
-  // Round up to next 15-minute interval
-  minutes = Math.ceil(minutes / 15) * 15;
-  if (minutes >= 60) {
-    hours += 1;
-    minutes = 0;
-  }
-
-  // Ensure within TIME_OPTIONS range (06:00 - 23:45)
-  if (hours < 6) {
-    hours = 6;
-    minutes = 0;
-  } else if (hours >= 24) {
-    hours = 6;
-    minutes = 0;
-  }
-
-  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-}
-
-// Get end time 1 hour after start
-function getDefaultEndTime(startTime) {
-  if (!startTime) return '07:00';
-  const [h, m] = startTime.split(':').map(Number);
-  let endH = h + 1;
-  if (endH > 23) endH = 23;
-  return `${String(endH).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-}
-
-// Strip seconds from time string (HH:MM:SS -> HH:MM)
+// Format 24-hour time to 12-hour AM/PM (e.g., "14:30:00" -> "2:30 PM")
 function formatTime(time) {
   if (!time) return '';
-  return time.slice(0, 5);
+  const [hours, minutes] = time.slice(0, 5).split(':').map(Number);
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  const hour12 = hours % 12 || 12;
+  return `${hour12}:${String(minutes).padStart(2, '0')} ${ampm}`;
 }
-
-// MUI styling to match other forms
-const textFieldSx = {
-  "& .MuiOutlinedInput-root": {
-    "& fieldset": { borderColor: "#E5E5E5" },
-    "&:hover fieldset": { borderColor: "#D0D0D0" },
-    "&.Mui-focused fieldset": { borderColor: "#750014" },
-  },
-  "& .MuiInputLabel-root.Mui-focused": { color: "#750014" },
-};
 
 // Auto-dismissing message with fade-out
 function FadeMessage({ message, onClear, duration = 4000, className = 'mb-6 p-4 rounded' }) {
@@ -174,23 +107,23 @@ export default function LivingGroupPage() {
 
   // Time proposal state
   const [proposals, setProposals] = useState([]);
-  const [proposalsLoading, setProposalsLoading] = useState(true);
-  const [proposalForm, setProposalForm] = useState({
-    date: '',
-    start_time: '',
-    end_time: '',
-    location: '',
-    notes: '',
-  });
-  const [submittingProposal, setSubmittingProposal] = useState(false);
   const [cancellingProposalId, setCancellingProposalId] = useState(null);
+  const [confirmCancelProposalId, setConfirmCancelProposalId] = useState(null);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(0);
   const ITEMS_PER_PAGE = 8;
+  const [bookViewMode, setBookViewMode] = useState('calendar');
+  const tc = useTranslations('calendarView');
 
   // Expanded time slots (to show location/notes)
   const [expandedTimeIds, setExpandedTimeIds] = useState(new Set());
+  const [showListProposeForm, setShowListProposeForm] = useState(false);
+  const [proposing, setProposing] = useState(false);
+
+  // Booking location form state
+  const [bookingTimeId, setBookingTimeId] = useState(null);
+  const [proposedLocations, setProposedLocations] = useState(['']);
 
   // Toggle expansion for a time slot
   function toggleTimeExpanded(timeId) {
@@ -223,32 +156,31 @@ export default function LivingGroupPage() {
   const [fadingProposals, setFadingProposals] = useState(new Set());
   const [hiddenProposals, setHiddenProposals] = useState(new Set());
 
+  // Lazy-load data per tab
+  const fetchedTabs = useRef(new Set());
+
   useEffect(() => {
-    if (isLoggedIn && user?.role === 'living_group') {
+    if (!isLoggedIn || user?.role !== 'living_group') return;
+    if (fetchedTabs.current.has(activeTab)) return;
+    fetchedTabs.current.add(activeTab);
+
+    if (activeTab === 'book') {
       fetchTimes();
       checkFrozen();
-      fetchMembers();
       fetchProposals();
+    } else if (activeTab === 'assign') {
       fetchSections();
+      if (livingGroup?.id) fetchTimeAssignments(livingGroup.id);
+    } else if (activeTab === 'members') {
+      fetchMembers();
+      if (!fetchedTabs.current.has('assign')) fetchSections();
+    } else if (activeTab === 'documents') {
       fetchDocuments();
-      if (livingGroup?.id) {
-        fetchTimeAssignments(livingGroup.id);
-      }
+    } else if (activeTab === 'settings') {
+      if (livingGroup?.id) fetchLivingGroupEmail();
     }
-  }, [isLoggedIn, user, livingGroup]);
+  }, [activeTab, isLoggedIn, user, livingGroup]);
 
-  // Set default proposal form values on mount
-  useEffect(() => {
-    const today = new Date().toISOString().split('T')[0];
-    const defaultStart = getDefaultStartTime();
-    const defaultEnd = getDefaultEndTime(defaultStart);
-    setProposalForm(prev => ({
-      ...prev,
-      date: today,
-      start_time: defaultStart,
-      end_time: defaultEnd,
-    }));
-  }, []);
 
   async function fetchTimes() {
     try {
@@ -275,7 +207,7 @@ export default function LivingGroupPage() {
     }
   }
 
-  async function handleBook(timeId) {
+  async function handleBook(timeId, locations) {
     if (isFrozen) return;
 
     setBooking(true);
@@ -285,13 +217,15 @@ export default function LivingGroupPage() {
       const res = await fetch('/api/living-groups/book', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ timeId }),
+        body: JSON.stringify({ timeId, proposed_locations: locations }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
         setMessage({ type: 'success', text: t('bookSuccess') });
+        setBookingTimeId(null);
+        setProposedLocations(['']);
         fetchTimes();
         refetch();
       } else {
@@ -599,7 +533,7 @@ export default function LivingGroupPage() {
         if (!assignmentsMap[a.photoshootTimeId]) {
           assignmentsMap[a.photoshootTimeId] = {};
         }
-        const slotKey = `${a.slotStart}-${a.slotEnd}`;
+        const slotKey = `${a.slotStart.slice(0, 5)}-${a.slotEnd.slice(0, 5)}`;
         assignmentsMap[a.photoshootTimeId][slotKey] = a.sectionName || '';
       });
       setTimeAssignments(assignmentsMap);
@@ -698,7 +632,6 @@ export default function LivingGroupPage() {
 
   async function fetchProposals() {
     try {
-      setProposalsLoading(true);
       const res = await fetch('/api/living-groups/propose-time');
       const data = await res.json();
       if (res.ok) {
@@ -708,16 +641,8 @@ export default function LivingGroupPage() {
       }
     } catch (error) {
       console.error('Error fetching proposals:', error);
-    } finally {
-      setProposalsLoading(false);
     }
   }
-
-  useEffect(() => {
-    if (livingGroup?.id) {
-      fetchLivingGroupEmail();
-    }
-  }, [livingGroup?.id]);
 
   async function fetchLivingGroupEmail() {
     if (!livingGroup?.id) return;
@@ -760,64 +685,6 @@ export default function LivingGroupPage() {
     }
   }
 
-
-  async function handleSubmitProposal(e) {
-    e.preventDefault();
-    if (!proposalForm.date || !proposalForm.start_time || !proposalForm.end_time) {
-      setMessage({ type: 'error', text: t('proposeTime.fieldsRequired') });
-      return;
-    }
-
-    // Validate start time is before end time
-    const startMins = parseInt(proposalForm.start_time.split(':')[0]) * 60 + parseInt(proposalForm.start_time.split(':')[1]);
-    const endMins = parseInt(proposalForm.end_time.split(':')[0]) * 60 + parseInt(proposalForm.end_time.split(':')[1]);
-    if (startMins >= endMins) {
-      setMessage({ type: 'error', text: t('proposeTime.startBeforeEnd') });
-      return;
-    }
-
-    // Validate date is not in the past
-    const today = new Date().toISOString().split('T')[0];
-    if (proposalForm.date < today) {
-      setMessage({ type: 'error', text: t('proposeTime.noPastDates') });
-      return;
-    }
-
-    setSubmittingProposal(true);
-    setMessage({ type: '', text: '' });
-
-    try {
-      const res = await fetch('/api/living-groups/propose-time', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(proposalForm),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        setMessage({ type: 'success', text: t('proposeTime.submitSuccess') });
-        if (data.proposal) {
-          setProposals(prev => [data.proposal, ...prev]);
-        }
-        setProposalForm({
-          date: '',
-          start_time: '',
-          end_time: '',
-          location: '',
-          notes: '',
-        });
-        // Refresh booked times since proposal is now auto-confirmed
-        fetchTimes();
-      } else {
-        setMessage({ type: 'error', text: data.error || t('proposeTime.submitError') });
-      }
-    } catch (error) {
-      setMessage({ type: 'error', text: t('proposeTime.submitError') });
-    } finally {
-      setSubmittingProposal(false);
-    }
-  }
 
   async function handleCancelProposal(proposalId) {
     setCancellingProposalId(proposalId);
@@ -954,34 +821,53 @@ export default function LivingGroupPage() {
                 <div className="mb-8">
                   <h2 className="text-lg font-medium mb-4">{t('currentBooking')}</h2>
                   <div className="space-y-3">
-                    {bookedTimes.map((bookedTime) => (
-                      <div key={bookedTime.id} className="p-4 border rounded-lg border-green-200 bg-green-50">
-                        <div className="flex justify-between items-start gap-4 mb-2">
-                          <div>
-                            <p className="font-medium">
-                              {new Date(bookedTime.date).toLocaleDateString(locale, {
-                                weekday: 'long',
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric',
-                              })}
-                            </p>
-                            <p className="text-text-secondary">
-                              {formatTime(bookedTime.start_time)} - {formatTime(bookedTime.end_time)} EST
-                            </p>
+                    {bookedTimes.map((bookedTime) => {
+                      const isPending = bookedTime.booking_status === 'pending_location';
+                      const isConfirmed = bookedTime.booking_status === 'confirmed';
+                      return (
+                        <div key={bookedTime.id} className={`p-4 border rounded-lg ${isPending ? 'border-yellow-200 bg-yellow-50' : 'border-green-200 bg-green-50'}`}>
+                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-2">
+                            <div>
+                              <p className="font-medium">
+                                {new Date(bookedTime.date + 'T12:00:00').toLocaleDateString(locale, {
+                                  weekday: 'long',
+                                  year: 'numeric',
+                                  month: 'long',
+                                  day: 'numeric',
+                                })}
+                              </p>
+                              <p className="text-text-secondary">
+                                {formatTime(bookedTime.start_time)} - {formatTime(bookedTime.end_time)} EST
+                              </p>
+                              {isPending && (
+                                <p className="text-yellow-700 text-sm mt-1 font-medium">
+                                  {t('pendingLocation')}
+                                </p>
+                              )}
+                              {isPending && bookedTime.proposed_locations?.length > 0 && (
+                                <p className="text-text-muted text-xs mt-0.5">
+                                  {t('yourLocations')}: {bookedTime.proposed_locations.join(', ')}
+                                </p>
+                              )}
+                              {isConfirmed && bookedTime.location && (
+                                <p className="text-green-700 text-sm mt-1">
+                                  {t('confirmedLocation')}: {bookedTime.location}
+                                </p>
+                              )}
+                            </div>
+                            {!isDisabled && !isFrozen && (
+                              <button
+                                onClick={() => handleCancelRequest(bookedTime.id)}
+                                disabled={cancelling}
+                                className="px-4 py-2 text-sm text-red-600 border border-red-200 rounded hover:bg-red-50 whitespace-nowrap w-full sm:w-auto"
+                              >
+                                {cancelling ? t('cancelling') : t('cancelBooking')}
+                              </button>
+                            )}
                           </div>
-                          {!isDisabled && !isFrozen && (
-                            <button
-                              onClick={() => handleCancelRequest(bookedTime.id)}
-                              disabled={cancelling}
-                              className="px-4 py-2 text-sm text-red-600 border border-red-200 rounded hover:bg-red-50 whitespace-nowrap"
-                            >
-                              {cancelling ? t('cancelling') : t('cancelBooking')}
-                            </button>
-                          )}
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -991,196 +877,329 @@ export default function LivingGroupPage() {
                 <div className="bg-white border border-border rounded-lg p-6">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="font-medium">{t('availableTimes')}</h3>
-                    {availableTimes.length > ITEMS_PER_PAGE && (
-                      <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3">
+                      {/* View toggle */}
+                      <div className="flex rounded border border-border overflow-hidden">
                         <button
-                          onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
-                          disabled={currentPage === 0}
-                          className="p-1 text-text-secondary hover:text-text disabled:opacity-30 disabled:cursor-not-allowed"
-                          aria-label="Previous page"
+                          onClick={() => setBookViewMode('calendar')}
+                          className={`px-3 py-1 text-xs ${bookViewMode === 'calendar' ? 'bg-accent text-white' : 'bg-bg-secondary text-text-secondary hover:bg-bg-secondary/80'}`}
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                          </svg>
+                          {tc('calendar')}
                         </button>
-                        <span className="text-sm text-text-secondary">
-                          {currentPage + 1} / {Math.ceil(availableTimes.length / ITEMS_PER_PAGE)}
-                        </span>
                         <button
-                          onClick={() => setCurrentPage(p => Math.min(Math.ceil(availableTimes.length / ITEMS_PER_PAGE) - 1, p + 1))}
-                          disabled={currentPage >= Math.ceil(availableTimes.length / ITEMS_PER_PAGE) - 1}
-                          className="p-1 text-text-secondary hover:text-text disabled:opacity-30 disabled:cursor-not-allowed"
-                          aria-label="Next page"
+                          onClick={() => setBookViewMode('list')}
+                          className={`px-3 py-1 text-xs ${bookViewMode === 'list' ? 'bg-accent text-white' : 'bg-bg-secondary text-text-secondary hover:bg-bg-secondary/80'}`}
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
+                          {tc('list')}
                         </button>
                       </div>
-                    )}
-                  </div>
-                  {loading ? (
-                    <p className="text-text-secondary text-sm">Loading...</p>
-                  ) : availableTimes.length === 0 ? (
-                    <p className="text-text-secondary text-sm">{t('noTimes')}</p>
-                  ) : (
-                    <div className="space-y-2">
-                      {availableTimes.slice(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE).map((time) => {
-                        const hasDetails = time.location || time.notes;
-                        const isExpanded = expandedTimeIds.has(time.id);
-                        return (
-                          <div
-                            key={time.id}
-                            className={`px-3 py-2 border border-border rounded-lg ${hasDetails ? 'cursor-pointer' : ''}`}
-                            onClick={hasDetails ? () => toggleTimeExpanded(time.id) : undefined}
+                      {bookViewMode === 'list' && availableTimes.length > ITEMS_PER_PAGE && (
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
+                            disabled={currentPage === 0}
+                            className="p-1 text-text-secondary hover:text-text disabled:opacity-30 disabled:cursor-not-allowed"
+                            aria-label="Previous page"
                           >
-                            <div className="flex justify-between items-center">
-                              <div className="flex items-center gap-4 flex-1 min-w-0">
-                                <div className="flex items-center gap-2 flex-shrink-0">
-                                  {hasDetails && (
-                                    <svg
-                                      className={`w-4 h-4 text-text-muted transition-transform ${isExpanded ? 'rotate-90' : ''}`}
-                                      fill="none"
-                                      stroke="currentColor"
-                                      viewBox="0 0 24 24"
-                                    >
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                    </svg>
-                                  )}
-                                  <span className="font-medium text-sm">
-                                    {new Date(time.date).toLocaleDateString(locale, {
-                                      weekday: 'short',
-                                      month: 'short',
-                                      day: 'numeric',
-                                    })}
-                                  </span>
-                                  <span className="text-text-secondary text-sm">
-                                    {formatTime(time.start_time)} - {formatTime(time.end_time)} EST
-                                  </span>
-                                </div>
-                                <span className="text-text-muted text-xs">
-                                  {t('postedBy', { name: getCreatorLabel(time) })}
-                                </span>
-                              </div>
-                              <button
-                                onClick={(e) => { e.stopPropagation(); handleBook(time.id); }}
-                                disabled={booking || isFrozen}
-                                className="btn-primary text-sm flex-shrink-0"
-                              >
-                                {booking ? t('booking') : t('book')}
-                              </button>
-                            </div>
-                            {/* Expandable details */}
-                            {isExpanded && hasDetails && (
-                              <div className="mt-2 pt-2 border-t border-border/50 text-xs text-text-muted space-y-0.5">
-                                {time.location && <p><span className="font-medium">{t('locationLabel')}:</span> {time.location}</p>}
-                                {time.notes && <p><span className="font-medium">{t('notesLabel')}:</span> {time.notes}</p>}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                            </svg>
+                          </button>
+                          <span className="text-sm text-text-secondary">
+                            {currentPage + 1} / {Math.ceil(availableTimes.length / ITEMS_PER_PAGE)}
+                          </span>
+                          <button
+                            onClick={() => setCurrentPage(p => Math.min(Math.ceil(availableTimes.length / ITEMS_PER_PAGE) - 1, p + 1))}
+                            disabled={currentPage >= Math.ceil(availableTimes.length / ITEMS_PER_PAGE) - 1}
+                            className="p-1 text-text-secondary hover:text-text disabled:opacity-30 disabled:cursor-not-allowed"
+                            aria-label="Next page"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                          </button>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              )}
-
-              {/* Propose Time Section */}
-              {!isDisabled && (
-                <div className="mt-8">
-                  <div className="bg-white border border-border rounded-lg p-6">
-                    <h3 className="font-medium mb-2">{t('proposeTime.title')}</h3>
-                    <p className="text-text-secondary text-sm mb-2">{t('proposeTime.description')}</p>
-                    <p className="text-text-muted text-xs mb-4">{t('proposeTime.timezoneNote')}</p>
-
-                    <form onSubmit={handleSubmitProposal} className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <TextField
-                          type="date"
-                          label={t('proposeTime.date')}
-                          value={proposalForm.date}
-                          onChange={(e) => setProposalForm({ ...proposalForm, date: e.target.value })}
-                          InputLabelProps={{ shrink: true }}
-                          inputProps={{ min: new Date().toISOString().split('T')[0] }}
-                          required
-                          size="small"
-                          fullWidth
-                          sx={textFieldSx}
-                        />
-                        <FormControl size="small" fullWidth required sx={textFieldSx}>
-                          <InputLabel id="start-time-label">{t('proposeTime.startTime')}</InputLabel>
-                          <Select
-                            labelId="start-time-label"
-                            value={proposalForm.start_time}
-                            label={t('proposeTime.startTime')}
-                            onChange={(e) => setProposalForm({ ...proposalForm, start_time: e.target.value })}
-                          >
-                            {TIME_OPTIONS.map((time) => (
-                              <MenuItem key={time} value={time}>
-                                {formatTimeDisplay(time)}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                        <FormControl size="small" fullWidth required sx={textFieldSx}>
-                          <InputLabel id="end-time-label">{t('proposeTime.endTime')}</InputLabel>
-                          <Select
-                            labelId="end-time-label"
-                            value={proposalForm.end_time}
-                            label={t('proposeTime.endTime')}
-                            onChange={(e) => setProposalForm({ ...proposalForm, end_time: e.target.value })}
-                          >
-                            {TIME_OPTIONS.map((time) => (
-                              <MenuItem key={time} value={time}>
-                                {formatTimeDisplay(time)}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <TextField
-                          label={t('proposeTime.location')}
-                          value={proposalForm.location}
-                          onChange={(e) => setProposalForm({ ...proposalForm, location: e.target.value })}
-                          size="small"
-                          fullWidth
-                          sx={textFieldSx}
-                        />
-                        <TextField
-                          label={t('proposeTime.notes')}
-                          value={proposalForm.notes}
-                          onChange={(e) => setProposalForm({ ...proposalForm, notes: e.target.value })}
-                          size="small"
-                          fullWidth
-                          sx={textFieldSx}
-                        />
-                      </div>
-                      <button
-                        type="submit"
-                        disabled={submittingProposal || isFrozen}
-                        className="btn-primary text-sm"
-                      >
-                        {submittingProposal ? t('proposeTime.submitting') : t('proposeTime.submit')}
-                      </button>
-                    </form>
                   </div>
+                  {bookViewMode === 'calendar' ? (
+                    <CalendarView
+                      role="living_group"
+                      times={[...availableTimes, ...bookedTimes]}
+                      proposals={proposals}
+                      loading={loading}
+                      frozen={isFrozen}
+                      onBook={async (timeId, locations) => { await handleBook(timeId, locations); }}
+                      onCancelBooking={async (timeId) => { await handleCancelRequest(timeId); }}
+                      onPropose={async (proposalData) => {
+                        const res = await fetch('/api/living-groups/propose-time', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify(proposalData),
+                        });
+                        const data = await res.json();
+                        if (res.ok) {
+                          setMessage({ type: 'success', text: t('proposeTime.submitSuccess') });
+                          if (data.proposal) {
+                            setProposals(prev => [data.proposal, ...prev]);
+                          }
+                          fetchTimes();
+                        } else {
+                          throw new Error(data.error || t('proposeTime.submitError'));
+                        }
+                      }}
+                    />
+                  ) : (
+                    <>
+                      {loading ? (
+                        <p className="text-text-secondary text-sm">Loading...</p>
+                      ) : availableTimes.length === 0 ? (
+                        <p className="text-text-secondary text-sm">{t('noTimes')}</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {availableTimes.slice(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE).map((time) => {
+                            const hasDetails = time.notes;
+                            const isExpanded = expandedTimeIds.has(time.id);
+                            const isBookingThis = bookingTimeId === time.id;
+                            return (
+                              <div
+                                key={time.id}
+                                className={`px-3 py-2 border border-border rounded-lg ${hasDetails && !isBookingThis ? 'cursor-pointer' : ''}`}
+                                onClick={hasDetails && !isBookingThis ? () => toggleTimeExpanded(time.id) : undefined}
+                              >
+                                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 min-w-0">
+                                    <div className="flex items-center gap-2 flex-shrink-0">
+                                      {hasDetails && (
+                                        <svg
+                                          className={`w-4 h-4 text-text-muted transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                                          fill="none"
+                                          stroke="currentColor"
+                                          viewBox="0 0 24 24"
+                                        >
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                        </svg>
+                                      )}
+                                      <span className="font-medium text-sm">
+                                        {new Date(time.date + 'T12:00:00').toLocaleDateString(locale, {
+                                          weekday: 'short',
+                                          month: 'short',
+                                          day: 'numeric',
+                                        })}
+                                      </span>
+                                      <span className="text-text-secondary text-sm">
+                                        {formatTime(time.start_time)} - {formatTime(time.end_time)} EST
+                                      </span>
+                                    </div>
+                                    <span className="text-text-muted text-xs truncate">
+                                      {t('postedBy', { name: getCreatorLabel(time) })}
+                                    </span>
+                                  </div>
+                                  {!isBookingThis && (
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setBookingTimeId(time.id);
+                                        setProposedLocations(['']);
+                                      }}
+                                      disabled={booking || isFrozen}
+                                      className="btn-primary text-sm flex-shrink-0 w-full sm:w-auto"
+                                    >
+                                      {t('book')}
+                                    </button>
+                                  )}
+                                </div>
+                                {/* Booking location form */}
+                                {isBookingThis && (
+                                  <div className="mt-3 pt-3 border-t border-border/50" onClick={(e) => e.stopPropagation()}>
+                                    <p className="text-sm font-medium mb-2">{t('proposeLocations')}</p>
+                                    <p className="text-xs text-text-muted mb-2">{t('proposeLocationsHint')}</p>
+                                    <div className="space-y-2">
+                                      {proposedLocations.map((loc, i) => (
+                                        <div key={i} className="flex gap-2">
+                                          <input
+                                            type="text"
+                                            value={loc}
+                                            onChange={(e) => {
+                                              const updated = [...proposedLocations];
+                                              updated[i] = e.target.value;
+                                              setProposedLocations(updated);
+                                            }}
+                                            placeholder={t('locationPlaceholder')}
+                                            className="flex-1 border border-border rounded px-2 py-1.5 text-sm"
+                                            maxLength={200}
+                                          />
+                                          {proposedLocations.length > 1 && (
+                                            <button
+                                              type="button"
+                                              onClick={() => setProposedLocations(proposedLocations.filter((_, j) => j !== i))}
+                                              className="text-red-500 text-sm px-2 hover:text-red-700"
+                                            >
+                                              ×
+                                            </button>
+                                          )}
+                                        </div>
+                                      ))}
+                                      {proposedLocations.length < 5 && (
+                                        <button
+                                          type="button"
+                                          onClick={() => setProposedLocations([...proposedLocations, ''])}
+                                          className="text-xs text-accent hover:underline"
+                                        >
+                                          + {t('addLocation')}
+                                        </button>
+                                      )}
+                                    </div>
+                                    <div className="flex gap-2 mt-3">
+                                      <button
+                                        onClick={() => {
+                                          const cleaned = proposedLocations.map(l => l.trim()).filter(l => l.length > 0);
+                                          if (cleaned.length === 0) {
+                                            setMessage({ type: 'error', text: t('locationRequired') });
+                                            return;
+                                          }
+                                          handleBook(time.id, cleaned);
+                                        }}
+                                        disabled={booking}
+                                        className="btn-primary text-sm"
+                                      >
+                                        {booking ? t('booking') : t('confirmBook')}
+                                      </button>
+                                      <button
+                                        onClick={() => { setBookingTimeId(null); setProposedLocations(['']); }}
+                                        className="text-sm text-text-secondary hover:text-text-primary"
+                                      >
+                                        {tc('cancel')}
+                                      </button>
+                                    </div>
+                                  </div>
+                                )}
+                                {/* Expandable details */}
+                                {isExpanded && hasDetails && !isBookingThis && (
+                                  <div className="mt-2 pt-2 border-t border-border/50 text-xs text-text-muted space-y-0.5">
+                                    {time.notes && <p><span className="font-medium">{t('notesLabel')}:</span> {time.notes}</p>}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+
+                      {/* Propose a Time */}
+                      {!isFrozen && (
+                        <div className="mt-4">
+                          {showListProposeForm ? (
+                            <div className="border border-border rounded-lg p-4">
+                              <h4 className="text-sm font-medium mb-3">{t('proposeTime.title')}</h4>
+                              <p className="text-xs text-text-muted mb-3">{t('proposeTime.description')}</p>
+                              <form
+                                onSubmit={async (e) => {
+                                  e.preventDefault();
+                                  const form = e.target;
+                                  const date = form.proposeDate.value;
+                                  const start_time = form.proposeStart.value;
+                                  const end_time = form.proposeEnd.value;
+                                  const notes = form.proposeNotes.value;
+                                  if (!date || !start_time || !end_time) return;
+                                  if (start_time >= end_time) {
+                                    setMessage({ type: 'error', text: t('proposeTime.startBeforeEnd') });
+                                    return;
+                                  }
+                                  setProposing(true);
+                                  try {
+                                    const res = await fetch('/api/living-groups/propose-time', {
+                                      method: 'POST',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify({ date, start_time, end_time, notes }),
+                                    });
+                                    const data = await res.json();
+                                    if (res.ok) {
+                                      setMessage({ type: 'success', text: t('proposeTime.submitSuccess') });
+                                      if (data.proposal) {
+                                        setProposals(prev => [data.proposal, ...prev]);
+                                      }
+                                      setShowListProposeForm(false);
+                                      fetchTimes();
+                                    } else {
+                                      setMessage({ type: 'error', text: data.error || t('proposeTime.submitError') });
+                                    }
+                                  } catch {
+                                    setMessage({ type: 'error', text: t('proposeTime.submitError') });
+                                  } finally {
+                                    setProposing(false);
+                                  }
+                                }}
+                                className="space-y-3"
+                              >
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                  <div>
+                                    <label className="block text-xs font-medium mb-1">{t('proposeTime.date')}</label>
+                                    <input
+                                      type="date"
+                                      name="proposeDate"
+                                      min={new Date().toISOString().split('T')[0]}
+                                      className="w-full border border-border rounded px-2 py-1.5 text-sm"
+                                      required
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="block text-xs font-medium mb-1">{t('proposeTime.startTime')} (EST)</label>
+                                    <input
+                                      type="time"
+                                      name="proposeStart"
+                                      className="w-full border border-border rounded px-2 py-1.5 text-sm"
+                                      required
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="block text-xs font-medium mb-1">{t('proposeTime.endTime')} (EST)</label>
+                                    <input
+                                      type="time"
+                                      name="proposeEnd"
+                                      className="w-full border border-border rounded px-2 py-1.5 text-sm"
+                                      required
+                                    />
+                                  </div>
+                                </div>
+                                <div>
+                                  <label className="block text-xs font-medium mb-1">{t('proposeTime.notes')}</label>
+                                  <input type="text" name="proposeNotes" className="w-full border border-border rounded px-2 py-1.5 text-sm" />
+                                </div>
+                                <div className="flex gap-2">
+                                  <button type="submit" disabled={proposing} className="btn-primary text-sm">
+                                    {proposing ? t('proposeTime.submitting') : t('proposeTime.submit')}
+                                  </button>
+                                  <button type="button" onClick={() => setShowListProposeForm(false)} className="text-sm text-text-secondary ml-4 hover:text-text-primary">
+                                    {tc('cancel')}
+                                  </button>
+                                </div>
+                              </form>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => setShowListProposeForm(true)}
+                              className="w-full py-2 text-sm border border-dashed border-accent/40 text-accent rounded-lg hover:bg-accent/5 transition-colors"
+                            >
+                              + {t('proposeTime.title')}
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </>
+                  )}
 
                   {/* Your Proposals */}
-                  <div className="bg-white border border-border rounded-lg p-6 mt-6">
-                    <h3 className="font-medium mb-4">{t('proposeTime.yourProposals')}</h3>
-                    {proposalsLoading ? (
-                      <p className="text-text-secondary text-sm">Loading...</p>
-                    ) : proposals.length === 0 ? (
-                      <p className="text-text-secondary text-sm">{t('proposeTime.noProposals')}</p>
-                    ) : (
-                      <div className="space-y-3">
-                        {proposals.filter(p => !hiddenProposals.has(p.id)).map((proposal) => (
+                  {proposals.filter(p => !hiddenProposals.has(p.id) && !(p.status === 'cancelled' && !p.accepted_by)).length > 0 && (
+                    <div className="mt-6 pt-4 border-t border-border">
+                      <h4 className="text-xs font-medium text-text-muted uppercase mb-2">{t('proposeTime.yourProposals')}</h4>
+                      <div className="space-y-2">
+                        {proposals.filter(p => !hiddenProposals.has(p.id) && !(p.status === 'cancelled' && !p.accepted_by)).map((proposal) => (
                           <div
                             key={proposal.id}
-                            className={`p-4 border rounded-lg ${
+                            className={`px-3 py-2 border rounded-lg text-sm ${
                               proposal.status === 'pending'
-                                ? 'border-blue-200 bg-blue-50'
+                                ? 'border-yellow-200 bg-yellow-50'
                                 : proposal.status === 'accepted'
                                 ? 'border-green-200 bg-green-50'
                                 : proposal.status === 'declined'
@@ -1189,20 +1208,22 @@ export default function LivingGroupPage() {
                             }`}
                             style={{ transition: 'opacity 500ms ease-out', opacity: fadingProposals.has(proposal.id) ? 0 : 1 }}
                           >
-                            <div className="flex justify-between items-start">
+                            <div className="flex justify-between items-center">
                               <div>
                                 <div className="flex items-baseline gap-2">
-                                  <p className="font-medium">
-                                    {new Date(proposal.date).toLocaleDateString(locale, {
-                                      weekday: 'long',
-                                      year: 'numeric',
-                                      month: 'long',
+                                  <p className="font-medium pb-0">
+                                    {new Date(proposal.date + 'T12:00:00').toLocaleDateString(locale, {
+                                      weekday: 'short',
+                                      month: 'short',
                                       day: 'numeric',
                                     })}
                                   </p>
+                                  <span className="text-text-secondary text-sm">
+                                    {formatTime(proposal.start_time)} - {formatTime(proposal.end_time)} EST
+                                  </span>
                                   <span className={`text-xs px-2 py-0.5 rounded whitespace-nowrap ${
                                     proposal.status === 'pending'
-                                      ? 'bg-blue-200 text-blue-800'
+                                      ? 'bg-yellow-200 text-yellow-800'
                                       : proposal.status === 'accepted'
                                       ? 'bg-green-200 text-green-800'
                                       : proposal.status === 'declined'
@@ -1212,18 +1233,10 @@ export default function LivingGroupPage() {
                                     {proposal.status === 'pending' ? t('proposeTime.status.posted') : t(`proposeTime.status.${proposal.status}`)}
                                   </span>
                                 </div>
-                                <p className="text-text-secondary text-sm">
-                                  {formatTime(proposal.start_time)} - {formatTime(proposal.end_time)} EST
-                                </p>
-                                {(proposal.location || proposal.notes) && (
-                                  <div className={`mt-1 ${proposal.location && proposal.notes ? 'grid grid-cols-2 gap-4' : ''}`}>
-                                    {proposal.location && (
-                                      <p className="text-text-muted text-xs"><span className="text-text-muted">Location:</span> {proposal.location}</p>
-                                    )}
-                                    {proposal.notes && (
-                                      <p className="text-text-muted text-xs"><span className="text-text-muted">Notes:</span> {proposal.notes}</p>
-                                    )}
-                                  </div>
+                                {proposal.notes && (
+                                  <p className="text-text-muted text-xs mt-0.5">
+                                    <span className="italic">{proposal.notes}</span>
+                                  </p>
                                 )}
                                 {proposal.status === 'declined' && proposal.decline_reason && (
                                   <p className="text-red-600 text-xs mt-1">{proposal.decline_reason}</p>
@@ -1238,19 +1251,27 @@ export default function LivingGroupPage() {
                               </div>
                               {(proposal.status === 'pending' || proposal.status === 'accepted') && !isFrozen && (
                                 <button
-                                  onClick={() => handleCancelProposal(proposal.id)}
+                                  onClick={() => {
+                                    if (confirmCancelProposalId !== proposal.id) {
+                                      setConfirmCancelProposalId(proposal.id);
+                                      setTimeout(() => setConfirmCancelProposalId((prev) => prev === proposal.id ? null : prev), 3000);
+                                      return;
+                                    }
+                                    setConfirmCancelProposalId(null);
+                                    handleCancelProposal(proposal.id);
+                                  }}
                                   disabled={cancellingProposalId === proposal.id}
-                                  className="text-sm text-red-600 hover:text-red-700"
+                                  className={`text-xs flex-shrink-0 ml-2 ${confirmCancelProposalId === proposal.id ? 'text-red-700 font-medium' : 'text-red-600 hover:text-red-700'}`}
                                 >
-                                  {cancellingProposalId === proposal.id ? '...' : t('proposeTime.cancel')}
+                                  {cancellingProposalId === proposal.id ? '...' : confirmCancelProposalId === proposal.id ? t('proposeTime.confirmCancel') : t('proposeTime.cancel')}
                                 </button>
                               )}
                             </div>
                           </div>
                         ))}
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               )}
             </>
@@ -1269,21 +1290,36 @@ export default function LivingGroupPage() {
 
                   {/* Unassigned sections warning */}
                   {(() => {
+                    if (sections.length === 0) return null;
+
                     const allAssignedSections = new Set();
+                    let totalSlots = 0;
+                    let assignedSlots = 0;
                     bookedTimes.forEach(bt => {
                       const assignments = timeAssignments[bt.id] || {};
-                      Object.values(assignments).forEach(sectionName => {
-                        if (sectionName) allAssignedSections.add(sectionName);
+                      const slots = generateTimeSlots(bt.start_time, bt.end_time);
+                      totalSlots += slots.length;
+                      slots.forEach(slot => {
+                        const key = `${slot.start}-${slot.end}`;
+                        if (assignments[key]) {
+                          assignedSlots++;
+                          allAssignedSections.add(assignments[key]);
+                        }
                       });
                     });
                     const unassigned = sections.filter(s => !allAssignedSections.has(s));
 
-                    if (unassigned.length > 0) {
+                    if (unassigned.length > 0 || assignedSlots < totalSlots) {
                       return (
                         <div className="mb-6 p-3 bg-yellow-50 border border-yellow-200 rounded">
                           <p className="text-sm text-yellow-800">
-                            <span className="font-medium">{t('assign.timeSlots.unassignedSections')}:</span>{' '}
-                            {unassigned.join(', ')}
+                            {unassigned.length > 0 && (
+                              <><span className="font-medium">{t('assign.timeSlots.unassignedSections')}:</span>{' '}{unassigned.join(', ')}</>
+                            )}
+                            {unassigned.length > 0 && assignedSlots < totalSlots && <br />}
+                            {assignedSlots < totalSlots && (
+                              <span>{assignedSlots}/{totalSlots} slots assigned</span>
+                            )}
                           </p>
                         </div>
                       );
@@ -1295,7 +1331,7 @@ export default function LivingGroupPage() {
                     );
                   })()}
 
-                  {/* Assignment grid for each booked time */}
+                  {/* Assignment timeline for each booked time */}
                   <div className="space-y-4">
                     {bookedTimes.map((bookedTime) => (
                       <div key={bookedTime.id} className="bg-white border border-border rounded-lg p-6">
@@ -1303,7 +1339,7 @@ export default function LivingGroupPage() {
                         <div className="mb-4 flex justify-between items-start gap-4">
                           <div>
                             <p className="font-medium">
-                              {new Date(bookedTime.date).toLocaleDateString(locale, {
+                              {new Date(bookedTime.date + 'T12:00:00').toLocaleDateString(locale, {
                                 weekday: 'long',
                                 year: 'numeric',
                                 month: 'long',
@@ -1314,7 +1350,6 @@ export default function LivingGroupPage() {
                               {formatTime(bookedTime.start_time)} - {formatTime(bookedTime.end_time)} EST
                             </p>
                           </div>
-                          {/* Assignment saved message - right of date */}
                           <FadeMessage
                             message={sectionsMessage}
                             onClear={setSectionsMessage}
@@ -1322,51 +1357,17 @@ export default function LivingGroupPage() {
                           />
                         </div>
 
-                        {/* Slot grid */}
                         {assignmentsLoading ? (
                           <p className="text-text-muted text-sm">Loading...</p>
                         ) : (
-                          <div className="space-y-2">
-                            {/* Header row */}
-                            <div className="grid grid-cols-[120px_1fr] gap-2 text-xs font-medium text-text-muted uppercase mb-2">
-                              <span>{t('assign.timeSlots.slot')}</span>
-                              <span>{t('assign.timeSlots.section')}</span>
-                            </div>
-
-                            {/* Slot rows */}
-                            {generateTimeSlots(bookedTime.start_time, bookedTime.end_time).map((slot) => {
-                              const slotKey = `${slot.start}-${slot.end}`;
-                              const currentAssignment = timeAssignments[bookedTime.id]?.[slotKey] || '';
-                              const isSaving = savingSlot === `${bookedTime.id}-${slotKey}`;
-
-                              return (
-                                <div key={slotKey} className="grid grid-cols-[120px_1fr] gap-2 items-center">
-                                  <span className="text-sm font-medium">
-                                    {formatTimeUtil(slot.start)} - {formatTimeUtil(slot.end)}
-                                  </span>
-                                  <div className="flex items-center gap-2">
-                                    <select
-                                      value={currentAssignment}
-                                      onChange={(e) => handleAssignSection(
-                                        bookedTime.id,
-                                        slot.start,
-                                        slot.end,
-                                        e.target.value
-                                      )}
-                                      disabled={isSaving}
-                                      className="flex-1 px-3 py-1.5 border border-border rounded text-sm disabled:opacity-50"
-                                    >
-                                      <option value="">{t('assign.timeSlots.notAssigned')}</option>
-                                      {sections.map((section) => (
-                                        <option key={section} value={section}>{section}</option>
-                                      ))}
-                                    </select>
-                                    {isSaving && <span className="text-xs text-text-muted">{t('assign.timeSlots.saving')}</span>}
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
+                          <SectionAssignmentTimeline
+                            bookedTime={bookedTime}
+                            sections={sections}
+                            assignments={timeAssignments[bookedTime.id] || {}}
+                            onAssign={handleAssignSection}
+                            formatTime={formatTime}
+                            saving={!!savingSlot}
+                          />
                         )}
                       </div>
                     ))}
@@ -1404,31 +1405,18 @@ export default function LivingGroupPage() {
                 ) : sections.length === 0 ? (
                   <p className="text-text-secondary">{t('assign.noSections')}</p>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {sections.map((section) => {
                       const memberCount = manualMembers.filter(m => m.section_name === section).length;
                       return (
                         <div
                           key={section}
-                          className="px-4 py-3 border border-border rounded-lg space-y-2"
+                          className="px-3 py-3 border border-border rounded-lg flex items-start gap-3"
                         >
-                          <div className="flex justify-between items-center gap-4">
-                            <span className="font-medium">{section}</span>
-                            <span className="text-sm text-text-muted">
-                              {t('assign.memberCount', { count: memberCount })}
-                            </span>
-                            <button
-                              onClick={() => handleRemoveSection(section)}
-                              disabled={removingSectionName === section}
-                              className="text-sm text-red-600 hover:text-red-700 whitespace-nowrap ml-auto"
-                            >
-                              {removingSectionName === section ? t('assign.removing') : t('assign.removeSection')}
-                            </button>
-                          </div>
                           <ImageUpload
                             imageUrl={livingGroup?.section_images?.[section] || null}
-                            label={t('assign.sectionImage')}
                             fileName={`${(livingGroup?.name || '').replace(/\s+/g, '_')}_${section.replace(/\s+/g, '_')}_Candid`}
+                            size="sm"
                             disabled={isFrozen}
                             onUpload={async (file) => {
                               setImageMessage({ type: '', text: '' });
@@ -1453,6 +1441,21 @@ export default function LivingGroupPage() {
                               }
                             }}
                           />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex justify-between items-start gap-2">
+                              <span className="font-medium">{section}</span>
+                              <button
+                                onClick={() => handleRemoveSection(section)}
+                                disabled={removingSectionName === section}
+                                className="text-xs text-red-600 hover:text-red-700 whitespace-nowrap"
+                              >
+                                {removingSectionName === section ? t('assign.removing') : t('assign.removeSection')}
+                              </button>
+                            </div>
+                            <span className="text-xs text-text-muted">
+                              {t('assign.memberCount', { count: memberCount })}
+                            </span>
+                          </div>
                         </div>
                       );
                     })}

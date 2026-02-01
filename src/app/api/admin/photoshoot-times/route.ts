@@ -28,8 +28,8 @@ export async function GET(request: NextRequest) {
       .select(`
         *,
         living_group:living_groups(id, name, user_id, user:users!living_groups_user_id_fkey(email)),
-        booked_by_user:users!photoshoot_times_booked_by_fkey(email),
-        created_by_user:users!photoshoot_times_created_by_fkey(email)
+        booked_by_user:users!photoshoot_times_booked_by_fkey(email, name, role),
+        created_by_user:users!photoshoot_times_created_by_fkey(email, name, role)
       `)
       .is('cancelled_at', null)
       .order('date', { ascending: true })

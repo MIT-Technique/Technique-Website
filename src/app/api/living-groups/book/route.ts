@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { timeId, location } = body;
+    const { timeId, proposed_locations } = body;
 
     if (!timeId) {
       return NextResponse.json(
@@ -32,10 +32,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate location if provided
-    if (location && typeof location === 'string' && location.length > 200) {
+    // Validate proposed_locations (required, array of 1-5 strings, each max 200 chars)
+    if (!Array.isArray(proposed_locations) || proposed_locations.length === 0) {
       return NextResponse.json(
-        { error: "Location must be 200 characters or less" },
+        { error: "At least one proposed location is required" },
+        { status: 400 }
+      );
+    }
+    if (proposed_locations.length > 5) {
+      return NextResponse.json(
+        { error: "Maximum 5 proposed locations allowed" },
+        { status: 400 }
+      );
+    }
+    const cleanedLocations = proposed_locations
+      .map((l: unknown) => (typeof l === 'string' ? l.trim() : ''))
+      .filter((l: string) => l.length > 0);
+    if (cleanedLocations.length === 0) {
+      return NextResponse.json(
+        { error: "At least one non-empty proposed location is required" },
+        { status: 400 }
+      );
+    }
+    if (cleanedLocations.some((l: string) => l.length > 200)) {
+      return NextResponse.json(
+        { error: "Each location must be 200 characters or less" },
         { status: 400 }
       );
     }
@@ -71,7 +92,8 @@ export async function POST(request: NextRequest) {
         living_group_id: livingGroup.id,
         booked_at: new Date().toISOString(),
         booked_by: user.id,
-        location: location || null,
+        proposed_locations: cleanedLocations,
+        booking_status: 'pending_location',
         updated_at: new Date().toISOString(),
       })
       .eq('id', timeId)

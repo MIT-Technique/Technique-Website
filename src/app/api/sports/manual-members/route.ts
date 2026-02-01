@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
 
     let query = supabase
       .from('sports_manual_members')
-      .select('id, name, team, added_at')
+      .select('id, name, role, team, added_at')
       .eq('sports_id', sports.id)
       .order('name');
 
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, bulkText, team } = body;
+    const { name, role, bulkText, team } = body;
 
     // Validate team value
     if (team && !['mens', 'womens'].includes(team)) {
@@ -169,12 +169,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "This member already exists" }, { status: 400 });
     }
 
+    const trimmedRole = role ? String(role).trim() : null;
     const { data, error } = await supabase
       .from('sports_manual_members')
       .insert({
         sports_id: sports.id,
         name: trimmedName,
         team: team || null,
+        ...(trimmedRole && { role: trimmedRole }),
       })
       .select()
       .single();

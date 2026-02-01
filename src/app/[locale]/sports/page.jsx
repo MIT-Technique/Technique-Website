@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { useUser } from '../../../hooks/useUser';
@@ -45,13 +45,15 @@ export default function SportsPage() {
   const [membersLoading, setMembersLoading] = useState(true);
   const [membersMessage, setMembersMessage] = useState({ type: '', text: '' });
   const [inputMode, setInputMode] = useState('single');
-  const [singleMember, setSingleMember] = useState({ name: '' });
+  const [singleMember, setSingleMember] = useState({ name: '', role: '' });
   const [bulkText, setBulkText] = useState('');
   const [parsePreview, setParsePreview] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
   const [addingMember, setAddingMember] = useState(false);
   const [removingMemberId, setRemovingMemberId] = useState(null);
   const [activeTeamTab, setActiveTeamTab] = useState('mens');
+  const [showCoachRoleDropdown, setShowCoachRoleDropdown] = useState(false);
+  const [showMemberRoleDropdown, setShowMemberRoleDropdown] = useState(false);
 
   // Image URL overrides (to avoid full refetch on upload/delete)
   const [imageOverrides, setImageOverrides] = useState({});
@@ -121,28 +123,34 @@ export default function SportsPage() {
     }
   }, [sports]);
 
-  useEffect(() => {
-    async function checkFrozen() {
-      try {
-        const res = await fetch('/api/auth/session');
-        const data = await res.json();
-        const frozen = data.frozenForms?.some(f => f.form_name === 'sports_form' && f.is_frozen);
-        setIsFrozen(frozen || false);
-      } catch (error) {
-        console.error('Error checking frozen status:', error);
-      }
-    }
-    checkFrozen();
-  }, []);
+  // Lazy-load data per tab
+  const fetchedTabs = useRef(new Set());
 
   useEffect(() => {
-    if (isLoggedIn && user?.role === 'sports') {
-      fetchCoaches();
-      fetchMembers();
-      fetchDocuments();
+    if (!isLoggedIn || user?.role !== 'sports') return;
+    if (fetchedTabs.current.has(activeTab)) return;
+    fetchedTabs.current.add(activeTab);
+
+    if (activeTab === 'profile') {
       fetchSportsEmail();
+      (async () => {
+        try {
+          const res = await fetch('/api/auth/session');
+          const data = await res.json();
+          const frozen = data.frozenForms?.some(f => f.form_name === 'sports_form' && f.is_frozen);
+          setIsFrozen(frozen || false);
+        } catch (error) {
+          console.error('Error checking frozen status:', error);
+        }
+      })();
+    } else if (activeTab === 'coaches') {
+      fetchCoaches();
+    } else if (activeTab === 'members') {
+      fetchMembers();
+    } else if (activeTab === 'documents') {
+      fetchDocuments();
     }
-  }, [isLoggedIn, user]);
+  }, [activeTab, isLoggedIn, user]);
 
   // ==================== API CALLS ====================
 
@@ -325,11 +333,12 @@ export default function SportsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: singleMember.name.trim(),
+          role: singleMember.role.trim() || null,
           team,
         }),
       });
       if (res.ok) {
-        setSingleMember({ name: '' });
+        setSingleMember({ name: '', role: '' });
         setMembersMessage({ type: 'success', text: t('members.addSuccess') });
         fetchMembers();
       } else {
@@ -454,7 +463,7 @@ export default function SportsPage() {
       <div className="space-y-2">
         {filtered.map((member) => (
           <div key={member.id} className="px-3 py-2 border border-border rounded-lg flex justify-between items-center">
-            <span>{member.name}</span>
+            <span>{member.name}{member.role && <span className="text-text-secondary ml-2">— {member.role}</span>}</span>
             <button
               onClick={() => handleRemoveMember(member.id)}
               disabled={removingMemberId === member.id}
@@ -669,20 +678,38 @@ export default function SportsPage() {
                     className="flex-1 min-w-[150px] border border-border rounded px-4 py-2"
                     required
                   />
-                  <input
-                    type="text"
-                    value={newCoach.role}
-                    onChange={(e) => setNewCoach({ ...newCoach, role: e.target.value })}
-                    placeholder={t('coaches.rolePlaceholder')}
-                    className="flex-1 min-w-[150px] border border-border rounded px-4 py-2"
-                    list="coach-roles"
-                    required
-                  />
-                  <datalist id="coach-roles">
-                    <option value={t('coaches.headCoach')} />
-                    <option value={t('coaches.assistantCoach')} />
-                    <option value={t('coaches.director')} />
-                  </datalist>
+                  <div className="relative flex-1 min-w-[150px]">
+                    <input
+                      type="text"
+                      value={newCoach.role}
+                      onChange={(e) => setNewCoach({ ...newCoach, role: e.target.value })}
+                      onFocus={() => setShowCoachRoleDropdown(true)}
+                      onBlur={() => setTimeout(() => setShowCoachRoleDropdown(false), 150)}
+                      placeholder={t('coaches.rolePlaceholder')}
+                      className="w-full border border-border rounded px-4 py-2"
+                      required
+                    />
+                    {showCoachRoleDropdown && (() => {
+                      const options = [
+                        t('coaches.headCoach'),
+                        t('coaches.assistantCoach'),
+                        t('coaches.volunteerAssistantCoach'),
+                      ].filter(o => !newCoach.role || o.toLowerCase().includes(newCoach.role.toLowerCase()));
+                      return options.length > 0 ? (
+                        <ul className="absolute z-50 w-full mt-1 bg-white border border-border rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                          {options.map((option) => (
+                            <li
+                              key={option}
+                              onMouseDown={() => setNewCoach({ ...newCoach, role: option })}
+                              className="px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 text-sm"
+                            >
+                              {option}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : null;
+                    })()}
+                  </div>
                   <button
                     type="submit"
                     disabled={addingCoach}
@@ -803,6 +830,36 @@ export default function SportsPage() {
                       className="flex-1 min-w-[150px] border border-border rounded px-4 py-2"
                       required
                     />
+                    <div className="relative flex-1 min-w-[150px]">
+                      <input
+                        type="text"
+                        value={singleMember.role}
+                        onChange={(e) => setSingleMember({ ...singleMember, role: e.target.value })}
+                        onFocus={() => setShowMemberRoleDropdown(true)}
+                        onBlur={() => setTimeout(() => setShowMemberRoleDropdown(false), 150)}
+                        placeholder={t('members.rolePlaceholder')}
+                        className="w-full border border-border rounded px-4 py-2"
+                      />
+                      {showMemberRoleDropdown && (() => {
+                        const options = [
+                          t('members.roles.captain'),
+                          t('members.roles.squadLeader'),
+                        ].filter(o => !singleMember.role || o.toLowerCase().includes(singleMember.role.toLowerCase()));
+                        return options.length > 0 ? (
+                          <ul className="absolute z-50 w-full mt-1 bg-white border border-border rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                            {options.map((option) => (
+                              <li
+                                key={option}
+                                onMouseDown={() => setSingleMember({ ...singleMember, role: option })}
+                                className="px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 text-sm"
+                              >
+                                {option}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : null;
+                      })()}
+                    </div>
                     <button
                       type="submit"
                       disabled={addingMember || !singleMember.name.trim()}

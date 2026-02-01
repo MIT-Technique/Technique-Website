@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { useUser } from '../../../hooks/useUser';
@@ -35,12 +35,13 @@ export default function ClubPage() {
   const [membersLoading, setMembersLoading] = useState(true);
   const [membersMessage, setMembersMessage] = useState({ type: '', text: '' });
   const [inputMode, setInputMode] = useState('single'); // 'single' or 'bulk'
-  const [singleMember, setSingleMember] = useState({ name: '' });
+  const [singleMember, setSingleMember] = useState({ name: '', role: '' });
   const [bulkText, setBulkText] = useState('');
   const [parsePreview, setParsePreview] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
   const [addingMember, setAddingMember] = useState(false);
   const [removingMemberId, setRemovingMemberId] = useState(null);
+  const [showRoleDropdown, setShowRoleDropdown] = useState(false);
 
   // Documents state
   const [documents, setDocuments] = useState({
@@ -96,28 +97,32 @@ export default function ClubPage() {
     }
   }, [club]);
 
-  useEffect(() => {
-    async function checkFrozen() {
-      try {
-        const res = await fetch('/api/auth/session');
-        const data = await res.json();
-        const frozen = data.frozenForms?.some(f => f.form_name === 'club_form' && f.is_frozen);
-        setIsFrozen(frozen || false);
-      } catch (error) {
-        console.error('Error checking frozen status:', error);
-      }
-    }
-    checkFrozen();
-  }, []);
+  // Lazy-load data per tab
+  const fetchedTabs = useRef(new Set());
 
-  // Fetch data when logged in
   useEffect(() => {
-    if (isLoggedIn && user?.role === 'club') {
-      fetchMembers();
-      fetchDocuments();
+    if (!isLoggedIn || user?.role !== 'club') return;
+    if (fetchedTabs.current.has(activeTab)) return;
+    fetchedTabs.current.add(activeTab);
+
+    if (activeTab === 'profile') {
       fetchClubEmail();
+      (async () => {
+        try {
+          const res = await fetch('/api/auth/session');
+          const data = await res.json();
+          const frozen = data.frozenForms?.some(f => f.form_name === 'club_form' && f.is_frozen);
+          setIsFrozen(frozen || false);
+        } catch (error) {
+          console.error('Error checking frozen status:', error);
+        }
+      })();
+    } else if (activeTab === 'members') {
+      fetchMembers();
+    } else if (activeTab === 'documents') {
+      fetchDocuments();
     }
-  }, [isLoggedIn, user]);
+  }, [activeTab, isLoggedIn, user]);
 
   async function fetchClubEmail() {
     try {
@@ -254,11 +259,12 @@ export default function ClubPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: singleMember.name.trim(),
+          role: singleMember.role.trim() || null,
         }),
       });
 
       if (res.ok) {
-        setSingleMember({ name: '' });
+        setSingleMember({ name: '', role: '' });
         setMembersMessage({ type: 'success', text: t('members.addSuccess') });
         fetchMembers();
       } else {
@@ -571,6 +577,40 @@ export default function ClubPage() {
                       className="flex-1 min-w-[150px] border border-border rounded px-4 py-2"
                       required
                     />
+                    <div className="relative flex-1 min-w-[150px]">
+                      <input
+                        type="text"
+                        value={singleMember.role}
+                        onChange={(e) => setSingleMember({ ...singleMember, role: e.target.value })}
+                        onFocus={() => setShowRoleDropdown(true)}
+                        onBlur={() => setTimeout(() => setShowRoleDropdown(false), 150)}
+                        placeholder={t('members.rolePlaceholder')}
+                        className="w-full border border-border rounded px-4 py-2"
+                      />
+                      {showRoleDropdown && (() => {
+                        const options = [
+                          t('members.roles.president'),
+                          t('members.roles.vicePresident'),
+                          t('members.roles.secretary'),
+                          t('members.roles.treasurer'),
+                          t('members.roles.socialChair'),
+                          t('members.roles.publicityChair'),
+                        ].filter(o => !singleMember.role || o.toLowerCase().includes(singleMember.role.toLowerCase()));
+                        return options.length > 0 ? (
+                          <ul className="absolute z-50 w-full mt-1 bg-white border border-border rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                            {options.map((option) => (
+                              <li
+                                key={option}
+                                onMouseDown={() => setSingleMember({ ...singleMember, role: option })}
+                                className="px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 text-sm"
+                              >
+                                {option}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : null;
+                      })()}
+                    </div>
                     <button
                       type="submit"
                       disabled={addingMember || !singleMember.name.trim()}
@@ -680,6 +720,7 @@ export default function ClubPage() {
                       >
                         <span>
                           {member.name}
+                          {member.role && <span className="text-text-secondary ml-2">— {member.role}</span>}
                         </span>
                         <button
                           onClick={() => handleRemoveManualMember(member.id)}
