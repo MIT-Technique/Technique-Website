@@ -120,10 +120,12 @@ function AccountButton({ isHomePage = false }) {
 
   // Get dashboard link based on role
   const getDashboardLink = () => {
-    // Admin goes to dashboard, everyone else goes to unified profile page
     if (user?.role === 'admin' || user?.role === 'staph') {
       return `/${locale}/dashboard`;
     }
+    if (user?.role === 'club') return `/${locale}/club`;
+    if (user?.role === 'living_group') return `/${locale}/living-group`;
+    if (user?.role === 'sports') return `/${locale}/sports`;
     return `/${locale}/profile`;
   };
 

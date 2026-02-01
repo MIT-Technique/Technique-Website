@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import TextField from "@mui/material/TextField";
+import CalendarView from '../CalendarView/CalendarView';
 
 // Strip seconds from time string (HH:MM:SS -> HH:MM)
 function formatTime(time) {
@@ -54,6 +55,8 @@ export default function PhotographerTimesSection() {
 
   const [message, setMessage] = useState({ type: '', text: '' });
   const [messageFading, setMessageFading] = useState(false);
+  const [viewMode, setViewMode] = useState('calendar');
+  const tc = useTranslations('calendarView');
 
   // Toggle expansion for a time slot
   function toggleTimeExpanded(timeId) {
@@ -327,109 +330,187 @@ export default function PhotographerTimesSection() {
       <div className="bg-white border border-border rounded-lg p-6">
         <div className="flex justify-between items-center mb-4">
           <h3 className="font-medium">{t('allTimes')}</h3>
-          {times.length > ITEMS_PER_PAGE && (
-            <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+            {/* View toggle */}
+            <div className="flex rounded border border-border overflow-hidden">
               <button
-                onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
-                disabled={currentPage === 0}
-                className="p-1 text-text-secondary hover:text-text disabled:opacity-30 disabled:cursor-not-allowed"
-                aria-label="Previous page"
+                onClick={() => setViewMode('calendar')}
+                className={`px-3 py-1 text-xs ${viewMode === 'calendar' ? 'bg-accent text-white' : 'bg-bg-secondary text-text-secondary hover:bg-bg-secondary/80'}`}
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
+                {tc('calendar')}
               </button>
-              <span className="text-sm text-text-secondary">
-                {currentPage + 1} / {Math.ceil(times.length / ITEMS_PER_PAGE)}
-              </span>
               <button
-                onClick={() => setCurrentPage(p => Math.min(Math.ceil(times.length / ITEMS_PER_PAGE) - 1, p + 1))}
-                disabled={currentPage >= Math.ceil(times.length / ITEMS_PER_PAGE) - 1}
-                className="p-1 text-text-secondary hover:text-text disabled:opacity-30 disabled:cursor-not-allowed"
-                aria-label="Next page"
+                onClick={() => setViewMode('list')}
+                className={`px-3 py-1 text-xs ${viewMode === 'list' ? 'bg-accent text-white' : 'bg-bg-secondary text-text-secondary hover:bg-bg-secondary/80'}`}
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
+                {tc('list')}
               </button>
             </div>
-          )}
-        </div>
-        {timesLoading ? (
-          <p className="text-text-secondary text-sm">Loading...</p>
-        ) : times.length === 0 ? (
-          <p className="text-text-secondary text-sm">{t('noTimes')}</p>
-        ) : (
-          <div className="space-y-2">
-            {times.slice(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE).map((time) => {
-              const hasDetails = time.location || time.notes;
-              const isExpanded = expandedTimeIds.has(time.id);
-              return (
-                <div
-                  key={time.id}
-                  className={`px-3 py-2 border rounded-lg ${
-                    time.living_group_id
-                      ? 'border-green-200 bg-green-50'
-                      : 'border-border'
-                  } ${hasDetails ? 'cursor-pointer' : ''}`}
-                  onClick={hasDetails ? () => toggleTimeExpanded(time.id) : undefined}
+            {viewMode === 'list' && times.length > ITEMS_PER_PAGE && (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
+                  disabled={currentPage === 0}
+                  className="p-1 text-text-secondary hover:text-text disabled:opacity-30 disabled:cursor-not-allowed"
+                  aria-label="Previous page"
                 >
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-4 flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        {hasDetails && (
-                          <svg
-                            className={`w-4 h-4 text-text-muted transition-transform ${isExpanded ? 'rotate-90' : ''}`}
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
-                        )}
-                        <span className="font-medium text-sm">
-                          {new Date(time.date).toLocaleDateString(locale, {
-                            weekday: 'short',
-                            month: 'short',
-                            day: 'numeric',
-                          })}
-                        </span>
-                        <span className="text-text-secondary text-sm">
-                          {formatTime(time.start_time)} - {formatTime(time.end_time)} EST
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3 flex-shrink-0">
-                      <span className="text-text-muted text-xs">
-                        {t('postedBy', { name: getCreatorLabel(time) })}
-                      </span>
-                      {time.living_group && (
-                        <span className="text-green-600 text-xs font-medium">
-                          {t('bookedBy', { name: time.living_group.name })}
-                        </span>
-                      )}
-                      {!time.living_group_id && time.created_by === currentUserId && (
-                        <button
-                          onClick={(e) => handleDeleteClick(e, time.id)}
-                          disabled={deletingTimeId === time.id}
-                          className={`text-xs ${confirmingDeleteId === time.id ? 'text-red-700 font-medium' : 'text-red-600 hover:text-red-700'}`}
-                        >
-                          {deletingTimeId === time.id ? '...' : confirmingDeleteId === time.id ? t('confirm') : t('delete')}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                  {/* Expandable details */}
-                  {isExpanded && hasDetails && (
-                    <div className="mt-2 pt-2 border-t border-border/50 text-xs text-text-muted space-y-0.5">
-                      {time.location && <p><span className="font-medium">Location:</span> {time.location}</p>}
-                      {time.notes && <p><span className="font-medium">Notes:</span> {time.notes}</p>}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <span className="text-sm text-text-secondary">
+                  {currentPage + 1} / {Math.ceil(times.length / ITEMS_PER_PAGE)}
+                </span>
+                <button
+                  onClick={() => setCurrentPage(p => Math.min(Math.ceil(times.length / ITEMS_PER_PAGE) - 1, p + 1))}
+                  disabled={currentPage >= Math.ceil(times.length / ITEMS_PER_PAGE) - 1}
+                  className="p-1 text-text-secondary hover:text-text disabled:opacity-30 disabled:cursor-not-allowed"
+                  aria-label="Next page"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            )}
           </div>
+        </div>
+        {viewMode === 'calendar' ? (
+          <CalendarView
+            role="photographer"
+            times={times}
+            proposals={proposals}
+            currentUserId={currentUserId}
+            loading={timesLoading}
+            onCreate={async (formData) => {
+              const res = await fetch('/api/photographer/times', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  date: formData.date,
+                  start_time: formData.startTime,
+                  end_time: formData.endTime,
+                  location: formData.location || '',
+                  notes: formData.notes || '',
+                }),
+              });
+              if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.error || 'Failed to create');
+              }
+              setMessage({ type: 'success', text: t('addSuccess') });
+              fetchTimes();
+            }}
+            onDelete={async (timeId) => {
+              const res = await fetch(`/api/photographer/times?id=${timeId}`, { method: 'DELETE' });
+              if (res.ok) {
+                setMessage({ type: 'success', text: t('deleteSuccess') });
+                fetchTimes();
+              }
+            }}
+            onAcceptProposal={async (proposalId) => {
+              const res = await fetch('/api/photographer/proposals', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ proposalId, action: 'accept' }),
+              });
+              if (res.ok) {
+                setMessage({ type: 'success', text: t('acceptSuccess') });
+                fetchProposals();
+                fetchTimes();
+              }
+            }}
+            onDeclineProposal={async (proposalId, reason) => {
+              const res = await fetch('/api/photographer/proposals', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ proposalId, action: 'decline', decline_reason: reason }),
+              });
+              if (res.ok) {
+                setMessage({ type: 'success', text: t('declineSuccess') });
+                fetchProposals();
+              }
+            }}
+          />
+        ) : (
+          <>
+            {timesLoading ? (
+              <p className="text-text-secondary text-sm">Loading...</p>
+            ) : times.length === 0 ? (
+              <p className="text-text-secondary text-sm">{t('noTimes')}</p>
+            ) : (
+              <div className="space-y-2">
+                {times.slice(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE).map((time) => {
+                  const hasDetails = time.location || time.notes;
+                  const isExpanded = expandedTimeIds.has(time.id);
+                  return (
+                    <div
+                      key={time.id}
+                      className={`px-3 py-2 border rounded-lg ${
+                        time.living_group_id
+                          ? 'border-green-200 bg-green-50'
+                          : 'border-border'
+                      } ${hasDetails ? 'cursor-pointer' : ''}`}
+                      onClick={hasDetails ? () => toggleTimeExpanded(time.id) : undefined}
+                    >
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-4 flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            {hasDetails && (
+                              <svg
+                                className={`w-4 h-4 text-text-muted transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                              </svg>
+                            )}
+                            <span className="font-medium text-sm">
+                              {new Date(time.date).toLocaleDateString(locale, {
+                                weekday: 'short',
+                                month: 'short',
+                                day: 'numeric',
+                              })}
+                            </span>
+                            <span className="text-text-secondary text-sm">
+                              {formatTime(time.start_time)} - {formatTime(time.end_time)} EST
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3 flex-shrink-0">
+                          <span className="text-text-muted text-xs">
+                            {t('postedBy', { name: getCreatorLabel(time) })}
+                          </span>
+                          {time.living_group && (
+                            <span className="text-green-600 text-xs font-medium">
+                              {t('bookedBy', { name: time.living_group.name })}
+                            </span>
+                          )}
+                          {!time.living_group_id && time.created_by === currentUserId && (
+                            <button
+                              onClick={(e) => handleDeleteClick(e, time.id)}
+                              disabled={deletingTimeId === time.id}
+                              className={`text-xs ${confirmingDeleteId === time.id ? 'text-red-700 font-medium' : 'text-red-600 hover:text-red-700'}`}
+                            >
+                              {deletingTimeId === time.id ? '...' : confirmingDeleteId === time.id ? t('confirm') : t('delete')}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                      {/* Expandable details */}
+                      {isExpanded && hasDetails && (
+                        <div className="mt-2 pt-2 border-t border-border/50 text-xs text-text-muted space-y-0.5">
+                          {time.location && <p><span className="font-medium">Location:</span> {time.location}</p>}
+                          {time.notes && <p><span className="font-medium">Notes:</span> {time.notes}</p>}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </>
         )}
       </div>
 

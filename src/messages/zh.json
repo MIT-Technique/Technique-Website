@@ -1423,6 +1423,43 @@
       }
     }
   },
+  "calendarView": {
+    "calendar": "日历",
+    "list": "列表",
+    "today": "今天",
+    "noSlots": "该日无时间段",
+    "available": "可预约",
+    "booked": "已预约",
+    "pending": "待处理",
+    "slots": "个时间段",
+    "proposals": "个提议",
+    "addSlot": "添加时间段",
+    "book": "预约",
+    "cancel": "取消",
+    "deleteSlot": "删除",
+    "confirmAction": "确认？",
+    "cancelAction": "取消",
+    "accept": "接受",
+    "decline": "拒绝",
+    "postedBy": "发布者",
+    "unknown": "未知",
+    "startTime": "开始时间",
+    "endTime": "结束时间",
+    "locationPlaceholder": "地点（可选）",
+    "notesPlaceholder": "备注（可选）",
+    "createSlot": "创建",
+    "fieldsRequired": "开始时间和结束时间为必填",
+    "startBeforeEnd": "开始时间必须早于结束时间",
+    "createError": "创建时间段失败",
+    "declineReasonPrompt": "请输入拒绝原因（可选）：",
+    "dayView": "日",
+    "weekView": "周",
+    "monthView": "月",
+    "proposeTime": "提议时间",
+    "proposeSlot": "提议",
+    "proposeError": "提议时间失败"
+  },
+
   "photographerTimes": {
     "title": "Staph排期",
     "timezoneNote": "所有时间均为美国东部标准时间（EST）",
@@ -1454,7 +1491,10 @@
     "acceptSuccess": "提议已接受并安排时间",
     "declineSuccess": "提议已拒绝",
     "actionError": "处理提议失败",
-    "declineReasonPrompt": "请输入拒绝原因（可选）："
+    "declineReasonPrompt": "请输入拒绝原因（可选）：",
+    "dayView": "日",
+    "weekView": "周",
+    "monthView": "月"
   },
   "resources": {
     "title": "常见问题",

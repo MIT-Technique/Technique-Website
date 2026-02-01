@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { useUser } from '../../../hooks/useUser';
@@ -12,6 +12,7 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import { generateTimeSlots, formatTimeDisplay as formatTimeUtil } from '../../../lib/utils/time';
+import CalendarView from '../../../components/CalendarView/CalendarView';
 
 // Generate 15-minute time slot options (06:00 to 23:45)
 function generateTimeOptions() {
@@ -188,6 +189,8 @@ export default function LivingGroupPage() {
   // Pagination state
   const [currentPage, setCurrentPage] = useState(0);
   const ITEMS_PER_PAGE = 8;
+  const [bookViewMode, setBookViewMode] = useState('calendar');
+  const tc = useTranslations('calendarView');
 
   // Expanded time slots (to show location/notes)
   const [expandedTimeIds, setExpandedTimeIds] = useState(new Set());
@@ -223,19 +226,30 @@ export default function LivingGroupPage() {
   const [fadingProposals, setFadingProposals] = useState(new Set());
   const [hiddenProposals, setHiddenProposals] = useState(new Set());
 
+  // Lazy-load data per tab
+  const fetchedTabs = useRef(new Set());
+
   useEffect(() => {
-    if (isLoggedIn && user?.role === 'living_group') {
+    if (!isLoggedIn || user?.role !== 'living_group') return;
+    if (fetchedTabs.current.has(activeTab)) return;
+    fetchedTabs.current.add(activeTab);
+
+    if (activeTab === 'book') {
       fetchTimes();
       checkFrozen();
-      fetchMembers();
       fetchProposals();
+    } else if (activeTab === 'assign') {
       fetchSections();
+      if (livingGroup?.id) fetchTimeAssignments(livingGroup.id);
+    } else if (activeTab === 'members') {
+      fetchMembers();
+      if (!fetchedTabs.current.has('assign')) fetchSections();
+    } else if (activeTab === 'documents') {
       fetchDocuments();
-      if (livingGroup?.id) {
-        fetchTimeAssignments(livingGroup.id);
-      }
+    } else if (activeTab === 'settings') {
+      if (livingGroup?.id) fetchLivingGroupEmail();
     }
-  }, [isLoggedIn, user, livingGroup]);
+  }, [activeTab, isLoggedIn, user, livingGroup]);
 
   // Set default proposal form values on mount
   useEffect(() => {
@@ -713,12 +727,6 @@ export default function LivingGroupPage() {
     }
   }
 
-  useEffect(() => {
-    if (livingGroup?.id) {
-      fetchLivingGroupEmail();
-    }
-  }, [livingGroup?.id]);
-
   async function fetchLivingGroupEmail() {
     if (!livingGroup?.id) return;
     try {
@@ -991,96 +999,144 @@ export default function LivingGroupPage() {
                 <div className="bg-white border border-border rounded-lg p-6">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="font-medium">{t('availableTimes')}</h3>
-                    {availableTimes.length > ITEMS_PER_PAGE && (
-                      <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3">
+                      {/* View toggle */}
+                      <div className="flex rounded border border-border overflow-hidden">
                         <button
-                          onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
-                          disabled={currentPage === 0}
-                          className="p-1 text-text-secondary hover:text-text disabled:opacity-30 disabled:cursor-not-allowed"
-                          aria-label="Previous page"
+                          onClick={() => setBookViewMode('calendar')}
+                          className={`px-3 py-1 text-xs ${bookViewMode === 'calendar' ? 'bg-accent text-white' : 'bg-bg-secondary text-text-secondary hover:bg-bg-secondary/80'}`}
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                          </svg>
+                          {tc('calendar')}
                         </button>
-                        <span className="text-sm text-text-secondary">
-                          {currentPage + 1} / {Math.ceil(availableTimes.length / ITEMS_PER_PAGE)}
-                        </span>
                         <button
-                          onClick={() => setCurrentPage(p => Math.min(Math.ceil(availableTimes.length / ITEMS_PER_PAGE) - 1, p + 1))}
-                          disabled={currentPage >= Math.ceil(availableTimes.length / ITEMS_PER_PAGE) - 1}
-                          className="p-1 text-text-secondary hover:text-text disabled:opacity-30 disabled:cursor-not-allowed"
-                          aria-label="Next page"
+                          onClick={() => setBookViewMode('list')}
+                          className={`px-3 py-1 text-xs ${bookViewMode === 'list' ? 'bg-accent text-white' : 'bg-bg-secondary text-text-secondary hover:bg-bg-secondary/80'}`}
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
+                          {tc('list')}
                         </button>
                       </div>
-                    )}
-                  </div>
-                  {loading ? (
-                    <p className="text-text-secondary text-sm">Loading...</p>
-                  ) : availableTimes.length === 0 ? (
-                    <p className="text-text-secondary text-sm">{t('noTimes')}</p>
-                  ) : (
-                    <div className="space-y-2">
-                      {availableTimes.slice(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE).map((time) => {
-                        const hasDetails = time.location || time.notes;
-                        const isExpanded = expandedTimeIds.has(time.id);
-                        return (
-                          <div
-                            key={time.id}
-                            className={`px-3 py-2 border border-border rounded-lg ${hasDetails ? 'cursor-pointer' : ''}`}
-                            onClick={hasDetails ? () => toggleTimeExpanded(time.id) : undefined}
+                      {bookViewMode === 'list' && availableTimes.length > ITEMS_PER_PAGE && (
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
+                            disabled={currentPage === 0}
+                            className="p-1 text-text-secondary hover:text-text disabled:opacity-30 disabled:cursor-not-allowed"
+                            aria-label="Previous page"
                           >
-                            <div className="flex justify-between items-center">
-                              <div className="flex items-center gap-4 flex-1 min-w-0">
-                                <div className="flex items-center gap-2 flex-shrink-0">
-                                  {hasDetails && (
-                                    <svg
-                                      className={`w-4 h-4 text-text-muted transition-transform ${isExpanded ? 'rotate-90' : ''}`}
-                                      fill="none"
-                                      stroke="currentColor"
-                                      viewBox="0 0 24 24"
-                                    >
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                    </svg>
-                                  )}
-                                  <span className="font-medium text-sm">
-                                    {new Date(time.date).toLocaleDateString(locale, {
-                                      weekday: 'short',
-                                      month: 'short',
-                                      day: 'numeric',
-                                    })}
-                                  </span>
-                                  <span className="text-text-secondary text-sm">
-                                    {formatTime(time.start_time)} - {formatTime(time.end_time)} EST
-                                  </span>
-                                </div>
-                                <span className="text-text-muted text-xs">
-                                  {t('postedBy', { name: getCreatorLabel(time) })}
-                                </span>
-                              </div>
-                              <button
-                                onClick={(e) => { e.stopPropagation(); handleBook(time.id); }}
-                                disabled={booking || isFrozen}
-                                className="btn-primary text-sm flex-shrink-0"
-                              >
-                                {booking ? t('booking') : t('book')}
-                              </button>
-                            </div>
-                            {/* Expandable details */}
-                            {isExpanded && hasDetails && (
-                              <div className="mt-2 pt-2 border-t border-border/50 text-xs text-text-muted space-y-0.5">
-                                {time.location && <p><span className="font-medium">{t('locationLabel')}:</span> {time.location}</p>}
-                                {time.notes && <p><span className="font-medium">{t('notesLabel')}:</span> {time.notes}</p>}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                            </svg>
+                          </button>
+                          <span className="text-sm text-text-secondary">
+                            {currentPage + 1} / {Math.ceil(availableTimes.length / ITEMS_PER_PAGE)}
+                          </span>
+                          <button
+                            onClick={() => setCurrentPage(p => Math.min(Math.ceil(availableTimes.length / ITEMS_PER_PAGE) - 1, p + 1))}
+                            disabled={currentPage >= Math.ceil(availableTimes.length / ITEMS_PER_PAGE) - 1}
+                            className="p-1 text-text-secondary hover:text-text disabled:opacity-30 disabled:cursor-not-allowed"
+                            aria-label="Next page"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                          </button>
+                        </div>
+                      )}
                     </div>
+                  </div>
+                  {bookViewMode === 'calendar' ? (
+                    <CalendarView
+                      role="living_group"
+                      times={[...availableTimes, ...bookedTimes]}
+                      proposals={[]}
+                      loading={loading}
+                      frozen={isFrozen}
+                      onBook={async (timeId) => { await handleBook(timeId); }}
+                      onCancelBooking={async (timeId) => { await handleCancelRequest(timeId); }}
+                      onPropose={async (proposalData) => {
+                        const res = await fetch('/api/living-groups/propose-time', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify(proposalData),
+                        });
+                        const data = await res.json();
+                        if (res.ok) {
+                          setMessage({ type: 'success', text: t('proposeTime.submitSuccess') });
+                          if (data.proposal) {
+                            setProposals(prev => [data.proposal, ...prev]);
+                          }
+                          fetchTimes();
+                        } else {
+                          throw new Error(data.error || t('proposeTime.submitError'));
+                        }
+                      }}
+                    />
+                  ) : (
+                    <>
+                      {loading ? (
+                        <p className="text-text-secondary text-sm">Loading...</p>
+                      ) : availableTimes.length === 0 ? (
+                        <p className="text-text-secondary text-sm">{t('noTimes')}</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {availableTimes.slice(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE).map((time) => {
+                            const hasDetails = time.location || time.notes;
+                            const isExpanded = expandedTimeIds.has(time.id);
+                            return (
+                              <div
+                                key={time.id}
+                                className={`px-3 py-2 border border-border rounded-lg ${hasDetails ? 'cursor-pointer' : ''}`}
+                                onClick={hasDetails ? () => toggleTimeExpanded(time.id) : undefined}
+                              >
+                                <div className="flex justify-between items-center">
+                                  <div className="flex items-center gap-4 flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 flex-shrink-0">
+                                      {hasDetails && (
+                                        <svg
+                                          className={`w-4 h-4 text-text-muted transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                                          fill="none"
+                                          stroke="currentColor"
+                                          viewBox="0 0 24 24"
+                                        >
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                        </svg>
+                                      )}
+                                      <span className="font-medium text-sm">
+                                        {new Date(time.date).toLocaleDateString(locale, {
+                                          weekday: 'short',
+                                          month: 'short',
+                                          day: 'numeric',
+                                        })}
+                                      </span>
+                                      <span className="text-text-secondary text-sm">
+                                        {formatTime(time.start_time)} - {formatTime(time.end_time)} EST
+                                      </span>
+                                    </div>
+                                    <span className="text-text-muted text-xs">
+                                      {t('postedBy', { name: getCreatorLabel(time) })}
+                                    </span>
+                                  </div>
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); handleBook(time.id); }}
+                                    disabled={booking || isFrozen}
+                                    className="btn-primary text-sm flex-shrink-0"
+                                  >
+                                    {booking ? t('booking') : t('book')}
+                                  </button>
+                                </div>
+                                {/* Expandable details */}
+                                {isExpanded && hasDetails && (
+                                  <div className="mt-2 pt-2 border-t border-border/50 text-xs text-text-muted space-y-0.5">
+                                    {time.location && <p><span className="font-medium">{t('locationLabel')}:</span> {time.location}</p>}
+                                    {time.notes && <p><span className="font-medium">{t('notesLabel')}:</span> {time.notes}</p>}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               )}

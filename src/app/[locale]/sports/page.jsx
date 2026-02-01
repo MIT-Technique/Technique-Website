@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { useUser } from '../../../hooks/useUser';
@@ -121,28 +121,34 @@ export default function SportsPage() {
     }
   }, [sports]);
 
-  useEffect(() => {
-    async function checkFrozen() {
-      try {
-        const res = await fetch('/api/auth/session');
-        const data = await res.json();
-        const frozen = data.frozenForms?.some(f => f.form_name === 'sports_form' && f.is_frozen);
-        setIsFrozen(frozen || false);
-      } catch (error) {
-        console.error('Error checking frozen status:', error);
-      }
-    }
-    checkFrozen();
-  }, []);
+  // Lazy-load data per tab
+  const fetchedTabs = useRef(new Set());
 
   useEffect(() => {
-    if (isLoggedIn && user?.role === 'sports') {
-      fetchCoaches();
-      fetchMembers();
-      fetchDocuments();
+    if (!isLoggedIn || user?.role !== 'sports') return;
+    if (fetchedTabs.current.has(activeTab)) return;
+    fetchedTabs.current.add(activeTab);
+
+    if (activeTab === 'profile') {
       fetchSportsEmail();
+      (async () => {
+        try {
+          const res = await fetch('/api/auth/session');
+          const data = await res.json();
+          const frozen = data.frozenForms?.some(f => f.form_name === 'sports_form' && f.is_frozen);
+          setIsFrozen(frozen || false);
+        } catch (error) {
+          console.error('Error checking frozen status:', error);
+        }
+      })();
+    } else if (activeTab === 'coaches') {
+      fetchCoaches();
+    } else if (activeTab === 'members') {
+      fetchMembers();
+    } else if (activeTab === 'documents') {
+      fetchDocuments();
     }
-  }, [isLoggedIn, user]);
+  }, [activeTab, isLoggedIn, user]);
 
   // ==================== API CALLS ====================
 
