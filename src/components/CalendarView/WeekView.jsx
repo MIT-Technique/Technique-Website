@@ -1,11 +1,11 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useRef, useCallback } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import TimelineSlot, { timeToRow } from './TimelineSlot';
 
-const HOUR_START = 6;
-const HOUR_END = 23;
+const HOUR_START = 0;
+const HOUR_END = 24;
 const TOTAL_HOURS = HOUR_END - HOUR_START;
 const ROWS = TOTAL_HOURS * 4;
 const ROW_HEIGHT = 15;
@@ -44,11 +44,13 @@ export default function WeekView({
   onCancelBooking,
   onAcceptProposal,
   onDeclineProposal,
+  onGridTimeClick,
 }) {
   const locale = useLocale();
   const t = useTranslations('calendarView');
   const today = new Date();
   const todayStr = toDateStr(today);
+  const gridRef = useRef(null);
 
   const weekDates = useMemo(() => getWeekDates(weekStart), [weekStart]);
 
@@ -70,6 +72,32 @@ export default function WeekView({
     return map;
   }, [proposals]);
 
+  const handleGridClick = useCallback((e) => {
+    if (e.target.closest('[data-slot]')) return;
+    const grid = gridRef.current;
+    if (!grid) return;
+    if (!onGridTimeClick) return;
+    const rect = grid.getBoundingClientRect();
+    const scrollContainer = grid.parentElement;
+    const y = e.clientY - rect.top;
+    const x = e.clientX - rect.left;
+    // 50px = time label column width
+    if (x <= 50) return;
+    const colWidth = (rect.width - 50) / 7;
+    const colIdx = Math.floor((x - 50) / colWidth);
+    if (colIdx < 0 || colIdx > 6) return;
+    const dateStr = toDateStr(weekDates[colIdx]);
+    if (new Date(dateStr) < new Date(todayStr)) return;
+    const row = Math.floor(y / ROW_HEIGHT);
+    const hour = Math.floor(row / 4) + HOUR_START;
+    const min = (row % 4) * 15;
+    if (hour < 0 || hour >= 24) return;
+    const startTime = `${String(hour).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
+    const endHour = hour + 1;
+    const endTime = endHour >= 24 ? '23:45' : `${String(endHour).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
+    onGridTimeClick({ date: dateStr, startTime, endTime });
+  }, [weekDates, todayStr, onGridTimeClick]);
+
   if (loading) {
     return <div className="py-12 text-center text-text-secondary text-sm">Loading...</div>;
   }
@@ -89,13 +117,14 @@ export default function WeekView({
           const dateStr = toDateStr(d);
           const isToday = dateStr === todayStr;
           const isSelected = dateStr === selectedDate;
+          const isPast = new Date(dateStr) < new Date(todayStr);
           return (
             <div
               key={dateStr}
               onClick={() => onSelectDate(dateStr === selectedDate ? null : dateStr)}
               className={`text-center py-2 cursor-pointer transition-colors border-l border-border ${
-                isSelected ? 'bg-accent/5' : 'hover:bg-bg-secondary/50'
-              }`}
+                isSelected ? 'bg-accent/5' : isPast ? 'bg-gray-50' : 'hover:bg-bg-secondary/50'
+              } ${isPast ? 'opacity-40' : ''}`}
             >
               <div className="text-[10px] text-text-muted uppercase">
                 {d.toLocaleDateString(locale, { weekday: 'short' })}
@@ -114,6 +143,9 @@ export default function WeekView({
 
       {/* Timeline grid */}
       <div
+        ref={gridRef}
+        onClick={handleGridClick}
+        className="cursor-pointer"
         style={{
           display: 'grid',
           gridTemplateRows: `repeat(${ROWS}, ${ROW_HEIGHT}px)`,
@@ -147,14 +179,18 @@ export default function WeekView({
           );
         })}
 
-        {/* Column separators */}
-        {weekDates.map((d, idx) => (
-          <div
-            key={`sep-${idx}`}
-            style={{ gridRow: `1 / span ${ROWS}`, gridColumn: idx + 2 }}
-            className="border-l border-border/30"
-          />
-        ))}
+        {/* Column separators + past day backgrounds */}
+        {weekDates.map((d, idx) => {
+          const dateStr = toDateStr(d);
+          const isPast = new Date(dateStr) < new Date(todayStr);
+          return (
+            <div
+              key={`sep-${idx}`}
+              style={{ gridRow: `1 / span ${ROWS}`, gridColumn: idx + 2 }}
+              className={`border-l border-border/30 ${isPast ? 'bg-gray-50 opacity-40' : ''}`}
+            />
+          );
+        })}
 
         {/* Current time indicator */}
         {(() => {
@@ -187,7 +223,7 @@ export default function WeekView({
               const sr = timeToRow(slot.start_time);
               const er = timeToRow(slot.end_time);
               return (
-              <div key={slot.id} style={{ gridColumn: colIdx + 2, gridRow: `${sr} / ${er}` }} className="px-0.5">
+              <div key={slot.id} data-slot style={{ gridColumn: colIdx + 2, gridRow: `${sr} / ${er}` }} className="px-0.5">
                 <TimelineSlot
                   slot={slot}
                   type="available"
@@ -206,7 +242,7 @@ export default function WeekView({
               const sr = timeToRow(slot.start_time);
               const er = timeToRow(slot.end_time);
               return (
-              <div key={slot.id} style={{ gridColumn: colIdx + 2, gridRow: `${sr} / ${er}` }} className="px-0.5">
+              <div key={slot.id} data-slot style={{ gridColumn: colIdx + 2, gridRow: `${sr} / ${er}` }} className="px-0.5">
                 <TimelineSlot
                   slot={slot}
                   type="booked"
@@ -226,7 +262,7 @@ export default function WeekView({
                   const sr = timeToRow(slot.start_time);
                   const er = timeToRow(slot.end_time);
                   return (
-                  <div key={slot.id} style={{ gridColumn: colIdx + 2, gridRow: `${sr} / ${er}` }} className="px-0.5">
+                  <div key={slot.id} data-slot style={{ gridColumn: colIdx + 2, gridRow: `${sr} / ${er}` }} className="px-0.5">
                     <TimelineSlot
                       slot={slot}
                       type="proposal"

@@ -3,10 +3,10 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 
-// Generate 15-minute time slot options (06:00 to 23:45)
+// Generate 15-minute time slot options (00:00 to 23:45)
 function generateTimeOptions() {
   const options = [];
-  for (let h = 6; h <= 23; h++) {
+  for (let h = 0; h <= 23; h++) {
     for (let m = 0; m < 60; m += 15) {
       const time = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
       options.push(time);
@@ -24,11 +24,11 @@ function formatTimeLabel(time) {
 
 const TIME_OPTIONS = generateTimeOptions();
 
-export default function CreateSlotForm({ date, onSubmit, onCancel, submitLabel }) {
+export default function CreateSlotForm({ date, onSubmit, onCancel, submitLabel, initialStartTime = '', initialEndTime = '' }) {
   const t = useTranslations('calendarView');
   const [form, setForm] = useState({
-    startTime: '',
-    endTime: '',
+    startTime: initialStartTime,
+    endTime: initialEndTime,
     location: '',
     notes: '',
   });

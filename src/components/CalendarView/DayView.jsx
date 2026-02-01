@@ -1,14 +1,15 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
-import CreateSlotForm from './CreateSlotForm';
+import { useState, useMemo, useRef, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
+import { AnimatePresence } from 'framer-motion';
+import DaySidePanel from './DaySidePanel';
 import TimelineSlot, { timeToRow } from './TimelineSlot';
 
-const HOUR_START = 6;
-const HOUR_END = 23;
-const TOTAL_HOURS = HOUR_END - HOUR_START; // 17
-const ROWS = TOTAL_HOURS * 4; // 68 quarter-hour rows
+const HOUR_START = 0;
+const HOUR_END = 24;
+const TOTAL_HOURS = HOUR_END - HOUR_START; // 24
+const ROWS = TOTAL_HOURS * 4; // 96 quarter-hour rows
 const ROW_HEIGHT = 15; // px per quarter-hour
 
 function formatHourLabel(hour) {
@@ -32,19 +33,12 @@ export default function DayView({
   onAcceptProposal,
   onDeclineProposal,
   onCancelBooking,
+  onPropose,
 }) {
-  const locale = useLocale();
   const t = useTranslations('calendarView');
-  const [showCreateForm, setShowCreateForm] = useState(false);
-
-  const isAdminOrPhotographer = role === 'admin' || role === 'photographer';
-
-  const dateLabel = new Date(date + 'T12:00:00').toLocaleDateString(locale, {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  });
+  const [showPanel, setShowPanel] = useState(false);
+  const [prefillTimes, setPrefillTimes] = useState(null);
+  const gridRef = useRef(null);
 
   const isPast = new Date(date) < new Date(new Date().toISOString().split('T')[0]);
   const isToday = date === new Date().toISOString().split('T')[0];
@@ -61,42 +55,36 @@ export default function DayView({
     ? (now.getHours() - HOUR_START) * 4 + Math.floor(now.getMinutes() / 15) + 1
     : null;
 
-  async function handleCreate(formData) {
-    if (!onCreate) return;
-    await onCreate({ ...formData, date });
-    setShowCreateForm(false);
-  }
+  const handleGridClick = useCallback((e) => {
+    if (isPast) return;
+    if (e.target.closest('[data-slot]')) return;
+    const grid = gridRef.current;
+    if (!grid) return;
+    const rect = grid.getBoundingClientRect();
+    const y = e.clientY - rect.top + grid.parentElement.scrollTop;
+    const row = Math.floor(y / ROW_HEIGHT);
+    const hour = Math.floor(row / 4) + HOUR_START;
+    const min = (row % 4) * 15;
+    if (hour < 0 || hour >= 24) return;
+    const startTime = `${String(hour).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
+    const endHour = hour + 1;
+    const endTime = endHour >= 24 ? '23:45' : `${String(endHour).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
+    setPrefillTimes({ startTime, endTime });
+    setShowPanel(true);
+  }, [isPast]);
 
   if (loading) {
     return <div className="py-12 text-center text-text-secondary text-sm">Loading...</div>;
   }
 
   return (
-    <div>
-      {/* Create slot */}
-      {isAdminOrPhotographer && !isPast && (
-        <div className="mb-3">
-          {showCreateForm ? (
-            <CreateSlotForm
-              date={date}
-              onSubmit={handleCreate}
-              onCancel={() => setShowCreateForm(false)}
-            />
-          ) : (
-            <button
-              onClick={() => setShowCreateForm(true)}
-              className="py-1.5 px-3 text-sm border border-dashed border-accent/40 text-accent rounded-lg hover:bg-accent/5 transition-colors"
-            >
-              + {t('addSlot')}
-            </button>
-          )}
-        </div>
-      )}
-
+    <div className="relative">
       {/* Timeline */}
-      <div className="overflow-y-auto border border-border rounded-lg" style={{ maxHeight: '600px' }}>
+      <div className={`overflow-y-auto border border-border rounded-lg ${isPast ? 'opacity-40' : ''}`} style={{ maxHeight: '600px' }}>
         <div
-          className="relative"
+          ref={gridRef}
+          onClick={handleGridClick}
+          className="relative cursor-pointer"
           style={{
             display: 'grid',
             gridTemplateRows: `repeat(${ROWS}, ${ROW_HEIGHT}px)`,
@@ -146,7 +134,7 @@ export default function DayView({
             const sr = timeToRow(slot.start_time);
             const er = timeToRow(slot.end_time);
             return (
-            <div key={slot.id} style={{ gridColumn: 2, gridRow: `${sr} / ${er}` }} className="px-1">
+            <div key={slot.id} data-slot style={{ gridColumn: 2, gridRow: `${sr} / ${er}` }} className="px-1">
               <TimelineSlot
                 slot={slot}
                 type="available"
@@ -166,7 +154,7 @@ export default function DayView({
             const sr = timeToRow(slot.start_time);
             const er = timeToRow(slot.end_time);
             return (
-            <div key={slot.id} style={{ gridColumn: 2, gridRow: `${sr} / ${er}` }} className="px-1">
+            <div key={slot.id} data-slot style={{ gridColumn: 2, gridRow: `${sr} / ${er}` }} className="px-1">
               <TimelineSlot
                 slot={slot}
                 type="booked"
@@ -186,7 +174,7 @@ export default function DayView({
             const sr = timeToRow(slot.start_time);
             const er = timeToRow(slot.end_time);
             return (
-            <div key={slot.id} style={{ gridColumn: 2, gridRow: `${sr} / ${er}` }} className="px-1">
+            <div key={slot.id} data-slot style={{ gridColumn: 2, gridRow: `${sr} / ${er}` }} className="px-1">
               <TimelineSlot
                 slot={slot}
                 type="proposal"
@@ -202,10 +190,36 @@ export default function DayView({
         </div>
       </div>
 
-      {/* Empty state */}
-      {dayTimes.length === 0 && dayProposals.length === 0 && (
+      {/* Empty state - only show for non-past days */}
+      {dayTimes.length === 0 && dayProposals.length === 0 && !isPast && (
         <p className="text-sm text-text-secondary text-center py-4">{t('noSlots')}</p>
       )}
+
+      {/* Side Panel overlay */}
+      <AnimatePresence>
+        {showPanel && (
+          <DaySidePanel
+            key={date}
+            date={date}
+            times={dayTimes}
+            proposals={dayProposals}
+            role={role}
+            currentUserId={currentUserId}
+            onClose={() => { setShowPanel(false); setPrefillTimes(null); }}
+            onBook={onBook}
+            onCreate={(...args) => { setPrefillTimes(null); return onCreate?.(...args); }}
+            onDelete={onDelete}
+            onAcceptProposal={onAcceptProposal}
+            onDeclineProposal={onDeclineProposal}
+            onCancelBooking={onCancelBooking}
+            onPropose={(...args) => { setPrefillTimes(null); return onPropose?.(...args); }}
+            frozen={frozen}
+            formatTime={formatTime}
+            initialStartTime={prefillTimes?.startTime || ''}
+            initialEndTime={prefillTimes?.endTime || ''}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

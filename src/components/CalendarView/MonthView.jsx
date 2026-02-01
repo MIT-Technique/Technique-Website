@@ -71,8 +71,10 @@ export default function MonthView({
                 className={`border-r border-b border-border min-h-[80px] p-1.5 cursor-pointer transition-colors ${
                   isSelected
                     ? 'bg-accent/5 ring-2 ring-accent ring-inset'
-                    : 'hover:bg-bg-secondary/50'
-                } ${isPast ? 'opacity-60' : ''}`}
+                    : isPast
+                      ? 'bg-gray-50'
+                      : 'hover:bg-bg-secondary/50'
+                } ${isPast ? 'opacity-40' : ''}`}
               >
                 <span
                   className={`text-sm font-medium w-7 h-7 flex items-center justify-center rounded-full mb-1 ${

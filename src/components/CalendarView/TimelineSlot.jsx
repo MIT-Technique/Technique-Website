@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 
-const HOUR_START = 6;
+const HOUR_START = 0;
 
 export function timeToRow(timeStr) {
   if (!timeStr) return 1;

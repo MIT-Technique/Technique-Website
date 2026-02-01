@@ -21,16 +21,20 @@ export default function DaySidePanel({
   onPropose,
   frozen = false,
   formatTime,
+  initialStartTime = '',
+  initialEndTime = '',
 }) {
   const locale = useLocale();
   const t = useTranslations('calendarView');
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [showProposeForm, setShowProposeForm] = useState(false);
-  const [processingId, setProcessingId] = useState(null);
-  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
   const isAdminOrPhotographer = role === 'admin' || role === 'photographer';
   const isLivingGroup = role === 'living_group';
+
+  const hasPrefill = !!(initialStartTime && initialEndTime);
+  const [showCreateForm, setShowCreateForm] = useState(isAdminOrPhotographer && hasPrefill);
+  const [showProposeForm, setShowProposeForm] = useState(isLivingGroup && hasPrefill);
+  const [processingId, setProcessingId] = useState(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
   const availableTimes = times.filter((t) => !t.living_group_id && !t.cancelled_at);
   const bookedTimes = times.filter((t) => t.living_group_id && !t.cancelled_at);
@@ -163,6 +167,8 @@ export default function DaySidePanel({
                 date={date}
                 onSubmit={handleCreate}
                 onCancel={() => setShowCreateForm(false)}
+                initialStartTime={initialStartTime}
+                initialEndTime={initialEndTime}
               />
             ) : (
               <button
@@ -184,6 +190,8 @@ export default function DaySidePanel({
                 onSubmit={handlePropose}
                 onCancel={() => setShowProposeForm(false)}
                 submitLabel={t('proposeSlot')}
+                initialStartTime={initialStartTime}
+                initialEndTime={initialEndTime}
               />
             ) : (
               <button

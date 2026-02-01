@@ -51,6 +51,7 @@ export default function CalendarView({
   const [viewMode, setViewMode] = useState('month'); // 'day' | 'week' | 'month'
   const [viewDate, setViewDate] = useState(today); // anchor date
   const [selectedDate, setSelectedDate] = useState(null);
+  const [prefillTimes, setPrefillTimes] = useState(null); // { startTime, endTime }
 
   // Derived values
   const viewYear = viewDate.getFullYear();
@@ -217,7 +218,7 @@ export default function CalendarView({
             timesByDate={timesByDate}
             proposalsByDate={proposalsByDate}
             selectedDate={selectedDate}
-            onDayClick={(dateStr) => setSelectedDate(dateStr === selectedDate ? null : dateStr)}
+            onDayClick={(dateStr) => { setSelectedDate(dateStr === selectedDate ? null : dateStr); setPrefillTimes(null); }}
             role={role}
             loading={loading}
             locale={locale}
@@ -242,6 +243,10 @@ export default function CalendarView({
             onCancelBooking={onCancelBooking}
             onAcceptProposal={onAcceptProposal}
             onDeclineProposal={onDeclineProposal}
+            onGridTimeClick={({ date: dateStr, startTime, endTime }) => {
+              setSelectedDate(dateStr);
+              setPrefillTimes({ startTime, endTime });
+            }}
           />
         )}
 
@@ -261,6 +266,7 @@ export default function CalendarView({
             onAcceptProposal={onAcceptProposal}
             onDeclineProposal={onDeclineProposal}
             onCancelBooking={onCancelBooking}
+            onPropose={onPropose}
           />
         )}
       </div>
@@ -275,16 +281,18 @@ export default function CalendarView({
             proposals={selectedProposals}
             role={role}
             currentUserId={currentUserId}
-            onClose={() => setSelectedDate(null)}
+            onClose={() => { setSelectedDate(null); setPrefillTimes(null); }}
             onBook={onBook}
-            onCreate={onCreate}
+            onCreate={(...args) => { setPrefillTimes(null); return onCreate?.(...args); }}
             onDelete={onDelete}
             onAcceptProposal={onAcceptProposal}
             onDeclineProposal={onDeclineProposal}
             onCancelBooking={onCancelBooking}
-            onPropose={onPropose}
+            onPropose={(...args) => { setPrefillTimes(null); return onPropose?.(...args); }}
             frozen={frozen}
             formatTime={formatTime}
+            initialStartTime={prefillTimes?.startTime || ''}
+            initialEndTime={prefillTimes?.endTime || ''}
           />
         )}
       </AnimatePresence>
