@@ -26,6 +26,13 @@ const nextConfig = {
         permanent: false,
       },
       {
+        source: "/purchase",
+        destination: "https://engage.mit.edu/technique/rsvp_boot?id=916938",
+        permanent: false,
+      },
+      {
+        source: "/bio",
+        destination: "/en/bio",
         source: "/admin",
         destination: "/en/login/admin",
         permanent: false,
