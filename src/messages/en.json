@@ -185,7 +185,7 @@
         "signInTitle": "Sign In",
         "organizationTab": "Organization",
         "staphTab": "Staph",
-        "selectOrganization": "Organization",
+        "selectOrganization": "Name",
         "searchOrganization": "Search for your organization...",
         "organizationRequired": "Please select an organization",
         "noOrganizationsFound": "No organizations found",
