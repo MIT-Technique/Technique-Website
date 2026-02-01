@@ -166,12 +166,6 @@
       "metaTitle": "Iniciar Sesión - MIT Technique",
       "metaDescription": "Inicia sesión para acceder a tu cuenta.",
       "description": "Inicia sesión para acceder a tu cuenta y gestionar tu información.",
-      "instructionText": "Inicio de sesión de estudiantes con credenciales de MIT.",
-      "signInButton": "Iniciar Sesión con MIT",
-      "dividerText": "o",
-      "success": "Sesión iniciada exitosamente",
-      "organizationButton": "Acceso de Organización",
-      "organizationPrefix": "¿Representas a un club o grupo de vivienda?",
       "organizationLink": "Acceso de Organización",
       "org": {
         "title": "Acceso de Organización",

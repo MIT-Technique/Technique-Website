@@ -236,11 +236,9 @@ export default function OrganizationAuthModal({ open, onClose }) {
       }
 
       setSuccess(t("successRedirecting"));
-      setTimeout(() => {
-        if (data.redirectUrl) {
-          window.location.href = data.redirectUrl;
-        }
-      }, 1000);
+      if (data.redirectUrl) {
+        window.location.href = data.redirectUrl;
+      }
     } catch (err) {
       setError(t("invalidCredentials"));
     } finally {

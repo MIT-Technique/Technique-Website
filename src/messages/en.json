@@ -178,12 +178,6 @@
       "metaTitle": "Login - MIT Technique",
       "metaDescription": "Sign in to access your account.",
       "description": "Sign in to access your account and manage your information.",
-      "instructionText": "Student sign-in with MIT credentials.",
-      "signInButton": "Sign In with MIT",
-      "dividerText": "or",
-      "success": "Signed in successfully",
-      "organizationButton": "Organization Login",
-      "organizationPrefix": "Representing a club or living group?",
       "organizationLink": "Organization Login",
       "org": {
         "title": "Organization Login",

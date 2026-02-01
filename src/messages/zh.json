@@ -166,10 +166,6 @@
       "metaTitle": "登录 - MIT Technique",
       "metaDescription": "登录以访问您的账户。",
       "description": "登录以访问您的账户并管理您的信息。",
-      "instructionText": "使用MIT凭据登录学生账户。",
-      "signInButton": "使用MIT登录",
-      "organizationButton": "组织登录",
-      "organizationPrefix": "代表社团或宿舍？",
       "organizationLink": "组织登录",
       "org": {
         "title": "组织登录",

@@ -2,7 +2,6 @@ import { IronSession, SessionOptions, getIronSession } from "iron-session";
 import { cookies } from "next/headers";
 import { createAdminClient } from "../supabase/admin";
 import { User, UserRole } from "../supabase/types";
-import { getSession as getMitSsoSession } from "../lib";
 
 export interface SessionData {
   isLoggedIn: boolean;
@@ -50,21 +49,9 @@ export async function getSession(): Promise<IronSession<SessionData>> {
 }
 
 // Get full user data from Supabase
-// Checks both technique_session (admin magic link) and next_js_session (MIT SSO)
 export async function getCurrentUser(): Promise<User | null> {
-  // First check technique_session (admin magic link logins)
-  const techniqueSession = await getSession();
-  let email: string | undefined;
-
-  if (techniqueSession.isLoggedIn && techniqueSession.userInfo?.email) {
-    email = techniqueSession.userInfo.email;
-  } else {
-    // Fallback to MIT SSO session (next_js_session)
-    const mitSsoSession = await getMitSsoSession();
-    if (mitSsoSession.isLoggedIn && mitSsoSession.userInfo?.email) {
-      email = mitSsoSession.userInfo.email;
-    }
-  }
+  const session = await getSession();
+  const email = session.isLoggedIn ? session.userInfo?.email : undefined;
 
   if (!email) {
     return null;
@@ -78,49 +65,6 @@ export async function getCurrentUser(): Promise<User | null> {
     .single();
 
   if (error || !data) {
-    return null;
-  }
-
-  return data as User;
-}
-
-// Upsert user after MIT SSO login
-export async function upsertMitSsoUser(email: string, firstName: string): Promise<User | null> {
-  const supabase = createAdminClient();
-
-  // Check if user exists
-  const { data: existingUser } = await supabase
-    .from('users')
-    .select('*')
-    .eq('email', email)
-    .single();
-
-  if (existingUser) {
-    // Update last login
-    const { data, error } = await supabase
-      .from('users')
-      .update({ updated_at: new Date().toISOString() })
-      .eq('email', email)
-      .select()
-      .single();
-
-    return data as User;
-  }
-
-  // Create new user with default staph role
-  const { data, error } = await supabase
-    .from('users')
-    .insert({
-      email,
-      name: firstName,
-      role: 'staph',
-      is_active: true,
-    })
-    .select()
-    .single();
-
-  if (error) {
-    console.error('Error creating user:', error);
     return null;
   }
 

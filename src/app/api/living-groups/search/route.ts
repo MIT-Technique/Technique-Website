@@ -1,20 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { getSession as getNewSession } from "../../../../lib/auth/session";
-import { getSession as getOriginalSession } from "../../../../lib/lib";
+import { getSession } from "../../../../lib/auth/session";
 
 // GET /api/living-groups/search?q=baker&type=dorm
 // Search living groups by name
 export async function GET(request: NextRequest) {
   try {
-    // Check both sessions (technique session and MIT SSO session)
-    const newSession = await getNewSession();
-    const originalSession = await getOriginalSession();
-
-    const isNewSessionActive = newSession?.isLoggedIn && newSession?.userInfo?.email;
-    const isOriginalSessionActive = originalSession?.isLoggedIn && originalSession?.userInfo?.email;
-
-    if (!isNewSessionActive && !isOriginalSessionActive) {
+    const session = await getSession();
+    if (!session?.isLoggedIn || !session?.userInfo?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
