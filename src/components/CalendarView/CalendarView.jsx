@@ -68,15 +68,18 @@ export default function CalendarView({
     return map;
   }, [times]);
 
+  // Only show pending proposals on the calendar
+  const pendingProposals = useMemo(() => proposals.filter((p) => p.status === 'pending'), [proposals]);
+
   const proposalsByDate = useMemo(() => {
     const map = {};
-    proposals.forEach((p) => {
+    pendingProposals.forEach((p) => {
       const key = p.date;
       if (!map[key]) map[key] = [];
       map[key].push(p);
     });
     return map;
-  }, [proposals]);
+  }, [pendingProposals]);
 
   // Navigation
   function navigate(delta) {
@@ -129,9 +132,6 @@ export default function CalendarView({
     return sun.toLocaleDateString(locale, { weekday: 'short' });
   });
 
-  // Legend
-  const showLegend = viewMode === 'month';
-
   // Selected day data (for side panel in month/week modes)
   const selectedTimes = selectedDate ? (timesByDate[selectedDate] || []) : [];
   const selectedProposals = selectedDate ? (proposalsByDate[selectedDate] || []) : [];
@@ -167,16 +167,17 @@ export default function CalendarView({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
-            <button
-              onClick={goToToday}
-              className="text-xs px-2 py-1 ml-1 rounded border border-border hover:bg-bg-secondary text-text-secondary"
-            >
-              {t('today')}
-            </button>
           </div>
 
           {/* View toggle */}
-          <div className="flex rounded border border-border overflow-hidden flex-shrink-0 mr-2">
+          <div className="flex items-center gap-2 flex-shrink-0 mr-2">
+            <button
+              onClick={goToToday}
+              className="text-xs px-2 py-1 rounded border border-border hover:bg-bg-secondary text-text-secondary"
+            >
+              {t('today')}
+            </button>
+            <div className="flex rounded border border-border overflow-hidden">
             {['day', 'week', 'month'].map((mode) => (
               <button
                 key={mode}
@@ -190,25 +191,27 @@ export default function CalendarView({
                 {t(`${mode}View`)}
               </button>
             ))}
+            </div>
           </div>
         </div>
 
-        {/* Legend (month view only) */}
-        {showLegend && (
-          <div className="flex gap-4 mb-3 text-xs text-text-secondary">
+        {/* Legend */}
+        <div className="flex gap-4 mb-3 text-xs text-text-secondary">
+          <span className="flex items-center gap-1">
+            <span className="w-2.5 h-2.5 rounded-full bg-blue-400" /> {t('available')}
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="w-2.5 h-2.5 rounded-full bg-green-500" /> {t('booked')}
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="w-2.5 h-2.5 rounded-full bg-yellow-400" /> {t('pending')}
+          </span>
+          {role === 'living_group' && (
             <span className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded-full bg-blue-400" /> {t('available')}
+              <span className="w-2.5 h-2.5 rounded-full bg-gray-400" /> {t('otherProposals')}
             </span>
-            <span className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded-full bg-green-500" /> {t('booked')}
-            </span>
-            {(role === 'admin' || role === 'photographer') && (
-              <span className="flex items-center gap-1">
-                <span className="w-2.5 h-2.5 rounded-full bg-yellow-400" /> {t('pending')}
-              </span>
-            )}
-          </div>
-        )}
+          )}
+        </div>
 
         {/* View content */}
         {viewMode === 'month' && (
@@ -230,7 +233,7 @@ export default function CalendarView({
           <WeekView
             weekStart={weekStart}
             times={times}
-            proposals={proposals}
+            proposals={pendingProposals}
             role={role}
             currentUserId={currentUserId}
             selectedDate={selectedDate}
@@ -254,7 +257,7 @@ export default function CalendarView({
           <DayView
             date={dayDateStr}
             times={times}
-            proposals={proposals}
+            proposals={pendingProposals}
             role={role}
             currentUserId={currentUserId}
             frozen={frozen}

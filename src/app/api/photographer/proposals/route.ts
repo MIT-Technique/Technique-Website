@@ -40,9 +40,9 @@ export async function GET() {
 
     const supabase = createAdminClient();
 
-    // Check if user is a photographer
-    const isPhotographer = await isStaphOrPhotographer(user.id, supabase);
-    if (!isPhotographer) {
+    // Check if user is admin, staph, or photographer
+    const isAllowed = user.role === "admin" || await isStaphOrPhotographer(user.id, supabase);
+    if (!isAllowed) {
       return NextResponse.json(
         { error: "You don't have staph access" },
         { status: 403 }
@@ -99,9 +99,9 @@ export async function PUT(request: NextRequest) {
 
     const supabase = createAdminClient();
 
-    // Check if user is a photographer
-    const isPhotographer = await isStaphOrPhotographer(user.id, supabase);
-    if (!isPhotographer) {
+    // Check if user is admin, staph, or photographer
+    const isAllowed = user.role === "admin" || await isStaphOrPhotographer(user.id, supabase);
+    if (!isAllowed) {
       return NextResponse.json(
         { error: "You don't have staph access" },
         { status: 403 }

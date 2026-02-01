@@ -231,6 +231,7 @@ export default function WeekView({
                   role={role}
                   currentUserId={currentUserId}
                   frozen={frozen}
+                  isOwn={!!currentUserId && slot.created_by === currentUserId}
                   formatTime={formatTime}
                   onBook={onBook}
                   onDelete={onDelete}
@@ -250,6 +251,7 @@ export default function WeekView({
                   role={role}
                   currentUserId={currentUserId}
                   frozen={frozen}
+                  isOwn={role === 'living_group' || (!!currentUserId && slot.created_by === currentUserId)}
                   formatTime={formatTime}
                   onCancelBooking={onCancelBooking}
                   onDelete={onDelete}
@@ -257,8 +259,7 @@ export default function WeekView({
               </div>
               );
             }),
-            ...(role === 'admin' || role === 'photographer'
-              ? dayProposals.map((slot) => {
+            ...dayProposals.map((slot) => {
                   const sr = timeToRow(slot.start_time);
                   const er = timeToRow(slot.end_time);
                   return (
@@ -268,14 +269,15 @@ export default function WeekView({
                       type="proposal"
                       compact
                       role={role}
+                      currentUserId={currentUserId}
+                      isOwn={role === 'living_group'}
                       formatTime={formatTime}
                       onAcceptProposal={onAcceptProposal}
                       onDeclineProposal={onDeclineProposal}
                     />
                   </div>
                   );
-                })
-              : []),
+                }),
           ];
         })}
       </div>

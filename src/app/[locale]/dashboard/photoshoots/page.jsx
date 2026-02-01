@@ -55,6 +55,7 @@ export default function PhotoshootsPage() {
   const { user } = useUser();
   const isAdmin = user?.role === 'admin';
   const [times, setTimes] = useState([]);
+  const [proposals, setProposals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const [showAddForm, setShowAddForm] = useState(false);
@@ -68,6 +69,7 @@ export default function PhotoshootsPage() {
 
   useEffect(() => {
     fetchTimes();
+    fetchProposals();
   }, [filter]);
 
   async function fetchTimes() {
@@ -84,6 +86,18 @@ export default function PhotoshootsPage() {
       console.error('Error fetching times:', error);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function fetchProposals() {
+    try {
+      const res = await fetch('/api/photographer/proposals');
+      if (res.ok) {
+        const data = await res.json();
+        setProposals(data.proposals || []);
+      }
+    } catch (error) {
+      console.error('Error fetching proposals:', error);
     }
   }
 
@@ -129,6 +143,29 @@ export default function PhotoshootsPage() {
       }
     } catch (error) {
       console.error('Error deleting time:', error);
+    }
+  }
+
+  async function handleAcceptProposal(proposalId) {
+    const res = await fetch('/api/photographer/proposals', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ proposalId, action: 'accept' }),
+    });
+    if (res.ok) {
+      fetchProposals();
+      fetchTimes();
+    }
+  }
+
+  async function handleDeclineProposal(proposalId, reason) {
+    const res = await fetch('/api/photographer/proposals', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ proposalId, action: 'decline', decline_reason: reason }),
+    });
+    if (res.ok) {
+      fetchProposals();
     }
   }
 
@@ -187,10 +224,12 @@ export default function PhotoshootsPage() {
         <CalendarView
           role="admin"
           times={times}
-          proposals={[]}
+          proposals={proposals}
           loading={loading}
           onCreate={handleCalendarCreate}
           onDelete={handleCalendarDelete}
+          onAcceptProposal={handleAcceptProposal}
+          onDeclineProposal={handleDeclineProposal}
         />
       ) : (
         <>

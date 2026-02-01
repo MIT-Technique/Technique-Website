@@ -30,6 +30,7 @@ export default function TimelineSlot({
   role,
   currentUserId,
   frozen = false,
+  isOwn = false,
   formatTime,
   onBook,
   onDelete,
@@ -45,11 +46,22 @@ export default function TimelineSlot({
   const isAdminOrPhotographer = role === 'admin' || role === 'photographer';
   const isLivingGroup = role === 'living_group';
 
+  // Living groups see other groups' proposals as gray
+  const isOtherProposal = type === 'proposal' && isLivingGroup && !isOwn;
+  const styles = isOtherProposal ? 'border-gray-200 bg-gray-50 text-gray-900' : TYPE_STYLES[type];
+  const badgeStyles = isOtherProposal ? 'bg-gray-100 text-gray-700' : TYPE_BADGE[type];
+
   function getCreatorLabel() {
     const creator = slot?.creator || slot?.created_by_user;
     if (!creator) return t('unknown');
     if (creator.role === 'admin') return 'TNQ Photo';
     return creator.name || creator.email || t('unknown');
+  }
+
+  function getBookerLabel() {
+    const booker = slot?.booked_by_user || slot?.created_by_user || slot?.creator;
+    if (!booker) return t('unknown');
+    return booker.email || t('unknown');
   }
 
   async function handleAction(fn, ...args) {
@@ -81,7 +93,7 @@ export default function TimelineSlot({
   if (compact) {
     return (
       <div
-        className={`border rounded text-[10px] px-1 py-0.5 overflow-hidden leading-tight cursor-pointer h-full ${TYPE_STYLES[type]}`}
+        className={`border rounded text-[10px] px-1 py-0.5 overflow-hidden leading-tight cursor-pointer h-full ${styles}${isOwn ? ' !border-l-[3px] !border-l-accent' : ''}`}
       >
         <span className="font-medium">
           {formatTime(slot.start_time)}
@@ -95,14 +107,14 @@ export default function TimelineSlot({
 
   return (
     <div
-      className={`border rounded-lg px-3 py-1.5 overflow-hidden text-sm h-full ${TYPE_STYLES[type]}`}
+      className={`border rounded-lg px-3 py-1.5 overflow-hidden text-sm h-full ${styles}${isOwn ? ' !border-l-[3px] !border-l-accent' : ''}`}
     >
       <div className="flex justify-between items-center gap-2">
         <div className="flex items-center gap-2 min-w-0">
           <span className="font-medium whitespace-nowrap">
             {formatTime(slot.start_time)} - {formatTime(slot.end_time)} EST
           </span>
-          <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${TYPE_BADGE[type]}`}>
+          <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${badgeStyles}`}>
             {t(type === 'available' ? 'available' : type === 'booked' ? 'booked' : 'pending')}
           </span>
         </div>
@@ -166,11 +178,10 @@ export default function TimelineSlot({
       <p className="text-xs opacity-75 mt-0.5 leading-snug truncate">
         {type === 'proposal'
           ? <span className="font-medium">{slot.living_group?.name || t('unknown')}</span>
-          : <>{t('postedBy')} {getCreatorLabel()}</>
+          : type === 'booked'
+            ? <><span className="font-medium">{slot.living_group?.name || t('booked')}</span>{' · '}{t('bookedBy', { name: getBookerLabel() })}</>
+            : <>{t('postedBy')} {getCreatorLabel()}</>
         }
-        {type === 'booked' && slot.living_group?.name && (
-          <>{' · '}<span className="font-medium">{slot.living_group.name}</span></>
-        )}
         {slot.location && <>{' · '}{slot.location}</>}
         {slot.notes && <>{' · '}<span className="italic">{slot.notes}</span></>}
       </p>

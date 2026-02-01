@@ -5,6 +5,27 @@ import { getSession } from "../../../../lib/auth/session";
 
 const ADMIN_EMAIL = "tnq-exec@mit.edu";
 
+async function saveSessionAndRespond(
+  session: Awaited<ReturnType<typeof getSession>>,
+  sessionData: {
+    access_token?: string;
+    userId: string;
+    userInfo: { sub: string; name: string; email: string; email_verified: boolean };
+  },
+  redirectUrl: string
+) {
+  session.isLoggedIn = true;
+  session.access_token = sessionData.access_token;
+  session.userId = sessionData.userId;
+  session.userInfo = sessionData.userInfo;
+  await session.save();
+
+  return NextResponse.json({
+    success: true,
+    redirectUrl,
+  });
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -39,6 +60,8 @@ export async function POST(request: NextRequest) {
     }
 
     const supabaseAdmin = createAdminClient();
+    const session = await getSession();
+    const dashboardUrl = "/en/dashboard";
 
     // Get user from our users table
     const { data: user, error: userError } = await supabaseAdmin
@@ -70,22 +93,16 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        const session = await getSession();
-        session.isLoggedIn = true;
-        session.access_token = authData.session?.access_token;
-        session.userId = newUser.id;
-        session.userInfo = {
-          sub: ADMIN_EMAIL,
-          name: "Admin",
-          email: ADMIN_EMAIL,
-          email_verified: true,
-        };
-        await session.save();
-
-        return NextResponse.json({
-          success: true,
-          redirectUrl: `${process.env.NEXT_PUBLIC_APP_URL}/en/dashboard`,
-        });
+        return saveSessionAndRespond(session, {
+          access_token: authData.session?.access_token,
+          userId: newUser.id,
+          userInfo: {
+            sub: ADMIN_EMAIL,
+            name: "Admin",
+            email: ADMIN_EMAIL,
+            email_verified: true,
+          },
+        }, dashboardUrl);
       }
 
       return NextResponse.json(
@@ -114,27 +131,16 @@ export async function POST(request: NextRequest) {
     }
 
     // Create technique_session
-    const session = await getSession();
-    session.isLoggedIn = true;
-    session.access_token = authData.session?.access_token;
-    session.userId = user.id;
-    session.userInfo = {
-      sub: loginEmail,
-      name: user.name || (user.role === "admin" ? "Admin" : "Staph"),
-      email: loginEmail,
-      email_verified: true,
-    };
-    await session.save();
-
-    // Redirect based on role
-    const redirectUrl = user.role === "admin"
-      ? `${process.env.NEXT_PUBLIC_APP_URL}/en/dashboard`
-      : `${process.env.NEXT_PUBLIC_APP_URL}/en/dashboard`;
-
-    return NextResponse.json({
-      success: true,
-      redirectUrl,
-    });
+    return saveSessionAndRespond(session, {
+      access_token: authData.session?.access_token,
+      userId: user.id,
+      userInfo: {
+        sub: loginEmail,
+        name: user.name || (user.role === "admin" ? "Admin" : "Staph"),
+        email: loginEmail,
+        email_verified: true,
+      },
+    }, dashboardUrl);
   } catch (error) {
     console.error("Admin/staph login error:", error);
     return NextResponse.json(

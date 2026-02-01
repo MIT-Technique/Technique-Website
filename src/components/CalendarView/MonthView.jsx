@@ -17,7 +17,6 @@ export default function MonthView({
   proposalsByDate,
   selectedDate,
   onDayClick,
-  role,
   loading,
   locale,
   dayNames,
@@ -96,7 +95,7 @@ export default function MonthView({
                       {bookedCount}
                     </span>
                   )}
-                  {proposalCount > 0 && (role === 'admin' || role === 'photographer') && (
+                  {proposalCount > 0 && (
                     <span className="flex items-center gap-0.5 text-[10px] text-yellow-700">
                       <span className="w-2 h-2 rounded-full bg-yellow-400" />
                       {proposalCount}

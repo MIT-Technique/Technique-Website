@@ -6,86 +6,17 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useUser } from '../../../hooks/useUser';
 import Footer from '../../../components/Footer/Footer';
 import ImageUpload from '../../../components/ImageUpload/ImageUpload';
-import TextField from "@mui/material/TextField";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
 import { generateTimeSlots, formatTimeDisplay as formatTimeUtil } from '../../../lib/utils/time';
 import CalendarView from '../../../components/CalendarView/CalendarView';
 
-// Generate 15-minute time slot options (06:00 to 23:45)
-function generateTimeOptions() {
-  const options = [];
-  for (let h = 6; h <= 23; h++) {
-    for (let m = 0; m < 60; m += 15) {
-      const time = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-      options.push(time);
-    }
-  }
-  return options;
-}
-
-// Format time for display (14:30 -> 2:30 PM)
-function formatTimeDisplay(time) {
-  if (!time) return '';
-  const [hours, minutes] = time.split(':').map(Number);
-  const ampm = hours >= 12 ? 'PM' : 'AM';
-  const displayHours = hours % 12 || 12;
-  return `${displayHours}:${String(minutes).padStart(2, '0')} ${ampm}`;
-}
-
-const TIME_OPTIONS = generateTimeOptions();
-
-// Get the next 15-minute time slot from now
-function getDefaultStartTime() {
-  const now = new Date();
-  let hours = now.getHours();
-  let minutes = now.getMinutes();
-
-  // Round up to next 15-minute interval
-  minutes = Math.ceil(minutes / 15) * 15;
-  if (minutes >= 60) {
-    hours += 1;
-    minutes = 0;
-  }
-
-  // Ensure within TIME_OPTIONS range (06:00 - 23:45)
-  if (hours < 6) {
-    hours = 6;
-    minutes = 0;
-  } else if (hours >= 24) {
-    hours = 6;
-    minutes = 0;
-  }
-
-  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-}
-
-// Get end time 1 hour after start
-function getDefaultEndTime(startTime) {
-  if (!startTime) return '07:00';
-  const [h, m] = startTime.split(':').map(Number);
-  let endH = h + 1;
-  if (endH > 23) endH = 23;
-  return `${String(endH).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-}
-
-// Strip seconds from time string (HH:MM:SS -> HH:MM)
+// Format 24-hour time to 12-hour AM/PM (e.g., "14:30:00" -> "2:30 PM")
 function formatTime(time) {
   if (!time) return '';
-  return time.slice(0, 5);
+  const [hours, minutes] = time.slice(0, 5).split(':').map(Number);
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  const hour12 = hours % 12 || 12;
+  return `${hour12}:${String(minutes).padStart(2, '0')} ${ampm}`;
 }
-
-// MUI styling to match other forms
-const textFieldSx = {
-  "& .MuiOutlinedInput-root": {
-    "& fieldset": { borderColor: "#E5E5E5" },
-    "&:hover fieldset": { borderColor: "#D0D0D0" },
-    "&.Mui-focused fieldset": { borderColor: "#750014" },
-  },
-  "& .MuiInputLabel-root.Mui-focused": { color: "#750014" },
-};
 
 // Auto-dismissing message with fade-out
 function FadeMessage({ message, onClear, duration = 4000, className = 'mb-6 p-4 rounded' }) {
@@ -175,15 +106,6 @@ export default function LivingGroupPage() {
 
   // Time proposal state
   const [proposals, setProposals] = useState([]);
-  const [proposalsLoading, setProposalsLoading] = useState(true);
-  const [proposalForm, setProposalForm] = useState({
-    date: '',
-    start_time: '',
-    end_time: '',
-    location: '',
-    notes: '',
-  });
-  const [submittingProposal, setSubmittingProposal] = useState(false);
   const [cancellingProposalId, setCancellingProposalId] = useState(null);
 
   // Pagination state
@@ -194,6 +116,8 @@ export default function LivingGroupPage() {
 
   // Expanded time slots (to show location/notes)
   const [expandedTimeIds, setExpandedTimeIds] = useState(new Set());
+  const [showListProposeForm, setShowListProposeForm] = useState(false);
+  const [proposing, setProposing] = useState(false);
 
   // Toggle expansion for a time slot
   function toggleTimeExpanded(timeId) {
@@ -251,18 +175,6 @@ export default function LivingGroupPage() {
     }
   }, [activeTab, isLoggedIn, user, livingGroup]);
 
-  // Set default proposal form values on mount
-  useEffect(() => {
-    const today = new Date().toISOString().split('T')[0];
-    const defaultStart = getDefaultStartTime();
-    const defaultEnd = getDefaultEndTime(defaultStart);
-    setProposalForm(prev => ({
-      ...prev,
-      date: today,
-      start_time: defaultStart,
-      end_time: defaultEnd,
-    }));
-  }, []);
 
   async function fetchTimes() {
     try {
@@ -712,7 +624,6 @@ export default function LivingGroupPage() {
 
   async function fetchProposals() {
     try {
-      setProposalsLoading(true);
       const res = await fetch('/api/living-groups/propose-time');
       const data = await res.json();
       if (res.ok) {
@@ -722,8 +633,6 @@ export default function LivingGroupPage() {
       }
     } catch (error) {
       console.error('Error fetching proposals:', error);
-    } finally {
-      setProposalsLoading(false);
     }
   }
 
@@ -768,64 +677,6 @@ export default function LivingGroupPage() {
     }
   }
 
-
-  async function handleSubmitProposal(e) {
-    e.preventDefault();
-    if (!proposalForm.date || !proposalForm.start_time || !proposalForm.end_time) {
-      setMessage({ type: 'error', text: t('proposeTime.fieldsRequired') });
-      return;
-    }
-
-    // Validate start time is before end time
-    const startMins = parseInt(proposalForm.start_time.split(':')[0]) * 60 + parseInt(proposalForm.start_time.split(':')[1]);
-    const endMins = parseInt(proposalForm.end_time.split(':')[0]) * 60 + parseInt(proposalForm.end_time.split(':')[1]);
-    if (startMins >= endMins) {
-      setMessage({ type: 'error', text: t('proposeTime.startBeforeEnd') });
-      return;
-    }
-
-    // Validate date is not in the past
-    const today = new Date().toISOString().split('T')[0];
-    if (proposalForm.date < today) {
-      setMessage({ type: 'error', text: t('proposeTime.noPastDates') });
-      return;
-    }
-
-    setSubmittingProposal(true);
-    setMessage({ type: '', text: '' });
-
-    try {
-      const res = await fetch('/api/living-groups/propose-time', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(proposalForm),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        setMessage({ type: 'success', text: t('proposeTime.submitSuccess') });
-        if (data.proposal) {
-          setProposals(prev => [data.proposal, ...prev]);
-        }
-        setProposalForm({
-          date: '',
-          start_time: '',
-          end_time: '',
-          location: '',
-          notes: '',
-        });
-        // Refresh booked times since proposal is now auto-confirmed
-        fetchTimes();
-      } else {
-        setMessage({ type: 'error', text: data.error || t('proposeTime.submitError') });
-      }
-    } catch (error) {
-      setMessage({ type: 'error', text: t('proposeTime.submitError') });
-    } finally {
-      setSubmittingProposal(false);
-    }
-  }
 
   async function handleCancelProposal(proposalId) {
     setCancellingProposalId(proposalId);
@@ -967,7 +818,7 @@ export default function LivingGroupPage() {
                         <div className="flex justify-between items-start gap-4 mb-2">
                           <div>
                             <p className="font-medium">
-                              {new Date(bookedTime.date).toLocaleDateString(locale, {
+                              {new Date(bookedTime.date + 'T12:00:00').toLocaleDateString(locale, {
                                 weekday: 'long',
                                 year: 'numeric',
                                 month: 'long',
@@ -1048,7 +899,7 @@ export default function LivingGroupPage() {
                     <CalendarView
                       role="living_group"
                       times={[...availableTimes, ...bookedTimes]}
-                      proposals={[]}
+                      proposals={proposals}
                       loading={loading}
                       frozen={isFrozen}
                       onBook={async (timeId) => { await handleBook(timeId); }}
@@ -1102,7 +953,7 @@ export default function LivingGroupPage() {
                                         </svg>
                                       )}
                                       <span className="font-medium text-sm">
-                                        {new Date(time.date).toLocaleDateString(locale, {
+                                        {new Date(time.date + 'T12:00:00').toLocaleDateString(locale, {
                                           weekday: 'short',
                                           month: 'short',
                                           day: 'numeric',
@@ -1136,107 +987,128 @@ export default function LivingGroupPage() {
                           })}
                         </div>
                       )}
+
+                      {/* Propose a Time */}
+                      {!isFrozen && (
+                        <div className="mt-4">
+                          {showListProposeForm ? (
+                            <div className="border border-border rounded-lg p-4">
+                              <h4 className="text-sm font-medium mb-3">{t('proposeTime.title')}</h4>
+                              <p className="text-xs text-text-muted mb-3">{t('proposeTime.description')}</p>
+                              <form
+                                onSubmit={async (e) => {
+                                  e.preventDefault();
+                                  const form = e.target;
+                                  const date = form.proposeDate.value;
+                                  const start_time = form.proposeStart.value;
+                                  const end_time = form.proposeEnd.value;
+                                  const location = form.proposeLocation.value;
+                                  const notes = form.proposeNotes.value;
+                                  if (!date || !start_time || !end_time) return;
+                                  if (start_time >= end_time) {
+                                    setMessage({ type: 'error', text: t('proposeTime.startBeforeEnd') });
+                                    return;
+                                  }
+                                  setProposing(true);
+                                  try {
+                                    const res = await fetch('/api/living-groups/propose-time', {
+                                      method: 'POST',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify({ date, start_time, end_time, location, notes }),
+                                    });
+                                    const data = await res.json();
+                                    if (res.ok) {
+                                      setMessage({ type: 'success', text: t('proposeTime.submitSuccess') });
+                                      if (data.proposal) {
+                                        setProposals(prev => [data.proposal, ...prev]);
+                                      }
+                                      setShowListProposeForm(false);
+                                      fetchTimes();
+                                    } else {
+                                      setMessage({ type: 'error', text: data.error || t('proposeTime.submitError') });
+                                    }
+                                  } catch {
+                                    setMessage({ type: 'error', text: t('proposeTime.submitError') });
+                                  } finally {
+                                    setProposing(false);
+                                  }
+                                }}
+                                className="space-y-3"
+                              >
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                  <div>
+                                    <label className="block text-xs font-medium mb-1">{t('proposeTime.date')}</label>
+                                    <input
+                                      type="date"
+                                      name="proposeDate"
+                                      min={new Date().toISOString().split('T')[0]}
+                                      className="w-full border border-border rounded px-2 py-1.5 text-sm"
+                                      required
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="block text-xs font-medium mb-1">{t('proposeTime.startTime')} (EST)</label>
+                                    <input
+                                      type="time"
+                                      name="proposeStart"
+                                      className="w-full border border-border rounded px-2 py-1.5 text-sm"
+                                      required
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="block text-xs font-medium mb-1">{t('proposeTime.endTime')} (EST)</label>
+                                    <input
+                                      type="time"
+                                      name="proposeEnd"
+                                      className="w-full border border-border rounded px-2 py-1.5 text-sm"
+                                      required
+                                    />
+                                  </div>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                  <div>
+                                    <label className="block text-xs font-medium mb-1">{t('proposeTime.location')}</label>
+                                    <input type="text" name="proposeLocation" className="w-full border border-border rounded px-2 py-1.5 text-sm" />
+                                  </div>
+                                  <div>
+                                    <label className="block text-xs font-medium mb-1">{t('proposeTime.notes')}</label>
+                                    <input type="text" name="proposeNotes" className="w-full border border-border rounded px-2 py-1.5 text-sm" />
+                                  </div>
+                                </div>
+                                <div className="flex gap-2">
+                                  <button type="submit" disabled={proposing} className="btn-primary text-sm">
+                                    {proposing ? t('proposeTime.submitting') : t('proposeTime.submit')}
+                                  </button>
+                                  <button type="button" onClick={() => setShowListProposeForm(false)} className="text-sm text-text-secondary ml-4 hover:text-text-primary">
+                                    {tc('cancel')}
+                                  </button>
+                                </div>
+                              </form>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => setShowListProposeForm(true)}
+                              className="w-full py-2 text-sm border border-dashed border-accent/40 text-accent rounded-lg hover:bg-accent/5 transition-colors"
+                            >
+                              + {t('proposeTime.title')}
+                            </button>
+                          )}
+                        </div>
+                      )}
                     </>
                   )}
-                </div>
-              )}
-
-              {/* Propose Time Section */}
-              {!isDisabled && (
-                <div className="mt-8">
-                  <div className="bg-white border border-border rounded-lg p-6">
-                    <h3 className="font-medium mb-2">{t('proposeTime.title')}</h3>
-                    <p className="text-text-secondary text-sm mb-2">{t('proposeTime.description')}</p>
-                    <p className="text-text-muted text-xs mb-4">{t('proposeTime.timezoneNote')}</p>
-
-                    <form onSubmit={handleSubmitProposal} className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <TextField
-                          type="date"
-                          label={t('proposeTime.date')}
-                          value={proposalForm.date}
-                          onChange={(e) => setProposalForm({ ...proposalForm, date: e.target.value })}
-                          InputLabelProps={{ shrink: true }}
-                          inputProps={{ min: new Date().toISOString().split('T')[0] }}
-                          required
-                          size="small"
-                          fullWidth
-                          sx={textFieldSx}
-                        />
-                        <FormControl size="small" fullWidth required sx={textFieldSx}>
-                          <InputLabel id="start-time-label">{t('proposeTime.startTime')}</InputLabel>
-                          <Select
-                            labelId="start-time-label"
-                            value={proposalForm.start_time}
-                            label={t('proposeTime.startTime')}
-                            onChange={(e) => setProposalForm({ ...proposalForm, start_time: e.target.value })}
-                          >
-                            {TIME_OPTIONS.map((time) => (
-                              <MenuItem key={time} value={time}>
-                                {formatTimeDisplay(time)}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                        <FormControl size="small" fullWidth required sx={textFieldSx}>
-                          <InputLabel id="end-time-label">{t('proposeTime.endTime')}</InputLabel>
-                          <Select
-                            labelId="end-time-label"
-                            value={proposalForm.end_time}
-                            label={t('proposeTime.endTime')}
-                            onChange={(e) => setProposalForm({ ...proposalForm, end_time: e.target.value })}
-                          >
-                            {TIME_OPTIONS.map((time) => (
-                              <MenuItem key={time} value={time}>
-                                {formatTimeDisplay(time)}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <TextField
-                          label={t('proposeTime.location')}
-                          value={proposalForm.location}
-                          onChange={(e) => setProposalForm({ ...proposalForm, location: e.target.value })}
-                          size="small"
-                          fullWidth
-                          sx={textFieldSx}
-                        />
-                        <TextField
-                          label={t('proposeTime.notes')}
-                          value={proposalForm.notes}
-                          onChange={(e) => setProposalForm({ ...proposalForm, notes: e.target.value })}
-                          size="small"
-                          fullWidth
-                          sx={textFieldSx}
-                        />
-                      </div>
-                      <button
-                        type="submit"
-                        disabled={submittingProposal || isFrozen}
-                        className="btn-primary text-sm"
-                      >
-                        {submittingProposal ? t('proposeTime.submitting') : t('proposeTime.submit')}
-                      </button>
-                    </form>
-                  </div>
 
                   {/* Your Proposals */}
-                  <div className="bg-white border border-border rounded-lg p-6 mt-6">
-                    <h3 className="font-medium mb-4">{t('proposeTime.yourProposals')}</h3>
-                    {proposalsLoading ? (
-                      <p className="text-text-secondary text-sm">Loading...</p>
-                    ) : proposals.length === 0 ? (
-                      <p className="text-text-secondary text-sm">{t('proposeTime.noProposals')}</p>
-                    ) : (
-                      <div className="space-y-3">
+                  {proposals.filter(p => !hiddenProposals.has(p.id)).length > 0 && (
+                    <div className="mt-6 pt-4 border-t border-border">
+                      <h4 className="text-xs font-medium text-text-muted uppercase mb-2">{t('proposeTime.yourProposals')}</h4>
+                      <div className="space-y-2">
                         {proposals.filter(p => !hiddenProposals.has(p.id)).map((proposal) => (
                           <div
                             key={proposal.id}
-                            className={`p-4 border rounded-lg ${
+                            className={`px-3 py-2 border rounded-lg text-sm ${
                               proposal.status === 'pending'
-                                ? 'border-blue-200 bg-blue-50'
+                                ? 'border-yellow-200 bg-yellow-50'
                                 : proposal.status === 'accepted'
                                 ? 'border-green-200 bg-green-50'
                                 : proposal.status === 'declined'
@@ -1245,20 +1117,22 @@ export default function LivingGroupPage() {
                             }`}
                             style={{ transition: 'opacity 500ms ease-out', opacity: fadingProposals.has(proposal.id) ? 0 : 1 }}
                           >
-                            <div className="flex justify-between items-start">
+                            <div className="flex justify-between items-center">
                               <div>
                                 <div className="flex items-baseline gap-2">
-                                  <p className="font-medium">
-                                    {new Date(proposal.date).toLocaleDateString(locale, {
-                                      weekday: 'long',
-                                      year: 'numeric',
-                                      month: 'long',
+                                  <p className="font-medium pb-0">
+                                    {new Date(proposal.date + 'T12:00:00').toLocaleDateString(locale, {
+                                      weekday: 'short',
+                                      month: 'short',
                                       day: 'numeric',
                                     })}
                                   </p>
+                                  <span className="text-text-secondary text-sm">
+                                    {formatTime(proposal.start_time)} - {formatTime(proposal.end_time)} EST
+                                  </span>
                                   <span className={`text-xs px-2 py-0.5 rounded whitespace-nowrap ${
                                     proposal.status === 'pending'
-                                      ? 'bg-blue-200 text-blue-800'
+                                      ? 'bg-yellow-200 text-yellow-800'
                                       : proposal.status === 'accepted'
                                       ? 'bg-green-200 text-green-800'
                                       : proposal.status === 'declined'
@@ -1268,18 +1142,12 @@ export default function LivingGroupPage() {
                                     {proposal.status === 'pending' ? t('proposeTime.status.posted') : t(`proposeTime.status.${proposal.status}`)}
                                   </span>
                                 </div>
-                                <p className="text-text-secondary text-sm">
-                                  {formatTime(proposal.start_time)} - {formatTime(proposal.end_time)} EST
-                                </p>
                                 {(proposal.location || proposal.notes) && (
-                                  <div className={`mt-1 ${proposal.location && proposal.notes ? 'grid grid-cols-2 gap-4' : ''}`}>
-                                    {proposal.location && (
-                                      <p className="text-text-muted text-xs"><span className="text-text-muted">Location:</span> {proposal.location}</p>
-                                    )}
-                                    {proposal.notes && (
-                                      <p className="text-text-muted text-xs"><span className="text-text-muted">Notes:</span> {proposal.notes}</p>
-                                    )}
-                                  </div>
+                                  <p className="text-text-muted text-xs mt-0.5">
+                                    {proposal.location && <>{proposal.location}</>}
+                                    {proposal.location && proposal.notes && <>{' · '}</>}
+                                    {proposal.notes && <span className="italic">{proposal.notes}</span>}
+                                  </p>
                                 )}
                                 {proposal.status === 'declined' && proposal.decline_reason && (
                                   <p className="text-red-600 text-xs mt-1">{proposal.decline_reason}</p>
@@ -1296,7 +1164,7 @@ export default function LivingGroupPage() {
                                 <button
                                   onClick={() => handleCancelProposal(proposal.id)}
                                   disabled={cancellingProposalId === proposal.id}
-                                  className="text-sm text-red-600 hover:text-red-700"
+                                  className="text-xs text-red-600 hover:text-red-700 flex-shrink-0 ml-2"
                                 >
                                   {cancellingProposalId === proposal.id ? '...' : t('proposeTime.cancel')}
                                 </button>
@@ -1305,8 +1173,8 @@ export default function LivingGroupPage() {
                           </div>
                         ))}
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               )}
             </>
@@ -1359,7 +1227,7 @@ export default function LivingGroupPage() {
                         <div className="mb-4 flex justify-between items-start gap-4">
                           <div>
                             <p className="font-medium">
-                              {new Date(bookedTime.date).toLocaleDateString(locale, {
+                              {new Date(bookedTime.date + 'T12:00:00').toLocaleDateString(locale, {
                                 weekday: 'long',
                                 year: 'numeric',
                                 month: 'long',

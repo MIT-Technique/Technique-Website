@@ -113,6 +113,12 @@ export default function DaySidePanel({
     return creator.name || creator.email || t('unknown');
   }
 
+  function getBookerLabel(time) {
+    const booker = time?.booked_by_user || time?.created_by_user || time?.creator;
+    if (!booker) return t('unknown');
+    return booker.email || t('unknown');
+  }
+
   async function handleCreate(formData) {
     if (!onCreate) return;
     await onCreate({ ...formData, date });
@@ -181,36 +187,13 @@ export default function DaySidePanel({
           </div>
         )}
 
-        {/* Propose time button/form (living group) */}
-        {isLivingGroup && !frozen && !isPast && onPropose && (
-          <div className="mb-4">
-            {showProposeForm ? (
-              <CreateSlotForm
-                date={date}
-                onSubmit={handlePropose}
-                onCancel={() => setShowProposeForm(false)}
-                submitLabel={t('proposeSlot')}
-                initialStartTime={initialStartTime}
-                initialEndTime={initialEndTime}
-              />
-            ) : (
-              <button
-                onClick={() => setShowProposeForm(true)}
-                className="w-full py-2 text-sm border border-dashed border-accent/40 text-accent rounded-lg hover:bg-accent/5 transition-colors"
-              >
-                + {t('proposeTime')}
-              </button>
-            )}
-          </div>
-        )}
-
         {/* Booked Times */}
         {bookedTimes.length > 0 && (
           <div className="mb-4">
             <h4 className="text-xs font-medium text-text-muted uppercase mb-2">{t('booked')}</h4>
             <div className="space-y-2">
               {bookedTimes.map((time) => (
-                <div key={time.id} className="px-3 py-2 border border-green-200 bg-green-50 rounded-lg text-sm">
+                <div key={time.id} className={`px-3 py-2 border border-green-200 bg-green-50 rounded-lg text-sm${(isLivingGroup || (currentUserId && time.created_by === currentUserId)) ? ' !border-l-[3px] !border-l-accent' : ''}`}>
                   <div className="flex justify-between items-center">
                     <p className="font-medium pb-0">
                       {formatTime(time.start_time)} - {formatTime(time.end_time)} EST
@@ -237,8 +220,8 @@ export default function DaySidePanel({
                     </div>
                   </div>
                   <p className="text-xs text-text-muted mt-0.5 leading-snug">
-                    {t('postedBy')} {getCreatorLabel(time)}
-                    {' · '}<span className="text-green-700 font-medium">{time.living_group?.name || t('booked')}</span>
+                    <span className="text-green-700 font-medium">{time.living_group?.name || t('booked')}</span>
+                    {' · '}{t('bookedBy', { name: getBookerLabel(time) })}
                     {time.location && <>{' · '}{time.location}</>}
                     {time.notes && <>{' · '}<span className="italic">{time.notes}</span></>}
                   </p>
@@ -249,12 +232,17 @@ export default function DaySidePanel({
         )}
 
         {/* Available Times */}
-        {availableTimes.length > 0 && (
+        {(availableTimes.length > 0 || (isLivingGroup && !frozen && !isPast && onPropose)) && (
           <div className="mb-4">
-            <h4 className="text-xs font-medium text-text-muted uppercase mb-2">{t('available')}</h4>
+            <h4 className="text-xs font-medium text-text-muted uppercase mb-2 group/tooltip relative inline-block cursor-help" title={t('availableTooltip')}>
+              {t('available')}
+              <svg className="w-3.5 h-3.5 inline-block ml-1 -mt-0.5 text-text-muted/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </h4>
             <div className="space-y-2">
               {availableTimes.map((time) => (
-                <div key={time.id} className="px-3 py-2 border border-blue-200 bg-blue-50 rounded-lg text-sm">
+                <div key={time.id} className={`px-3 py-2 border border-blue-200 bg-blue-50 rounded-lg text-sm${(currentUserId && time.created_by === currentUserId) ? ' !border-l-[3px] !border-l-accent' : ''}`}>
                   <div className="flex justify-between items-center">
                     <p className="font-medium pb-0">
                       {formatTime(time.start_time)} - {formatTime(time.end_time)} EST
@@ -291,45 +279,77 @@ export default function DaySidePanel({
                   </p>
                 </div>
               ))}
+
+              {/* Propose time (living group) */}
+              {isLivingGroup && !frozen && !isPast && onPropose && (
+                showProposeForm ? (
+                  <CreateSlotForm
+                    date={date}
+                    onSubmit={handlePropose}
+                    onCancel={() => setShowProposeForm(false)}
+                    submitLabel={t('proposeSlot')}
+                    initialStartTime={initialStartTime}
+                    initialEndTime={initialEndTime}
+                  />
+                ) : (
+                  <button
+                    onClick={() => setShowProposeForm(true)}
+                    className="w-full py-2 text-sm border border-dashed border-accent/40 text-accent rounded-lg hover:bg-accent/5 transition-colors"
+                  >
+                    + {t('proposeTime')}
+                  </button>
+                )
+              )}
             </div>
           </div>
         )}
 
         {/* Proposals */}
-        {proposals.length > 0 && isAdminOrPhotographer && (
+        {proposals.length > 0 && (
           <div className="mb-4">
             <h4 className="text-xs font-medium text-text-muted uppercase mb-2">{t('pending')}</h4>
             <div className="space-y-2">
-              {proposals.map((proposal) => (
-                <div key={proposal.id} className="px-3 py-2 border border-yellow-200 bg-yellow-50 rounded-lg text-sm">
+              {proposals.map((proposal) => {
+                // Living groups see other groups' proposals as gray
+                const isOwnProposal = isLivingGroup || isAdminOrPhotographer;
+                const proposalBorder = isOwnProposal ? 'border-yellow-200' : 'border-gray-200';
+                const proposalBg = isOwnProposal ? 'bg-yellow-50' : 'bg-gray-50';
+                const proposalNameColor = isOwnProposal ? 'text-yellow-700' : 'text-gray-700';
+                return (
+                <div key={proposal.id} className={`px-3 py-2 border ${proposalBorder} ${proposalBg} rounded-lg text-sm${isLivingGroup ? ' !border-l-[3px] !border-l-accent' : ''}`}>
                   <div className="flex justify-between items-center">
                     <p className="font-medium pb-0">
                       {formatTime(proposal.start_time)} - {formatTime(proposal.end_time)} EST
                     </p>
                     <div className="flex gap-1 flex-shrink-0 ml-2">
-                      <button
-                        onClick={() => handleAcceptProposal(proposal.id)}
-                        disabled={processingId === proposal.id}
-                        className="text-xs px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
-                      >
-                        {processingId === proposal.id ? '...' : t('accept')}
-                      </button>
-                      <button
-                        onClick={() => handleDeclineProposal(proposal.id)}
-                        disabled={processingId === proposal.id}
-                        className="text-xs px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
-                      >
-                        {processingId === proposal.id ? '...' : t('decline')}
-                      </button>
+                      {isAdminOrPhotographer && (
+                        <>
+                          <button
+                            onClick={() => handleAcceptProposal(proposal.id)}
+                            disabled={processingId === proposal.id}
+                            className="text-xs px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
+                          >
+                            {processingId === proposal.id ? '...' : t('accept')}
+                          </button>
+                          <button
+                            onClick={() => handleDeclineProposal(proposal.id)}
+                            disabled={processingId === proposal.id}
+                            className="text-xs px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
+                          >
+                            {processingId === proposal.id ? '...' : t('decline')}
+                          </button>
+                        </>
+                      )}
                     </div>
                   </div>
                   <p className="text-xs text-text-muted mt-0.5 leading-snug">
-                    <span className="text-yellow-700 font-medium">{proposal.living_group?.name || t('unknown')}</span>
+                    <span className={`${proposalNameColor} font-medium`}>{proposal.living_group?.name || t('unknown')}</span>
                     {proposal.location && <>{' · '}{proposal.location}</>}
                     {proposal.notes && <>{' · '}<span className="italic">{proposal.notes}</span></>}
                   </p>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}

@@ -436,7 +436,7 @@
       "scheduling": {
         "title": "Living Group Photoshoot Scheduling",
         "status": "Status",
-        "currentBooking": "Your Booked Time",
+        "currentBooking": "Upcoming Photoshoots",
         "noBooking": "No time slot booked yet",
         "cancellationPending": "Cancellation request pending review",
         "requestCancel": "Request Cancellation",
@@ -1312,7 +1312,7 @@
     "disabled": "Your account has been disabled",
     "disabledHint": "Please contact an administrator for assistance",
     "frozen": "Booking is currently frozen. You cannot make changes at this time.",
-    "currentBooking": "Your Booked Time",
+    "currentBooking": "Upcoming Photoshoots",
     "cancelBooking": "Cancel Booking",
     "cancelling": "Cancelling...",
     "confirmCancel": "Are you sure you want to cancel this booking?",
@@ -1475,6 +1475,7 @@
     "accept": "Accept",
     "decline": "Decline",
     "postedBy": "Posted by",
+    "bookedBy": "Booked by {name}",
     "unknown": "Unknown",
     "startTime": "Start Time",
     "endTime": "End Time",
@@ -1490,7 +1491,9 @@
     "monthView": "Month",
     "proposeTime": "Propose Time",
     "proposeSlot": "Propose",
-    "proposeError": "Failed to propose time"
+    "proposeError": "Failed to propose time",
+    "availableTooltip": "Click on dates and the calendar grid to set or propose time slots",
+    "otherProposals": "Other Proposals"
   },
 
   "photographerTimes": {

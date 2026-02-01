@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useMemo, useRef, useCallback } from 'react';
-import { useTranslations } from 'next-intl';
 import { AnimatePresence } from 'framer-motion';
 import DaySidePanel from './DaySidePanel';
 import TimelineSlot, { timeToRow } from './TimelineSlot';
@@ -35,7 +34,6 @@ export default function DayView({
   onCancelBooking,
   onPropose,
 }) {
-  const t = useTranslations('calendarView');
   const [showPanel, setShowPanel] = useState(false);
   const [prefillTimes, setPrefillTimes] = useState(null);
   const gridRef = useRef(null);
@@ -141,6 +139,7 @@ export default function DayView({
                 role={role}
                 currentUserId={currentUserId}
                 frozen={frozen}
+                isOwn={!!currentUserId && slot.created_by === currentUserId}
                 formatTime={formatTime}
                 onBook={onBook}
                 onDelete={onDelete}
@@ -161,6 +160,7 @@ export default function DayView({
                 role={role}
                 currentUserId={currentUserId}
                 frozen={frozen}
+                isOwn={role === 'living_group' || (!!currentUserId && slot.created_by === currentUserId)}
                 formatTime={formatTime}
                 onCancelBooking={onCancelBooking}
                 onDelete={onDelete}
@@ -180,6 +180,7 @@ export default function DayView({
                 type="proposal"
                 role={role}
                 currentUserId={currentUserId}
+                isOwn={role === 'living_group'}
                 formatTime={formatTime}
                 onAcceptProposal={onAcceptProposal}
                 onDeclineProposal={onDeclineProposal}
@@ -189,11 +190,6 @@ export default function DayView({
           })}
         </div>
       </div>
-
-      {/* Empty state - only show for non-past days */}
-      {dayTimes.length === 0 && dayProposals.length === 0 && !isPast && (
-        <p className="text-sm text-text-secondary text-center py-4">{t('noSlots')}</p>
-      )}
 
       {/* Side Panel overlay */}
       <AnimatePresence>

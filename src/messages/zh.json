@@ -420,7 +420,7 @@
       "scheduling": {
         "title": "宿舍拍摄预约管理",
         "status": "状态",
-        "currentBooking": "您预约的时间",
+        "currentBooking": "即将到来的拍摄",
         "noBooking": "尚未预约时间段",
         "cancellationPending": "取消请求待审核",
         "requestCancel": "申请取消",
@@ -1275,7 +1275,7 @@
     "disabled": "您的账户已被禁用",
     "disabledHint": "请联系管理员获取帮助",
     "frozen": "预约功能目前已冻结。您暂时无法进行更改。",
-    "currentBooking": "您预约的时间",
+    "currentBooking": "即将到来的拍摄",
     "cancelBooking": "取消预约",
     "cancelling": "取消中...",
     "confirmCancel": "确定要取消此预约吗？",
@@ -1438,6 +1438,7 @@
     "accept": "接受",
     "decline": "拒绝",
     "postedBy": "发布者",
+    "bookedBy": "已被{name}预约",
     "unknown": "未知",
     "startTime": "开始时间",
     "endTime": "结束时间",
@@ -1453,7 +1454,9 @@
     "monthView": "月",
     "proposeTime": "提议时间",
     "proposeSlot": "提议",
-    "proposeError": "提议时间失败"
+    "proposeError": "提议时间失败",
+    "availableTooltip": "点击日期和日历网格来设置或提议时间段",
+    "otherProposals": "其他提议"
   },
 
   "photographerTimes": {

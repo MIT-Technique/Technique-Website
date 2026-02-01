@@ -418,7 +418,7 @@
       "scheduling": {
         "title": "Programación de Sesión de Fotos",
         "status": "Estado",
-        "currentBooking": "Tu Horario Reservado",
+        "currentBooking": "Próximas Sesiones Fotográficas",
         "noBooking": "Aún no hay horario reservado",
         "cancellationPending": "Solicitud de cancelación pendiente de revisión",
         "requestCancel": "Solicitar Cancelación",
@@ -1273,7 +1273,7 @@
     "disabled": "Su cuenta ha sido deshabilitada",
     "disabledHint": "Por favor contacte a un administrador para asistencia",
     "frozen": "Las reservas están congeladas. No puede hacer cambios en este momento.",
-    "currentBooking": "Su Horario Reservado",
+    "currentBooking": "Próximas Sesiones Fotográficas",
     "cancelBooking": "Cancelar Reserva",
     "cancelling": "Cancelando...",
     "confirmCancel": "¿Estás seguro de que quieres cancelar esta reserva?",
@@ -1435,6 +1435,7 @@
     "accept": "Aceptar",
     "decline": "Rechazar",
     "postedBy": "Publicado por",
+    "bookedBy": "Reservado por {name}",
     "unknown": "Desconocido",
     "startTime": "Hora de Inicio",
     "endTime": "Hora de Fin",
@@ -1450,7 +1451,9 @@
     "monthView": "Mes",
     "proposeTime": "Proponer Horario",
     "proposeSlot": "Proponer",
-    "proposeError": "Error al proponer horario"
+    "proposeError": "Error al proponer horario",
+    "availableTooltip": "Haz clic en las fechas y la cuadrícula del calendario para establecer o proponer horarios",
+    "otherProposals": "Otras Propuestas"
   },
 
   "photographerTimes": {
