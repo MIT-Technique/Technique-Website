@@ -1356,6 +1356,7 @@
       "assignAllToSection": "将全部成员分配到区域：",
       "assignLater": "稍后分配区域",
       "addPlaceholder": "输入成员姓名",
+      "namePlaceholder": "输入成员姓名",
       "searchPlaceholder": "搜索邮箱...",
       "selectSection": "分配到区域",
       "noSection": "未分配",

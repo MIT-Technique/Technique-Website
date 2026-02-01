@@ -1334,6 +1334,7 @@
       "addSingle": "Añadir Individual",
       "bulkImport": "Importación Masiva",
       "addPlaceholder": "Nombre del miembro",
+      "namePlaceholder": "Nombre del miembro",
       "firstNamePlaceholder": "Nombre",
       "lastNamePlaceholder": "Apellido (requerido)",
       "bulkInputLabel": "Pegue nombres de miembros",

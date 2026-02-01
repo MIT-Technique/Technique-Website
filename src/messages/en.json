@@ -1373,6 +1373,7 @@
       "addSingle": "Add Single",
       "bulkImport": "Bulk Import",
       "addPlaceholder": "Enter member name",
+      "namePlaceholder": "Enter member name",
       "firstNamePlaceholder": "First name",
       "lastNamePlaceholder": "Last name (required)",
       "bulkInputLabel": "Paste member names",
