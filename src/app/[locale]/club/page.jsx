@@ -616,7 +616,7 @@ export default function ClubPage() {
                       disabled={addingMember || !singleMember.name.trim()}
                       className="btn-primary whitespace-nowrap"
                     >
-                      {addingMember ? t('members.adding') : t('members.add')}
+                      {addingMember ? t('members.adding') : <><span className="sm:hidden text-lg leading-none">+</span><span className="hidden sm:inline">{t('members.add')}</span></>}
                     </button>
                   </div>
                 </form>

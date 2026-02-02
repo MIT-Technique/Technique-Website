@@ -8,7 +8,8 @@ const HOUR_START = 0;
 const HOUR_END = 24;
 const TOTAL_HOURS = HOUR_END - HOUR_START;
 const ROWS = TOTAL_HOURS * 4;
-const ROW_HEIGHT = 12;
+const ROW_HEIGHT_DEFAULT = 12;
+const ROW_HEIGHT_MOBILE = 8;
 
 function formatHourLabel(hour) {
   const ampm = hour >= 12 ? 'PM' : 'AM';
@@ -49,6 +50,14 @@ export default function WeekView({
 }) {
   const locale = useLocale();
   const t = useTranslations('calendarView');
+  const [rowHeight, setRowHeight] = useState(ROW_HEIGHT_DEFAULT);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 639px)');
+    const update = (e) => setRowHeight(e.matches ? ROW_HEIGHT_MOBILE : ROW_HEIGHT_DEFAULT);
+    update(mq);
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
   const today = new Date();
   const todayStr = toDateStr(today);
   const gridRef = useRef(null);
@@ -102,7 +111,7 @@ export default function WeekView({
       showFlashError(t('noPastDates'));
       return;
     }
-    const row = Math.floor(y / ROW_HEIGHT);
+    const row = Math.floor(y / rowHeight);
     const hour = Math.floor(row / 4) + HOUR_START;
     const min = (row % 4) * 15;
     if (hour < 0 || hour >= 24) return;
@@ -169,7 +178,7 @@ export default function WeekView({
         className="cursor-pointer"
         style={{
           display: 'grid',
-          gridTemplateRows: `repeat(${ROWS}, ${ROW_HEIGHT}px)`,
+          gridTemplateRows: `repeat(${ROWS}, ${rowHeight}px)`,
           gridTemplateColumns: '50px repeat(7, 1fr)',
         }}
       >

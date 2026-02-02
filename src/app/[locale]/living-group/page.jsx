@@ -90,6 +90,7 @@ export default function LivingGroupPage() {
   const [sectionsMessage, setSectionsMessage] = useState({ type: '', text: '' });
   const [imageMessage, setImageMessage] = useState({ type: '', text: '' });
   const [sectionToRemove, setSectionToRemove] = useState(null);
+  const [collapsedTimes, setCollapsedTimes] = useState(new Set());
 
   // Time assignments state
   const [timeAssignments, setTimeAssignments] = useState({});
@@ -737,7 +738,10 @@ export default function LivingGroupPage() {
 
   const tabs = [
     { id: 'book', label: t('tabs.book') },
-    ...(!isFsilg ? [{ id: 'assign', label: t('tabs.assign') }] : []),
+    ...(!isFsilg ? [
+      { id: 'sections', label: t('tabs.sections') },
+      ...(livingGroup?.dorm_sections?.length > 0 ? [{ id: 'assign', label: t('tabs.assign') }] : []),
+    ] : []),
     { id: 'members', label: t('tabs.members') },
     { id: 'documents', label: t('tabs.documents') },
     { id: 'settings', label: t('tabs.settings') },
@@ -905,7 +909,7 @@ export default function LivingGroupPage() {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                             </svg>
                           </button>
-                          <span className="text-sm text-text-secondary">
+                          <span className="text-sm text-text-secondary whitespace-nowrap">
                             {currentPage + 1} / {Math.ceil(availableTimes.length / ITEMS_PER_PAGE)}
                           </span>
                           <button
@@ -1277,12 +1281,138 @@ export default function LivingGroupPage() {
             </>
           )}
 
-          {/* Assign Tab - Section Management */}
+          {/* Sections Tab - Section Management */}
+          {activeTab === 'sections' && (
+            <div>
+              <p className="text-text-secondary text-sm mb-4">{t('assign.description')}</p>
+
+              {/* Add section form */}
+              <form onSubmit={handleAddSection} className="mb-4 flex gap-2">
+                <input
+                  type="text"
+                  value={newSectionName}
+                  onChange={(e) => setNewSectionName(e.target.value)}
+                  placeholder={t('assign.addPlaceholder')}
+                  className="flex-1 border border-border rounded px-4 py-2"
+                />
+                <button
+                  type="submit"
+                  disabled={addingSection || !newSectionName.trim()}
+                  className="btn-primary"
+                >
+                  {addingSection ? t('assign.adding') : <><span className="sm:hidden text-lg leading-none">+</span><span className="hidden sm:inline">{t('assign.addSection')}</span></>}
+                </button>
+              </form>
+
+              <FadeMessage message={imageMessage} onClear={setImageMessage} className="mb-4 p-4 rounded" />
+
+              {/* Sections List - Compact */}
+              {sectionsLoading ? (
+                <p className="text-text-secondary">Loading...</p>
+              ) : sections.length === 0 ? (
+                <p className="text-text-secondary">{t('assign.noSections')}</p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {sections.map((section) => {
+                    const memberCount = manualMembers.filter(m => m.section_name === section).length;
+                    return (
+                      <div
+                        key={section}
+                        className="px-3 py-3 border border-border rounded-lg flex items-start gap-3"
+                      >
+                        <ImageUpload
+                          imageUrl={livingGroup?.section_images?.[section] || null}
+                          fileName={`${(livingGroup?.name || '').replace(/\s+/g, '_')}_${section.replace(/\s+/g, '_')}_Candid`}
+                          size="sm"
+                          disabled={isFrozen}
+                          onUpload={async (file) => {
+                            setImageMessage({ type: '', text: '' });
+                            const fd = new FormData();
+                            fd.append('file', file);
+                            fd.append('section_name', section);
+                            const res = await fetch('/api/living-groups/images', { method: 'POST', body: fd });
+                            const data = await res.json();
+                            if (!res.ok) {
+                              setImageMessage({ type: 'error', text: data.error || 'Upload failed' });
+                              throw new Error(data.error || 'Upload failed');
+                            }
+                            return data.url;
+                          }}
+                          onDelete={async () => {
+                            setImageMessage({ type: '', text: '' });
+                            const res = await fetch(`/api/living-groups/images?section_name=${encodeURIComponent(section)}`, { method: 'DELETE' });
+                            const data = await res.json();
+                            if (!res.ok) {
+                              setImageMessage({ type: 'error', text: data.error || 'Delete failed' });
+                              throw new Error(data.error || 'Delete failed');
+                            }
+                          }}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex justify-between items-start gap-2">
+                            <span className="font-medium">{section}</span>
+                            <button
+                              onClick={() => handleRemoveSection(section)}
+                              disabled={removingSectionName === section}
+                              className="text-xs text-red-600 hover:text-red-700 whitespace-nowrap"
+                            >
+                              {removingSectionName === section ? t('assign.removing') : t('assign.removeSection')}
+                            </button>
+                          </div>
+                          <span className="text-xs text-text-muted">
+                            {t('assign.memberCount', { count: memberCount })}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Confirmation Modal for Removing Section */}
+              {sectionToRemove && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                  <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                    <h3 className="text-lg font-medium mb-2">{t('assign.confirmRemoveTitle')}</h3>
+                    <p className="text-text-secondary mb-4">
+                      {t('assign.confirmRemoveMessage', { section: sectionToRemove })}
+                    </p>
+                    <div className="flex gap-2 justify-end">
+                      <button
+                        onClick={() => setSectionToRemove(null)}
+                        className="px-4 py-2 border border-border rounded hover:bg-gray-50"
+                      >
+                        {t('members.cancel')}
+                      </button>
+                      <button
+                        onClick={confirmRemoveSection}
+                        disabled={removingSectionName === sectionToRemove}
+                        className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
+                      >
+                        {removingSectionName === sectionToRemove ? t('assign.removing') : t('members.confirm')}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Assign Tab - Time Slot Assignment */}
           {activeTab === 'assign' && (
             <div>
-              {/* Time Slot Assignment UI - Above Section Management */}
-              {sections.length > 0 && bookedTimes.length > 0 && (
-                <div className="mb-8">
+              {bookedTimes.length === 0 ? (
+                <div className="py-8 text-center">
+                  <p className="text-text-secondary text-sm mb-3">{t('assign.noBookedTimes')}</p>
+                  <button
+                    onClick={() => setActiveTab('book')}
+                    className="text-sm text-red-600 hover:text-red-700 underline"
+                  >
+                    {t('assign.goToBook')}
+                  </button>
+                </div>
+              ) : (
+                <div>
                   <h3 className="text-lg font-medium mb-2">{t('assign.timeSlots.title')}</h3>
                   <p className="text-text-secondary text-sm mb-4">
                     {t('assign.timeSlots.description')}
@@ -1290,8 +1420,6 @@ export default function LivingGroupPage() {
 
                   {/* Unassigned sections warning */}
                   {(() => {
-                    if (sections.length === 0) return null;
-
                     const allAssignedSections = new Set();
                     let totalSlots = 0;
                     let assignedSlots = 0;
@@ -1331,24 +1459,42 @@ export default function LivingGroupPage() {
                     );
                   })()}
 
-                  {/* Assignment timeline for each booked time */}
+                  {/* Assignment timeline for each booked time, grouped by date */}
                   <div className="space-y-4">
-                    {bookedTimes.map((bookedTime) => (
-                      <div key={bookedTime.id} className="bg-white border border-border rounded-lg p-6">
-                        {/* Date/Time header with assignment message */}
-                        <div className="mb-4 flex justify-between items-start gap-4">
-                          <div>
-                            <p className="font-medium">
-                              {new Date(bookedTime.date + 'T12:00:00').toLocaleDateString(locale, {
+                    {Object.entries(
+                      bookedTimes.reduce((groups, bt) => {
+                        (groups[bt.date] ||= []).push(bt);
+                        return groups;
+                      }, {})
+                    )
+                      .sort(([a], [b]) => a.localeCompare(b))
+                      .map(([dateStr, dateTimes]) => (
+                      <div key={dateStr} className="bg-white border border-border rounded-lg p-6">
+                        {/* Date header */}
+                        <div
+                          className="flex justify-between items-center cursor-pointer select-none"
+                          onClick={() => setCollapsedTimes((prev) => {
+                            const next = new Set(prev);
+                            if (next.has(dateStr)) next.delete(dateStr);
+                            else next.add(dateStr);
+                            return next;
+                          })}
+                        >
+                          <div className="flex items-center gap-2">
+                            <svg
+                              className={`w-4 h-4 flex-shrink-0 text-text-muted transition-transform ${collapsedTimes.has(dateStr) ? '' : 'rotate-90'}`}
+                              fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                            <span className="font-medium leading-none">
+                              {new Date(dateStr + 'T12:00:00').toLocaleDateString(locale, {
                                 weekday: 'long',
                                 year: 'numeric',
                                 month: 'long',
                                 day: 'numeric',
                               })}
-                            </p>
-                            <p className="text-text-secondary text-sm">
-                              {formatTime(bookedTime.start_time)} - {formatTime(bookedTime.end_time)} EST
-                            </p>
+                            </span>
                           </div>
                           <FadeMessage
                             message={sectionsMessage}
@@ -1357,135 +1503,33 @@ export default function LivingGroupPage() {
                           />
                         </div>
 
-                        {assignmentsLoading ? (
-                          <p className="text-text-muted text-sm">Loading...</p>
-                        ) : (
-                          <SectionAssignmentTimeline
-                            bookedTime={bookedTime}
-                            sections={sections}
-                            assignments={timeAssignments[bookedTime.id] || {}}
-                            onAssign={handleAssignSection}
-                            formatTime={formatTime}
-                            saving={!!savingSlot}
-                          />
+                        {!collapsedTimes.has(dateStr) && (
+                          <div className="mt-4 space-y-6">
+                            {dateTimes
+                              .sort((a, b) => a.start_time.localeCompare(b.start_time))
+                              .map((bookedTime) => (
+                              <div key={bookedTime.id}>
+                                <p className="text-text-secondary text-sm mb-3">
+                                  {formatTime(bookedTime.start_time)} - {formatTime(bookedTime.end_time)} EST
+                                </p>
+                                {assignmentsLoading ? (
+                                  <p className="text-text-muted text-sm">Loading...</p>
+                                ) : (
+                                  <SectionAssignmentTimeline
+                                    bookedTime={bookedTime}
+                                    sections={sections}
+                                    assignments={timeAssignments[bookedTime.id] || {}}
+                                    onAssign={handleAssignSection}
+                                    formatTime={formatTime}
+                                    saving={!!savingSlot}
+                                  />
+                                )}
+                              </div>
+                            ))}
+                          </div>
                         )}
                       </div>
                     ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Section Management - Below Time Slot Assignment */}
-              <div className={sections.length > 0 && bookedTimes.length > 0 ? 'mt-8' : ''}>
-                <p className="text-text-secondary text-sm mb-4">{t('assign.description')}</p>
-
-                {/* Add section form */}
-                <form onSubmit={handleAddSection} className="mb-4 flex gap-2">
-                  <input
-                    type="text"
-                    value={newSectionName}
-                    onChange={(e) => setNewSectionName(e.target.value)}
-                    placeholder={t('assign.addPlaceholder')}
-                    className="flex-1 border border-border rounded px-4 py-2"
-                  />
-                  <button
-                    type="submit"
-                    disabled={addingSection || !newSectionName.trim()}
-                    className="btn-primary"
-                  >
-                    {addingSection ? t('assign.adding') : t('assign.addSection')}
-                  </button>
-                </form>
-
-                <FadeMessage message={imageMessage} onClear={setImageMessage} className="mb-4 p-4 rounded" />
-
-                {/* Sections List - Compact */}
-                {sectionsLoading ? (
-                  <p className="text-text-secondary">Loading...</p>
-                ) : sections.length === 0 ? (
-                  <p className="text-text-secondary">{t('assign.noSections')}</p>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {sections.map((section) => {
-                      const memberCount = manualMembers.filter(m => m.section_name === section).length;
-                      return (
-                        <div
-                          key={section}
-                          className="px-3 py-3 border border-border rounded-lg flex items-start gap-3"
-                        >
-                          <ImageUpload
-                            imageUrl={livingGroup?.section_images?.[section] || null}
-                            fileName={`${(livingGroup?.name || '').replace(/\s+/g, '_')}_${section.replace(/\s+/g, '_')}_Candid`}
-                            size="sm"
-                            disabled={isFrozen}
-                            onUpload={async (file) => {
-                              setImageMessage({ type: '', text: '' });
-                              const fd = new FormData();
-                              fd.append('file', file);
-                              fd.append('section_name', section);
-                              const res = await fetch('/api/living-groups/images', { method: 'POST', body: fd });
-                              const data = await res.json();
-                              if (!res.ok) {
-                                setImageMessage({ type: 'error', text: data.error || 'Upload failed' });
-                                throw new Error(data.error || 'Upload failed');
-                              }
-                              return data.url;
-                            }}
-                            onDelete={async () => {
-                              setImageMessage({ type: '', text: '' });
-                              const res = await fetch(`/api/living-groups/images?section_name=${encodeURIComponent(section)}`, { method: 'DELETE' });
-                              const data = await res.json();
-                              if (!res.ok) {
-                                setImageMessage({ type: 'error', text: data.error || 'Delete failed' });
-                                throw new Error(data.error || 'Delete failed');
-                              }
-                            }}
-                          />
-                          <div className="flex-1 min-w-0">
-                            <div className="flex justify-between items-start gap-2">
-                              <span className="font-medium">{section}</span>
-                              <button
-                                onClick={() => handleRemoveSection(section)}
-                                disabled={removingSectionName === section}
-                                className="text-xs text-red-600 hover:text-red-700 whitespace-nowrap"
-                              >
-                                {removingSectionName === section ? t('assign.removing') : t('assign.removeSection')}
-                              </button>
-                            </div>
-                            <span className="text-xs text-text-muted">
-                              {t('assign.memberCount', { count: memberCount })}
-                            </span>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-
-              {/* Confirmation Modal for Removing Section */}
-              {sectionToRemove && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                  <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-                    <h3 className="text-lg font-medium mb-2">{t('assign.confirmRemoveTitle')}</h3>
-                    <p className="text-text-secondary mb-4">
-                      {t('assign.confirmRemoveMessage', { section: sectionToRemove })}
-                    </p>
-                    <div className="flex gap-2 justify-end">
-                      <button
-                        onClick={() => setSectionToRemove(null)}
-                        className="px-4 py-2 border border-border rounded hover:bg-gray-50"
-                      >
-                        {t('members.cancel')}
-                      </button>
-                      <button
-                        onClick={confirmRemoveSection}
-                        disabled={removingSectionName === sectionToRemove}
-                        className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
-                      >
-                        {removingSectionName === sectionToRemove ? t('assign.removing') : t('members.confirm')}
-                      </button>
-                    </div>
                   </div>
                 </div>
               )}
@@ -1550,7 +1594,7 @@ export default function LivingGroupPage() {
                       disabled={addingMember || !singleMember.name.trim()}
                       className="btn-primary whitespace-nowrap"
                     >
-                      {addingMember ? t('members.adding') : t('members.add')}
+                      {addingMember ? t('members.adding') : <><span className="sm:hidden text-lg leading-none">+</span><span className="hidden sm:inline">{t('members.add')}</span></>}
                     </button>
                   </div>
                 </form>

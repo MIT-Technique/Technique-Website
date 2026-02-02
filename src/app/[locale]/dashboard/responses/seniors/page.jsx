@@ -92,7 +92,7 @@ export default function ResponsesSeniorsPage() {
           >
             ←
           </button>
-          <span className="text-sm text-text-muted px-2">
+          <span className="text-sm text-text-muted px-2 whitespace-nowrap">
             {page + 1} / {totalPages || 1}
           </span>
           <button

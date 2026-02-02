@@ -10,7 +10,8 @@ const HOUR_START = 0;
 const HOUR_END = 24;
 const TOTAL_HOURS = HOUR_END - HOUR_START; // 24
 const ROWS = TOTAL_HOURS * 4; // 96 quarter-hour rows
-const ROW_HEIGHT = 12; // px per quarter-hour
+const ROW_HEIGHT_DEFAULT = 12; // px per quarter-hour
+const ROW_HEIGHT_MOBILE = 8;
 
 function formatHourLabel(hour) {
   const ampm = hour >= 12 ? 'PM' : 'AM';
@@ -37,6 +38,14 @@ export default function DayView({
   timeAssignments = {},
 }) {
   const t = useTranslations('calendarView');
+  const [rowHeight, setRowHeight] = useState(ROW_HEIGHT_DEFAULT);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 639px)');
+    const update = (e) => setRowHeight(e.matches ? ROW_HEIGHT_MOBILE : ROW_HEIGHT_DEFAULT);
+    update(mq);
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
   const [showPanel, setShowPanel] = useState(false);
   const [prefillTimes, setPrefillTimes] = useState(null);
   const gridRef = useRef(null);
@@ -76,7 +85,7 @@ export default function DayView({
     if (!grid) return;
     const rect = grid.getBoundingClientRect();
     const y = e.clientY - rect.top + grid.parentElement.scrollTop;
-    const row = Math.floor(y / ROW_HEIGHT);
+    const row = Math.floor(y / rowHeight);
     const hour = Math.floor(row / 4) + HOUR_START;
     const min = (row % 4) * 15;
     if (hour < 0 || hour >= 24) return;
@@ -108,7 +117,7 @@ export default function DayView({
           className="relative cursor-pointer"
           style={{
             display: 'grid',
-            gridTemplateRows: `repeat(${ROWS}, ${ROW_HEIGHT}px)`,
+            gridTemplateRows: `repeat(${ROWS}, ${rowHeight}px)`,
             gridTemplateColumns: '50px 1fr',
           }}
         >

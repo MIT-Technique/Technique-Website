@@ -1251,7 +1251,8 @@
     "tabs": {
       "profile": "资料",
       "book": "预约",
-      "assign": "区域",
+      "assign": "分配",
+      "sections": "区域",
       "members": "成员",
       "documents": "文档",
       "settings": "设置"
@@ -1323,6 +1324,9 @@
       "addSectionSuccess": "区域添加成功",
       "addSectionError": "添加区域失败",
       "noSections": "尚未创建任何区域",
+      "noSectionsToAssign": "请先在「区域」标签中创建区域，然后预约拍摄时间以开始分配。",
+      "noBookedTimes": "尚无已预约的拍摄时间。请先预约拍摄时间，然后再分配区域。",
+      "goToBook": "前往预约拍摄",
       "memberCount": "{count} 名成员",
       "sectionImage": "分区照片",
       "sectionFileNaming": "请将文件命名为：组织名称_分区名称_Candid",

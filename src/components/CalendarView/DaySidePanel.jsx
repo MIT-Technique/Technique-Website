@@ -159,7 +159,7 @@ export default function DaySidePanel({
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: 20, opacity: 0 }}
       transition={{ duration: 0.2 }}
-      className="absolute top-0 right-0 w-[360px] max-w-full z-20 bg-white border border-border rounded-lg shadow-lg"
+      className="absolute top-0 right-0 w-[360px] max-w-full z-40 bg-white border border-border rounded-lg shadow-lg"
     >
       <div className="w-full max-h-[500px] overflow-y-auto p-4">
         {/* Header */}

@@ -60,13 +60,13 @@ export default function ResponsesActivitiesPage() {
 
       {/* Community Candids Section */}
       <h3 className="text-md font-medium mb-3">{t('activities.candidsTitle')}</h3>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
-        <div className="p-4 rounded-lg border border-border bg-bg-secondary">
-          <p className="text-sm text-text-secondary">{t('activities.totalCandids')}</p>
-          <p className="text-2xl font-medium">{stats.totalCandids}</p>
+      <div className="flex flex-wrap gap-3 mb-4">
+        <div className="px-3 py-2 rounded-lg border border-border bg-bg-secondary">
+          <p className="text-xs text-text-secondary">{t('activities.totalCandids')}</p>
+          <p className="text-lg font-medium">{stats.totalCandids}</p>
         </div>
-        <div className="p-4 rounded-lg border border-border bg-bg-secondary col-span-2">
-          <p className="text-sm text-text-secondary">{t('activities.uniqueEvents')}</p>
+        <div className="px-3 py-2 rounded-lg border border-border bg-bg-secondary flex-1 min-w-[150px]">
+          <p className="text-xs text-text-secondary">{t('activities.uniqueEvents')}</p>
           <p className="text-sm mt-1">{stats.uniqueEvents.length > 0 ? stats.uniqueEvents.join(', ') : '—'}</p>
         </div>
       </div>
@@ -110,10 +110,10 @@ export default function ResponsesActivitiesPage() {
 
       {/* Student Work Section */}
       <h3 className="text-md font-medium mb-3">{t('activities.studentWorkTitle')}</h3>
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        <div className="p-4 rounded-lg border border-border bg-bg-secondary">
-          <p className="text-sm text-text-secondary">{t('activities.totalStudentWork')}</p>
-          <p className="text-2xl font-medium">{stats.totalStudentWork}</p>
+      <div className="flex flex-wrap gap-3 mb-4">
+        <div className="px-3 py-2 rounded-lg border border-border bg-bg-secondary">
+          <p className="text-xs text-text-secondary">{t('activities.totalStudentWork')}</p>
+          <p className="text-lg font-medium">{stats.totalStudentWork}</p>
         </div>
       </div>
 

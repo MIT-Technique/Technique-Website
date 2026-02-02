@@ -1249,7 +1249,8 @@
     "tabs": {
       "profile": "Perfil",
       "book": "Reservar",
-      "assign": "Secciones",
+      "assign": "Asignar",
+      "sections": "Secciones",
       "members": "Miembros",
       "documents": "Documentos",
       "settings": "Configuración"
@@ -1321,6 +1322,9 @@
       "addSectionSuccess": "Sección añadida exitosamente",
       "addSectionError": "Error al añadir sección",
       "noSections": "Aún no hay secciones creadas",
+      "noSectionsToAssign": "Primero crea secciones en la pestaña Secciones, luego reserva un horario de sesión de fotos para comenzar a asignar.",
+      "noBookedTimes": "Aún no hay sesiones de fotos reservadas. Reserva un horario para comenzar a asignar secciones.",
+      "goToBook": "Ir a Reservar Sesión",
       "memberCount": "{count} miembro(s)",
       "sectionImage": "Imagen de Sección",
       "sectionFileNaming": "Nombre del archivo: Nombre_Organización_Nombre_Sección_Candid",
