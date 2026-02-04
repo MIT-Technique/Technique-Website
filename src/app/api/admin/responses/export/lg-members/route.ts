@@ -14,6 +14,7 @@ export async function GET() {
     const { data: lgs } = await supabase
       .from('living_groups')
       .select('id, name')
+      .neq('status', 'disabled')
       .order('name', { ascending: true });
 
     const lgIds = (lgs || []).map(lg => lg.id);

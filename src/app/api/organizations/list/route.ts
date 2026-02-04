@@ -21,10 +21,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Fetch all living groups
+    // Fetch active living groups only (exclude disabled)
     const { data: livingGroups, error: lgError } = await supabaseAdmin
       .from("living_groups")
       .select("id, name, living_group_type")
+      .neq("status", "disabled")
       .order("name");
 
     if (lgError) {

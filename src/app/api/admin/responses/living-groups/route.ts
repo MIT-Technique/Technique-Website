@@ -14,6 +14,7 @@ export async function GET() {
     const { data: lgs, error } = await supabase
       .from('living_groups')
       .select('id, name, living_group_type, dorm_sections, section_images, manually_booked, manually_booked_by')
+      .neq('status', 'disabled')
       .order('name', { ascending: true });
 
     if (error) {

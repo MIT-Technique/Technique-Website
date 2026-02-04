@@ -1,10 +1,12 @@
 "use client";
 import Footer from "../../../../components/Footer/Footer";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import * as React from "react";
 import Box from "@mui/material/Box";
 import { Button, TextField } from "@mui/material";
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
+import { useRouter } from 'next/navigation';
+import { useUser } from "../../../../hooks/useUser";
 
 const textFieldSx = {
   "& .MuiOutlinedInput-root": {
@@ -17,10 +19,34 @@ const textFieldSx = {
 
 export default function AdminLoginPage() {
   const t = useTranslations('pages.login');
+  const locale = useLocale();
+  const router = useRouter();
+  const { isLoggedIn, user, loading: userLoading } = useUser();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
+
+  useEffect(() => {
+    if (!userLoading && isLoggedIn) {
+      const role = user?.role;
+      if (role === 'admin' || role === 'staph') {
+        router.replace(`/${locale}/dashboard`);
+      } else if (role === 'club') {
+        router.replace(`/${locale}/club`);
+      } else if (role === 'living_group') {
+        router.replace(`/${locale}/living-group`);
+      } else if (role === 'sports') {
+        router.replace(`/${locale}/sports`);
+      } else {
+        router.replace(`/${locale}`);
+      }
+    }
+  }, [userLoading, isLoggedIn, user, router, locale]);
+
+  if (userLoading || isLoggedIn) {
+    return null;
+  }
 
   async function handleAdminLogin(e) {
     e.preventDefault();
