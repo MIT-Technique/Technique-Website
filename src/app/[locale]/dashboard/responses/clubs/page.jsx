@@ -98,16 +98,16 @@ export default function ResponsesClubsPage() {
 
       {/* Summary Cards */}
       {stats && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="flex flex-wrap gap-3 mb-4">
           {[
             { label: t('clubs.totalClubs'), value: stats.total },
             { label: t('clubs.withDescriptions'), value: stats.withDescriptions },
             { label: t('clubs.withMembers'), value: stats.withMembers },
             { label: t('clubs.totalMembers'), value: stats.totalMembers },
           ].map((card) => (
-            <div key={card.label} className="p-4 rounded-lg border border-border bg-bg-secondary">
-              <p className="text-sm text-text-secondary">{card.label}</p>
-              <p className="text-2xl font-medium">{card.value}</p>
+            <div key={card.label} className="px-3 py-2 rounded-lg border border-border bg-bg-secondary">
+              <p className="text-xs text-text-secondary">{card.label}</p>
+              <p className="text-lg font-medium">{card.value}</p>
             </div>
           ))}
         </div>
@@ -130,7 +130,7 @@ export default function ResponsesClubsPage() {
           >
             ←
           </button>
-          <span className="text-sm text-text-muted px-2">
+          <span className="text-sm text-text-muted px-2 whitespace-nowrap">
             {page + 1} / {totalPages || 1}
           </span>
           <button

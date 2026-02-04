@@ -715,7 +715,7 @@ export default function SportsPage() {
                     disabled={addingCoach}
                     className="btn-primary whitespace-nowrap"
                   >
-                    {addingCoach ? '...' : t('coaches.addCoach')}
+                    {addingCoach ? '...' : <><span className="sm:hidden text-lg leading-none">+</span><span className="hidden sm:inline">{t('coaches.addCoach')}</span></>}
                   </button>
                 </div>
               </form>
@@ -865,7 +865,7 @@ export default function SportsPage() {
                       disabled={addingMember || !singleMember.name.trim()}
                       className="btn-primary whitespace-nowrap"
                     >
-                      {addingMember ? t('members.adding') : t('members.add')}
+                      {addingMember ? t('members.adding') : <><span className="sm:hidden text-lg leading-none">+</span><span className="hidden sm:inline">{t('members.add')}</span></>}
                     </button>
                   </div>
                 </form>

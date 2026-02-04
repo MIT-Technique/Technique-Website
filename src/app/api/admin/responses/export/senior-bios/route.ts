@@ -11,20 +11,31 @@ export async function GET() {
 
     const supabase = createAdminClient();
 
-    const { data: bios, error } = await supabase
-      .from('senior_bios')
-      .select('name, major, second_major, minor, quote, achievements')
-      .order('name', { ascending: true });
+    const PAGE_SIZE = 1000;
+    let allBios: any[] = [];
+    let from = 0;
 
-    if (error) {
-      console.error("Error fetching senior bios:", error);
-      return NextResponse.json({ error: "Failed to fetch bios" }, { status: 500 });
+    while (true) {
+      const { data: bios, error } = await supabase
+        .from('senior_bios')
+        .select('first_name, last_name, email, major, second_major, minor, quote, achievements')
+        .order('last_name', { ascending: true })
+        .range(from, from + PAGE_SIZE - 1);
+
+      if (error) {
+        console.error("Error fetching senior bios:", error);
+        return NextResponse.json({ error: "Failed to fetch bios" }, { status: 500 });
+      }
+
+      allBios = allBios.concat(bios || []);
+      if (!bios || bios.length < PAGE_SIZE) break;
+      from += PAGE_SIZE;
     }
 
-    const headers = ['name', 'major', 'second_major', 'minor', 'quote', 'achievements'];
+    const headers = ['first_name', 'last_name', 'email', 'major', 'second_major', 'minor', 'quote', 'achievements'];
 
     const rows: string[][] = [headers];
-    (bios || []).forEach(bio => {
+    allBios.forEach(bio => {
       rows.push(headers.map(h => (bio as Record<string, string | null>)[h] || ''));
     });
 

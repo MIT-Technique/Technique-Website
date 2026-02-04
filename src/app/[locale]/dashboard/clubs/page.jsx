@@ -185,7 +185,7 @@ export default function ClubsPage() {
           >
             ←
           </button>
-          <span className="text-sm text-text-muted px-2">
+          <span className="text-sm text-text-muted px-2 whitespace-nowrap">
             {page + 1} / {displayTotalPages || 1}
           </span>
           <button

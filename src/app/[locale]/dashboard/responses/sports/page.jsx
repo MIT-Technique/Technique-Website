@@ -81,7 +81,7 @@ export default function ResponsesSportsPage() {
     <div>
       <h2 className="text-lg font-medium mb-4">{t('sports.title')}</h2>
 
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+      <div className="flex flex-wrap gap-3 mb-4">
         {[
           { label: t('sports.totalTeams'), value: stats.total },
           { label: t('sports.withAchievements'), value: stats.withAchievements },
@@ -89,9 +89,9 @@ export default function ResponsesSportsPage() {
           { label: t('sports.totalMembers'), value: stats.totalMembers },
           { label: t('sports.totalCoaches'), value: stats.totalCoaches },
         ].map((card) => (
-          <div key={card.label} className="p-4 rounded-lg border border-border bg-bg-secondary">
-            <p className="text-sm text-text-secondary">{card.label}</p>
-            <p className="text-2xl font-medium">{card.value}</p>
+          <div key={card.label} className="px-3 py-2 rounded-lg border border-border bg-bg-secondary">
+            <p className="text-xs text-text-secondary">{card.label}</p>
+            <p className="text-lg font-medium">{card.value}</p>
           </div>
         ))}
       </div>
@@ -113,7 +113,7 @@ export default function ResponsesSportsPage() {
           >
             ←
           </button>
-          <span className="text-sm text-text-muted px-2">
+          <span className="text-sm text-text-muted px-2 whitespace-nowrap">
             {page + 1} / {totalPages || 1}
           </span>
           <button

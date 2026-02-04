@@ -75,11 +75,11 @@ export default function DashboardPage() {
   return (
     <div>
       {/* Organization Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-3 gap-3 mb-4">
         {loading ? (
           <>
             {[1, 2, 3].map((i) => (
-              <div key={i} className="p-4 rounded-lg border border-border bg-bg-secondary animate-pulse h-24" />
+              <div key={i} className="px-3 py-2 rounded-lg border border-border bg-bg-secondary animate-pulse h-16" />
             ))}
           </>
         ) : (
@@ -87,18 +87,20 @@ export default function DashboardPage() {
             <Link
               key={card.title}
               href={card.href}
-              className={`p-4 rounded-lg border ${card.color} hover:shadow-md transition-shadow`}
+              className={`px-3 py-2 rounded-lg border ${card.color} hover:shadow-md transition-shadow`}
             >
-              <p className="text-sm text-text-secondary mb-1">{card.title}</p>
-              <p className="text-2xl font-medium">{card.value}</p>
-              <p className="text-xs text-text-muted mt-1">{card.subtitle}</p>
+              <div className="flex items-baseline justify-between gap-2">
+                <p className="text-sm text-text-secondary">{card.title}</p>
+                <p className="text-xl font-medium">{card.value}</p>
+              </div>
+              <p className="text-xs text-text-muted">{card.subtitle}</p>
             </Link>
           ))
         )}
       </div>
 
       {/* Detail Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-3 gap-3 mb-6">
         {!loading && detailCards.map((card) => {
           const Wrapper = card.href ? Link : 'div';
           const wrapperProps = card.href ? { href: card.href } : {};
@@ -106,38 +108,40 @@ export default function DashboardPage() {
             <Wrapper
               key={card.title}
               {...wrapperProps}
-              className={`p-4 rounded-lg border ${card.color} ${card.href ? 'hover:shadow-md transition-shadow' : ''}`}
+              className={`px-3 py-2 rounded-lg border ${card.color} ${card.href ? 'hover:shadow-md transition-shadow' : ''}`}
             >
-              <p className="text-sm text-text-secondary mb-1">{card.title}</p>
-              <p className="text-2xl font-medium">{card.value}</p>
+              <div className="flex items-baseline justify-between gap-2">
+                <p className="text-sm text-text-secondary">{card.title}</p>
+                <p className="text-xl font-medium">{card.value}</p>
+              </div>
             </Wrapper>
           );
         })}
       </div>
 
       {/* Quick Actions */}
-      <h3 className="text-md font-medium mb-4">{t('overview.quickActions')}</h3>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <h3 className="text-md font-medium mb-3">{t('overview.quickActions')}</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <Link
           href={`/${locale}/dashboard/photoshoots`}
-          className="p-4 border border-border rounded-lg hover:border-accent transition-colors"
+          className="px-3 py-2 border border-border rounded-lg hover:border-accent transition-colors"
         >
-          <h4 className="font-medium mb-1">{t('actions.managePhotoshoots')}</h4>
-          <p className="text-sm text-text-secondary">{t('actions.managePhotoshootsDesc')}</p>
+          <h4 className="font-medium text-sm">{t('actions.managePhotoshoots')}</h4>
+          <p className="text-xs text-text-secondary">{t('actions.managePhotoshootsDesc')}</p>
         </Link>
         <Link
           href={`/${locale}/dashboard/users`}
-          className="p-4 border border-border rounded-lg hover:border-accent transition-colors"
+          className="px-3 py-2 border border-border rounded-lg hover:border-accent transition-colors"
         >
-          <h4 className="font-medium mb-1">{t('actions.manageUsers')}</h4>
-          <p className="text-sm text-text-secondary">{t('actions.manageUsersDesc')}</p>
+          <h4 className="font-medium text-sm">{t('actions.manageUsers')}</h4>
+          <p className="text-xs text-text-secondary">{t('actions.manageUsersDesc')}</p>
         </Link>
         <Link
           href={`/${locale}/dashboard/settings`}
-          className="p-4 border border-border rounded-lg hover:border-accent transition-colors"
+          className="px-3 py-2 border border-border rounded-lg hover:border-accent transition-colors"
         >
-          <h4 className="font-medium mb-1">{t('actions.formSettings')}</h4>
-          <p className="text-sm text-text-secondary">{t('actions.formSettingsDesc')}</p>
+          <h4 className="font-medium text-sm">{t('actions.formSettings')}</h4>
+          <p className="text-xs text-text-secondary">{t('actions.formSettingsDesc')}</p>
         </Link>
       </div>
     </div>

@@ -24,34 +24,44 @@ export async function GET() {
       .in('sports_id', sportIds)
       .order('name', { ascending: true });
 
+    const { data: coaches } = await supabase
+      .from('sports_coaches')
+      .select('sports_id, name, role, display_order')
+      .in('sports_id', sportIds)
+      .order('display_order', { ascending: true });
+
     // Build columns: for gender teams, create separate columns
-    type Column = { header: string; members: string[] };
+    type Column = { header: string; entries: string[] };
     const columns: Column[] = [];
 
-    (sports || []).forEach(sport => {
-      const sportMembers = (members || []).filter(m => m.sports_id === sport.id);
+    const formatCoach = (c: { name: string; role?: string | null }) =>
+      c.role ? `${c.name} (${c.role})` : c.name;
 
-      const formatMember = (m: { name: string; role?: string | null }) =>
-        m.role ? `${m.name} (${m.role})` : m.name;
+    const formatMember = (m: { name: string; role?: string | null }) =>
+      m.role ? `${m.name} (${m.role})` : m.name;
+
+    (sports || []).forEach(sport => {
+      const sportCoaches = (coaches || []).filter(c => c.sports_id === sport.id).map(formatCoach);
+      const sportMembers = (members || []).filter(m => m.sports_id === sport.id);
 
       if (sport.has_gender_teams) {
         const mensMembers = sportMembers.filter(m => m.team === 'mens').map(formatMember);
         const womensMembers = sportMembers.filter(m => m.team === 'womens').map(formatMember);
-        columns.push({ header: `${sport.name} (Men's)`, members: mensMembers });
-        columns.push({ header: `${sport.name} (Women's)`, members: womensMembers });
+        columns.push({ header: `${sport.name} (Men's)`, entries: [...sportCoaches, ...mensMembers] });
+        columns.push({ header: `${sport.name} (Women's)`, entries: [...sportCoaches, ...womensMembers] });
       } else {
         const allMembers = sportMembers.map(formatMember);
-        columns.push({ header: sport.name, members: allMembers });
+        columns.push({ header: sport.name, entries: [...sportCoaches, ...allMembers] });
       }
     });
 
-    const maxMembers = Math.max(...columns.map(c => c.members.length), 0);
+    const maxMembers = Math.max(...columns.map(c => c.entries.length), 0);
 
     const rows: string[][] = [];
     rows.push(columns.map(c => c.header));
 
     for (let i = 0; i < maxMembers; i++) {
-      rows.push(columns.map(c => c.members[i] || ''));
+      rows.push(columns.map(c => c.entries[i] || ''));
     }
 
     const csv = rows.map(row =>

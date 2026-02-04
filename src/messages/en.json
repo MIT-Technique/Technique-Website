@@ -1288,7 +1288,8 @@
     "tabs": {
       "profile": "Profile",
       "book": "Book",
-      "assign": "Sections",
+      "assign": "Assign",
+      "sections": "Sections",
       "members": "Members",
       "documents": "Documents",
       "settings": "Settings"
@@ -1360,6 +1361,9 @@
       "addSectionSuccess": "Section added successfully",
       "addSectionError": "Failed to add section",
       "noSections": "No sections created yet",
+      "noSectionsToAssign": "Create sections in the Sections tab first, then book a photoshoot time to start assigning.",
+      "noBookedTimes": "No upcoming photoshoots booked yet. Book a photoshoot time to start assigning sections.",
+      "goToBook": "Go to Book Photoshoot",
       "memberCount": "{count} member(s)",
       "sectionImage": "Section Image",
       "sectionFileNaming": "Please name the file as: Organization_Name_Section_Name_Candid",

@@ -2,12 +2,38 @@
 import Footer from "../../../components/Footer/Footer";
 import OrganizationAuthModal from "../../../components/OrganizationAuthModal/OrganizationAuthModal";
 import * as React from "react";
-import { useState } from "react";
-import { useTranslations } from 'next-intl';
+import { useState, useEffect } from "react";
+import { useTranslations, useLocale } from 'next-intl';
+import { useRouter } from 'next/navigation';
+import { useUser } from "../../../hooks/useUser";
 
 export default function LoginPage() {
   const t = useTranslations('pages.login');
+  const locale = useLocale();
+  const router = useRouter();
+  const { isLoggedIn, user, loading: userLoading } = useUser();
   const [orgModalOpen, setOrgModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (!userLoading && isLoggedIn) {
+      const role = user?.role;
+      if (role === 'admin' || role === 'staph') {
+        router.replace(`/${locale}/dashboard`);
+      } else if (role === 'club') {
+        router.replace(`/${locale}/club`);
+      } else if (role === 'living_group') {
+        router.replace(`/${locale}/living-group`);
+      } else if (role === 'sports') {
+        router.replace(`/${locale}/sports`);
+      } else {
+        router.replace(`/${locale}`);
+      }
+    }
+  }, [userLoading, isLoggedIn, user, router, locale]);
+
+  if (userLoading || isLoggedIn) {
+    return null;
+  }
 
   return (
     <>

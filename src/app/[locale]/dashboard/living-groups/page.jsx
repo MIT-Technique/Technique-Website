@@ -110,7 +110,7 @@ export default function LivingGroupsPage() {
           >
             ←
           </button>
-          <span className="text-sm text-text-muted px-2">
+          <span className="text-sm text-text-muted px-2 whitespace-nowrap">
             {currentPage} / {totalPages || 1}
           </span>
           <button

@@ -62,7 +62,7 @@ export default function MonthView({
       ) : (
         <div className="grid grid-cols-7 border-t border-l border-border">
           {Array.from({ length: firstDay }, (_, i) => (
-            <div key={`empty-${i}`} className="border-r border-b border-border min-h-[80px] bg-bg-secondary/30" />
+            <div key={`empty-${i}`} className="border-r border-b border-border min-h-[56px] sm:min-h-[80px] bg-bg-secondary/30" />
           ))}
 
           {Array.from({ length: daysInMonth }, (_, i) => {
@@ -89,7 +89,7 @@ export default function MonthView({
                   if (isPast) { showFlashError(t('noPastDates')); return; }
                   onDayClick(dateStr);
                 }}
-                className={`border-r border-b border-border min-h-[80px] p-1.5 cursor-pointer transition-colors ${
+                className={`border-r border-b border-border min-h-[56px] sm:min-h-[80px] p-1 sm:p-1.5 cursor-pointer transition-colors ${
                   isSelected
                     ? 'bg-accent/5 ring-2 ring-accent ring-inset'
                     : isPast
@@ -131,7 +131,7 @@ export default function MonthView({
           {Array.from(
             { length: (7 - ((firstDay + daysInMonth) % 7)) % 7 },
             (_, i) => (
-              <div key={`trail-${i}`} className="border-r border-b border-border min-h-[80px] bg-bg-secondary/30" />
+              <div key={`trail-${i}`} className="border-r border-b border-border min-h-[56px] sm:min-h-[80px] bg-bg-secondary/30" />
             )
           )}
         </div>
