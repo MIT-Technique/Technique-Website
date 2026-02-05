@@ -10,11 +10,17 @@ export default function ImageUpload({ imageUrl, onUpload, onDelete, disabled, la
   const [error, setError] = useState('');
   const [dragOver, setDragOver] = useState(false);
   const [localUrl, setLocalUrl] = useState(null);
+  const [deleted, setDeleted] = useState(false);
   const inputRef = useRef(null);
 
-  // Reset localUrl when the parent's imageUrl changes (e.g., after external refetch)
+  // Reset local state when the parent's imageUrl changes (e.g., after external refetch)
   useEffect(() => {
-    setLocalUrl(null);
+    // Only reset if imageUrl actually changed to a new value
+    // Don't reset deleted state if imageUrl becomes null (that's expected after delete)
+    if (imageUrl) {
+      setLocalUrl(null);
+      setDeleted(false);
+    }
   }, [imageUrl]);
 
   function validate(file) {
@@ -35,12 +41,24 @@ export default function ImageUpload({ imageUrl, onUpload, onDelete, disabled, la
       return;
     }
     setError('');
+
+    // Show local preview immediately
+    const localPreview = URL.createObjectURL(file);
+    setLocalUrl(localPreview);
+
     setUploading(true);
     try {
       const url = await onUpload(file);
-      if (url) setLocalUrl(url);
+      // Update with server URL after upload completes
+      if (url) {
+        URL.revokeObjectURL(localPreview);
+        setLocalUrl(url);
+      }
     } catch (e) {
       setError(e.message || 'Upload failed');
+      // Revert preview on error
+      URL.revokeObjectURL(localPreview);
+      setLocalUrl(null);
     } finally {
       setUploading(false);
       if (inputRef.current) inputRef.current.value = '';
@@ -61,6 +79,7 @@ export default function ImageUpload({ imageUrl, onUpload, onDelete, disabled, la
     try {
       await onDelete();
       setLocalUrl(null);
+      setDeleted(true);
     } catch (e) {
       setError(e.message || 'Delete failed');
     } finally {
@@ -68,7 +87,8 @@ export default function ImageUpload({ imageUrl, onUpload, onDelete, disabled, la
     }
   }
 
-  const displayUrl = localUrl || imageUrl;
+  // If deleted locally, don't fall back to old imageUrl until parent refetches
+  const displayUrl = deleted ? null : (localUrl || imageUrl);
   const sizeClass = size === 'sm' ? 'w-20 h-20' : 'w-32 h-32';
 
   if (displayUrl) {

@@ -59,26 +59,41 @@ export async function POST(request: NextRequest) {
     const supabase = createAdminClient();
 
     // Get club
-    const { data: club } = await supabase
+    let { data: club } = await supabase
       .from('clubs')
-      .select('id, club_id, name')
+      .select('id, name')
       .eq('user_id', user.id)
       .single();
 
+    // If club doesn't exist, create it (fallback for incomplete signup)
     if (!club) {
-      return NextResponse.json(
-        { error: "Club not found" },
-        { status: 404 }
-      );
+      const { data: newClub, error: createError } = await supabase
+        .from('clubs')
+        .insert({
+          user_id: user.id,
+          name: user.email?.split('@')[0] || 'Unknown Club',
+          approval_status: 'pending',
+        })
+        .select('id, name')
+        .single();
+
+      if (createError) {
+        console.error("Create club error:", createError);
+        return NextResponse.json(
+          { error: "Failed to create club record" },
+          { status: 500 }
+        );
+      }
+      club = newClub;
     }
 
     // Upload to Supabase Storage
     const fileExt = file.name.split('.').pop();
-    const safeName = (club.name || club.club_id).replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '');
+    const safeName = (club.name || club.id).replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '');
     const suffix = slot === '1' ? '' : `_${slot}`;
-    const fileName = `clubs/${safeName}_Candid${suffix}.${fileExt}`;
+    const fileName = `clubs/${safeName}/Candid${suffix}.${fileExt}`;
 
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('club-images')
       .upload(fileName, file, {
         cacheControl: '3600',
@@ -93,17 +108,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get public URL
+    // Get public URL with cache-busting parameter
     const { data: urlData } = supabase.storage
       .from('club-images')
       .getPublicUrl(fileName);
+
+    // Add timestamp to bust browser cache on re-uploads
+    const publicUrlWithCache = `${urlData.publicUrl}?t=${Date.now()}`;
 
     // Update club record
     const imageField = `candid_image_${slot}`;
     const { error: updateError } = await supabase
       .from('clubs')
       .update({
-        [imageField]: urlData.publicUrl,
+        [imageField]: publicUrlWithCache,
         updated_at: new Date().toISOString(),
       })
       .eq('id', club.id);
@@ -118,7 +136,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      url: urlData.publicUrl,
+      url: publicUrlWithCache,
       slot,
     });
   } catch (error) {
@@ -163,23 +181,40 @@ export async function DELETE(request: NextRequest) {
 
     // Get club with current image URL
     const imageField = `candid_image_${slot}`;
-    const { data: club } = await supabase
+    let { data: club } = await supabase
       .from('clubs')
       .select('id, candid_image_1, candid_image_2, candid_image_3')
       .eq('user_id', user.id)
       .single();
 
+    // If club doesn't exist, create it (fallback for incomplete signup)
     if (!club) {
-      return NextResponse.json(
-        { error: "Club not found" },
-        { status: 404 }
-      );
+      const { data: newClub, error: createError } = await supabase
+        .from('clubs')
+        .insert({
+          user_id: user.id,
+          name: user.email?.split('@')[0] || 'Unknown Club',
+          approval_status: 'pending',
+        })
+        .select('id, candid_image_1, candid_image_2, candid_image_3')
+        .single();
+
+      if (createError) {
+        console.error("Create club error:", createError);
+        return NextResponse.json(
+          { error: "Failed to create club record" },
+          { status: 500 }
+        );
+      }
+      club = newClub;
     }
 
     // Delete file from storage
     const imageUrl = (club as Record<string, unknown>)[imageField] as string | null;
     if (imageUrl) {
-      const match = imageUrl.match(/\/club-images\/(.+)$/);
+      // Strip query params before extracting path
+      const urlWithoutParams = imageUrl.split('?')[0];
+      const match = urlWithoutParams.match(/\/club-images\/(.+)$/);
       if (match) {
         await supabase.storage.from('club-images').remove([decodeURIComponent(match[1])]);
       }

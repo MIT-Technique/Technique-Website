@@ -43,32 +43,34 @@ const testAccounts = [
     role: "club",
     type: "club",
   },
-  {
-    name: "Test Sports",
-    email: "test-sports@mit.edu",
-    role: "sports",
-    type: "sports",
-    has_gender_teams: false,
-  },
-  {
-    name: "Test Living Group",
-    email: "test-living-group@mit.edu",
-    role: "living_group",
-    type: "living_group",
-    living_group_type: "dorm",
-  },
-  {
-    name: "Test Staph",
-    email: "test-staph@mit.edu",
-    role: "staph",
-    type: "staph",
-  },
+  // {
+  //   name: "Test Sports",
+  //   email: "test-sports@mit.edu",
+  //   role: "sports",
+  //   type: "sports",
+  //   has_gender_teams: false,
+  // },
+  // {
+  //   name: "Test Living Group",
+  //   email: "test-living-group@mit.edu",
+  //   role: "living_group",
+  //   type: "living_group",
+  //   living_group_type: "dorm",
+  // },
+  // {
+  //   name: "Test Staph",
+  //   email: "test-staph@mit.edu",
+  //   role: "staph",
+  //   type: "staph",
+  // },
 ];
 
 function generateUniquePassword(name) {
   const hash = crypto
     .createHash("sha256")
-    .update(name + Date.now().toString() + crypto.randomBytes(8).toString("hex"))
+    .update(
+      name + Date.now().toString() + crypto.randomBytes(8).toString("hex"),
+    )
     .digest("hex")
     .slice(0, 12);
   return `TNQ-${hash}`;
@@ -76,7 +78,7 @@ function generateUniquePassword(name) {
 
 async function createOrGetUser(account, password) {
   // 1. Create auth user
-  const { data: authData, error: authError } =
+  let { data: authData, error: authError } =
     await supabase.auth.admin.createUser({
       email: account.email,
       password,
@@ -88,11 +90,19 @@ async function createOrGetUser(account, password) {
     });
 
   if (authError) {
-    if (authError.message.includes("already exists")) {
-      console.log(`-- ${account.name}: Auth account already exists, skipping`);
-      return null;
+    if (authError.message.includes("already") || authError.message.includes("exists")) {
+      console.log(`-- ${account.name}: Auth account already exists, fetching existing user`);
+      // Get existing auth user
+      const { data: { users: existingAuthUsers } } = await supabase.auth.admin.listUsers();
+      const existingAuthUser = existingAuthUsers?.find(u => u.email === account.email);
+      if (!existingAuthUser) {
+        throw new Error(`Auth user exists but could not be fetched`);
+      }
+      // Continue with existing auth user
+      authData = { user: existingAuthUser };
+    } else {
+      throw new Error(`Auth error: ${authError.message}`);
     }
-    throw new Error(`Auth error: ${authError.message}`);
   }
 
   // 2. Check if public.users record exists
@@ -114,7 +124,8 @@ async function createOrGetUser(account, password) {
       })
       .eq("id", existingUser.id);
 
-    if (updateError) throw new Error(`User update error: ${updateError.message}`);
+    if (updateError)
+      throw new Error(`User update error: ${updateError.message}`);
     userId = existingUser.id;
   } else {
     const { data: newUser, error: insertError } = await supabase
@@ -123,15 +134,14 @@ async function createOrGetUser(account, password) {
         email: account.email,
         role: account.role,
         supabase_auth_id: authData.user.id,
-        auth_provider: account.type === "staph" ? "mit_sso" : "supabase_auth",
-        first_name: "Test",
-        last_name: account.type.charAt(0).toUpperCase() + account.type.slice(1),
+        name: account.name,
         is_staph: account.type === "staph",
       })
       .select("id")
       .single();
 
-    if (insertError) throw new Error(`User insert error: ${insertError.message}`);
+    if (insertError)
+      throw new Error(`User insert error: ${insertError.message}`);
     userId = newUser.id;
   }
 
@@ -145,7 +155,11 @@ async function createOrgRecord(account, userId) {
       name: account.name,
       approval_status: "approved",
     });
-    if (error && !error.message.includes("duplicate") && !error.message.includes("unique")) {
+    if (
+      error &&
+      !error.message.includes("duplicate") &&
+      !error.message.includes("unique")
+    ) {
       throw new Error(`Club insert error: ${error.message}`);
     }
   } else if (account.type === "sports") {
@@ -154,7 +168,11 @@ async function createOrgRecord(account, userId) {
       name: account.name,
       has_gender_teams: account.has_gender_teams,
     });
-    if (error && !error.message.includes("duplicate") && !error.message.includes("unique")) {
+    if (
+      error &&
+      !error.message.includes("duplicate") &&
+      !error.message.includes("unique")
+    ) {
       throw new Error(`Sports insert error: ${error.message}`);
     }
   } else if (account.type === "living_group") {
@@ -164,7 +182,11 @@ async function createOrgRecord(account, userId) {
       living_group_type: account.living_group_type,
       status: "active",
     });
-    if (error && !error.message.includes("duplicate") && !error.message.includes("unique")) {
+    if (
+      error &&
+      !error.message.includes("duplicate") &&
+      !error.message.includes("unique")
+    ) {
       throw new Error(`Living group insert error: ${error.message}`);
     }
   }
@@ -224,7 +246,8 @@ async function createTestAccounts() {
     const csvContent = ["Name,Email,Password,Type,Role"]
       .concat(
         createdAccounts.map(
-          (a) => `"${a.name}","${a.email}","${a.password}","${a.type}","${a.role}"`,
+          (a) =>
+            `"${a.name}","${a.email}","${a.password}","${a.type}","${a.role}"`,
         ),
       )
       .join("\n");
@@ -247,9 +270,7 @@ async function createTestAccounts() {
     console.log("========================================");
   }
 
-  console.log(
-    `\nDone: ${createdAccounts.length} created, ${errors} errors`,
-  );
+  console.log(`\nDone: ${createdAccounts.length} created, ${errors} errors`);
 }
 
 createTestAccounts().catch(console.error);

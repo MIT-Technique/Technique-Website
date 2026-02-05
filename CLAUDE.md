@@ -737,6 +737,7 @@ club_id uuid NOT NULL,
 name text NOT NULL,
 added_at timestamp with time zone DEFAULT now(),
 section_name text,
+role text,
 CONSTRAINT club_manual_members_pkey PRIMARY KEY (id),
 CONSTRAINT club_manual_members_club_id_fkey FOREIGN KEY (club_id) REFERENCES public.clubs(id)
 );
@@ -963,6 +964,7 @@ sports_id uuid NOT NULL,
 name text NOT NULL,
 team text CHECK (team IS NULL OR (team = ANY (ARRAY['mens'::text, 'womens'::text]))),
 added_at timestamp with time zone DEFAULT now(),
+role text,
 CONSTRAINT sports_manual_members_pkey PRIMARY KEY (id),
 CONSTRAINT sports_manual_members_sports_id_fkey FOREIGN KEY (sports_id) REFERENCES public.sports(id)
 );
