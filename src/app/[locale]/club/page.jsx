@@ -458,8 +458,25 @@ export default function ClubPage() {
                   </p>
                 </div>
 
-                {/* Images Section */}
-                <div>
+                {message.text && (
+                  <div className={`p-4 rounded ${
+                    message.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
+                  }`}>
+                    {message.text}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={saving || isFrozen}
+                  className="btn-primary"
+                >
+                  {saving ? t('saving') : t('save')}
+                </button>
+              </form>
+
+              {/* Images Section */}
+              <div className="mt-8">
                   <label className="block text-sm font-medium mb-2">{t('form.images')}</label>
                   <p className="text-sm text-text-muted mb-4">{t('form.imagesHint')}</p>
                   {imageMessage.text && (
@@ -510,23 +527,6 @@ export default function ClubPage() {
                     })}
                   </div>
                 </div>
-
-                {message.text && (
-                  <div className={`p-4 rounded ${
-                    message.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
-                  }`}>
-                    {message.text}
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={saving || isFrozen}
-                  className="btn-primary"
-                >
-                  {saving ? t('saving') : t('save')}
-                </button>
-              </form>
 
             </div>
           )}

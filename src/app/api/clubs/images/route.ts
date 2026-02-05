@@ -212,7 +212,9 @@ export async function DELETE(request: NextRequest) {
     // Delete file from storage
     const imageUrl = (club as Record<string, unknown>)[imageField] as string | null;
     if (imageUrl) {
-      const match = imageUrl.match(/\/club-images\/(.+)$/);
+      // Strip query params before extracting path
+      const urlWithoutParams = imageUrl.split('?')[0];
+      const match = urlWithoutParams.match(/\/club-images\/(.+)$/);
       if (match) {
         await supabase.storage.from('club-images').remove([decodeURIComponent(match[1])]);
       }

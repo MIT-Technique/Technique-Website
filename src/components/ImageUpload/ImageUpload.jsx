@@ -41,12 +41,24 @@ export default function ImageUpload({ imageUrl, onUpload, onDelete, disabled, la
       return;
     }
     setError('');
+
+    // Show local preview immediately
+    const localPreview = URL.createObjectURL(file);
+    setLocalUrl(localPreview);
+
     setUploading(true);
     try {
       const url = await onUpload(file);
-      if (url) setLocalUrl(url);
+      // Update with server URL after upload completes
+      if (url) {
+        URL.revokeObjectURL(localPreview);
+        setLocalUrl(url);
+      }
     } catch (e) {
       setError(e.message || 'Upload failed');
+      // Revert preview on error
+      URL.revokeObjectURL(localPreview);
+      setLocalUrl(null);
     } finally {
       setUploading(false);
       if (inputRef.current) inputRef.current.value = '';
