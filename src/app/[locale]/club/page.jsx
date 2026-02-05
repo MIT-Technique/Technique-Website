@@ -491,6 +491,8 @@ export default function ClubPage() {
                               setImageMessage({ type: 'error', text: data.error || 'Upload failed' });
                               throw new Error(data.error || 'Upload failed');
                             }
+                            // Return URL for immediate preview via localUrl
+                            // Backend is already updated; club data will sync on next page load
                             return data.url;
                           }}
                           onDelete={async () => {
@@ -501,6 +503,7 @@ export default function ClubPage() {
                               setImageMessage({ type: 'error', text: data.error || 'Delete failed' });
                               throw new Error(data.error || 'Delete failed');
                             }
+                            // ImageUpload handles the deleted state visually
                           }}
                         />
                       );
