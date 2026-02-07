@@ -12,7 +12,7 @@ export default function SportsPage() {
   const router = useRouter();
   const locale = useLocale();
   const t = useTranslations('sportsPage');
-  const { isLoggedIn, user, sports, loading: userLoading, refetch } = useUser();
+  const { isLoggedIn, user, sports, loading: userLoading } = useUser();
 
   const [activeTab, setActiveTab] = useState('profile');
   const [isFrozen, setIsFrozen] = useState(false);
@@ -25,8 +25,15 @@ export default function SportsPage() {
     mens_achievement_summary: '',
     womens_achievement_summary: '',
   });
-  const [saving, setSaving] = useState(false);
+  const [profileSaveStatus, setProfileSaveStatus] = useState('idle'); // 'idle' | 'saving' | 'saved' | 'error'
   const [message, setMessage] = useState({ type: '', text: '' });
+  const profileSaveTimer = useRef(null);
+  const lastSavedProfile = useRef({
+    description: '',
+    achievement_summary: '',
+    mens_achievement_summary: '',
+    womens_achievement_summary: '',
+  });
 
   // Email state
   const [sportsEmail, setSportsEmail] = useState('');
@@ -65,9 +72,10 @@ export default function SportsPage() {
 
   // Documents state
   const [documents, setDocuments] = useState({ links: '', notes: '' });
-  const [savingDocuments, setSavingDocuments] = useState(false);
-  const [documentsMessage, setDocumentsMessage] = useState({ type: '', text: '' });
+  const [documentsSaveStatus, setDocumentsSaveStatus] = useState('idle');
   const [documentsLoading, setDocumentsLoading] = useState(true);
+  const documentsSaveTimer = useRef(null);
+  const lastSavedDocuments = useRef({ links: '', notes: '' });
 
   useEffect(() => {
     if (!userLoading && (!isLoggedIn || user?.role !== 'sports')) {
@@ -104,12 +112,6 @@ export default function SportsPage() {
     }
   }, [membersMessage]);
 
-  useEffect(() => {
-    if (documentsMessage.type === 'success' && documentsMessage.text) {
-      const timer = setTimeout(() => setDocumentsMessage({ type: '', text: '' }), 4000);
-      return () => clearTimeout(timer);
-    }
-  }, [documentsMessage]);
 
   useEffect(() => {
     if (sports) {
@@ -120,6 +122,12 @@ export default function SportsPage() {
         mens_achievement_summary: sports.mens_achievement_summary || '',
         womens_achievement_summary: sports.womens_achievement_summary || '',
       });
+      lastSavedProfile.current = {
+        description: sports.description || '',
+        achievement_summary: sports.achievement_summary || '',
+        mens_achievement_summary: sports.mens_achievement_summary || '',
+        womens_achievement_summary: sports.womens_achievement_summary || '',
+      };
     }
   }, [sports]);
 
@@ -186,29 +194,61 @@ export default function SportsPage() {
     }
   }
 
-  async function handleSubmitProfile(e) {
-    e.preventDefault();
+  // Auto-save profile function
+  async function saveProfile(data) {
+    const hasChanges =
+      data.description !== lastSavedProfile.current.description ||
+      data.achievement_summary !== lastSavedProfile.current.achievement_summary ||
+      data.mens_achievement_summary !== lastSavedProfile.current.mens_achievement_summary ||
+      data.womens_achievement_summary !== lastSavedProfile.current.womens_achievement_summary;
+
+    if (!hasChanges) return;
     if (isFrozen) return;
-    setSaving(true);
-    setMessage({ type: '', text: '' });
+
+    setProfileSaveStatus('saving');
     try {
       const res = await fetch('/api/sports/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(data),
       });
-      const data = await res.json();
       if (res.ok) {
-        setMessage({ type: 'success', text: t('success') });
-        refetch();
+        lastSavedProfile.current = {
+          description: data.description,
+          achievement_summary: data.achievement_summary,
+          mens_achievement_summary: data.mens_achievement_summary,
+          womens_achievement_summary: data.womens_achievement_summary,
+        };
+        setProfileSaveStatus('saved');
+        setTimeout(() => setProfileSaveStatus('idle'), 2000);
       } else {
-        setMessage({ type: 'error', text: data.error || t('error') });
+        setProfileSaveStatus('error');
       }
     } catch (error) {
-      setMessage({ type: 'error', text: t('error') });
-    } finally {
-      setSaving(false);
+      setProfileSaveStatus('error');
     }
+  }
+
+  // Debounced auto-save on profile change
+  function handleProfileChange(field, value) {
+    const newData = { ...formData, [field]: value };
+    setFormData(newData);
+
+    if (profileSaveTimer.current) {
+      clearTimeout(profileSaveTimer.current);
+    }
+
+    profileSaveTimer.current = setTimeout(() => {
+      saveProfile(newData);
+    }, 1000);
+  }
+
+  // Save profile on blur
+  function handleProfileBlur() {
+    if (profileSaveTimer.current) {
+      clearTimeout(profileSaveTimer.current);
+    }
+    saveProfile(formData);
   }
 
   // Coaches
@@ -415,7 +455,9 @@ export default function SportsPage() {
       const res = await fetch('/api/sports/documents');
       const data = await res.json();
       if (res.ok && data.documents) {
-        setDocuments({ links: data.documents.links || '', notes: data.documents.notes || '' });
+        const docs = { links: data.documents.links || '', notes: data.documents.notes || '' };
+        setDocuments(docs);
+        lastSavedDocuments.current = docs;
       }
     } catch (error) {
       console.error('Error fetching documents:', error);
@@ -424,27 +466,49 @@ export default function SportsPage() {
     }
   }
 
-  async function handleSaveDocuments(e) {
-    e.preventDefault();
-    setSavingDocuments(true);
-    setDocumentsMessage({ type: '', text: '' });
+  // Auto-save documents function
+  async function saveDocuments(docs) {
+    if (docs.links === lastSavedDocuments.current.links && docs.notes === lastSavedDocuments.current.notes) return;
+
+    setDocumentsSaveStatus('saving');
     try {
       const res = await fetch('/api/sports/documents', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(documents),
+        body: JSON.stringify(docs),
       });
       if (res.ok) {
-        setDocumentsMessage({ type: 'success', text: t('documents.saveSuccess') });
+        lastSavedDocuments.current = docs;
+        setDocumentsSaveStatus('saved');
+        setTimeout(() => setDocumentsSaveStatus('idle'), 2000);
       } else {
-        const data = await res.json();
-        setDocumentsMessage({ type: 'error', text: data.error || t('documents.saveError') });
+        setDocumentsSaveStatus('error');
       }
     } catch (error) {
-      setDocumentsMessage({ type: 'error', text: t('documents.saveError') });
-    } finally {
-      setSavingDocuments(false);
+      setDocumentsSaveStatus('error');
     }
+  }
+
+  // Debounced auto-save on documents change
+  function handleDocumentsChange(field, value) {
+    const newDocs = { ...documents, [field]: value };
+    setDocuments(newDocs);
+
+    if (documentsSaveTimer.current) {
+      clearTimeout(documentsSaveTimer.current);
+    }
+
+    documentsSaveTimer.current = setTimeout(() => {
+      saveDocuments(newDocs);
+    }, 1000);
+  }
+
+  // Save documents on blur
+  function handleDocumentsBlur() {
+    if (documentsSaveTimer.current) {
+      clearTimeout(documentsSaveTimer.current);
+    }
+    saveDocuments(documents);
   }
 
   // ==================== RENDER HELPERS ====================
@@ -588,7 +652,7 @@ export default function SportsPage() {
                 </div>
               )}
 
-              <form onSubmit={handleSubmitProfile} className="space-y-6">
+              <div className="space-y-6">
                 {/* Email */}
                 <div>
                   <label className="block text-sm font-medium mb-2">{t('profile.email')}</label>
@@ -610,14 +674,31 @@ export default function SportsPage() {
                       {savingEmail ? '...' : t('email.save')}
                     </button>
                   </div>
+                  {message.text && (
+                    <p className={`text-sm mt-2 ${message.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
+                      {message.text}
+                    </p>
+                  )}
                 </div>
 
                 {/* Description */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">{t('profile.description')}</label>
+                  <div className="flex items-center gap-2 mb-2">
+                    <label className="block text-sm font-medium">{t('profile.description')}</label>
+                    {profileSaveStatus === 'saving' && (
+                      <span className="text-sm text-text-secondary">Saving...</span>
+                    )}
+                    {profileSaveStatus === 'saved' && (
+                      <span className="text-sm text-green-600">Saved!</span>
+                    )}
+                    {profileSaveStatus === 'error' && (
+                      <span className="text-sm text-red-600">Error saving</span>
+                    )}
+                  </div>
                   <textarea
                     value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    onChange={(e) => handleProfileChange('description', e.target.value)}
+                    onBlur={handleProfileBlur}
                     className="w-full border border-border rounded px-4 py-2 min-h-[100px]"
                     disabled={isFrozen}
                   />
@@ -640,19 +721,7 @@ export default function SportsPage() {
                     {t('profile.hasGenderTeams')}
                   </label>
                 </div>
-
-                {message.text && (
-                  <div className={`p-4 rounded ${
-                    message.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
-                  }`}>
-                    {message.text}
-                  </div>
-                )}
-
-                <button type="submit" disabled={saving || isFrozen} className="btn-primary">
-                  {saving ? t('saving') : t('save')}
-                </button>
-              </form>
+              </div>
             </div>
           )}
 
@@ -981,14 +1050,27 @@ export default function SportsPage() {
           {/* ==================== ACHIEVEMENTS TAB ==================== */}
           {activeTab === 'achievements' && (
             <div>
-              <form onSubmit={handleSubmitProfile} className="space-y-6">
+              <div className="flex items-center gap-3 mb-6">
+                <h2 className="text-lg font-medium">{t('achievements.title')}</h2>
+                {profileSaveStatus === 'saving' && (
+                  <span className="text-sm text-text-secondary">Saving...</span>
+                )}
+                {profileSaveStatus === 'saved' && (
+                  <span className="text-sm text-green-600">Saved!</span>
+                )}
+                {profileSaveStatus === 'error' && (
+                  <span className="text-sm text-red-600">Error saving</span>
+                )}
+              </div>
+              <div className="space-y-6">
                 {formData.has_gender_teams ? (
                   <>
                     <div>
                       <label className="block text-sm font-medium mb-2">{t('achievements.mensAchievements')}</label>
                       <textarea
                         value={formData.mens_achievement_summary}
-                        onChange={(e) => setFormData({ ...formData, mens_achievement_summary: e.target.value })}
+                        onChange={(e) => handleProfileChange('mens_achievement_summary', e.target.value)}
+                        onBlur={handleProfileBlur}
                         placeholder={t('achievements.placeholder')}
                         className="w-full border border-border rounded px-4 py-2 min-h-[150px]"
                         disabled={isFrozen}
@@ -998,7 +1080,8 @@ export default function SportsPage() {
                       <label className="block text-sm font-medium mb-2">{t('achievements.womensAchievements')}</label>
                       <textarea
                         value={formData.womens_achievement_summary}
-                        onChange={(e) => setFormData({ ...formData, womens_achievement_summary: e.target.value })}
+                        onChange={(e) => handleProfileChange('womens_achievement_summary', e.target.value)}
+                        onBlur={handleProfileBlur}
                         placeholder={t('achievements.placeholder')}
                         className="w-full border border-border rounded px-4 py-2 min-h-[150px]"
                         disabled={isFrozen}
@@ -1007,55 +1090,48 @@ export default function SportsPage() {
                   </>
                 ) : (
                   <div>
-                    <label className="block text-sm font-medium mb-2">{t('achievements.title')}</label>
+                    <label className="block text-sm font-medium mb-2">{t('achievements.label')}</label>
                     <textarea
                       value={formData.achievement_summary}
-                      onChange={(e) => setFormData({ ...formData, achievement_summary: e.target.value })}
+                      onChange={(e) => handleProfileChange('achievement_summary', e.target.value)}
+                      onBlur={handleProfileBlur}
                       placeholder={t('achievements.placeholder')}
                       className="w-full border border-border rounded px-4 py-2 min-h-[150px]"
                       disabled={isFrozen}
                     />
                   </div>
                 )}
-
-                {message.text && (
-                  <div className={`p-4 rounded ${
-                    message.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
-                  }`}>
-                    {message.text}
-                  </div>
-                )}
-
-                <button type="submit" disabled={saving || isFrozen} className="btn-primary">
-                  {saving ? t('saving') : t('save')}
-                </button>
-              </form>
+              </div>
             </div>
           )}
 
           {/* ==================== DOCUMENTS TAB ==================== */}
           {activeTab === 'documents' && (
             <div>
-              <h2 className="text-lg font-medium mb-2">{t('documents.title')}</h2>
+              <div className="flex items-center gap-3 mb-2">
+                <h2 className="text-lg font-medium">{t('documents.title')}</h2>
+                {documentsSaveStatus === 'saving' && (
+                  <span className="text-sm text-text-secondary">Saving...</span>
+                )}
+                {documentsSaveStatus === 'saved' && (
+                  <span className="text-sm text-green-600">Saved!</span>
+                )}
+                {documentsSaveStatus === 'error' && (
+                  <span className="text-sm text-red-600">Error saving</span>
+                )}
+              </div>
               <p className="text-text-secondary text-sm mb-6">{t('documents.description')}</p>
-
-              {documentsMessage.text && (
-                <div className={`mb-6 p-4 rounded ${
-                  documentsMessage.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
-                }`}>
-                  {documentsMessage.text}
-                </div>
-              )}
 
               {documentsLoading ? (
                 <p className="text-text-secondary">Loading...</p>
               ) : (
-                <form onSubmit={handleSaveDocuments} className="space-y-6">
+                <div className="space-y-6">
                   <div>
                     <label className="block text-sm font-medium mb-2">{t('documents.linksLabel')}</label>
                     <textarea
                       value={documents.links}
-                      onChange={(e) => setDocuments({ ...documents, links: e.target.value })}
+                      onChange={(e) => handleDocumentsChange('links', e.target.value)}
+                      onBlur={handleDocumentsBlur}
                       placeholder={t('documents.linksPlaceholder')}
                       className="w-full border border-border rounded px-4 py-2 min-h-[120px] font-mono text-sm"
                       maxLength={2000}
@@ -1068,7 +1144,8 @@ export default function SportsPage() {
                     <label className="block text-sm font-medium mb-2">{t('documents.notesLabel')}</label>
                     <textarea
                       value={documents.notes}
-                      onChange={(e) => setDocuments({ ...documents, notes: e.target.value })}
+                      onChange={(e) => handleDocumentsChange('notes', e.target.value)}
+                      onBlur={handleDocumentsBlur}
                       placeholder={t('documents.notesPlaceholder')}
                       className="w-full border border-border rounded px-4 py-2 min-h-[150px]"
                       maxLength={5000}
@@ -1077,10 +1154,7 @@ export default function SportsPage() {
                       {t('documents.notesHint')} ({documents.notes.length}/5000)
                     </p>
                   </div>
-                  <button type="submit" disabled={savingDocuments} className="btn-primary">
-                    {savingDocuments ? t('saving') : t('documents.save')}
-                  </button>
-                </form>
+                </div>
               )}
             </div>
           )}
