@@ -329,7 +329,15 @@
       "submitButton": "Submit Bio",
       "success": "Your bio was saved successfully",
       "error": "There was an error saving your bio",
-      "contactText": "Questions or suggestions?"
+      "contactText": "Questions or suggestions?",
+      "photo": {
+        "label": "Senior Photo",
+        "uploadLabel": "Upload Photo",
+        "guideline": "Only submit if you did not have a professional photo taken with Technique. For best results, use a portrait-oriented photo with letter-size proportions (8.5 x 11).",
+        "learnMore": "Learn more",
+        "uploadError": "Failed to upload photo",
+        "deleteError": "Failed to remove photo"
+      }
     },
 
     "candids": {
