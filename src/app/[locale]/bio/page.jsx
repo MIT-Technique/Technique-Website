@@ -1,5 +1,6 @@
 "use client";
 import Footer from "../../../components/Footer/Footer";
+import ImageUpload from "../../../components/ImageUpload/ImageUpload";
 import { useState, useCallback } from "react";
 import * as React from "react";
 import { useTranslations } from "next-intl";
@@ -49,6 +50,7 @@ export default function BioPage() {
   const [snackMessage, setSnackMessage] = useState("");
   const [dataLoaded, setDataLoaded] = useState(false);
   const [disableEmail, setDisabledEmail] = useState(false);
+  const [photoUrl, setPhotoUrl] = useState(null);
 
   const vertical = "top";
   const horizontal = "center";
@@ -63,6 +65,7 @@ export default function BioPage() {
       setSecondMajor("");
       setQuote("");
       setExtracurriculars("");
+      setPhotoUrl(null);
       const trimmed = emailValue.trim().toLowerCase();
       if (!trimmed) return;
       // Normalize: if no @, append @mit.edu
@@ -89,33 +92,28 @@ export default function BioPage() {
           if (json.data.firstName && json.data.lastName && json.data.major) {
             setDataLoaded(true);
             setDisabledEmail(true);
-            return;
           }
         }
 
-        // Fallback: fetch from users table for missing fields
-        // const userRes = await fetch(
-        //   `/api/user/lookup?email=${encodeURIComponent(normalized)}`,
-        // );
-        // if (userRes.ok) {
-        //   const userJson = await userRes.json();
-        //   if (userJson.data) {
-        //     if (!firstName && userJson.data.firstName)
-        //       setFirstName(userJson.data.firstName);
-        //     if (!lastName && userJson.data.lastName)
-        //       setLastName(userJson.data.lastName);
-        //     if (!major && userJson.data.major) setMajor(userJson.data.major);
-        //     if (!secondMajor && userJson.data.secondMajor)
-        //       setSecondMajor(userJson.data.secondMajor);
-        //   } else {
-        //     console.error("No user found matching kerb");
-        //     return;
-        //   }
-        //   console.log(userRes);
-        // }
+        // Fetch existing photo
+        try {
+          const photoRes = await fetch(
+            `/api/senior-photos?email=${encodeURIComponent(normalized)}`,
+            { cache: "no-store" },
+          );
+          if (photoRes.ok) {
+            const photoJson = await photoRes.json();
+            if (photoJson.data?.imageUrl) {
+              setPhotoUrl(photoJson.data.imageUrl);
+            }
+          }
+        } catch {
+          // Ignore photo fetch errors
+        }
 
-        // setDataLoaded(true);
-        // setDisabledEmail(true);
+        // Always show form after fetching (even if no existing data)
+        setDataLoaded(true);
+        setDisabledEmail(true);
       } catch {
         // Ignore fetch errors
       }
@@ -150,6 +148,42 @@ export default function BioPage() {
     }
     setEmailError("");
     return true;
+  }
+
+  async function handlePhotoUpload(file) {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("email", normalizeEmail(email));
+    formData.append("firstName", firstName);
+    formData.append("lastName", lastName);
+
+    const res = await fetch("/api/senior-photos", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!res.ok) {
+      const data = await res.json();
+      throw new Error(data.error || t("photo.uploadError"));
+    }
+
+    const { url } = await res.json();
+    setPhotoUrl(url);
+    return url;
+  }
+
+  async function handlePhotoDelete() {
+    const res = await fetch(
+      `/api/senior-photos?email=${encodeURIComponent(normalizeEmail(email))}`,
+      { method: "DELETE" },
+    );
+
+    if (!res.ok) {
+      const data = await res.json();
+      throw new Error(data.error || t("photo.deleteError"));
+    }
+
+    setPhotoUrl(null);
   }
 
   async function updateBio() {
@@ -538,6 +572,29 @@ export default function BioPage() {
                   fullWidth
                   placeholder="Extracurriculars you would like to highlight"
                 />
+
+                {/* Photo Upload Section */}
+                <div className="mt-4 mb-2">
+                  <p className="text-sm font-medium text-text-secondary mb-2">
+                    {t("photo.label")}
+                  </p>
+
+                  <p className="text-xs text-text-muted mb-3">
+                    {t("photo.guideline")}{" "}
+                    <a href="/seniors" className="text-primary hover:underline">
+                      {t("photo.learnMore")}
+                    </a>
+                  </p>
+
+                  <ImageUpload
+                    imageUrl={photoUrl}
+                    onUpload={handlePhotoUpload}
+                    onDelete={handlePhotoDelete}
+                    disabled={!dataLoaded}
+                    label={t("photo.uploadLabel")}
+                    size="md"
+                  />
+                </div>
 
                 <Button
                   type="submit"

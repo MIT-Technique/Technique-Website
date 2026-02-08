@@ -11,7 +11,7 @@ export default function ClubPage() {
   const router = useRouter();
   const locale = useLocale();
   const t = useTranslations('clubPage');
-  const { isLoggedIn, user, club, loading: userLoading, refetch } = useUser();
+  const { isLoggedIn, user, club, loading: userLoading } = useUser();
 
   // Tab state
   const [activeTab, setActiveTab] = useState('profile');
@@ -21,8 +21,10 @@ export default function ClubPage() {
     name: '',
     description: '',
   });
-  const [saving, setSaving] = useState(false);
+  const [descriptionSaveStatus, setDescriptionSaveStatus] = useState('idle'); // 'idle' | 'saving' | 'saved' | 'error'
   const [message, setMessage] = useState({ type: '', text: '' });
+  const descriptionSaveTimer = useRef(null);
+  const lastSavedDescription = useRef('');
   const [imageMessage, setImageMessage] = useState({ type: '', text: '' });
   const [isFrozen, setIsFrozen] = useState(false);
 
@@ -48,9 +50,10 @@ export default function ClubPage() {
     links: '',
     notes: '',
   });
-  const [savingDocuments, setSavingDocuments] = useState(false);
-  const [documentsMessage, setDocumentsMessage] = useState({ type: '', text: '' });
+  const [documentsSaveStatus, setDocumentsSaveStatus] = useState('idle'); // 'idle' | 'saving' | 'saved' | 'error'
   const [documentsLoading, setDocumentsLoading] = useState(true);
+  const documentsSaveTimer = useRef(null);
+  const lastSavedDocuments = useRef({ links: '', notes: '' });
 
 
   useEffect(() => {
@@ -81,12 +84,6 @@ export default function ClubPage() {
     }
   }, [membersMessage]);
 
-  useEffect(() => {
-    if (documentsMessage.type === 'success' && documentsMessage.text) {
-      const timer = setTimeout(() => setDocumentsMessage({ type: '', text: '' }), 4000);
-      return () => clearTimeout(timer);
-    }
-  }, [documentsMessage]);
 
   useEffect(() => {
     if (club) {
@@ -94,8 +91,62 @@ export default function ClubPage() {
         name: club.name || '',
         description: club.description || '',
       });
+      lastSavedDescription.current = club.description || '';
     }
   }, [club]);
+
+  // Auto-save description function
+  async function saveDescription(description) {
+    if (description === lastSavedDescription.current) return;
+    if (isFrozen) return;
+
+    setDescriptionSaveStatus('saving');
+    try {
+      const res = await fetch('/api/clubs/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...formData, description }),
+      });
+
+      if (res.ok) {
+        lastSavedDescription.current = description;
+        setDescriptionSaveStatus('saved');
+        // Reset to idle after 2 seconds
+        setTimeout(() => setDescriptionSaveStatus('idle'), 2000);
+      } else {
+        setDescriptionSaveStatus('error');
+      }
+    } catch (error) {
+      setDescriptionSaveStatus('error');
+    }
+  }
+
+  // Debounced auto-save on description change
+  function handleDescriptionChange(e) {
+    const words = e.target.value.trim().split(/\s+/).filter(Boolean);
+    if (words.length <= 75 || e.target.value.length < formData.description.length) {
+      const newDescription = e.target.value;
+      setFormData({ ...formData, description: newDescription });
+
+      // Clear existing timer
+      if (descriptionSaveTimer.current) {
+        clearTimeout(descriptionSaveTimer.current);
+      }
+
+      // Set new timer for auto-save (1 second after stop typing)
+      descriptionSaveTimer.current = setTimeout(() => {
+        saveDescription(newDescription);
+      }, 1000);
+    }
+  }
+
+  // Save on blur
+  function handleDescriptionBlur() {
+    if (descriptionSaveTimer.current) {
+      clearTimeout(descriptionSaveTimer.current);
+    }
+    saveDescription(formData.description);
+  }
 
   // Lazy-load data per tab
   const fetchedTabs = useRef(new Set());
@@ -180,10 +231,12 @@ export default function ClubPage() {
       const res = await fetch('/api/clubs/documents');
       const data = await res.json();
       if (res.ok && data.documents) {
-        setDocuments({
+        const docs = {
           links: data.documents.links || '',
           notes: data.documents.notes || '',
-        });
+        };
+        setDocuments(docs);
+        lastSavedDocuments.current = docs;
       }
     } catch (error) {
       console.error('Error fetching documents:', error);
@@ -192,59 +245,52 @@ export default function ClubPage() {
     }
   }
 
-  async function handleSaveDocuments(e) {
-    e.preventDefault();
-    setSavingDocuments(true);
-    setDocumentsMessage({ type: '', text: '' });
+  // Auto-save documents function
+  async function saveDocuments(docs) {
+    if (docs.links === lastSavedDocuments.current.links && docs.notes === lastSavedDocuments.current.notes) return;
 
+    setDocumentsSaveStatus('saving');
     try {
       const res = await fetch('/api/clubs/documents', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(documents),
+        body: JSON.stringify(docs),
       });
 
       if (res.ok) {
-        setDocumentsMessage({ type: 'success', text: t('documents.saveSuccess') });
+        lastSavedDocuments.current = docs;
+        setDocumentsSaveStatus('saved');
+        setTimeout(() => setDocumentsSaveStatus('idle'), 2000);
       } else {
-        const data = await res.json();
-        setDocumentsMessage({ type: 'error', text: data.error || t('documents.saveError') });
+        setDocumentsSaveStatus('error');
       }
     } catch (error) {
-      setDocumentsMessage({ type: 'error', text: t('documents.saveError') });
-    } finally {
-      setSavingDocuments(false);
+      setDocumentsSaveStatus('error');
     }
   }
 
-  async function handleSubmit(e) {
-    e.preventDefault();
-    if (isFrozen) return;
+  // Debounced auto-save on documents change
+  function handleDocumentsChange(field, value) {
+    const newDocs = { ...documents, [field]: value };
+    setDocuments(newDocs);
 
-    setSaving(true);
-    setMessage({ type: '', text: '' });
-
-    try {
-      const res = await fetch('/api/clubs/profile', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        setMessage({ type: 'success', text: t('success') });
-        refetch();
-      } else {
-        setMessage({ type: 'error', text: data.error || t('error') });
-      }
-    } catch (error) {
-      setMessage({ type: 'error', text: t('error') });
-    } finally {
-      setSaving(false);
+    if (documentsSaveTimer.current) {
+      clearTimeout(documentsSaveTimer.current);
     }
+
+    documentsSaveTimer.current = setTimeout(() => {
+      saveDocuments(newDocs);
+    }, 1000);
   }
+
+  // Save documents on blur
+  function handleDocumentsBlur() {
+    if (documentsSaveTimer.current) {
+      clearTimeout(documentsSaveTimer.current);
+    }
+    saveDocuments(documents);
+  }
+
 
   async function handleAddSingleMember(e) {
     e.preventDefault();
@@ -414,7 +460,7 @@ export default function ClubPage() {
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
                 {/* Email Section */}
                 <div>
                   <label className="block text-sm font-medium mb-2">{t('email.title')}</label>
@@ -436,6 +482,11 @@ export default function ClubPage() {
                       {savingEmail ? '...' : t('email.save')}
                     </button>
                   </div>
+                  {message.text && (
+                    <p className={`text-sm mt-2 ${message.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
+                      {message.text}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -443,36 +494,25 @@ export default function ClubPage() {
                   <p className="text-sm text-text-muted mb-2">{t('form.descriptionHint')}</p>
                   <textarea
                     value={formData.description}
-                    onChange={(e) => {
-                      const words = e.target.value.trim().split(/\s+/).filter(Boolean);
-                      if (words.length <= 75 || e.target.value.length < formData.description.length) {
-                        setFormData({ ...formData, description: e.target.value });
-                      }
-                    }}
+                    onChange={handleDescriptionChange}
+                    onBlur={handleDescriptionBlur}
                     placeholder={t('form.descriptionPlaceholder')}
                     className="w-full border border-border rounded px-4 py-2 min-h-[100px]"
                     disabled={isFrozen}
                   />
-                  <p className="text-xs text-text-muted mt-1">
-                    {formData.description.trim().split(/\s+/).filter(Boolean).length} / 75 words
+                  <p className="text-xs text-text-muted mt-1 flex items-center gap-2">
+                    <span>{formData.description.trim().split(/\s+/).filter(Boolean).length} / 75 words</span>
+                    {descriptionSaveStatus === 'saving' && (
+                      <span className="text-text-secondary">Saving...</span>
+                    )}
+                    {descriptionSaveStatus === 'saved' && (
+                      <span className="text-green-600">Saved!</span>
+                    )}
+                    {descriptionSaveStatus === 'error' && (
+                      <span className="text-red-600">Error saving</span>
+                    )}
                   </p>
                 </div>
-
-                {message.text && (
-                  <div className={`p-4 rounded ${
-                    message.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
-                  }`}>
-                    {message.text}
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={saving || isFrozen}
-                  className="btn-primary"
-                >
-                  {saving ? t('saving') : t('save')}
-                </button>
               </form>
 
               {/* Images Section */}
@@ -743,26 +783,30 @@ export default function ClubPage() {
           {/* Documents Tab */}
           {activeTab === 'documents' && (
             <div>
-              <h2 className="text-lg font-medium mb-2">{t('documents.title')}</h2>
+              <div className="flex items-center gap-3 mb-2">
+                <h2 className="text-lg font-medium">{t('documents.title')}</h2>
+                {documentsSaveStatus === 'saving' && (
+                  <span className="text-sm text-text-secondary">Saving...</span>
+                )}
+                {documentsSaveStatus === 'saved' && (
+                  <span className="text-sm text-green-600">Saved!</span>
+                )}
+                {documentsSaveStatus === 'error' && (
+                  <span className="text-sm text-red-600">Error saving</span>
+                )}
+              </div>
               <p className="text-text-secondary text-sm mb-6">{t('documents.description')}</p>
-
-              {documentsMessage.text && (
-                <div className={`mb-6 p-4 rounded ${
-                  documentsMessage.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
-                }`}>
-                  {documentsMessage.text}
-                </div>
-              )}
 
               {documentsLoading ? (
                 <p className="text-text-secondary">Loading...</p>
               ) : (
-                <form onSubmit={handleSaveDocuments} className="space-y-6">
+                <div className="space-y-6">
                   <div>
                     <label className="block text-sm font-medium mb-2">{t('documents.linksLabel')}</label>
                     <textarea
                       value={documents.links}
-                      onChange={(e) => setDocuments({ ...documents, links: e.target.value })}
+                      onChange={(e) => handleDocumentsChange('links', e.target.value)}
+                      onBlur={handleDocumentsBlur}
                       placeholder={t('documents.linksPlaceholder')}
                       className="w-full border border-border rounded px-4 py-2 min-h-[120px] font-mono text-sm"
                       maxLength={2000}
@@ -776,7 +820,8 @@ export default function ClubPage() {
                     <label className="block text-sm font-medium mb-2">{t('documents.notesLabel')}</label>
                     <textarea
                       value={documents.notes}
-                      onChange={(e) => setDocuments({ ...documents, notes: e.target.value })}
+                      onChange={(e) => handleDocumentsChange('notes', e.target.value)}
+                      onBlur={handleDocumentsBlur}
                       placeholder={t('documents.notesPlaceholder')}
                       className="w-full border border-border rounded px-4 py-2 min-h-[150px]"
                       maxLength={5000}
@@ -785,15 +830,7 @@ export default function ClubPage() {
                       {t('documents.notesHint')} ({documents.notes.length}/5000)
                     </p>
                   </div>
-
-                  <button
-                    type="submit"
-                    disabled={savingDocuments}
-                    className="btn-primary"
-                  >
-                    {savingDocuments ? t('saving') : t('documents.save')}
-                  </button>
-                </form>
+                </div>
               )}
             </div>
           )}

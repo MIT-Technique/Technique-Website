@@ -313,7 +313,15 @@
       "submitButton": "Enviar Bio",
       "success": "Tu bio fue guardada exitosamente",
       "error": "Hubo un error al guardar tu bio",
-      "contactText": "¿Preguntas o sugerencias?"
+      "contactText": "¿Preguntas o sugerencias?",
+      "photo": {
+        "label": "Foto de Graduacion",
+        "uploadLabel": "Subir Foto",
+        "guideline": "Solo sube una foto si no te tomaron una profesional con Technique. Para mejores resultados, usa una foto vertical con proporciones de tamano carta (8.5 x 11).",
+        "learnMore": "Mas informacion",
+        "uploadError": "Error al subir la foto",
+        "deleteError": "Error al eliminar la foto"
+      }
     },
     "candids": {
       "title": "Fotos de la Comunidad",
