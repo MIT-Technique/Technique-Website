@@ -50,7 +50,7 @@ export default function LivingGroupPage() {
   const { isLoggedIn, user, livingGroup, loading: userLoading, refetch } = useUser();
 
   // Tab state
-  const [activeTab, setActiveTab] = useState('schedule');
+  const [activeTab, setActiveTab] = useState('sections');
   const [scheduleSubTab, setScheduleSubTab] = useState('book');
 
   // Settings state (email)
