@@ -32,10 +32,21 @@ export async function GET() {
       from += PAGE_SIZE;
     }
 
+    // Count photos from senior_photos table
+    const { count: photoCount, error: photoError } = await supabase
+      .from('senior_photos')
+      .select('*', { count: 'exact', head: true })
+      .not('image_url', 'is', null);
+
+    if (photoError) {
+      console.error("Error counting senior photos:", photoError);
+    }
+
     return NextResponse.json({
       seniors: allBios,
       stats: {
         total: allBios.length,
+        photos: photoCount || 0,
       },
     });
   } catch (error) {

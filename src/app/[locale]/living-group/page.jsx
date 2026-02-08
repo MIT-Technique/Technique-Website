@@ -50,7 +50,8 @@ export default function LivingGroupPage() {
   const { isLoggedIn, user, livingGroup, loading: userLoading, refetch } = useUser();
 
   // Tab state
-  const [activeTab, setActiveTab] = useState('book');
+  const [activeTab, setActiveTab] = useState('schedule');
+  const [scheduleSubTab, setScheduleSubTab] = useState('book');
 
   // Settings state (email)
   const [livingGroupEmail, setLivingGroupEmail] = useState('');
@@ -115,7 +116,7 @@ export default function LivingGroupPage() {
   // Pagination state
   const [currentPage, setCurrentPage] = useState(0);
   const ITEMS_PER_PAGE = 8;
-  const [bookViewMode, setBookViewMode] = useState('calendar');
+  const [bookViewMode, setBookViewMode] = useState('list');
   const tc = useTranslations('calendarView');
 
   // Expanded time slots (to show location/notes)
@@ -163,25 +164,36 @@ export default function LivingGroupPage() {
 
   useEffect(() => {
     if (!isLoggedIn || user?.role !== 'living_group') return;
-    if (fetchedTabs.current.has(activeTab)) return;
-    fetchedTabs.current.add(activeTab);
 
-    if (activeTab === 'book') {
-      fetchTimes();
-      checkFrozen();
-      fetchProposals();
-    } else if (activeTab === 'assign') {
-      fetchSections();
-      if (livingGroup?.id) fetchTimeAssignments(livingGroup.id);
-    } else if (activeTab === 'members') {
-      fetchMembers();
-      if (!fetchedTabs.current.has('assign')) fetchSections();
-    } else if (activeTab === 'documents') {
-      fetchDocuments();
-    } else if (activeTab === 'settings') {
-      if (livingGroup?.id) fetchLivingGroupEmail();
+    // For schedule tab, check sub-tabs
+    if (activeTab === 'schedule') {
+      const subTabKey = `schedule-${scheduleSubTab}`;
+      if (fetchedTabs.current.has(subTabKey)) return;
+      fetchedTabs.current.add(subTabKey);
+
+      if (scheduleSubTab === 'book') {
+        fetchTimes();
+        checkFrozen();
+        fetchProposals();
+      } else if (scheduleSubTab === 'assign') {
+        fetchSections();
+        if (livingGroup?.id) fetchTimeAssignments(livingGroup.id);
+      }
+    } else {
+      if (fetchedTabs.current.has(activeTab)) return;
+      fetchedTabs.current.add(activeTab);
+
+      if (activeTab === 'members') {
+        fetchMembers();
+        if (!fetchedTabs.current.has('schedule-assign')) fetchSections();
+      } else if (activeTab === 'settings') {
+        if (livingGroup?.id) fetchLivingGroupEmail();
+        fetchDocuments();
+      } else if (activeTab === 'sections') {
+        fetchSections();
+      }
     }
-  }, [activeTab, isLoggedIn, user, livingGroup]);
+  }, [activeTab, scheduleSubTab, isLoggedIn, user, livingGroup]);
 
 
   async function fetchTimes() {
@@ -759,15 +771,40 @@ export default function LivingGroupPage() {
 
   const isFsilg = livingGroup?.living_group_type === 'fsilg';
 
+  // Dorm-specific section terminology
+  const dormSectionLabels = {
+    'Baker': 'Sections',
+    'Burton Conner': 'Floors',
+    'East Campus': 'Halls',
+    'New House': 'Houses',
+    'New Vassar': 'Sections',
+    'Next House': 'Wings',
+    'MacGregor': 'Entries',
+    'Maseeh': 'Floors',
+    'McCormick': 'Floors',
+    'Random Hall': 'Floors',
+    'Simmons': 'Sections',
+  };
+
+  const getSectionsLabel = () => {
+    const name = livingGroup?.name;
+    if (name && dormSectionLabels[name]) {
+      return dormSectionLabels[name];
+    }
+    return t('tabs.sections');
+  };
+
   const tabs = [
-    { id: 'book', label: t('tabs.book') },
-    ...(!isFsilg ? [
-      { id: 'sections', label: t('tabs.sections') },
-      ...(livingGroup?.dorm_sections?.length > 0 ? [{ id: 'assign', label: t('tabs.assign') }] : []),
-    ] : []),
+    ...(!isFsilg ? [{ id: 'sections', label: getSectionsLabel() }] : []),
     { id: 'members', label: t('tabs.members') },
-    { id: 'documents', label: t('tabs.documents') },
+    { id: 'schedule', label: t('tabs.schedule') },
     { id: 'settings', label: t('tabs.settings') },
+  ];
+
+  // Sub-tabs for the Schedule tab
+  const scheduleTabs = [
+    { id: 'book', label: t('tabs.book') },
+    ...(!isFsilg && livingGroup?.dorm_sections?.length > 0 ? [{ id: 'assign', label: t('tabs.assign') }] : []),
   ];
 
   return (
@@ -788,7 +825,7 @@ export default function LivingGroupPage() {
           )}
 
           {/* Frozen Notice */}
-          {isFrozen && !isDisabled && activeTab === 'book' && (
+          {isFrozen && !isDisabled && activeTab === 'schedule' && scheduleSubTab === 'book' && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
               <p className="text-red-600 font-medium">{t('frozen')}</p>
             </div>
@@ -840,10 +877,30 @@ export default function LivingGroupPage() {
             </div>
           )}
 
-          {/* Book Tab */}
-          {activeTab === 'book' && (
+          {/* Schedule Tab */}
+          {activeTab === 'schedule' && (
             <>
-              {/* Current Bookings */}
+              {/* Sub-tabs for Schedule */}
+              <div className="flex gap-4 mb-6 border-b border-border">
+                {scheduleTabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setScheduleSubTab(tab.id)}
+                    className={`pb-2 text-sm font-medium border-b-2 transition-colors ${
+                      scheduleSubTab === tab.id
+                        ? 'border-accent text-accent'
+                        : 'border-transparent text-text-secondary hover:text-text-primary'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Book Sub-Tab */}
+              {scheduleSubTab === 'book' && (
+                <>
+                  {/* Current Bookings */}
               {bookedTimes.length > 0 && (
                 <div className="mb-8">
                   <h2 className="text-lg font-medium mb-4">{t('currentBooking')}</h2>
@@ -1301,6 +1358,146 @@ export default function LivingGroupPage() {
                   )}
                 </div>
               )}
+                </>
+              )}
+
+              {/* Assign Sub-Tab */}
+              {scheduleSubTab === 'assign' && (
+                <div>
+                  {bookedTimes.length === 0 ? (
+                    <div className="py-8 text-center">
+                      <p className="text-text-secondary text-sm mb-3">{t('assign.noBookedTimes')}</p>
+                      <button
+                        onClick={() => setScheduleSubTab('book')}
+                        className="text-sm text-red-600 hover:text-red-700 underline"
+                      >
+                        {t('assign.goToBook')}
+                      </button>
+                    </div>
+                  ) : (
+                    <div>
+                      <h3 className="text-lg font-medium mb-2">{t('assign.timeSlots.title')}</h3>
+                      <p className="text-text-secondary text-sm mb-4">
+                        {t('assign.timeSlots.description')}
+                      </p>
+
+                      {/* Unassigned sections warning */}
+                      {(() => {
+                        const allAssignedSections = new Set();
+                        let totalSlots = 0;
+                        let assignedSlots = 0;
+                        bookedTimes.forEach(bt => {
+                          const assignments = timeAssignments[bt.id] || {};
+                          const slots = generateTimeSlots(bt.start_time, bt.end_time);
+                          totalSlots += slots.length;
+                          slots.forEach(slot => {
+                            const key = `${slot.start}-${slot.end}`;
+                            if (assignments[key]) {
+                              assignedSlots++;
+                              allAssignedSections.add(assignments[key]);
+                            }
+                          });
+                        });
+                        const unassigned = sections.filter(s => !allAssignedSections.has(s));
+
+                        if (unassigned.length > 0 || assignedSlots < totalSlots) {
+                          return (
+                            <div className="mb-6 p-3 bg-yellow-50 border border-yellow-200 rounded">
+                              <p className="text-sm text-yellow-800">
+                                {unassigned.length > 0 && (
+                                  <><span className="font-medium">{t('assign.timeSlots.unassignedSections')}:</span>{' '}{unassigned.join(', ')}</>
+                                )}
+                                {unassigned.length > 0 && assignedSlots < totalSlots && <br />}
+                                {assignedSlots < totalSlots && (
+                                  <span>{assignedSlots}/{totalSlots} slots assigned</span>
+                                )}
+                              </p>
+                            </div>
+                          );
+                        }
+                        return (
+                          <div className="mb-6 p-3 bg-green-50 border border-green-200 rounded">
+                            <p className="text-sm p-0 font-medium text-green-800">{t('assign.timeSlots.allAssigned')}</p>
+                          </div>
+                        );
+                      })()}
+
+                      {/* Assignment timeline for each booked time, grouped by date */}
+                      <div className="space-y-4">
+                        {Object.entries(
+                          bookedTimes.reduce((groups, bt) => {
+                            (groups[bt.date] ||= []).push(bt);
+                            return groups;
+                          }, {})
+                        )
+                          .sort(([a], [b]) => a.localeCompare(b))
+                          .map(([dateStr, dateTimes]) => (
+                          <div key={dateStr} className="bg-white border border-border rounded-lg p-6">
+                            {/* Date header */}
+                            <div
+                              className="flex justify-between items-center cursor-pointer select-none"
+                              onClick={() => setCollapsedTimes((prev) => {
+                                const next = new Set(prev);
+                                if (next.has(dateStr)) next.delete(dateStr);
+                                else next.add(dateStr);
+                                return next;
+                              })}
+                            >
+                              <div className="flex items-center gap-2">
+                                <svg
+                                  className={`w-4 h-4 flex-shrink-0 text-text-muted transition-transform ${collapsedTimes.has(dateStr) ? '' : 'rotate-90'}`}
+                                  fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                >
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
+                                <span className="font-medium leading-none">
+                                  {new Date(dateStr + 'T12:00:00').toLocaleDateString(locale, {
+                                    weekday: 'long',
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric',
+                                  })}
+                                </span>
+                              </div>
+                              <FadeMessage
+                                message={sectionsMessage}
+                                onClear={setSectionsMessage}
+                                className="text-xs px-2 py-1 rounded whitespace-nowrap"
+                              />
+                            </div>
+
+                            {!collapsedTimes.has(dateStr) && (
+                              <div className="mt-4 space-y-6">
+                                {dateTimes
+                                  .sort((a, b) => a.start_time.localeCompare(b.start_time))
+                                  .map((bookedTime) => (
+                                  <div key={bookedTime.id}>
+                                    <p className="text-text-secondary text-sm mb-3">
+                                      {formatTime(bookedTime.start_time)} - {formatTime(bookedTime.end_time)} EST
+                                    </p>
+                                    {assignmentsLoading ? (
+                                      <p className="text-text-muted text-sm">Loading...</p>
+                                    ) : (
+                                      <SectionAssignmentTimeline
+                                        bookedTime={bookedTime}
+                                        sections={sections}
+                                        assignments={timeAssignments[bookedTime.id] || {}}
+                                        onAssign={handleAssignSection}
+                                        formatTime={formatTime}
+                                        saving={!!savingSlot}
+                                      />
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </>
           )}
 
@@ -1333,7 +1530,43 @@ export default function LivingGroupPage() {
               {sectionsLoading ? (
                 <p className="text-text-secondary">Loading...</p>
               ) : sections.length === 0 ? (
-                <p className="text-text-secondary">{t('assign.noSections')}</p>
+                <div>
+                  <p className="text-text-secondary text-sm mb-4">{t('assign.noSectionsDescription')}</p>
+                  <div className="px-3 py-3 border border-border rounded-lg flex items-start gap-3 max-w-sm">
+                    <ImageUpload
+                      imageUrl={livingGroup?.section_images?.['__default__'] || null}
+                      fileName={`${(livingGroup?.name || '').replace(/\s+/g, '_')}_Candid`}
+                      size="sm"
+                      disabled={isFrozen}
+                      onUpload={async (file) => {
+                        setImageMessage({ type: '', text: '' });
+                        const fd = new FormData();
+                        fd.append('file', file);
+                        fd.append('section_name', '__default__');
+                        const res = await fetch('/api/living-groups/images', { method: 'POST', body: fd });
+                        const data = await res.json();
+                        if (!res.ok) {
+                          setImageMessage({ type: 'error', text: data.error || 'Upload failed' });
+                          throw new Error(data.error || 'Upload failed');
+                        }
+                        return data.url;
+                      }}
+                      onDelete={async () => {
+                        setImageMessage({ type: '', text: '' });
+                        const res = await fetch(`/api/living-groups/images?section_name=${encodeURIComponent('__default__')}`, { method: 'DELETE' });
+                        const data = await res.json();
+                        if (!res.ok) {
+                          setImageMessage({ type: 'error', text: data.error || 'Delete failed' });
+                          throw new Error(data.error || 'Delete failed');
+                        }
+                      }}
+                    />
+                    <div className="flex-1">
+                      <span className="font-medium">{t('assign.defaultImageTitle')}</span>
+                      <p className="text-xs text-text-muted mt-1">{t('assign.defaultImageHint')}</p>
+                    </div>
+                  </div>
+                </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {sections.map((section) => {
@@ -1382,9 +1615,15 @@ export default function LivingGroupPage() {
                               {removingSectionName === section ? t('assign.removing') : t('assign.removeSection')}
                             </button>
                           </div>
-                          <span className="text-xs text-text-muted">
+                          <button
+                            onClick={() => {
+                              setNewMemberSection(section);
+                              setActiveTab('members');
+                            }}
+                            className="text-xs text-text-muted hover:text-accent hover:underline"
+                          >
                             {t('assign.memberCount', { count: memberCount })}
-                          </span>
+                          </button>
                         </div>
                       </div>
                     );
@@ -1415,144 +1654,6 @@ export default function LivingGroupPage() {
                         {removingSectionName === sectionToRemove ? t('assign.removing') : t('members.confirm')}
                       </button>
                     </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Assign Tab - Time Slot Assignment */}
-          {activeTab === 'assign' && (
-            <div>
-              {bookedTimes.length === 0 ? (
-                <div className="py-8 text-center">
-                  <p className="text-text-secondary text-sm mb-3">{t('assign.noBookedTimes')}</p>
-                  <button
-                    onClick={() => setActiveTab('book')}
-                    className="text-sm text-red-600 hover:text-red-700 underline"
-                  >
-                    {t('assign.goToBook')}
-                  </button>
-                </div>
-              ) : (
-                <div>
-                  <h3 className="text-lg font-medium mb-2">{t('assign.timeSlots.title')}</h3>
-                  <p className="text-text-secondary text-sm mb-4">
-                    {t('assign.timeSlots.description')}
-                  </p>
-
-                  {/* Unassigned sections warning */}
-                  {(() => {
-                    const allAssignedSections = new Set();
-                    let totalSlots = 0;
-                    let assignedSlots = 0;
-                    bookedTimes.forEach(bt => {
-                      const assignments = timeAssignments[bt.id] || {};
-                      const slots = generateTimeSlots(bt.start_time, bt.end_time);
-                      totalSlots += slots.length;
-                      slots.forEach(slot => {
-                        const key = `${slot.start}-${slot.end}`;
-                        if (assignments[key]) {
-                          assignedSlots++;
-                          allAssignedSections.add(assignments[key]);
-                        }
-                      });
-                    });
-                    const unassigned = sections.filter(s => !allAssignedSections.has(s));
-
-                    if (unassigned.length > 0 || assignedSlots < totalSlots) {
-                      return (
-                        <div className="mb-6 p-3 bg-yellow-50 border border-yellow-200 rounded">
-                          <p className="text-sm text-yellow-800">
-                            {unassigned.length > 0 && (
-                              <><span className="font-medium">{t('assign.timeSlots.unassignedSections')}:</span>{' '}{unassigned.join(', ')}</>
-                            )}
-                            {unassigned.length > 0 && assignedSlots < totalSlots && <br />}
-                            {assignedSlots < totalSlots && (
-                              <span>{assignedSlots}/{totalSlots} slots assigned</span>
-                            )}
-                          </p>
-                        </div>
-                      );
-                    }
-                    return (
-                      <div className="mb-6 p-3 bg-green-50 border border-green-200 rounded">
-                        <p className="text-sm p-0 font-medium text-green-800">{t('assign.timeSlots.allAssigned')}</p>
-                      </div>
-                    );
-                  })()}
-
-                  {/* Assignment timeline for each booked time, grouped by date */}
-                  <div className="space-y-4">
-                    {Object.entries(
-                      bookedTimes.reduce((groups, bt) => {
-                        (groups[bt.date] ||= []).push(bt);
-                        return groups;
-                      }, {})
-                    )
-                      .sort(([a], [b]) => a.localeCompare(b))
-                      .map(([dateStr, dateTimes]) => (
-                      <div key={dateStr} className="bg-white border border-border rounded-lg p-6">
-                        {/* Date header */}
-                        <div
-                          className="flex justify-between items-center cursor-pointer select-none"
-                          onClick={() => setCollapsedTimes((prev) => {
-                            const next = new Set(prev);
-                            if (next.has(dateStr)) next.delete(dateStr);
-                            else next.add(dateStr);
-                            return next;
-                          })}
-                        >
-                          <div className="flex items-center gap-2">
-                            <svg
-                              className={`w-4 h-4 flex-shrink-0 text-text-muted transition-transform ${collapsedTimes.has(dateStr) ? '' : 'rotate-90'}`}
-                              fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            >
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                            </svg>
-                            <span className="font-medium leading-none">
-                              {new Date(dateStr + 'T12:00:00').toLocaleDateString(locale, {
-                                weekday: 'long',
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric',
-                              })}
-                            </span>
-                          </div>
-                          <FadeMessage
-                            message={sectionsMessage}
-                            onClear={setSectionsMessage}
-                            className="text-xs px-2 py-1 rounded whitespace-nowrap"
-                          />
-                        </div>
-
-                        {!collapsedTimes.has(dateStr) && (
-                          <div className="mt-4 space-y-6">
-                            {dateTimes
-                              .sort((a, b) => a.start_time.localeCompare(b.start_time))
-                              .map((bookedTime) => (
-                              <div key={bookedTime.id}>
-                                <p className="text-text-secondary text-sm mb-3">
-                                  {formatTime(bookedTime.start_time)} - {formatTime(bookedTime.end_time)} EST
-                                </p>
-                                {assignmentsLoading ? (
-                                  <p className="text-text-muted text-sm">Loading...</p>
-                                ) : (
-                                  <SectionAssignmentTimeline
-                                    bookedTime={bookedTime}
-                                    sections={sections}
-                                    assignments={timeAssignments[bookedTime.id] || {}}
-                                    onAssign={handleAssignSection}
-                                    formatTime={formatTime}
-                                    saving={!!savingSlot}
-                                  />
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ))}
                   </div>
                 </div>
               )}
@@ -1868,66 +1969,11 @@ export default function LivingGroupPage() {
             </div>
           )}
 
-          {/* Documents Tab */}
-          {activeTab === 'documents' && (
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <h2 className="text-lg font-medium">{t('documents.title')}</h2>
-                {documentsSaveStatus === 'saving' && (
-                  <span className="text-sm text-text-secondary">Saving...</span>
-                )}
-                {documentsSaveStatus === 'saved' && (
-                  <span className="text-sm text-green-600">Saved!</span>
-                )}
-                {documentsSaveStatus === 'error' && (
-                  <span className="text-sm text-red-600">Error saving</span>
-                )}
-              </div>
-              <p className="text-text-secondary text-sm mb-6">{t('documents.description')}</p>
-
-              {documentsLoading ? (
-                <p className="text-text-secondary">Loading...</p>
-              ) : (
-                <div className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">{t('documents.linksLabel')}</label>
-                    <textarea
-                      value={documents.links}
-                      onChange={(e) => handleDocumentsChange('links', e.target.value)}
-                      onBlur={handleDocumentsBlur}
-                      placeholder={t('documents.linksPlaceholder')}
-                      className="w-full border border-border rounded px-4 py-2 min-h-[120px] font-mono text-sm"
-                      maxLength={2000}
-                    />
-                    <p className="text-xs text-text-muted mt-1">
-                      {t('documents.linksHint')} ({documents.links.length}/2000)
-                    </p>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-2">{t('documents.notesLabel')}</label>
-                    <textarea
-                      value={documents.notes}
-                      onChange={(e) => handleDocumentsChange('notes', e.target.value)}
-                      onBlur={handleDocumentsBlur}
-                      placeholder={t('documents.notesPlaceholder')}
-                      className="w-full border border-border rounded px-4 py-2 min-h-[150px]"
-                      maxLength={5000}
-                    />
-                    <p className="text-xs text-text-muted mt-1">
-                      {t('documents.notesHint')} ({documents.notes.length}/5000)
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
           {/* Settings Tab */}
           {activeTab === 'settings' && (
             <div>
               {/* Email Section */}
-              <div className="mb-6">
+              <div className="mb-8">
                 <label className="block text-sm font-medium mb-2">{t('settings.emailTitle')}</label>
                 <p className="text-text-secondary text-sm mb-3">{t('settings.emailDescription')}</p>
                 <div className="flex gap-2">
@@ -1946,6 +1992,59 @@ export default function LivingGroupPage() {
                     {savingEmail ? '...' : t('settings.saveEmail')}
                   </button>
                 </div>
+              </div>
+
+              {/* Documents Section */}
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <h3 className="text-sm font-medium">{t('documents.title')}</h3>
+                  {documentsSaveStatus === 'saving' && (
+                    <span className="text-sm text-text-secondary">Saving...</span>
+                  )}
+                  {documentsSaveStatus === 'saved' && (
+                    <span className="text-sm text-green-600">Saved!</span>
+                  )}
+                  {documentsSaveStatus === 'error' && (
+                    <span className="text-sm text-red-600">Error saving</span>
+                  )}
+                </div>
+                <p className="text-text-secondary text-sm mb-4">{t('documents.description')}</p>
+
+                {documentsLoading ? (
+                  <p className="text-text-secondary">Loading...</p>
+                ) : (
+                  <div className="space-y-6">
+                    <div>
+                      <label className="block text-sm font-medium mb-2">{t('documents.linksLabel')}</label>
+                      <textarea
+                        value={documents.links}
+                        onChange={(e) => handleDocumentsChange('links', e.target.value)}
+                        onBlur={handleDocumentsBlur}
+                        placeholder={t('documents.linksPlaceholder')}
+                        className="w-full border border-border rounded px-4 py-2 min-h-[120px] font-mono text-sm"
+                        maxLength={2000}
+                      />
+                      <p className="text-xs text-text-muted mt-1">
+                        {t('documents.linksHint')} ({documents.links.length}/2000)
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium mb-2">{t('documents.notesLabel')}</label>
+                      <textarea
+                        value={documents.notes}
+                        onChange={(e) => handleDocumentsChange('notes', e.target.value)}
+                        onBlur={handleDocumentsBlur}
+                        placeholder={t('documents.notesPlaceholder')}
+                        className="w-full border border-border rounded px-4 py-2 min-h-[150px]"
+                        maxLength={5000}
+                      />
+                      <p className="text-xs text-text-muted mt-1">
+                        {t('documents.notesHint')} ({documents.notes.length}/5000)
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}

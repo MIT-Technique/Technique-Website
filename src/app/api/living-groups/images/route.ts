@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "../../../../lib/auth/session";
 import { createAdminClient } from "../../../../lib/supabase/admin";
 
+const DEFAULT_SECTION_KEY = "__default__";
+
 // POST - Upload a section image
 export async function POST(request: NextRequest) {
   try {
@@ -75,10 +77,12 @@ export async function POST(request: NextRequest) {
     // Upload to Supabase Storage
     const fileExt = file.name.split('.').pop();
     const safeOrgName = (livingGroup.name || livingGroup.id).replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '');
-    const safeSectionName = sectionName.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '');
+    const isDefaultSlot = sectionName === DEFAULT_SECTION_KEY;
     const bucketName = 'living-group-images';
     const subfolder = livingGroup.living_group_type === 'fsilg' ? 'fsilgs' : 'dorms';
-    const fileName = `${subfolder}/${safeOrgName}_${safeSectionName}_Candid.${fileExt}`;
+    const fileName = isDefaultSlot
+      ? `${subfolder}/${safeOrgName}_Candid.${fileExt}`
+      : `${subfolder}/${safeOrgName}_${sectionName.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '')}_Candid.${fileExt}`;
 
     // Ensure bucket exists
     const { data: buckets } = await supabase.storage.listBuckets();

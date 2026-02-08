@@ -1104,7 +1104,8 @@
         "secondMajor": "第二专业",
         "quote": "引言",
         "achievements": "成就",
-        "exportBios": "导出简介CSV"
+        "exportBios": "导出简介CSV",
+        "exportImages": "导出图片"
       }
     }
   },
@@ -1258,6 +1259,7 @@
     "notesLabel": "备注",
     "tabs": {
       "profile": "资料",
+      "schedule": "日程",
       "book": "预约",
       "assign": "分配",
       "sections": "区域",
@@ -1332,6 +1334,9 @@
       "addSectionSuccess": "区域添加成功",
       "addSectionError": "添加区域失败",
       "noSections": "尚未创建任何区域",
+      "noSectionsDescription": "您可以为您的住宿群体上传一张集体照片，或在下方创建区域按楼层/区块进行组织。",
+      "defaultImageTitle": "集体照片",
+      "defaultImageHint": "上传一张代表您整个住宿群体的照片。如果您之后添加区域，此图片将移至您的第一个区域。",
       "noSectionsToAssign": "请先在「区域」标签中创建区域，然后预约拍摄时间以开始分配。",
       "noBookedTimes": "尚无已预约的拍摄时间。请先预约拍摄时间，然后再分配区域。",
       "goToBook": "前往预约拍摄",

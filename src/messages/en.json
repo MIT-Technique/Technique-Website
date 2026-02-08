@@ -1139,7 +1139,8 @@
         "secondMajor": "2nd Major",
         "quote": "Quote",
         "achievements": "Achievements",
-        "exportBios": "Export Senior Bios CSV"
+        "exportBios": "Export Senior Bios CSV",
+        "exportImages": "Export Images"
       }
     }
   },
@@ -1295,6 +1296,7 @@
     "notesLabel": "Notes",
     "tabs": {
       "profile": "Profile",
+      "schedule": "Schedule",
       "book": "Book",
       "assign": "Assign",
       "sections": "Sections",
@@ -1369,6 +1371,9 @@
       "addSectionSuccess": "Section added successfully",
       "addSectionError": "Failed to add section",
       "noSections": "No sections created yet",
+      "noSectionsDescription": "You can upload a single group photo for your living group, or create sections below to organize by floor/wing.",
+      "defaultImageTitle": "Group Photo",
+      "defaultImageHint": "Upload one photo representing your entire living group. If you add sections later, this image will move to your first section.",
       "noSectionsToAssign": "Create sections in the Sections tab first, then book a photoshoot time to start assigning.",
       "noBookedTimes": "No upcoming photoshoots booked yet. Book a photoshoot time to start assigning sections.",
       "goToBook": "Go to Book Photoshoot",

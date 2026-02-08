@@ -11,6 +11,7 @@ export default function ResponsesSeniorsPage() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
+  const [exportingImages, setExportingImages] = useState(false);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(0);
   const [expandedId, setExpandedId] = useState(null);
@@ -63,6 +64,30 @@ export default function ResponsesSeniorsPage() {
     }
   };
 
+  const handleExportImages = async () => {
+    setExportingImages(true);
+    try {
+      const res = await fetch('/api/admin/responses/export/images?bucket=senior-photos');
+      const data = await res.json();
+      if (data.files && data.files.length > 0) {
+        // Download each file
+        for (const file of data.files) {
+          const a = document.createElement('a');
+          a.href = file.url;
+          a.download = file.path.split('/').pop() || 'senior-photo';
+          a.target = '_blank';
+          a.click();
+          // Small delay between downloads to prevent browser blocking
+          await new Promise(resolve => setTimeout(resolve, 200));
+        }
+      }
+    } catch (error) {
+      console.error('Export images error:', error);
+    } finally {
+      setExportingImages(false);
+    }
+  };
+
   if (loading) return <p className="text-text-secondary">{tc('loading')}</p>;
   if (!data) return <p className="text-text-secondary">{tc('noData')}</p>;
 
@@ -72,7 +97,7 @@ export default function ResponsesSeniorsPage() {
     <div>
       <div className="flex items-center gap-3 mb-4">
         <h2 className="text-lg font-medium">{t('seniors.title')}</h2>
-        <span className="text-sm text-text-secondary">({stats.total} {t('seniors.totalBios').toLowerCase()})</span>
+        <span className="text-sm text-text-secondary">({stats.total} total senior bios | {stats.photos} photos)</span>
       </div>
 
       {/* Search + Pagination */}
@@ -151,6 +176,13 @@ export default function ResponsesSeniorsPage() {
           className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 disabled:opacity-50 text-sm"
         >
           {exporting ? tc('exporting') : t('seniors.exportBios')}
+        </button>
+        <button
+          onClick={handleExportImages}
+          disabled={exportingImages || stats.photos === 0}
+          className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 disabled:opacity-50 text-sm"
+        >
+          {exportingImages ? tc('exporting') : t('seniors.exportImages')}
         </button>
       </div>
     </div>
