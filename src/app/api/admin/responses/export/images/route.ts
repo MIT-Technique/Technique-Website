@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "../../../../../../lib/auth/session";
 import { createAdminClient } from "../../../../../../lib/supabase/admin";
 
-const ALLOWED_BUCKETS = ['club-images', 'living-group-images', 'sports-images', 'community-candids', 'student-work-images'];
+const ALLOWED_BUCKETS = ['club-images', 'living-group-images', 'sports-images', 'community-candids', 'student-work-images', 'senior-photos'];
 
 async function listAllFiles(supabase: ReturnType<typeof createAdminClient>, bucket: string, prefix: string = ''): Promise<string[]> {
   const paths: string[] = [];

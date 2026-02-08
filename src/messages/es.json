@@ -1102,7 +1102,8 @@
         "secondMajor": "2da Carrera",
         "quote": "Cita",
         "achievements": "Logros",
-        "exportBios": "Exportar Biografías CSV"
+        "exportBios": "Exportar Biografías CSV",
+        "exportImages": "Exportar Imágenes"
       }
     }
   },
@@ -1256,6 +1257,7 @@
     "notesLabel": "Notas",
     "tabs": {
       "profile": "Perfil",
+      "schedule": "Horario",
       "book": "Reservar",
       "assign": "Asignar",
       "sections": "Secciones",
@@ -1330,6 +1332,9 @@
       "addSectionSuccess": "Sección añadida exitosamente",
       "addSectionError": "Error al añadir sección",
       "noSections": "Aún no hay secciones creadas",
+      "noSectionsDescription": "Puedes subir una foto grupal de tu residencia, o crear secciones a continuación para organizar por piso/ala.",
+      "defaultImageTitle": "Foto Grupal",
+      "defaultImageHint": "Sube una foto que represente a toda tu residencia. Si agregas secciones más tarde, esta imagen se moverá a tu primera sección.",
       "noSectionsToAssign": "Primero crea secciones en la pestaña Secciones, luego reserva un horario de sesión de fotos para comenzar a asignar.",
       "noBookedTimes": "Aún no hay sesiones de fotos reservadas. Reserva un horario para comenzar a asignar secciones.",
       "goToBook": "Ir a Reservar Sesión",
