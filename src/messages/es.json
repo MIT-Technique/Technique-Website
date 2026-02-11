@@ -1261,6 +1261,7 @@
       "book": "Reservar",
       "assign": "Asignar",
       "sections": "Secciones",
+      "candids": "Fotos",
       "members": "Miembros",
       "documents": "Documentos",
       "settings": "Configuración"
@@ -1458,6 +1459,15 @@
         "declined": "Rechazado",
         "cancelled": "Cancelado"
       }
+    },
+    "candids": {
+      "title": "Fotos Espontáneas del Grupo Residencial",
+      "description": "Sube una foto principal con todos en tu organización. Esta es la imagen principal que aparecerá en el anuario.",
+      "optionalNote": "Nota: Las fotos adicionales serán consideradas pero no se garantiza su inclusión si el espacio del anuario es limitado. Enfócate en obtener la mejor foto individual de todos en tu organización para la imagen principal.",
+      "mainImage": "Foto Principal",
+      "additionalImage": "Adicional (Opcional)",
+      "uploadSuccess": "Foto subida exitosamente",
+      "deleteSuccess": "Foto eliminada exitosamente"
     }
   },
   "calendarView": {

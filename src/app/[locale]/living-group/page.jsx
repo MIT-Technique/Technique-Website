@@ -50,7 +50,7 @@ export default function LivingGroupPage() {
   const { isLoggedIn, user, livingGroup, loading: userLoading, refetch } = useUser();
 
   // Tab state
-  const [activeTab, setActiveTab] = useState('sections');
+  const [activeTab, setActiveTab] = useState(null); // Will be set based on living group type
   const [scheduleSubTab, setScheduleSubTab] = useState('book');
 
   // Settings state (email)
@@ -92,6 +92,10 @@ export default function LivingGroupPage() {
   const [imageMessage, setImageMessage] = useState({ type: '', text: '' });
   const [sectionToRemove, setSectionToRemove] = useState(null);
   const [collapsedTimes, setCollapsedTimes] = useState(new Set());
+
+  // Candid images state (FSILGs only)
+  const [imageOverrides, setImageOverrides] = useState({});
+  const [candidImageMessage, setCandidImageMessage] = useState({ type: '', text: '' });
 
   // Time assignments state
   const [timeAssignments, setTimeAssignments] = useState({});
@@ -155,6 +159,14 @@ export default function LivingGroupPage() {
     }
   }, [isLoggedIn, user, userLoading, router, locale]);
 
+  // Set default tab based on living group type
+  useEffect(() => {
+    if (livingGroup && activeTab === null) {
+      const isFsilg = livingGroup.living_group_type === 'fsilg';
+      setActiveTab(isFsilg ? 'candids' : 'sections');
+    }
+  }, [livingGroup, activeTab]);
+
   // Track recently cancelled proposal IDs for fade-out
   const [fadingProposals, setFadingProposals] = useState(new Set());
   const [hiddenProposals, setHiddenProposals] = useState(new Set());
@@ -163,7 +175,7 @@ export default function LivingGroupPage() {
   const fetchedTabs = useRef(new Set());
 
   useEffect(() => {
-    if (!isLoggedIn || user?.role !== 'living_group') return;
+    if (!isLoggedIn || user?.role !== 'living_group' || !activeTab) return;
 
     // For schedule tab, check sub-tabs
     if (activeTab === 'schedule') {
@@ -795,7 +807,11 @@ export default function LivingGroupPage() {
   };
 
   const tabs = [
-    ...(!isFsilg ? [{ id: 'sections', label: getSectionsLabel() }] : []),
+    // Dorms get Sections tab, FSILGs get Candids tab
+    {
+      id: isFsilg ? 'candids' : 'sections',
+      label: isFsilg ? t('tabs.candids') : getSectionsLabel()
+    },
     { id: 'members', label: t('tabs.members') },
     { id: 'schedule', label: t('tabs.schedule') },
     { id: 'settings', label: t('tabs.settings') },
@@ -1657,6 +1673,89 @@ export default function LivingGroupPage() {
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Candids Tab - FSILGs Only */}
+          {activeTab === 'candids' && isFsilg && (
+            <div>
+              {candidImageMessage.text && (
+                <div className={`mb-6 p-4 rounded ${
+                  candidImageMessage.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
+                }`}>
+                  {candidImageMessage.text}
+                </div>
+              )}
+
+              <div className="flex gap-4 flex-wrap">
+                {[1, 2, 3].map((slot) => {
+                  const suffix = slot === 1 ? '' : `_${slot}`;
+                  const imageField = `candid_image_${slot}`;
+                  // Use local override if set, otherwise fall back to livingGroup data
+                  const currentUrl = imageField in imageOverrides
+                    ? imageOverrides[imageField]
+                    : livingGroup?.[imageField];
+                  return (
+                    <ImageUpload
+                      key={slot}
+                      imageUrl={currentUrl}
+                      label={slot === 1 ? t('candids.mainImage') : t('candids.additionalImage')}
+                      fileName={`${(livingGroup?.name || '').replace(/\s+/g, '_')}_Candid${suffix}`}
+                      disabled={isFrozen}
+                      onUpload={async (file) => {
+                        setCandidImageMessage({ type: '', text: '' });
+                        const fd = new FormData();
+                        fd.append('file', file);
+                        fd.append('slot', String(slot));
+                        const res = await fetch('/api/living-groups/candid-images', {
+                          method: 'POST',
+                          body: fd
+                        });
+                        const data = await res.json();
+                        if (!res.ok) {
+                          setCandidImageMessage({
+                            type: 'error',
+                            text: data.error || 'Upload failed'
+                          });
+                          throw new Error(data.error || 'Upload failed');
+                        }
+                        setCandidImageMessage({
+                          type: 'success',
+                          text: t('candids.uploadSuccess')
+                        });
+                        // Update locally with cache-busting param
+                        const newUrl = data.url + '?t=' + Date.now();
+                        setImageOverrides(prev => ({ ...prev, [imageField]: newUrl }));
+                        return newUrl;
+                      }}
+                      onDelete={async () => {
+                        setCandidImageMessage({ type: '', text: '' });
+                        const res = await fetch(`/api/living-groups/candid-images?slot=${slot}`, {
+                          method: 'DELETE'
+                        });
+                        const data = await res.json();
+                        if (!res.ok) {
+                          setCandidImageMessage({
+                            type: 'error',
+                            text: data.error || 'Delete failed'
+                          });
+                          throw new Error(data.error || 'Delete failed');
+                        }
+                        setCandidImageMessage({
+                          type: 'success',
+                          text: t('candids.deleteSuccess')
+                        });
+                        // Clear locally
+                        setImageOverrides(prev => ({ ...prev, [imageField]: null }));
+                      }}
+                    />
+                  );
+                })}
+              </div>
+
+              <p className="text-text-secondary text-sm mt-6 p-3 bg-gray-50 border border-gray-200 rounded">
+                {t('candids.optionalNote')}
+              </p>
             </div>
           )}
 

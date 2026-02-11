@@ -1300,6 +1300,7 @@
       "book": "Book",
       "assign": "Assign",
       "sections": "Sections",
+      "candids": "Candids",
       "members": "Members",
       "documents": "Documents",
       "settings": "Settings"
@@ -1497,6 +1498,15 @@
         "declined": "Declined",
         "cancelled": "Cancelled"
       }
+    },
+    "candids": {
+      "title": "Living Group Candid Photos",
+      "description": "Upload a main photo with everyone in your organization. This is the primary image that will appear in the yearbook.",
+      "optionalNote": "Note: Additional photos will be considered but are not guaranteed to be included if yearbook spacing is tight. Focus on getting the best single photo of everyone in your organization for the main image.",
+      "mainImage": "Main Photo",
+      "additionalImage": "Additional (Optional)",
+      "uploadSuccess": "Photo uploaded successfully",
+      "deleteSuccess": "Photo deleted successfully"
     }
   },
 

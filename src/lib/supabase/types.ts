@@ -57,6 +57,10 @@ export interface LivingGroup {
   promoted_at: string | null;
   disabled_by: string | null;
   disabled_at: string | null;
+  candid_image_1: string | null;
+  candid_image_2: string | null;
+  candid_image_3: string | null;
+  candid_image_4: string | null;
   created_at: string;
   updated_at: string;
 }
