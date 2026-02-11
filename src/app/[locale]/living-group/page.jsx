@@ -9,6 +9,7 @@ import ImageUpload from '../../../components/ImageUpload/ImageUpload';
 import { generateTimeSlots } from '../../../lib/utils/time';
 import CalendarView from '../../../components/CalendarView/CalendarView';
 import SectionAssignmentTimeline from '../../../components/CalendarView/SectionAssignmentTimeline';
+import ConfirmationModal from '../../../components/ConfirmationModal/ConfirmationModal';
 
 // Format 24-hour time to 12-hour AM/PM (e.g., "14:30:00" -> "2:30 PM")
 function formatTime(time) {
@@ -20,7 +21,7 @@ function formatTime(time) {
 }
 
 // Auto-dismissing message with fade-out
-function FadeMessage({ message, onClear, duration = 4000, className = 'mb-6 p-4 rounded' }) {
+function FadeMessage({ message, onClear, duration = 3500, className = 'mb-6 p-4 rounded' }) {
   const [fading, setFading] = useState(false);
 
   useEffect(() => {
@@ -81,6 +82,12 @@ export default function LivingGroupPage() {
   const [removingMemberId, setRemovingMemberId] = useState(null);
   const [updatingMemberId, setUpdatingMemberId] = useState(null);
   const [memberToRemove, setMemberToRemove] = useState(null);
+
+  // Bulk reset state
+  const [showBulkResetConfirm, setShowBulkResetConfirm] = useState(false);
+  const [bulkResetSection, setBulkResetSection] = useState('all');
+  const [bulkResetting, setBulkResetting] = useState(false);
+  const [deletedMembersForRevert, setDeletedMembersForRevert] = useState(null);
 
   // Sections state
   const [sections, setSections] = useState([]);
@@ -428,6 +435,97 @@ export default function LivingGroupPage() {
     } finally {
       setRemovingMemberId(null);
       setMemberToRemove(null);
+    }
+  }
+
+  async function handleBulkReset() {
+    setBulkResetting(true);
+    setMembersMessage({ type: '', text: '' });
+    setDeletedMembersForRevert(null);
+
+    const section = bulkResetSection;
+
+    try {
+      const params = new URLSearchParams({
+        bulk: 'true',
+        section: section,
+      });
+
+      const res = await fetch(`/api/living-groups/manual-members?${params}`, {
+        method: 'DELETE',
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const deletedCount = data.deletedCount || 0;
+        const deletedMembers = data.deletedMembers || [];
+
+        // Store deleted members for revert
+        setDeletedMembersForRevert(deletedMembers);
+
+        // Update local state
+        if (section === 'all') {
+          setManualMembers([]);
+        } else {
+          setManualMembers(prev => prev.filter(m => m.section_name !== section));
+        }
+
+        const sectionText = section === 'all'
+          ? t('members.allSections')
+          : section;
+
+        setMembersMessage({
+          type: 'success',
+          text: t('members.bulkResetSuccess', { count: deletedCount, section: sectionText }),
+        });
+      } else {
+        const data = await res.json();
+        setMembersMessage({ type: 'error', text: data.error || t('members.bulkResetError') });
+      }
+    } catch (error) {
+      console.error('Bulk reset error:', error);
+      setMembersMessage({ type: 'error', text: t('members.bulkResetError') });
+    } finally {
+      setBulkResetting(false);
+      setShowBulkResetConfirm(false);
+    }
+  }
+
+  async function handleRevertBulkReset() {
+    if (!deletedMembersForRevert || deletedMembersForRevert.length === 0) return;
+
+    setMembersMessage({ type: '', text: '' });
+
+    try {
+      // Re-insert all deleted members
+      const promises = deletedMembersForRevert.map(member =>
+        fetch('/api/living-groups/manual-members', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: member.name,
+            section_name: member.section_name,
+          }),
+        })
+      );
+
+      const results = await Promise.all(promises);
+      const allSuccess = results.every(res => res.ok);
+
+      if (allSuccess) {
+        // Refetch members to get fresh data with correct IDs
+        await fetchMembers();
+        setMembersMessage({
+          type: 'success',
+          text: t('members.revertSuccess'),
+        });
+        setDeletedMembersForRevert(null);
+      } else {
+        setMembersMessage({ type: 'error', text: t('members.revertError') });
+      }
+    } catch (error) {
+      console.error('Revert error:', error);
+      setMembersMessage({ type: 'error', text: t('members.revertError') });
     }
   }
 
@@ -1762,7 +1860,26 @@ export default function LivingGroupPage() {
           {/* Members Tab */}
           {activeTab === 'members' && (
             <div>
-              <FadeMessage message={membersMessage} onClear={setMembersMessage} />
+              {/* Success/Error Message with optional Undo button */}
+              {membersMessage.text && (
+                deletedMembersForRevert && deletedMembersForRevert.length > 0 && membersMessage.type === 'success' ? (
+                  // Message with undo button - no auto-fade
+                  <div
+                    className="mb-6 p-4 rounded flex items-center justify-between gap-3 bg-green-50 text-green-600"
+                  >
+                    <p className="flex-1 pb-0">{membersMessage.text}</p>
+                    <button
+                      onClick={handleRevertBulkReset}
+                      className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm whitespace-nowrap"
+                    >
+                      {t('members.bulkReset.revertButton')}
+                    </button>
+                  </div>
+                ) : (
+                  // Regular message - auto-fade after 3.5 seconds
+                  <FadeMessage message={membersMessage} onClear={setMembersMessage} />
+                )
+              )}
 
               {/* Mode Switcher */}
               <div className="mb-4 flex gap-2">
@@ -1941,7 +2058,7 @@ export default function LivingGroupPage() {
                               key={member.id}
                               className="py-2 px-3 border border-border rounded-lg flex justify-between items-center gap-2"
                             >
-                              <p className="flex-1">
+                              <p className="flex-1 p-0">
                                 {member.name}
                               </p>
                               <select
@@ -1984,7 +2101,7 @@ export default function LivingGroupPage() {
                               key={member.id}
                               className="py-2 px-3 border border-border rounded-lg flex justify-between items-center gap-2"
                             >
-                              <p className="flex-1">
+                              <p className="flex-1 py-1">
                                 {member.name}
                               </p>
                               <select
@@ -2018,9 +2135,9 @@ export default function LivingGroupPage() {
                   {manualMembers.map((member) => (
                     <div
                       key={member.id}
-                      className="px-4 border border-border rounded-lg flex justify-between items-center"
+                      className="px-4 py-2 border border-border rounded-lg flex justify-between items-center"
                     >
-                      <p>
+                      <p className="p-0">
                         {member.name}
                       </p>
                       <button
@@ -2032,6 +2149,35 @@ export default function LivingGroupPage() {
                       </button>
                     </div>
                   ))}
+                </div>
+              )}
+
+              {/* Bulk Reset Section */}
+              {manualMembers.length > 0 && (
+                <div className="mt-8 pt-6 border-t border-border">
+                  <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                    <button
+                      onClick={() => setShowBulkResetConfirm(true)}
+                      disabled={bulkResetting}
+                      className="px-4 py-2 border-2 border-[#750014] text-[#750014] rounded hover:bg-[#750014] hover:text-white disabled:opacity-50 whitespace-nowrap text-sm transition-colors"
+                    >
+                      {bulkResetting ? t('members.bulkReset.resetting') : t('members.bulkReset.button')}
+                    </button>
+                    {!isFsilg && sections.length > 0 && (
+                      <select
+                        value={bulkResetSection}
+                        onChange={(e) => setBulkResetSection(e.target.value)}
+                        className="border border-border rounded px-3 py-2 text-sm"
+                      >
+                        <option value="all">{t('members.bulkReset.allSections')}</option>
+                        {sections.map((section) => (
+                          <option key={section} value={section}>
+                            {section}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  </div>
                 </div>
               )}
 
@@ -2065,6 +2211,26 @@ export default function LivingGroupPage() {
                   </div>
                 </div>
               )}
+
+              {/* Bulk Reset Confirmation Modal */}
+              <ConfirmationModal
+                open={showBulkResetConfirm}
+                onCancel={() => setShowBulkResetConfirm(false)}
+                onConfirm={handleBulkReset}
+                title={t('members.bulkReset.confirmTitle')}
+                message={
+                  isFsilg || bulkResetSection === 'all'
+                    ? t('members.bulkReset.confirmMessageAll', { count: manualMembers.length })
+                    : t('members.bulkReset.confirmMessageSection', {
+                        section: bulkResetSection,
+                        count: manualMembers.filter(m => m.section_name === bulkResetSection).length,
+                      })
+                }
+                confirmText={t('members.bulkReset.confirmButton')}
+                cancelText={t('members.cancel')}
+                isDangerous={true}
+                disabled={bulkResetting}
+              />
             </div>
           )}
 

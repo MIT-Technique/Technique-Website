@@ -1452,7 +1452,24 @@
       "cancel": "Cancel",
       "removeSuccess": "Member removed successfully",
       "removeError": "Failed to remove member",
-      "confirmRemove": "Remove this member?"
+      "confirmRemove": "Remove this member?",
+      "bulkResetSuccess": "{count} members removed from {section}",
+      "bulkReset": {
+        "title": "Reset Members",
+        "description": "Remove all members from your organization.",
+        "descriptionWithSections": "Remove all members or members from a specific section.",
+        "button": "Reset Members",
+        "resetting": "Resetting...",
+        "allSections": "All Sections",
+        "confirmTitle": "Reset Members?",
+        "confirmMessageAll": "This will permanently delete all {count} members. This action cannot be undone.",
+        "confirmMessageSection": "This will permanently delete all {count} members from '{section}'. This action cannot be undone.",
+        "confirmButton": "Delete All Members",
+        "bulkResetError": "Failed to remove members",
+        "revertButton": "Undo",
+        "revertSuccess": "Members restored successfully",
+        "revertError": "Failed to restore members"
+      }
     },
     "documents": {
       "title": "Internal Documents",

@@ -86,24 +86,24 @@ export default function ProfilePage() {
     }
   }, [isLoggedIn, userLoading, router, locale]);
 
-  // Auto-fade success messages after 4 seconds
+  // Auto-fade success messages after 3.5 seconds
   useEffect(() => {
     if (bioMessage.type === 'success' && bioMessage.text) {
-      const timer = setTimeout(() => setBioMessage({ type: '', text: '' }), 4000);
+      const timer = setTimeout(() => setBioMessage({ type: '', text: '' }), 3500);
       return () => clearTimeout(timer);
     }
   }, [bioMessage]);
 
   useEffect(() => {
     if (clubMessage.type === 'success' && clubMessage.text) {
-      const timer = setTimeout(() => setClubMessage({ type: '', text: '' }), 4000);
+      const timer = setTimeout(() => setClubMessage({ type: '', text: '' }), 3500);
       return () => clearTimeout(timer);
     }
   }, [clubMessage]);
 
   useEffect(() => {
     if (schedulingMessage.type === 'success' && schedulingMessage.text) {
-      const timer = setTimeout(() => setSchedulingMessage({ type: '', text: '' }), 4000);
+      const timer = setTimeout(() => setSchedulingMessage({ type: '', text: '' }), 3500);
       return () => clearTimeout(timer);
     }
   }, [schedulingMessage]);

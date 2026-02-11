@@ -1416,7 +1416,24 @@
       "cancel": "取消",
       "removeSuccess": "成员移除成功",
       "removeError": "移除成员失败",
-      "confirmRemove": "确认移除此成员？"
+      "confirmRemove": "确认移除此成员？",
+      "bulkResetSuccess": "已从 {section} 删除 {count} 名成员",
+      "bulkReset": {
+        "title": "重置成员",
+        "description": "删除您组织的所有成员。",
+        "descriptionWithSections": "删除所有成员或特定区域的成员。",
+        "button": "重置成员",
+        "resetting": "重置中...",
+        "allSections": "所有区域",
+        "confirmTitle": "确认重置成员？",
+        "confirmMessageAll": "此操作将永久删除所有 {count} 名成员。此操作无法撤销。",
+        "confirmMessageSection": "此操作将永久删除 '{section}' 区域的所有 {count} 名成员。此操作无法撤销。",
+        "confirmButton": "删除所有成员",
+        "bulkResetError": "删除成员失败",
+        "revertButton": "撤销",
+        "revertSuccess": "成员已成功恢复",
+        "revertError": "恢复成员失败"
+      }
     },
     "documents": {
       "title": "内部文档",
