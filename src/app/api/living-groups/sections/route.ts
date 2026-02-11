@@ -147,8 +147,8 @@ export async function POST(request: NextRequest) {
           const extMatch = defaultImageUrl.match(/\.(\w+)(?:\?|$)/);
           const fileExt = extMatch ? extMatch[1] : 'jpg';
 
-          const oldPath = `${subfolder}/${safeOrgName}_Candid.${fileExt}`;
-          const newPath = `${subfolder}/${safeOrgName}_${safeSectionName}_Candid.${fileExt}`;
+          const oldPath = `${subfolder}/${safeOrgName}/Candid.${fileExt}`;
+          const newPath = `${subfolder}/${safeOrgName}/${safeSectionName}_Candid.${fileExt}`;
 
           // Move file in storage
           await supabase.storage
@@ -278,8 +278,8 @@ export async function DELETE(request: NextRequest) {
           const extMatch = imageUrl.match(/\.(\w+)(?:\?|$)/);
           const fileExt = extMatch ? extMatch[1] : 'jpg';
 
-          const oldPath = `${subfolder}/${safeOrgName}_${safeSectionName}_Candid.${fileExt}`;
-          const newPath = `${subfolder}/${safeOrgName}_Candid.${fileExt}`;
+          const oldPath = `${subfolder}/${safeOrgName}/${safeSectionName}_Candid.${fileExt}`;
+          const newPath = `${subfolder}/${safeOrgName}/Candid.${fileExt}`;
 
           // Move file in storage
           await supabase.storage

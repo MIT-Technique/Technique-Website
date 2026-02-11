@@ -62,24 +62,24 @@ export default function ClubPage() {
     }
   }, [isLoggedIn, user, userLoading, router, locale]);
 
-  // Auto-fade success messages after 4 seconds
+  // Auto-fade success messages after 3.5 seconds
   useEffect(() => {
     if (message.type === 'success' && message.text) {
-      const timer = setTimeout(() => setMessage({ type: '', text: '' }), 4000);
+      const timer = setTimeout(() => setMessage({ type: '', text: '' }), 3500);
       return () => clearTimeout(timer);
     }
   }, [message]);
 
   useEffect(() => {
     if (imageMessage.type === 'success' && imageMessage.text) {
-      const timer = setTimeout(() => setImageMessage({ type: '', text: '' }), 4000);
+      const timer = setTimeout(() => setImageMessage({ type: '', text: '' }), 3500);
       return () => clearTimeout(timer);
     }
   }, [imageMessage]);
 
   useEffect(() => {
     if (membersMessage.type === 'success' && membersMessage.text) {
-      const timer = setTimeout(() => setMembersMessage({ type: '', text: '' }), 4000);
+      const timer = setTimeout(() => setMembersMessage({ type: '', text: '' }), 3500);
       return () => clearTimeout(timer);
     }
   }, [membersMessage]);

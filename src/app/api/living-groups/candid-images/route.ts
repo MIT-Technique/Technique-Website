@@ -78,10 +78,8 @@ export async function POST(request: NextRequest) {
     const suffix = slot === '1' ? '' : `_${slot}`;
     const livingGroupTypeFolder = livingGroup.living_group_type === 'fsilg' ? 'fsilgs' : 'dorms';
 
-    // FSILGs get their own subfolder (like clubs), dorms use flat structure
-    const fileName = livingGroup.living_group_type === 'fsilg'
-      ? `${livingGroupTypeFolder}/${safeName}/Candid${suffix}.${fileExt}`
-      : `${livingGroupTypeFolder}/${safeName}_Candid${suffix}.${fileExt}`;
+    // Both FSILGs and dorms get their own subfolder
+    const fileName = `${livingGroupTypeFolder}/${safeName}/Candid${suffix}.${fileExt}`;
 
     const { error: uploadError } = await supabase.storage
       .from('living-group-images')

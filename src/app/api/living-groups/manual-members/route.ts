@@ -342,7 +342,7 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-// DELETE - Remove a manual member
+// DELETE - Remove a manual member or bulk delete members
 export async function DELETE(request: NextRequest) {
   try {
     const user = await getCurrentUser();
@@ -360,13 +360,8 @@ export async function DELETE(request: NextRequest) {
 
     const searchParams = request.nextUrl.searchParams;
     const memberId = searchParams.get("id");
-
-    if (!memberId) {
-      return NextResponse.json(
-        { error: "Member ID is required" },
-        { status: 400 }
-      );
-    }
+    const bulkDelete = searchParams.get("bulk");
+    const sectionName = searchParams.get("section");
 
     const supabase = createAdminClient();
 
@@ -381,6 +376,65 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json(
         { error: "Living group not found" },
         { status: 404 }
+      );
+    }
+
+    // BULK DELETE MODE
+    if (bulkDelete === "true") {
+      // First, get the members that will be deleted (for revert functionality)
+      let query = supabase
+        .from("living_group_manual_members")
+        .select("*")
+        .eq("living_group_id", livingGroup.id);
+
+      // If section is specified and not "all", filter by section
+      if (sectionName && sectionName !== "all") {
+        query = query.eq("section_name", sectionName);
+      }
+
+      const { data: deletedMembers, error: fetchError } = await query;
+
+      if (fetchError) {
+        console.error("Fetch members for bulk delete error:", fetchError);
+        return NextResponse.json(
+          { error: "Failed to fetch members" },
+          { status: 500 }
+        );
+      }
+
+      // Now delete the members
+      let deleteQuery = supabase
+        .from("living_group_manual_members")
+        .delete()
+        .eq("living_group_id", livingGroup.id);
+
+      // If section is specified and not "all", filter by section
+      if (sectionName && sectionName !== "all") {
+        deleteQuery = deleteQuery.eq("section_name", sectionName);
+      }
+
+      const { error: deleteError } = await deleteQuery;
+
+      if (deleteError) {
+        console.error("Bulk delete error:", deleteError);
+        return NextResponse.json(
+          { error: "Failed to delete members" },
+          { status: 500 }
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        deletedCount: deletedMembers?.length || 0,
+        deletedMembers: deletedMembers || [],
+      });
+    }
+
+    // SINGLE DELETE MODE
+    if (!memberId) {
+      return NextResponse.json(
+        { error: "Member ID is required" },
+        { status: 400 }
       );
     }
 

@@ -1413,7 +1413,24 @@
       "cancel": "Cancelar",
       "removeSuccess": "Miembro eliminado exitosamente",
       "removeError": "Error al eliminar miembro",
-      "confirmRemove": "¿Eliminar este miembro?"
+      "confirmRemove": "¿Eliminar este miembro?",
+      "bulkResetSuccess": "{count} miembros eliminados de {section}",
+      "bulkReset": {
+        "title": "Restablecer Miembros",
+        "description": "Eliminar todos los miembros de tu organización.",
+        "descriptionWithSections": "Eliminar todos los miembros o miembros de una sección específica.",
+        "button": "Restablecer Miembros",
+        "resetting": "Restableciendo...",
+        "allSections": "Todas las Secciones",
+        "confirmTitle": "¿Restablecer Miembros?",
+        "confirmMessageAll": "Esto eliminará permanentemente todos los {count} miembros. Esta acción no se puede deshacer.",
+        "confirmMessageSection": "Esto eliminará permanentemente todos los {count} miembros de '{section}'. Esta acción no se puede deshacer.",
+        "confirmButton": "Eliminar Todos los Miembros",
+        "bulkResetError": "Error al eliminar miembros",
+        "revertButton": "Deshacer",
+        "revertSuccess": "Miembros restaurados exitosamente",
+        "revertError": "Error al restaurar miembros"
+      }
     },
     "documents": {
       "title": "Documentos Internos",

@@ -81,8 +81,8 @@ export async function POST(request: NextRequest) {
     const bucketName = 'living-group-images';
     const subfolder = livingGroup.living_group_type === 'fsilg' ? 'fsilgs' : 'dorms';
     const fileName = isDefaultSlot
-      ? `${subfolder}/${safeOrgName}_Candid.${fileExt}`
-      : `${subfolder}/${safeOrgName}_${sectionName.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '')}_Candid.${fileExt}`;
+      ? `${subfolder}/${safeOrgName}/Candid.${fileExt}`
+      : `${subfolder}/${safeOrgName}/${sectionName.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '')}_Candid.${fileExt}`;
 
     // Ensure bucket exists
     const { data: buckets } = await supabase.storage.listBuckets();

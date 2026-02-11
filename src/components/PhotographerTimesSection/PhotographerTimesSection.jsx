@@ -93,8 +93,8 @@ export default function PhotographerTimesSection() {
   useEffect(() => {
     if (message.type === 'success' && message.text) {
       setMessageFading(false);
-      const fadeTimer = setTimeout(() => setMessageFading(true), 3500);
-      const clearTimer = setTimeout(() => { setMessage({ type: '', text: '' }); setMessageFading(false); }, 4000);
+      const fadeTimer = setTimeout(() => setMessageFading(true), 3000);
+      const clearTimer = setTimeout(() => { setMessage({ type: '', text: '' }); setMessageFading(false); }, 3500);
       return () => { clearTimeout(fadeTimer); clearTimeout(clearTimer); };
     }
   }, [message]);

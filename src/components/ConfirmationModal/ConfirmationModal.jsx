@@ -18,6 +18,7 @@ export default function ConfirmationModal({
   onConfirm,
   onCancel,
   isDangerous = false,
+  disabled = false,
 }) {
   return (
     <Dialog
@@ -68,6 +69,7 @@ export default function ConfirmationModal({
         <Button
           onClick={onCancel}
           variant="outlined"
+          disabled={disabled}
           sx={{
             textTransform: "none",
             fontSize: "0.875rem",
@@ -86,6 +88,7 @@ export default function ConfirmationModal({
         <Button
           onClick={onConfirm}
           variant="contained"
+          disabled={disabled}
           sx={{
             textTransform: "none",
             fontSize: "0.875rem",
