@@ -89,6 +89,11 @@ export default function LivingGroupPage() {
   const [bulkResetting, setBulkResetting] = useState(false);
   const [deletedMembersForRevert, setDeletedMembersForRevert] = useState(null);
 
+  // Members pagination state
+  const [memberSearchQuery, setMemberSearchQuery] = useState('');
+  const [membersPage, setMembersPage] = useState(1);
+  const MEMBERS_PER_PAGE = 10;
+
   // Sections state
   const [sections, setSections] = useState([]);
   const [sectionsLoading, setSectionsLoading] = useState(true);
@@ -308,6 +313,7 @@ export default function LivingGroupPage() {
       const res = await fetch(`/api/living-groups/manual-members?livingGroupId=${livingGroup.id}`);
       const data = await res.json();
       setManualMembers(data.members || []);
+      setMembersPage(1); // Reset to first page
     } catch (error) {
       console.error('Error fetching members:', error);
     } finally {
@@ -426,6 +432,7 @@ export default function LivingGroupPage() {
         });
         // Optimistically update state instead of refetching
         setManualMembers(prev => prev.filter(m => m.id !== memberToRemove.id));
+        setMembersPage(1); // Reset to first page
       } else {
         const data = await res.json();
         setMembersMessage({ type: 'error', text: data.error || t('members.removeError') });
@@ -469,6 +476,9 @@ export default function LivingGroupPage() {
         } else {
           setManualMembers(prev => prev.filter(m => m.section_name !== section));
         }
+
+        setMembersPage(1); // Reset to first page
+        setMemberSearchQuery(''); // Clear search
 
         const sectionText = section === 'all'
           ? t('members.allSections')
@@ -2035,17 +2045,106 @@ export default function LivingGroupPage() {
                 </div>
               )}
 
+              {/* Divider */}
+              {!membersLoading && manualMembers.length > 0 && (
+                <div className="border-t border-gray-200 my-6"></div>
+              )}
+
+              {/* Search and Pagination Controls */}
+              {!membersLoading && manualMembers.length > 0 && (() => {
+                // Filter members based on search query
+                const filteredMembers = memberSearchQuery.trim()
+                  ? manualMembers.filter(m =>
+                      m.name.toLowerCase().includes(memberSearchQuery.toLowerCase())
+                    )
+                  : manualMembers;
+
+                const totalPages = Math.ceil(filteredMembers.length / MEMBERS_PER_PAGE);
+                const startIndex = (membersPage - 1) * MEMBERS_PER_PAGE;
+                const endIndex = startIndex + MEMBERS_PER_PAGE;
+                const paginatedMembers = filteredMembers.slice(startIndex, endIndex);
+
+                return (
+                  <>
+                    {/* Search and Pagination Bar */}
+                    <div className="mb-4 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+                      {/* Search Input */}
+                      <div className="flex-1">
+                        <input
+                          type="text"
+                          value={memberSearchQuery}
+                          onChange={(e) => {
+                            setMemberSearchQuery(e.target.value);
+                            setMembersPage(1); // Reset to first page on search
+                          }}
+                          placeholder={t('members.searchPlaceholder') || 'Search members...'}
+                          className="w-full border border-border rounded px-4 py-2"
+                        />
+                      </div>
+
+                      {/* Pagination Controls */}
+                      {filteredMembers.length > MEMBERS_PER_PAGE && (
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => setMembersPage(p => Math.max(1, p - 1))}
+                            disabled={membersPage === 1}
+                            className="p-2 text-text-secondary hover:text-text disabled:opacity-30 disabled:cursor-not-allowed border border-border rounded"
+                            aria-label="Previous page"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                            </svg>
+                          </button>
+                          <span className="text-sm text-text-secondary whitespace-nowrap min-w-[60px] text-center">
+                            {membersPage} / {totalPages}
+                          </span>
+                          <button
+                            onClick={() => setMembersPage(p => Math.min(totalPages, p + 1))}
+                            disabled={membersPage >= totalPages}
+                            className="p-2 text-text-secondary hover:text-text disabled:opacity-30 disabled:cursor-not-allowed border border-border rounded"
+                            aria-label="Next page"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Store filtered and paginated members for rendering below */}
+                    <div style={{ display: 'none' }} data-filtered-members={JSON.stringify(paginatedMembers)} />
+                  </>
+                );
+              })()}
+
               {/* Members List - grouped by section if sections exist */}
               {membersLoading ? (
                 <p className="text-text-secondary">Loading...</p>
               ) : manualMembers.length === 0 ? (
                 <p className="text-text-secondary">{t('members.noMembers')}</p>
-              ) : sections.length > 0 ? (
+              ) : (() => {
+                // Apply search filter and pagination
+                const filteredMembers = memberSearchQuery.trim()
+                  ? manualMembers.filter(m =>
+                      m.name.toLowerCase().includes(memberSearchQuery.toLowerCase())
+                    )
+                  : manualMembers;
+
+                const startIndex = (membersPage - 1) * MEMBERS_PER_PAGE;
+                const endIndex = startIndex + MEMBERS_PER_PAGE;
+                const paginatedMembers = filteredMembers.slice(startIndex, endIndex);
+
+                if (filteredMembers.length === 0) {
+                  return <p className="text-text-secondary">{t('members.noResults') || 'No members found'}</p>;
+                }
+
+                return sections.length > 0 ? (
                 // Show members grouped by section (sections first, then unassigned)
                 <div className="space-y-6">
                   {/* Members by section */}
                   {sections.map((section) => {
-                    const sectionMembers = manualMembers.filter(m => m.section_name === section);
+                    const sectionMembers = paginatedMembers.filter(m => m.section_name === section);
                     if (sectionMembers.length === 0) return null;
                     return (
                       <div key={section}>
@@ -2088,7 +2187,7 @@ export default function LivingGroupPage() {
 
                   {/* Unassigned members - at the bottom */}
                   {(() => {
-                    const unassigned = manualMembers.filter(m => !m.section_name);
+                    const unassigned = paginatedMembers.filter(m => !m.section_name);
                     if (unassigned.length === 0) return null;
                     return (
                       <div>
@@ -2132,7 +2231,7 @@ export default function LivingGroupPage() {
               ) : (
                 // No sections - simple list
                 <div className="space-y-2">
-                  {manualMembers.map((member) => (
+                  {paginatedMembers.map((member) => (
                     <div
                       key={member.id}
                       className="px-4 py-2 border border-border rounded-lg flex justify-between items-center"
@@ -2150,7 +2249,8 @@ export default function LivingGroupPage() {
                     </div>
                   ))}
                 </div>
-              )}
+              );
+              })()}
 
               {/* Bulk Reset Section */}
               {manualMembers.length > 0 && (

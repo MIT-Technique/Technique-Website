@@ -26,11 +26,45 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { email } = body;
 
+    const newEmail = email?.trim();
+    if (!newEmail) {
+      return NextResponse.json({ error: "Email cannot be empty" }, { status: 400 });
+    }
+
     const supabaseAdmin = createAdminClient();
 
+    // Get the user's Supabase Auth ID
+    const { data: userData, error: userFetchError } = await supabaseAdmin
+      .from("users")
+      .select("supabase_auth_id, email")
+      .eq("id", user.id)
+      .single();
+
+    if (userFetchError || !userData) {
+      console.error("Error fetching user:", userFetchError);
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    // Update Supabase Auth email if auth ID exists
+    if (userData.supabase_auth_id) {
+      const { error: authUpdateError } = await supabaseAdmin.auth.admin.updateUserById(
+        userData.supabase_auth_id,
+        { email: newEmail }
+      );
+
+      if (authUpdateError) {
+        console.error("Error updating Supabase Auth email:", authUpdateError);
+        return NextResponse.json(
+          { error: "Failed to update authentication email" },
+          { status: 500 }
+        );
+      }
+    }
+
+    // Update the user's email in the database
     const { error: updateError } = await supabaseAdmin
       .from("users")
-      .update({ email: email.trim() || null })
+      .update({ email: newEmail })
       .eq("id", user.id);
 
     if (updateError) {
