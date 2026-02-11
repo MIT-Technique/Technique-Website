@@ -1480,6 +1480,16 @@
         "cancelled": "已取消"
       }
     },
+    "profile": {
+      "descriptionTitle": "简介",
+      "descriptionHint": "撰写组织的简要介绍（最多75个词）。这将被考虑收录在年鉴中。",
+      "descriptionPlaceholder": "介绍你的组织...",
+      "words": "词",
+      "saving": "保存中...",
+      "saved": "已保存！",
+      "saveError": "保存失败",
+      "photosTitle": "照片"
+    },
     "candids": {
       "title": "居住小组生活照",
       "description": "上传一张包含组织中所有成员的主要照片。这是将出现在年鉴中的主要图像。",
