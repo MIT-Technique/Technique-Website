@@ -110,9 +110,12 @@ export async function POST(request: NextRequest) {
       .from(bucketName)
       .getPublicUrl(fileName);
 
+    // Add timestamp to bust browser cache on re-uploads
+    const publicUrlWithCache = `${urlData.publicUrl}?t=${Date.now()}`;
+
     // Update section_images JSONB
     const sectionImages = livingGroup.section_images || {};
-    sectionImages[sectionName] = urlData.publicUrl;
+    sectionImages[sectionName] = publicUrlWithCache;
 
     const { error: updateError } = await supabase
       .from('living_groups')
@@ -132,7 +135,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      url: urlData.publicUrl,
+      url: publicUrlWithCache,
       section_name: sectionName,
     });
   } catch (error) {
@@ -193,7 +196,9 @@ export async function DELETE(request: NextRequest) {
     const sectionImages = livingGroup.section_images || {};
     const imageUrl = sectionImages[sectionName];
     if (imageUrl) {
-      const match = imageUrl.match(/\/living-group-images\/(.+)$/);
+      // Strip query params before extracting path
+      const urlWithoutParams = imageUrl.split('?')[0];
+      const match = urlWithoutParams.match(/\/living-group-images\/(.+)$/);
       if (match) {
         await supabase.storage.from('living-group-images').remove([decodeURIComponent(match[1])]);
       }

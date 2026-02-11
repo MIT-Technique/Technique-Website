@@ -20,7 +20,12 @@ export function useUser() {
   const fetchSession = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/auth/session');
+      const response = await fetch('/api/auth/session', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      });
 
       if (!response.ok) {
         throw new Error('Failed to fetch session');

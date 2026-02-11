@@ -2,15 +2,22 @@ import { NextResponse } from "next/server";
 import { getSession } from "../../../../lib/auth/session";
 import { createAdminClient } from "../../../../lib/supabase/admin";
 
+// Disable caching for session data
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const session = await getSession();
+
+    const noCacheHeaders = {
+      'Cache-Control': 'no-store, no-cache, must-revalidate',
+    };
 
     if (!session.isLoggedIn || !session.userInfo?.email) {
       return NextResponse.json({
         isLoggedIn: false,
         user: null,
-      });
+      }, { headers: noCacheHeaders });
     }
 
     const userEmail = session.userInfo.email;
@@ -28,7 +35,7 @@ export async function GET() {
         isLoggedIn: true,
         user: null,
         userInfo: session.userInfo,
-      });
+      }, { headers: noCacheHeaders });
     }
 
     // Get additional data based on role (at top level for useUser hook)
@@ -77,7 +84,7 @@ export async function GET() {
       livingGroup,
       sports,
       frozenForms,
-    });
+    }, { headers: noCacheHeaders });
   } catch (error) {
     console.error('Session error:', error);
     return NextResponse.json(

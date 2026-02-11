@@ -114,6 +114,9 @@ export async function POST(request: NextRequest) {
       .from(bucketName)
       .getPublicUrl(fileName);
 
+    // Add timestamp to bust browser cache on re-uploads
+    const publicUrlWithCache = `${urlData.publicUrl}?t=${Date.now()}`;
+
     // Determine which DB column to update
     const teamPrefix = team ? `${team}_` : '';
     const imageField = `${teamPrefix}candid_image_${slot}`;
@@ -121,7 +124,7 @@ export async function POST(request: NextRequest) {
     const { error: updateError } = await supabase
       .from('sports')
       .update({
-        [imageField]: urlData.publicUrl,
+        [imageField]: publicUrlWithCache,
         updated_at: new Date().toISOString(),
       })
       .eq('id', sports.id);
@@ -136,7 +139,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      url: urlData.publicUrl,
+      url: publicUrlWithCache,
       slot,
       team: team || null,
     });
@@ -208,7 +211,9 @@ export async function DELETE(request: NextRequest) {
     // Delete file from storage
     const imageUrl = (sports as Record<string, unknown>)[imageField] as string | null;
     if (imageUrl) {
-      const match = imageUrl.match(/\/sports-images\/(.+)$/);
+      // Strip query params before extracting path
+      const urlWithoutParams = imageUrl.split('?')[0];
+      const match = urlWithoutParams.match(/\/sports-images\/(.+)$/);
       if (match) {
         await supabase.storage.from('sports-images').remove([decodeURIComponent(match[1])]);
       }
