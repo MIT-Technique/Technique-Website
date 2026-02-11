@@ -1263,6 +1263,7 @@
       "book": "预约",
       "assign": "分配",
       "sections": "区域",
+      "candids": "生活照",
       "members": "成员",
       "documents": "文档",
       "settings": "设置"
@@ -1461,6 +1462,15 @@
         "declined": "已拒绝",
         "cancelled": "已取消"
       }
+    },
+    "candids": {
+      "title": "居住小组生活照",
+      "description": "上传一张包含组织中所有成员的主要照片。这是将出现在年鉴中的主要图像。",
+      "optionalNote": "注意：附加照片将被考虑，但如果年鉴空间紧张，不保证会被收录。请专注于为主要图像拍摄包含组织中所有人的最佳单张照片。",
+      "mainImage": "主要照片",
+      "additionalImage": "附加（可选）",
+      "uploadSuccess": "照片上传成功",
+      "deleteSuccess": "照片删除成功"
     }
   },
   "calendarView": {
