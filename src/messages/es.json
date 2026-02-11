@@ -1477,6 +1477,16 @@
         "cancelled": "Cancelado"
       }
     },
+    "profile": {
+      "descriptionTitle": "Descripción",
+      "descriptionHint": "Escribe una breve descripción de tu organización (máximo 75 palabras). Esto será considerado para inclusión en el anuario.",
+      "descriptionPlaceholder": "Cuéntanos sobre tu organización...",
+      "words": "palabras",
+      "saving": "Guardando...",
+      "saved": "¡Guardado!",
+      "saveError": "Error al guardar",
+      "photosTitle": "Fotos"
+    },
     "candids": {
       "title": "Fotos Espontáneas del Grupo Residencial",
       "description": "Sube una foto principal con todos en tu organización. Esta es la imagen principal que aparecerá en el anuario.",

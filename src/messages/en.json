@@ -1516,6 +1516,16 @@
         "cancelled": "Cancelled"
       }
     },
+    "profile": {
+      "descriptionTitle": "Description",
+      "descriptionHint": "Write a brief description of your organization (75 words max). This will be considered for inclusion in the yearbook.",
+      "descriptionPlaceholder": "Tell us about your organization...",
+      "words": "words",
+      "saving": "Saving...",
+      "saved": "Saved!",
+      "saveError": "Error saving",
+      "photosTitle": "Photos"
+    },
     "candids": {
       "title": "Living Group Candid Photos",
       "description": "Upload a main photo with everyone in your organization. This is the primary image that will appear in the yearbook.",

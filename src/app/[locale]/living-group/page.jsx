@@ -109,6 +109,12 @@ export default function LivingGroupPage() {
   const [imageOverrides, setImageOverrides] = useState({});
   const [candidImageMessage, setCandidImageMessage] = useState({ type: '', text: '' });
 
+  // Profile/Description state (FSILGs only)
+  const [description, setDescription] = useState('');
+  const [descriptionSaveStatus, setDescriptionSaveStatus] = useState('idle');
+  const descriptionSaveTimer = useRef(null);
+  const lastSavedDescription = useRef('');
+
   // Time assignments state
   const [timeAssignments, setTimeAssignments] = useState({});
   const [assignmentsLoading, setAssignmentsLoading] = useState(false);
@@ -175,7 +181,7 @@ export default function LivingGroupPage() {
   useEffect(() => {
     if (livingGroup && activeTab === null) {
       const isFsilg = livingGroup.living_group_type === 'fsilg';
-      setActiveTab(isFsilg ? 'candids' : 'sections');
+      setActiveTab(isFsilg ? 'profile' : 'sections');
     }
   }, [livingGroup, activeTab]);
 
@@ -215,6 +221,12 @@ export default function LivingGroupPage() {
         fetchDocuments();
       } else if (activeTab === 'sections') {
         fetchSections();
+      } else if (activeTab === 'profile') {
+        // Initialize description from livingGroup data
+        if (livingGroup?.description !== undefined) {
+          setDescription(livingGroup.description || '');
+          lastSavedDescription.current = livingGroup.description || '';
+        }
       }
     }
   }, [activeTab, scheduleSubTab, isLoggedIn, user, livingGroup]);
@@ -786,6 +798,57 @@ export default function LivingGroupPage() {
     saveDocuments(documents);
   }
 
+  // Auto-save description function (FSILGs only)
+  async function saveDescription(desc) {
+    if (desc === lastSavedDescription.current) return;
+
+    // Validate word count
+    const wordCount = desc.trim().split(/\s+/).filter(Boolean).length;
+    if (wordCount > 75) {
+      setDescriptionSaveStatus('error');
+      return;
+    }
+
+    setDescriptionSaveStatus('saving');
+    try {
+      const res = await fetch('/api/living-groups/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ description: desc }),
+      });
+      if (res.ok) {
+        lastSavedDescription.current = desc;
+        setDescriptionSaveStatus('saved');
+        setTimeout(() => setDescriptionSaveStatus('idle'), 2000);
+      } else {
+        setDescriptionSaveStatus('error');
+      }
+    } catch (error) {
+      setDescriptionSaveStatus('error');
+    }
+  }
+
+  // Debounced auto-save on description change
+  function handleDescriptionChange(value) {
+    setDescription(value);
+
+    if (descriptionSaveTimer.current) {
+      clearTimeout(descriptionSaveTimer.current);
+    }
+
+    descriptionSaveTimer.current = setTimeout(() => {
+      saveDescription(value);
+    }, 1000);
+  }
+
+  // Save description on blur
+  function handleDescriptionBlur() {
+    if (descriptionSaveTimer.current) {
+      clearTimeout(descriptionSaveTimer.current);
+    }
+    saveDescription(description);
+  }
+
   async function fetchProposals() {
     try {
       const res = await fetch('/api/living-groups/propose-time');
@@ -915,10 +978,10 @@ export default function LivingGroupPage() {
   };
 
   const tabs = [
-    // Dorms get Sections tab, FSILGs get Candids tab
+    // Dorms get Sections tab, FSILGs get Profile tab
     {
-      id: isFsilg ? 'candids' : 'sections',
-      label: isFsilg ? t('tabs.candids') : getSectionsLabel()
+      id: isFsilg ? 'profile' : 'sections',
+      label: isFsilg ? t('tabs.profile') : getSectionsLabel()
     },
     { id: 'members', label: t('tabs.members') },
     { id: 'schedule', label: t('tabs.schedule') },
@@ -974,8 +1037,8 @@ export default function LivingGroupPage() {
             ))}
           </div>
 
-          {/* Profile Tab */}
-          {activeTab === 'profile' && (
+          {/* Profile Tab (Dorms only - shows email) */}
+          {activeTab === 'profile' && !isFsilg && (
             <div>
               {/* Email Section */}
               <div className="mb-6">
@@ -1784,9 +1847,41 @@ export default function LivingGroupPage() {
             </div>
           )}
 
-          {/* Candids Tab - FSILGs Only */}
-          {activeTab === 'candids' && isFsilg && (
+          {/* Profile Tab - FSILGs Only */}
+          {activeTab === 'profile' && isFsilg && (
             <div>
+              {/* Description Section */}
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold mb-2">{t('profile.descriptionTitle')}</h3>
+                <p className="text-text-secondary text-sm mb-3">{t('profile.descriptionHint')}</p>
+                <textarea
+                  value={description}
+                  onChange={(e) => handleDescriptionChange(e.target.value)}
+                  onBlur={handleDescriptionBlur}
+                  disabled={isFrozen}
+                  placeholder={t('profile.descriptionPlaceholder')}
+                  className="w-full p-3 border border-border rounded min-h-[120px] resize-y disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  maxLength={2000}
+                />
+                <p className="text-xs text-text-muted mt-1 flex items-center gap-2">
+                  <span className={description.trim().split(/\s+/).filter(Boolean).length > 75 ? 'text-red-600' : ''}>
+                    {description.trim().split(/\s+/).filter(Boolean).length} / 75 {t('profile.words')}
+                  </span>
+                  {descriptionSaveStatus === 'saving' && (
+                    <span className="text-text-secondary">{t('profile.saving')}</span>
+                  )}
+                  {descriptionSaveStatus === 'saved' && (
+                    <span className="text-green-600">{t('profile.saved')}</span>
+                  )}
+                  {descriptionSaveStatus === 'error' && (
+                    <span className="text-red-600">{t('profile.saveError')}</span>
+                  )}
+                </p>
+              </div>
+
+              {/* Candid Images Section */}
+              <h3 className="text-lg font-semibold mb-4">{t('profile.photosTitle')}</h3>
+
               {candidImageMessage.text && (
                 <div className={`mb-6 p-4 rounded ${
                   candidImageMessage.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'

@@ -50,6 +50,7 @@ export interface LivingGroup {
   id: string;
   user_id: string;
   name: string;
+  description: string | null;
   status: LivingGroupStatus;
   living_group_type: LivingGroupType;
   has_leader: boolean;
