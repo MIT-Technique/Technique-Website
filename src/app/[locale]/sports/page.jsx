@@ -572,10 +572,8 @@ export default function SportsPage() {
                   setImageMessage({ type: 'error', text: data.error || 'Upload failed' });
                   throw new Error(data.error || 'Upload failed');
                 }
-                // Update locally with cache-busting param
-                const newUrl = data.url + '?t=' + Date.now();
-                setImageOverrides(prev => ({ ...prev, [imageField]: newUrl }));
-                return newUrl;
+                // ImageUpload handles display via localUrl; data syncs on next page load
+                return data.url;
               }}
               onDelete={async () => {
                 setImageMessage({ type: '', text: '' });

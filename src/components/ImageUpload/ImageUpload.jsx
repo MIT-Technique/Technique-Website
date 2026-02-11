@@ -41,6 +41,7 @@ export default function ImageUpload({ imageUrl, onUpload, onDelete, disabled, la
       return;
     }
     setError('');
+    setDeleted(false); // Reset deleted state so new preview can show
 
     // Show local preview immediately
     const localPreview = URL.createObjectURL(file);

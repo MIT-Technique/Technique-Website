@@ -543,13 +543,22 @@ export default function ClubPage() {
                             fd.append('file', file);
                             fd.append('slot', String(slot));
                             const res = await fetch('/api/clubs/images', { method: 'POST', body: fd });
+                            // Handle non-JSON responses (e.g., "Request Entity Too Large")
+                            const contentType = res.headers.get('content-type');
+                            if (!contentType || !contentType.includes('application/json')) {
+                              const text = await res.text();
+                              const errorMsg = text.includes('Too Large')
+                                ? 'File too large. Please try a smaller image (under 4MB).'
+                                : 'Upload failed. Please try again.';
+                              setImageMessage({ type: 'error', text: errorMsg });
+                              throw new Error(errorMsg);
+                            }
                             const data = await res.json();
                             if (!res.ok) {
                               setImageMessage({ type: 'error', text: data.error || 'Upload failed' });
                               throw new Error(data.error || 'Upload failed');
                             }
-                            // Return URL for immediate preview via localUrl
-                            // Backend is already updated; club data will sync on next page load
+                            // ImageUpload handles visual state; data syncs on next page load
                             return data.url;
                           }}
                           onDelete={async () => {
@@ -560,7 +569,7 @@ export default function ClubPage() {
                               setImageMessage({ type: 'error', text: data.error || 'Delete failed' });
                               throw new Error(data.error || 'Delete failed');
                             }
-                            // ImageUpload handles the deleted state visually
+                            // ImageUpload handles visual state; data syncs on next page load
                           }}
                         />
                       );
