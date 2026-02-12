@@ -76,7 +76,7 @@
       "metaTitle": "About Us - MIT Technique",
       "metaDescription": "Learn about MIT Technique, the photography and yearbook organization since 1885.",
       "hero": "Since 1885, our staph have crafted a beautiful annual of photographs and prose commemorating each year at MIT.",
-      "paragraph1": "We are MIT's photography, yearbook, and design student organization. Every year, our staph send off our 400 page annual to the publisher in February and release the book in May. As students and alumni of MIT, we take great care to showcase MIT in its truest form, candidly, at its best and at its worst. We know how tough the Institute can be, and we know how rewarding it is to get to the other side.",
+      "paragraph1": "We are MIT's photography, yearbook, and design student organization. Every year, our staph send off our 280 page annual to the publisher in February and release the book in May. As students and alumni of MIT, we take great care to showcase MIT in its truest form, candidly, at its best and at its worst. We know how tough the Institute can be, and we know how rewarding it is to get to the other side.",
       "paragraph2": "In addition to designing the MIT yearbook, Technique supports the campus photography community by providing equipment rentals and event photography services.",
       "grogo": {
         "title": "H.R.H. Grogo",
@@ -288,6 +288,7 @@
       "metaDescription": "Information about MIT senior portrait sessions with Technique.",
       "hero": "Senior portrait sessions open on a rolling basis.",
       "scheduleButton": "Schedule Your Portrait",
+      "selfSubmissionsButton": "SELF-SUBMISSIONS",
       "dressCode": {
         "title": "Dress Code",
         "content": "There is no dress code for senior portraits. You can show up in a suit, dress, or even your pajamas. We have even had students bring their instruments and pets. We recommend wearing something that you are comfortable being pictured in, since your image will likely be on shelves of your peers for decades to come.",
@@ -1631,7 +1632,7 @@
       "yearbook": {
         "title": "Yearbook",
         "q1": "When can I order the yearbook?",
-        "a1": "Yearbooks are typically available for preorder in the spring semester. Check the Yearbook page for current availability and pricing.",
+        "a1": "Yearbooks are typically available for preorder in the spring semester. Check <purchaseLink>here</purchaseLink> for current availability and pricing.",
         "q2": "How much does the yearbook cost?",
         "a2": "Preorder pricing is discounted compared to the regular price. Seniors who attend their portrait session receive an additional discount. Visit the Yearbook page for exact pricing.",
         "q3": "Can parents or alumni order yearbooks?",
@@ -1646,14 +1647,16 @@
         "q2": "How do I submit my senior bio?",
         "a2": "Navigate to the Senior Bio page. You can enter your name, major, and an optional quote that will appear alongside your portrait in the yearbook.",
         "q3": "What if I missed my portrait session?",
-        "a3": "Contact technique@mit.edu as soon as possible. Technique has a publication deadline, so late sessions cannot always be accommodated. Your name will still appear in the yearbook regardless."
+        "a3": "Contact technique@mit.edu as soon as possible. Technique has a publication deadline, so late sessions cannot always be accommodated. Your name will still appear in the yearbook regardless.",
+        "q4": "What if I couldn't schedule a professional senior portrait?",
+        "a4": "Seniors who were unable to schedule a professional senior portrait can still submit the senior bio form. Visit the <seniorsLink>Seniors page</seniorsLink> for more information."
       },
       "organizations": {
         "title": "Clubs, Living Groups & Sports",
         "q1": "How does my organization get featured in the yearbook?",
         "a1": "Each organization has a dashboard where you can add a description, member list, and candid photos. Log in with your organization credentials to access it.",
         "q2": "What kind of photos should we submit?",
-        "a2": "Submit high-quality candid photos that show your organization in action. You can upload up to 3 images. Avoid posed group shots — we want to capture authentic moments!",
+        "a2": "Submit high-quality candid photos that show your organization in action. You can upload up to 3 images. A group shot is preferred, but other candids are also allowed.",
         "q3": "How do living groups schedule a photoshoot?",
         "a3": "Log in to your living group dashboard and use the booking tab to select an available time slot, or propose a new time for Technique staph to review."
       },

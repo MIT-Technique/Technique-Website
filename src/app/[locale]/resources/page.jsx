@@ -5,10 +5,12 @@ import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
+import Link from "next/link";
 
 function ResourcesPage() {
   const t = useTranslations('resources');
+  const locale = useLocale();
   const [expanded, setExpanded] = useState(false);
 
   const handleChange = (panel) => (event, isExpanded) => {
@@ -20,7 +22,9 @@ function ResourcesPage() {
       id: 'yearbook',
       title: t('faq.yearbook.title'),
       questions: [
-        { q: t('faq.yearbook.q1'), a: t('faq.yearbook.a1') },
+        { q: t('faq.yearbook.q1'), a: t.rich('faq.yearbook.a1', {
+          purchaseLink: (chunks) => <Link href={`/${locale}/purchase`} className="text-accent hover:text-accent-hover">{chunks}</Link>
+        }) },
         { q: t('faq.yearbook.q2'), a: t('faq.yearbook.a2') },
         { q: t('faq.yearbook.q3'), a: t('faq.yearbook.a3') },
         { q: t('faq.yearbook.q4'), a: t('faq.yearbook.a4') },
@@ -33,6 +37,9 @@ function ResourcesPage() {
         { q: t('faq.seniors.q1'), a: t('faq.seniors.a1') },
         { q: t('faq.seniors.q2'), a: t('faq.seniors.a2') },
         { q: t('faq.seniors.q3'), a: t('faq.seniors.a3') },
+        { q: t('faq.seniors.q4'), a: t.rich('faq.seniors.a4', {
+          seniorsLink: (chunks) => <Link href={`/${locale}/seniors`} className="text-accent hover:text-accent-hover">{chunks}</Link>
+        }) },
       ],
     },
     {
@@ -103,7 +110,7 @@ function ResourcesPage() {
                         pt: 2,
                       }}
                     >
-                      <p className="text-sm text-text-secondary leading-relaxed">
+                      <p className="text-sm pb-0 text-text-secondary leading-relaxed">
                         {item.a}
                       </p>
                     </AccordionDetails>
