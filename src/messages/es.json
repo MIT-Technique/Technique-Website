@@ -69,7 +69,7 @@
       "metaTitle": "Acerca de Nosotros - MIT Technique",
       "metaDescription": "Conoce a MIT Technique, la organización de fotografía y anuario desde 1885.",
       "hero": "Desde 1885, nuestro staph ha creado un hermoso anuario de fotografías y prosa conmemorando cada año en MIT.",
-      "paragraph1": "Somos la organización estudiantil de fotografía, anuario y diseño de MIT. Cada año, nuestro staph envía nuestro anuario de 400 páginas al editor en febrero y lanza el libro en mayo. Como estudiantes y ex alumnos de MIT, tenemos mucho cuidado de mostrar MIT en su forma más verdadera, con sinceridad, en su mejor y en su peor momento. Sabemos lo difícil que puede ser el Instituto, y sabemos lo gratificante que es llegar al otro lado.",
+      "paragraph1": "Somos la organización estudiantil de fotografía, anuario y diseño de MIT. Cada año, nuestro staph envía nuestro anuario de 280 páginas al editor en febrero y lanza el libro en mayo. Como estudiantes y ex alumnos de MIT, tenemos mucho cuidado de mostrar MIT en su forma más verdadera, con sinceridad, en su mejor y en su peor momento. Sabemos lo difícil que puede ser el Instituto, y sabemos lo gratificante que es llegar al otro lado.",
       "paragraph2": "Además de diseñar el anuario de MIT, Technique apoya a la comunidad de fotografía del campus proporcionando alquiler de equipo y servicios de fotografía de eventos.",
       "grogo": {
         "title": "S.A.R. Grogo",
@@ -273,6 +273,7 @@
       "metaDescription": "Información sobre las sesiones de retratos de seniors con Technique.",
       "hero": "Las sesiones de retratos de seniors se abren de forma continua.",
       "scheduleButton": "Programa Tu Retrato",
+      "selfSubmissionsButton": "AUTO-ENVÍOS",
       "dressCode": {
         "title": "Código de Vestimenta",
         "content": "No hay código de vestimenta para los retratos de seniors. Puedes presentarte con un traje, vestido o incluso tu pijama. Incluso hemos tenido estudiantes que traen sus instrumentos y mascotas. Recomendamos usar algo en lo que te sientas cómodo siendo fotografiado, ya que tu imagen probablemente estará en los estantes de tus compañeros durante décadas.",
@@ -1590,7 +1591,7 @@
       "yearbook": {
         "title": "Anuario",
         "q1": "¿Cuándo puedo ordenar el anuario?",
-        "a1": "Los anuarios típicamente están disponibles para preorden en el semestre de primavera. Consulta la página de Anuario para disponibilidad y precios actuales.",
+        "a1": "Los anuarios típicamente están disponibles para preorden en el semestre de primavera. Consulta <purchaseLink>aquí</purchaseLink> para disponibilidad y precios actuales.",
         "q2": "¿Cuánto cuesta el anuario?",
         "a2": "El precio de preorden es más bajo que el precio regular. Los graduados que asisten a su sesión de retrato reciben un descuento adicional. Visita la página de Anuario para precios exactos.",
         "q3": "¿Pueden los padres o exalumnos ordenar anuarios?",
@@ -1605,14 +1606,16 @@
         "q2": "¿Cómo envío mi biografía de graduación?",
         "a2": "Ve a la página de Biografía de Graduado. Puedes ingresar tu nombre, carrera y una cita opcional que aparecerá junto a tu retrato en el anuario.",
         "q3": "¿Qué pasa si no pude asistir a mi sesión de retrato?",
-        "a3": "Contacta a technique@mit.edu lo antes posible. Technique tiene una fecha límite de publicación, por lo que no siempre se pueden acomodar sesiones tardías. Tu nombre aparecerá en el anuario de todas formas."
+        "a3": "Contacta a technique@mit.edu lo antes posible. Technique tiene una fecha límite de publicación, por lo que no siempre se pueden acomodar sesiones tardías. Tu nombre aparecerá en el anuario de todas formas.",
+        "q4": "¿Qué pasa si no pude programar un retrato de graduación profesional?",
+        "a4": "Los graduados que no pudieron programar un retrato de graduación profesional aún pueden enviar el formulario de biografía de graduación. Visita la <seniorsLink>página de Graduados</seniorsLink> para más información."
       },
       "organizations": {
         "title": "Clubes, Grupos de Vivienda y Deportes",
         "q1": "¿Cómo aparece mi organización en el anuario?",
         "a1": "Cada organización tiene un panel donde pueden agregar descripción, lista de miembros y fotos candidas. Inicia sesión con las credenciales de tu organización para acceder.",
         "q2": "¿Qué tipo de fotos debemos enviar?",
-        "a2": "Envía fotos candidas de alta calidad que muestren a tu organización en acción. Puedes subir hasta 3 imágenes. Evita fotos grupales posadas — ¡queremos capturar momentos auténticos!",
+        "a2": "Envía fotos candidas de alta calidad que muestren a tu organización en acción. Puedes subir hasta 3 imágenes. Se prefiere una foto grupal, pero otras fotos candidas también están permitidas.",
         "q3": "¿Cómo programan los grupos de vivienda una sesión de fotos?",
         "a3": "Inicia sesión en tu panel de grupo de vivienda y usa la pestaña de reservas para seleccionar un horario disponible, o propón un nuevo horario para que el equipo de Technique lo revise."
       },
