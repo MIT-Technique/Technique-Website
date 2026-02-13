@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "../../../../lib/supabase/admin";
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-const MAX_SIZE = 20 * 1024 * 1024; // 20MB
+const MAX_SIZE = 25 * 1024 * 1024; // 25MB
 
 // GET - Fetch existing candid submission by email
 export async function GET(request: NextRequest): Promise<NextResponse> {

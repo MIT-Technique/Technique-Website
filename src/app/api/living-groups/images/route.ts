@@ -50,10 +50,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate file size (max 20MB)
-    if (file.size > 20 * 1024 * 1024) {
+    // Validate file size (max 25MB)
+    if (file.size > 25 * 1024 * 1024) {
       return NextResponse.json(
-        { error: "File too large. Maximum size is 20MB" },
+        { error: "File too large. Maximum size is 25MB" },
         { status: 400 }
       );
     }

@@ -548,7 +548,7 @@ export default function ClubPage() {
                             if (!contentType || !contentType.includes('application/json')) {
                               const text = await res.text();
                               const errorMsg = text.includes('Too Large')
-                                ? 'File too large. Please try a smaller image (under 4MB).'
+                                ? 'File too large. Maximum size is 25MB.'
                                 : 'Upload failed. Please try again.';
                               setImageMessage({ type: 'error', text: errorMsg });
                               throw new Error(errorMsg);
