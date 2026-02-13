@@ -187,50 +187,86 @@ export default function CandidsPage() {
 
     setSubmitting(true);
     try {
-      const formData = new FormData();
-      formData.append('email', normalizeEmail(email));
+      const normalizedEmail = normalizeEmail(email);
+      const uploadedPaths = [];
 
-      let fileIndex = 1;
-      for (const file of files) {
-        if (file) {
-          formData.append(`file${fileIndex}`, file);
-          fileIndex++;
+      // Upload each file using presigned URLs
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (!file) continue;
+
+        // Get presigned URL
+        const presignRes = await fetch('/api/candids/presign', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: normalizedEmail,
+            fileName: file.name,
+            fileType: file.type,
+            slot: String(i + 1),
+            eventName: eventName.trim(),
+          }),
+        });
+
+        if (!presignRes.ok) {
+          const data = await presignRes.json();
+          throw new Error(data.error || 'Failed to get upload URL');
         }
+
+        const { signedUrl, path } = await presignRes.json();
+
+        // Upload file directly to Supabase storage
+        const uploadRes = await fetch(signedUrl, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': file.type,
+            'x-upsert': 'true',
+          },
+          body: file,
+        });
+
+        if (!uploadRes.ok) {
+          const errorText = await uploadRes.text().catch(() => '');
+          console.error('Upload failed:', uploadRes.status, errorText);
+          throw new Error(`Failed to upload image ${i + 1}`);
+        }
+
+        uploadedPaths.push(path);
       }
 
-      // Send existing image URLs to keep (not replaced or removed by user)
+      // Confirm upload and save to database
       const keepUrls = existingImageUrls.filter(Boolean);
-      if (keepUrls.length > 0) {
-        formData.append('keepImageUrls', JSON.stringify(keepUrls));
-      }
-
-      formData.append('organizationName', eventName.trim()); // API expects this field name
-      formData.append('organizationType', 'event'); // API expects this field name
-      formData.append('eventDescription', eventDescription.trim());
-
-      const res = await fetch('/api/candids/upload', {
+      const confirmRes = await fetch('/api/candids/confirm', {
         method: 'POST',
-        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: normalizedEmail,
+          paths: uploadedPaths,
+          eventName: eventName.trim(),
+          eventDescription: eventDescription.trim(),
+          keepImageUrls: keepUrls,
+        }),
       });
 
-      if (res.ok) {
+      if (confirmRes.ok) {
         setSnackMessage(t('success'));
         setSnackError(false);
         setSnackOpen(true);
         // Reset form
         setFiles([null, null, null]);
         setPreviews([null, null, null]);
+        setExistingImageUrls([null, null, null]);
         setEventName("");
         setEventDescription("");
         fileInputRefs.forEach(ref => { if (ref.current) ref.current.value = ''; });
       } else {
-        const data = await res.json();
+        const data = await confirmRes.json();
         setSnackMessage(data.error || t('error'));
         setSnackError(true);
         setSnackOpen(true);
       }
-    } catch {
-      setSnackMessage(t('error'));
+    } catch (err) {
+      setSnackMessage(err.message || t('error'));
       setSnackError(true);
       setSnackOpen(true);
     } finally {
