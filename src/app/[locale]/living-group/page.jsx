@@ -1727,16 +1727,57 @@ export default function LivingGroupPage() {
                       disabled={isFrozen}
                       onUpload={async (file) => {
                         setImageMessage({ type: '', text: '' });
-                        const fd = new FormData();
-                        fd.append('file', file);
-                        fd.append('section_name', '__default__');
-                        const res = await fetch('/api/living-groups/images', { method: 'POST', body: fd });
-                        const data = await res.json();
-                        if (!res.ok) {
-                          setImageMessage({ type: 'error', text: data.error || 'Upload failed' });
-                          throw new Error(data.error || 'Upload failed');
+
+                        // Step 1: Get presigned upload URL
+                        const presignRes = await fetch('/api/living-groups/images/presign', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            fileName: file.name,
+                            fileType: file.type,
+                            sectionName: '__default__'
+                          })
+                        });
+
+                        if (!presignRes.ok) {
+                          const presignData = await presignRes.json();
+                          setImageMessage({ type: 'error', text: presignData.error || 'Failed to prepare upload' });
+                          throw new Error(presignData.error || 'Failed to prepare upload');
                         }
-                        return data.url;
+
+                        const { signedUrl, path, livingGroupId, sectionName } = await presignRes.json();
+
+                        // Step 2: Upload directly to Supabase Storage
+                        const uploadRes = await fetch(signedUrl, {
+                          method: 'PUT',
+                          headers: {
+                            'Content-Type': file.type,
+                            'x-upsert': 'true'
+                          },
+                          body: file
+                        });
+
+                        if (!uploadRes.ok) {
+                          const errorText = await uploadRes.text().catch(() => '');
+                          console.error('Upload failed:', uploadRes.status, errorText);
+                          setImageMessage({ type: 'error', text: 'Upload to storage failed' });
+                          throw new Error('Upload to storage failed');
+                        }
+
+                        // Step 3: Confirm upload and update database
+                        const confirmRes = await fetch('/api/living-groups/images/confirm', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ path, sectionName, livingGroupId })
+                        });
+
+                        const confirmData = await confirmRes.json();
+                        if (!confirmRes.ok) {
+                          setImageMessage({ type: 'error', text: confirmData.error || 'Failed to confirm upload' });
+                          throw new Error(confirmData.error || 'Failed to confirm upload');
+                        }
+
+                        return confirmData.url;
                       }}
                       onDelete={async () => {
                         setImageMessage({ type: '', text: '' });
@@ -1770,16 +1811,52 @@ export default function LivingGroupPage() {
                           disabled={isFrozen}
                           onUpload={async (file) => {
                             setImageMessage({ type: '', text: '' });
-                            const fd = new FormData();
-                            fd.append('file', file);
-                            fd.append('section_name', section);
-                            const res = await fetch('/api/living-groups/images', { method: 'POST', body: fd });
-                            const data = await res.json();
-                            if (!res.ok) {
-                              setImageMessage({ type: 'error', text: data.error || 'Upload failed' });
-                              throw new Error(data.error || 'Upload failed');
+
+                            // Step 1: Get presigned upload URL
+                            const presignRes = await fetch('/api/living-groups/images/presign', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({
+                                fileName: file.name,
+                                fileType: file.type,
+                                sectionName: section
+                              })
+                            });
+
+                            if (!presignRes.ok) {
+                              const presignData = await presignRes.json();
+                              setImageMessage({ type: 'error', text: presignData.error || 'Failed to prepare upload' });
+                              throw new Error(presignData.error || 'Failed to prepare upload');
                             }
-                            return data.url;
+
+                            const { signedUrl, path, livingGroupId, sectionName } = await presignRes.json();
+
+                            // Step 2: Upload directly to Supabase Storage
+                            const uploadRes = await fetch(signedUrl, {
+                              method: 'PUT',
+                              headers: { 'Content-Type': file.type },
+                              body: file
+                            });
+
+                            if (!uploadRes.ok) {
+                              setImageMessage({ type: 'error', text: 'Upload to storage failed' });
+                              throw new Error('Upload to storage failed');
+                            }
+
+                            // Step 3: Confirm upload and update database
+                            const confirmRes = await fetch('/api/living-groups/images/confirm', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ path, sectionName, livingGroupId })
+                            });
+
+                            const confirmData = await confirmRes.json();
+                            if (!confirmRes.ok) {
+                              setImageMessage({ type: 'error', text: confirmData.error || 'Failed to confirm upload' });
+                              throw new Error(confirmData.error || 'Failed to confirm upload');
+                            }
+
+                            return confirmData.url;
                           }}
                           onDelete={async () => {
                             setImageMessage({ type: '', text: '' });
@@ -1907,27 +1984,62 @@ export default function LivingGroupPage() {
                       disabled={isFrozen}
                       onUpload={async (file) => {
                         setCandidImageMessage({ type: '', text: '' });
-                        const fd = new FormData();
-                        fd.append('file', file);
-                        fd.append('slot', String(slot));
-                        const res = await fetch('/api/living-groups/candid-images', {
+
+                        // Step 1: Get presigned upload URL
+                        const presignRes = await fetch('/api/living-groups/candid-images/presign', {
                           method: 'POST',
-                          body: fd
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            fileName: file.name,
+                            fileType: file.type,
+                            slot: String(slot)
+                          })
                         });
-                        const data = await res.json();
-                        if (!res.ok) {
-                          setCandidImageMessage({
-                            type: 'error',
-                            text: data.error || 'Upload failed'
-                          });
-                          throw new Error(data.error || 'Upload failed');
+
+                        if (!presignRes.ok) {
+                          const presignData = await presignRes.json();
+                          setCandidImageMessage({ type: 'error', text: presignData.error || 'Failed to prepare upload' });
+                          throw new Error(presignData.error || 'Failed to prepare upload');
                         }
+
+                        const { signedUrl, path, livingGroupId } = await presignRes.json();
+
+                        // Step 2: Upload directly to Supabase Storage
+                        const uploadRes = await fetch(signedUrl, {
+                          method: 'PUT',
+                          headers: {
+                            'Content-Type': file.type,
+                            'x-upsert': 'true'
+                          },
+                          body: file
+                        });
+
+                        if (!uploadRes.ok) {
+                          const errorText = await uploadRes.text().catch(() => '');
+                          console.error('Upload failed:', uploadRes.status, errorText);
+                          setCandidImageMessage({ type: 'error', text: 'Upload to storage failed' });
+                          throw new Error('Upload to storage failed');
+                        }
+
+                        // Step 3: Confirm upload and update database
+                        const confirmRes = await fetch('/api/living-groups/candid-images/confirm', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ path, slot: String(slot), livingGroupId })
+                        });
+
+                        const confirmData = await confirmRes.json();
+                        if (!confirmRes.ok) {
+                          setCandidImageMessage({ type: 'error', text: confirmData.error || 'Failed to confirm upload' });
+                          throw new Error(confirmData.error || 'Failed to confirm upload');
+                        }
+
                         setCandidImageMessage({
                           type: 'success',
                           text: t('candids.uploadSuccess')
                         });
                         // Update locally with cache-busting param
-                        const newUrl = data.url + '?t=' + Date.now();
+                        const newUrl = confirmData.url;
                         setImageOverrides(prev => ({ ...prev, [imageField]: newUrl }));
                         return newUrl;
                       }}

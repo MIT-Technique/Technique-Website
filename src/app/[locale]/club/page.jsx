@@ -562,11 +562,16 @@ export default function ClubPage() {
                             // Step 2: Upload directly to Supabase Storage (bypasses API size limits)
                             const uploadRes = await fetch(signedUrl, {
                               method: 'PUT',
-                              headers: { 'Content-Type': file.type },
+                              headers: {
+                                'Content-Type': file.type,
+                                'x-upsert': 'true'
+                              },
                               body: file
                             });
 
                             if (!uploadRes.ok) {
+                              const errorText = await uploadRes.text().catch(() => '');
+                              console.error('Upload failed:', uploadRes.status, errorText);
                               setImageMessage({ type: 'error', text: 'Upload to storage failed' });
                               throw new Error('Upload to storage failed');
                             }
