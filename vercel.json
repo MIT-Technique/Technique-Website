@@ -1,19 +1,19 @@
 {
   "functions": {
     "src/app/api/clubs/images/route.ts": {
-      "maxBodyLength": 31457280
+      "maxDuration": 60
     },
     "src/app/api/sports/images/route.ts": {
-      "maxBodyLength": 31457280
+      "maxDuration": 60
     },
     "src/app/api/living-groups/images/route.ts": {
-      "maxBodyLength": 31457280
+      "maxDuration": 60
     },
     "src/app/api/candids/upload/route.ts": {
-      "maxBodyLength": 31457280
+      "maxDuration": 60
     },
     "src/app/api/student-work-feature/submit/route.ts": {
-      "maxBodyLength": 31457280
+      "maxDuration": 60
     }
   }
 }

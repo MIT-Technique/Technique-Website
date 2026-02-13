@@ -539,27 +539,52 @@ export default function ClubPage() {
                           disabled={isFrozen}
                           onUpload={async (file) => {
                             setImageMessage({ type: '', text: '' });
-                            const fd = new FormData();
-                            fd.append('file', file);
-                            fd.append('slot', String(slot));
-                            const res = await fetch('/api/clubs/images', { method: 'POST', body: fd });
-                            // Handle non-JSON responses (e.g., "Request Entity Too Large")
-                            const contentType = res.headers.get('content-type');
-                            if (!contentType || !contentType.includes('application/json')) {
-                              const text = await res.text();
-                              const errorMsg = text.includes('Too Large')
-                                ? 'File too large. Maximum size is 25MB.'
-                                : 'Upload failed. Please try again.';
-                              setImageMessage({ type: 'error', text: errorMsg });
-                              throw new Error(errorMsg);
+
+                            // Step 1: Get presigned upload URL
+                            const presignRes = await fetch('/api/clubs/images/presign', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({
+                                fileName: file.name,
+                                fileType: file.type,
+                                slot: String(slot)
+                              })
+                            });
+
+                            if (!presignRes.ok) {
+                              const presignData = await presignRes.json();
+                              setImageMessage({ type: 'error', text: presignData.error || 'Failed to prepare upload' });
+                              throw new Error(presignData.error || 'Failed to prepare upload');
                             }
-                            const data = await res.json();
-                            if (!res.ok) {
-                              setImageMessage({ type: 'error', text: data.error || 'Upload failed' });
-                              throw new Error(data.error || 'Upload failed');
+
+                            const { signedUrl, path, clubId } = await presignRes.json();
+
+                            // Step 2: Upload directly to Supabase Storage (bypasses API size limits)
+                            const uploadRes = await fetch(signedUrl, {
+                              method: 'PUT',
+                              headers: { 'Content-Type': file.type },
+                              body: file
+                            });
+
+                            if (!uploadRes.ok) {
+                              setImageMessage({ type: 'error', text: 'Upload to storage failed' });
+                              throw new Error('Upload to storage failed');
                             }
-                            // ImageUpload handles visual state; data syncs on next page load
-                            return data.url;
+
+                            // Step 3: Confirm upload and update database
+                            const confirmRes = await fetch('/api/clubs/images/confirm', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ path, slot: String(slot), clubId })
+                            });
+
+                            const confirmData = await confirmRes.json();
+                            if (!confirmRes.ok) {
+                              setImageMessage({ type: 'error', text: confirmData.error || 'Failed to confirm upload' });
+                              throw new Error(confirmData.error || 'Failed to confirm upload');
+                            }
+
+                            return confirmData.url;
                           }}
                           onDelete={async () => {
                             setImageMessage({ type: '', text: '' });
