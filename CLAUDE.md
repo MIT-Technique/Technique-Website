@@ -1032,5 +1032,5 @@ CONSTRAINT yearbook_inventory_updated_by_fkey FOREIGN KEY (updated_by) REFERENCE
 - **Email:** technique@mit.edu
 - **Instagram:** @mit.tnq
 - **Office:** Walker Memorial, Room 50-320
-- **Meetings:** Walker Memorial, Room 4-25, Saturday 12-2pm
+- **Meetings:** MIT Building 4, Room 4-257, Saturday 12-2pm
 - **Mailing:** MIT Technique, 32 Vassar Street, Cambridge, MA 02139

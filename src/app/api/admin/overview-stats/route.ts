@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
       cancellationResult,
     ] = await Promise.all([
       supabase.from('clubs').select('id, description, candid_image_1, candid_image_2, candid_image_3'),
-      supabase.from('living_groups').select('id, section_images'),
+      supabase.from('living_groups').select('id, candid_image_1, candid_image_2, candid_image_3, candid_image_4'),
       supabase.from('sports').select('id, description, has_gender_teams, candid_image_1, candid_image_2, candid_image_3, mens_candid_image_1, mens_candid_image_2, mens_candid_image_3, womens_candid_image_1, womens_candid_image_2, womens_candid_image_3'),
       supabase.from('photoshoot_times').select('id, living_group_id'),
       supabase.from('photoshoot_times').select('id').eq('cancellation_requested', true).is('cancellation_approved', null),
@@ -66,14 +66,18 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Living group images (stored in section_images JSONB)
+    // Living group images (stored in candid_image_1-4 fields on living_groups table)
     let lgCandidsSubmitted = 0;
+    let lgImageCount = 0;
     for (const lg of livingGroups) {
-      const sectionImages = lg.section_images || {};
-      const imageCount = Object.values(sectionImages).filter(Boolean).length;
-      totalImages += imageCount;
-      if (imageCount > 0) lgCandidsSubmitted++;
+      let hasAnyImage = false;
+      if (lg.candid_image_1) { lgImageCount++; hasAnyImage = true; }
+      if (lg.candid_image_2) { lgImageCount++; hasAnyImage = true; }
+      if (lg.candid_image_3) { lgImageCount++; hasAnyImage = true; }
+      if (lg.candid_image_4) { lgImageCount++; hasAnyImage = true; }
+      if (hasAnyImage) lgCandidsSubmitted++;
     }
+    totalImages += lgImageCount;
 
     return NextResponse.json({
       clubs: {

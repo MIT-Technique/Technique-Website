@@ -1074,6 +1074,12 @@
         "description": "Description?",
         "images": "Images",
         "members": "Members",
+        "email": "Email",
+        "noEmail": "No email set",
+        "imagePreview": "Image Preview",
+        "filterAll": "All Clubs",
+        "filterFilled": "Complete",
+        "filterNotFilled": "Incomplete",
         "exportMembers": "Export Club Members CSV",
         "downloadImages": "Download Club Images"
       },
@@ -1113,6 +1119,12 @@
         "mensMembers": "Men's Members",
         "womensMembers": "Women's Members",
         "coaches": "Coaches",
+        "email": "Email",
+        "noEmail": "No email set",
+        "imagePreview": "Image Preview",
+        "filterAll": "All Sports",
+        "filterFilled": "Complete",
+        "filterNotFilled": "Incomplete",
         "exportMembers": "Export Sport Members CSV",
         "downloadImages": "Download Sports Images"
       },
@@ -1586,7 +1598,11 @@
     "confirmBook": "Confirm Booking",
     "pendingLocation": "Proposed",
     "selectLocation": "Select a location:",
-    "yourLocations": "Proposed locations"
+    "yourLocations": "Proposed locations",
+    "assignPhotographer": "Photographer",
+    "unassigned": "Unassigned",
+    "assignedTo": "Assigned to",
+    "photographer": "Photographer"
   },
 
   "photographerTimes": {

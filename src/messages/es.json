@@ -1037,6 +1037,12 @@
         "description": "¿Descripción?",
         "images": "Imágenes",
         "members": "Miembros",
+        "email": "Email",
+        "noEmail": "Sin email configurado",
+        "imagePreview": "Vista Previa de Imagen",
+        "filterAll": "Todos los Clubes",
+        "filterFilled": "Completo",
+        "filterNotFilled": "Incompleto",
         "exportMembers": "Exportar Miembros de Clubes CSV",
         "downloadImages": "Descargar Imágenes de Clubes"
       },
@@ -1076,6 +1082,12 @@
         "mensMembers": "Miembros Masc.",
         "womensMembers": "Miembros Fem.",
         "coaches": "Entrenadores",
+        "email": "Email",
+        "noEmail": "Sin email configurado",
+        "imagePreview": "Vista Previa de Imagen",
+        "filterAll": "Todos los Deportes",
+        "filterFilled": "Completo",
+        "filterNotFilled": "Incompleto",
         "exportMembers": "Exportar Miembros CSV",
         "downloadImages": "Descargar Imágenes"
       },
@@ -1546,7 +1558,11 @@
     "confirmBook": "Confirmar Reserva",
     "pendingLocation": "Propuesto",
     "selectLocation": "Seleccionar una ubicación:",
-    "yourLocations": "Ubicaciones propuestas"
+    "yourLocations": "Ubicaciones propuestas",
+    "assignPhotographer": "Fotógrafo",
+    "unassigned": "Sin asignar",
+    "assignedTo": "Asignado a",
+    "photographer": "Fotógrafo"
   },
 
   "photographerTimes": {

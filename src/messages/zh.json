@@ -1039,6 +1039,12 @@
         "description": "描述?",
         "images": "图片",
         "members": "成员",
+        "email": "邮箱",
+        "noEmail": "未设置邮箱",
+        "imagePreview": "图片预览",
+        "filterAll": "所有社团",
+        "filterFilled": "已完成",
+        "filterNotFilled": "未完成",
         "exportMembers": "导出社团成员CSV",
         "downloadImages": "下载社团图片"
       },
@@ -1078,6 +1084,12 @@
         "mensMembers": "男队成员",
         "womensMembers": "女队成员",
         "coaches": "教练",
+        "email": "邮箱",
+        "noEmail": "未设置邮箱",
+        "imagePreview": "图片预览",
+        "filterAll": "所有运动队",
+        "filterFilled": "已完成",
+        "filterNotFilled": "未完成",
         "exportMembers": "导出运动员CSV",
         "downloadImages": "下载体育图片"
       },
@@ -1549,7 +1561,11 @@
     "confirmBook": "确认预约",
     "pendingLocation": "已提议",
     "selectLocation": "选择地点：",
-    "yourLocations": "建议的地点"
+    "yourLocations": "建议的地点",
+    "assignPhotographer": "摄影师",
+    "unassigned": "未分配",
+    "assignedTo": "已分配给",
+    "photographer": "摄影师"
   },
 
   "photographerTimes": {

@@ -42,6 +42,8 @@ export default function CalendarView({
   onCancelBooking,
   onPropose,
   onConfirmLocation,
+  onAssignPhotographer,
+  photographers = [],
   frozen = false,
   loading = false,
   timeAssignments = {},
@@ -297,6 +299,8 @@ export default function CalendarView({
             onCancelBooking={onCancelBooking}
             onPropose={(...args) => { setPrefillTimes(null); return onPropose?.(...args); }}
             onConfirmLocation={onConfirmLocation}
+            onAssignPhotographer={onAssignPhotographer}
+            photographers={photographers}
             frozen={frozen}
             formatTime={formatTime}
             initialStartTime={prefillTimes?.startTime || ''}

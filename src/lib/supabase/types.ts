@@ -82,6 +82,9 @@ export interface PhotoshootTime {
   cancelled_by: string | null;
   created_by: string;
   notes: string | null;
+  photographer_id: string | null;
+  photographer_assigned_at: string | null;
+  photographer_assigned_by: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -136,6 +139,7 @@ export interface PhotoshootTimeWithLivingGroup extends PhotoshootTime {
   living_group?: LivingGroup & {
     user?: User;
   };
+  photographer?: Pick<User, 'id' | 'email' | 'name'>;
 }
 
 export interface PromotionRequestWithUser extends PromotionRequest {
