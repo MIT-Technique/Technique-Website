@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { downloadImagesAsZip } from '../../../../../lib/utils/downloadImages';
 
@@ -18,14 +18,17 @@ export default function ResponsesClubsPage() {
   const [exporting, setExporting] = useState(false);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(0);
+  const [filter, setFilter] = useState('all');
+  const [expandedClubs, setExpandedClubs] = useState([]);
   const searchTimer = useRef(null);
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
-  const fetchPage = useCallback(async (p, s) => {
+  const fetchPage = useCallback(async (p, s, f) => {
     setLoading(true);
     try {
       const params = new URLSearchParams({ page: String(p), limit: String(PAGE_SIZE) });
       if (s) params.set('search', s);
+      if (f && f !== 'all') params.set('filter', f);
       const res = await fetch(`/api/admin/responses/clubs?${params}`);
       const json = await res.json();
       setClubs(json.clubs || []);
@@ -42,7 +45,7 @@ export default function ResponsesClubsPage() {
   }, []);
 
   // Initial load
-  useEffect(() => { fetchPage(0, ''); }, [fetchPage]);
+  useEffect(() => { fetchPage(0, '', 'all'); }, [fetchPage]);
 
   // Debounce search
   useEffect(() => {
@@ -54,14 +57,26 @@ export default function ResponsesClubsPage() {
     return () => clearTimeout(searchTimer.current);
   }, [search]);
 
-  // Fetch on page or debounced search change (skip initial)
+  // Fetch on page, debounced search, or filter change (skip initial)
   const isInitial = useRef(true);
   useEffect(() => {
     if (isInitial.current) { isInitial.current = false; return; }
-    fetchPage(page, debouncedSearch);
-  }, [page, debouncedSearch, fetchPage]);
+    fetchPage(page, debouncedSearch, filter);
+  }, [page, debouncedSearch, filter, fetchPage]);
+
+  // Reset page when filter changes
+  useEffect(() => {
+    setPage(0);
+    setExpandedClubs([]);
+  }, [filter]);
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+
+  const toggleExpand = (id) => {
+    setExpandedClubs(prev =>
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+    );
+  };
 
   const handleExportCSV = async () => {
     setExporting(true);
@@ -113,8 +128,8 @@ export default function ResponsesClubsPage() {
         </div>
       )}
 
-      {/* Search + Pagination */}
-      <div className="mb-4 flex items-center gap-3">
+      {/* Search + Filter + Pagination */}
+      <div className="mb-4 flex flex-wrap items-center gap-3">
         <input
           type="text"
           placeholder="Search clubs..."
@@ -122,6 +137,15 @@ export default function ResponsesClubsPage() {
           onChange={(e) => setSearch(e.target.value)}
           className="px-3 py-2 border border-border rounded-lg w-full max-w-sm text-sm"
         />
+        <select
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          className="px-3 py-2 border border-border rounded-lg text-sm bg-white"
+        >
+          <option value="all">{t('clubs.filterAll')}</option>
+          <option value="filled">{t('clubs.filterFilled')}</option>
+          <option value="not_filled">{t('clubs.filterNotFilled')}</option>
+        </select>
         <div className="flex items-center gap-1 ml-auto">
           <button
             onClick={() => setPage((p) => Math.max(0, p - 1))}
@@ -160,12 +184,49 @@ export default function ResponsesClubsPage() {
             ) : clubs.length === 0 ? (
               <tr><td colSpan={4} className="p-3 text-center text-text-secondary">{tc('noData')}</td></tr>
             ) : clubs.map((club) => (
-              <tr key={club.id} className="border-b border-border last:border-0">
-                <td className="p-3">{club.name || 'Unnamed'}</td>
-                <td className="p-3 text-center">{club.hasDescription ? tc('yes') : tc('no')}</td>
-                <td className="p-3 text-center">{club.imageCount}</td>
-                <td className="p-3 text-center">{club.memberCount}</td>
-              </tr>
+              <React.Fragment key={club.id}>
+                <tr
+                  className="border-b border-border cursor-pointer hover:bg-bg-secondary/50"
+                  onClick={() => toggleExpand(club.id)}
+                >
+                  <td className="p-3">
+                    <span className="mr-2 text-text-muted">{expandedClubs.includes(club.id) ? '▼' : '▶'}</span>
+                    {club.name || 'Unnamed'}
+                  </td>
+                  <td className="p-3 text-center">{club.hasDescription ? tc('yes') : tc('no')}</td>
+                  <td className="p-3 text-center">{club.imageCount}</td>
+                  <td className="p-3 text-center">{club.memberCount}</td>
+                </tr>
+                {expandedClubs.includes(club.id) && (
+                  <tr className="border-b border-border bg-bg-secondary/30">
+                    <td colSpan={4} className="p-4 pl-10">
+                      <div className="space-y-3">
+                        {/* Email */}
+                        <div>
+                          <span className="text-text-secondary text-sm">{t('clubs.email')}: </span>
+                          <span className="text-sm">{club.email || t('clubs.noEmail')}</span>
+                        </div>
+                        {/* Image previews */}
+                        {club.imageUrls && club.imageUrls.length > 0 && (
+                          <div>
+                            <span className="text-text-secondary text-sm block mb-2">{t('clubs.imagePreview')}:</span>
+                            <div className="flex gap-2">
+                              {club.imageUrls.map((url, i) => (
+                                <img
+                                  key={i}
+                                  src={url}
+                                  alt={`Club image ${i + 1}`}
+                                  className="w-16 h-16 object-cover rounded border border-border"
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
             ))}
           </tbody>
         </table>

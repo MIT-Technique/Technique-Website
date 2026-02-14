@@ -29,7 +29,8 @@ export async function GET(request: NextRequest) {
         *,
         living_group:living_groups(id, name, user_id, user:users!living_groups_user_id_fkey(email)),
         booked_by_user:users!photoshoot_times_booked_by_fkey(email, name, role),
-        created_by_user:users!photoshoot_times_created_by_fkey(email, name, role)
+        created_by_user:users!photoshoot_times_created_by_fkey(email, name, role),
+        photographer:users!photoshoot_times_photographer_id_fkey(id, email, name)
       `)
       .is('cancelled_at', null)
       .order('date', { ascending: true })
@@ -185,7 +186,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { timeId, action, date, startTime, endTime, notes } = body;
+    const { timeId, action, date, startTime, endTime, notes, photographerId } = body;
 
     if (!timeId) {
       return NextResponse.json(
@@ -279,6 +280,76 @@ export async function PUT(request: NextRequest) {
 
         return NextResponse.json({ time: updatedTime });
       }
+    }
+
+    // Handle photographer assignment
+    if (action === 'assign_photographer') {
+      // Get time info before update for logging
+      const { data: timeInfo } = await supabase
+        .from('photoshoot_times')
+        .select('date, start_time, end_time, living_group:living_groups(name), photographer_id')
+        .eq('id', timeId)
+        .single();
+
+      const updateData: Record<string, unknown> = {
+        updated_at: new Date().toISOString(),
+      };
+
+      if (photographerId) {
+        // Verify the photographer exists and is active
+        const { data: photographerPermission } = await supabase
+          .from('photographer_permissions')
+          .select('user_id, is_active')
+          .eq('user_id', photographerId)
+          .eq('is_active', true)
+          .single();
+
+        if (!photographerPermission) {
+          return NextResponse.json(
+            { error: "Invalid photographer or photographer is not active" },
+            { status: 400 }
+          );
+        }
+
+        updateData.photographer_id = photographerId;
+        updateData.photographer_assigned_at = new Date().toISOString();
+        updateData.photographer_assigned_by = user.id;
+      } else {
+        // Unassign photographer
+        updateData.photographer_id = null;
+        updateData.photographer_assigned_at = null;
+        updateData.photographer_assigned_by = null;
+      }
+
+      const { data: updatedTime, error } = await supabase
+        .from('photoshoot_times')
+        .update(updateData)
+        .eq('id', timeId)
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Error assigning photographer:", error);
+        return NextResponse.json(
+          { error: "Failed to assign photographer" },
+          { status: 500 }
+        );
+      }
+
+      // Log the photographer assignment
+      const lgName = Array.isArray(timeInfo?.living_group)
+        ? timeInfo.living_group[0]?.name
+        : (timeInfo?.living_group as { name?: string } | null)?.name;
+
+      await createLog(user.id, photographerId ? "photographer_assigned" : "photographer_unassigned", "photoshoot_time", timeId, {
+        living_group_name: lgName || "N/A",
+        date: timeInfo?.date,
+        start_time: timeInfo?.start_time,
+        end_time: timeInfo?.end_time,
+        photographer_id: photographerId || timeInfo?.photographer_id,
+      });
+
+      return NextResponse.json({ time: updatedTime });
     }
 
     // Regular update

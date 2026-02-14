@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { downloadImagesAsZip } from '../../../../../lib/utils/downloadImages';
 
@@ -15,21 +15,33 @@ export default function ResponsesSportsPage() {
   const [exporting, setExporting] = useState(false);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(0);
+  const [filter, setFilter] = useState('all');
+  const [expandedSports, setExpandedSports] = useState([]);
+
+  const fetchData = async (filterValue) => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (filterValue && filterValue !== 'all') params.set('filter', filterValue);
+      const res = await fetch(`/api/admin/responses/sports?${params}`);
+      const json = await res.json();
+      setData(json);
+    } catch (error) {
+      console.error('Error fetching sports responses:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const res = await fetch('/api/admin/responses/sports');
-        const json = await res.json();
-        setData(json);
-      } catch (error) {
-        console.error('Error fetching sports responses:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, []);
+    fetchData(filter);
+  }, [filter]);
+
+  // Reset page when filter changes
+  useEffect(() => {
+    setPage(0);
+    setExpandedSports([]);
+  }, [filter]);
 
   const filtered = useMemo(() => {
     if (!data) return [];
@@ -42,6 +54,12 @@ export default function ResponsesSportsPage() {
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
+  const toggleExpand = (id) => {
+    setExpandedSports(prev =>
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+    );
+  };
 
   const handleExportCSV = async () => {
     setExporting(true);
@@ -96,8 +114,8 @@ export default function ResponsesSportsPage() {
         ))}
       </div>
 
-      {/* Search + Pagination */}
-      <div className="mb-4 flex items-center gap-3">
+      {/* Search + Filter + Pagination */}
+      <div className="mb-4 flex flex-wrap items-center gap-3">
         <input
           type="text"
           placeholder="Search sports..."
@@ -105,6 +123,15 @@ export default function ResponsesSportsPage() {
           onChange={(e) => setSearch(e.target.value)}
           className="px-3 py-2 border border-border rounded-lg w-full max-w-sm text-sm"
         />
+        <select
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          className="px-3 py-2 border border-border rounded-lg text-sm bg-white"
+        >
+          <option value="all">{t('sports.filterAll')}</option>
+          <option value="filled">{t('sports.filterFilled')}</option>
+          <option value="not_filled">{t('sports.filterNotFilled')}</option>
+        </select>
         <div className="flex items-center gap-1 ml-auto">
           <button
             onClick={() => setPage((p) => Math.max(0, p - 1))}
@@ -140,30 +167,102 @@ export default function ResponsesSportsPage() {
           </thead>
           <tbody>
             {paginated.map((sport) => (
-              <tr key={sport.id} className="border-b border-border last:border-0">
-                <td className="p-3">{sport.name}</td>
-                <td className="p-3 text-center">{sport.hasDescription ? tc('yes') : tc('no')}</td>
-                {sport.hasGenderTeams ? (
-                  <>
-                    <td className="p-3 text-center text-xs">
-                      M: {sport.mensHasAchievement ? tc('yes') : tc('no')} / W: {sport.womensHasAchievement ? tc('yes') : tc('no')}
+              <React.Fragment key={sport.id}>
+                <tr
+                  className="border-b border-border cursor-pointer hover:bg-bg-secondary/50"
+                  onClick={() => toggleExpand(sport.id)}
+                >
+                  <td className="p-3">
+                    <span className="mr-2 text-text-muted">{expandedSports.includes(sport.id) ? '▼' : '▶'}</span>
+                    {sport.name}
+                  </td>
+                  <td className="p-3 text-center">{sport.hasDescription ? tc('yes') : tc('no')}</td>
+                  {sport.hasGenderTeams ? (
+                    <>
+                      <td className="p-3 text-center text-xs">
+                        M: {sport.mensHasAchievement ? tc('yes') : tc('no')} / W: {sport.womensHasAchievement ? tc('yes') : tc('no')}
+                      </td>
+                      <td className="p-3 text-center text-xs">
+                        M: {sport.mensImageCount} / W: {sport.womensImageCount}
+                      </td>
+                      <td className="p-3 text-center text-xs">
+                        M: {sport.mensMembers} / W: {sport.womensMembers}
+                      </td>
+                    </>
+                  ) : (
+                    <>
+                      <td className="p-3 text-center">{sport.hasAchievement ? tc('yes') : tc('no')}</td>
+                      <td className="p-3 text-center">{sport.imageCount}</td>
+                      <td className="p-3 text-center">{sport.memberCount}</td>
+                    </>
+                  )}
+                  <td className="p-3 text-center">{sport.coachCount}</td>
+                </tr>
+                {expandedSports.includes(sport.id) && (
+                  <tr className="border-b border-border bg-bg-secondary/30">
+                    <td colSpan={6} className="p-4 pl-10">
+                      <div className="space-y-3">
+                        {/* Email */}
+                        <div>
+                          <span className="text-text-secondary text-sm">{t('sports.email')}: </span>
+                          <span className="text-sm">{sport.email || t('sports.noEmail')}</span>
+                        </div>
+                        {/* Image previews */}
+                        {sport.hasGenderTeams ? (
+                          <>
+                            {sport.mensImageUrls && sport.mensImageUrls.length > 0 && (
+                              <div>
+                                <span className="text-text-secondary text-sm block mb-2">{t('sports.mensImages')}:</span>
+                                <div className="flex gap-2">
+                                  {sport.mensImageUrls.map((url, i) => (
+                                    <img
+                                      key={i}
+                                      src={url}
+                                      alt={`Men's image ${i + 1}`}
+                                      className="w-16 h-16 object-cover rounded border border-border"
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            {sport.womensImageUrls && sport.womensImageUrls.length > 0 && (
+                              <div>
+                                <span className="text-text-secondary text-sm block mb-2">{t('sports.womensImages')}:</span>
+                                <div className="flex gap-2">
+                                  {sport.womensImageUrls.map((url, i) => (
+                                    <img
+                                      key={i}
+                                      src={url}
+                                      alt={`Women's image ${i + 1}`}
+                                      className="w-16 h-16 object-cover rounded border border-border"
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          sport.imageUrls && sport.imageUrls.length > 0 && (
+                            <div>
+                              <span className="text-text-secondary text-sm block mb-2">{t('sports.imagePreview')}:</span>
+                              <div className="flex gap-2">
+                                {sport.imageUrls.map((url, i) => (
+                                  <img
+                                    key={i}
+                                    src={url}
+                                    alt={`Sport image ${i + 1}`}
+                                    className="w-16 h-16 object-cover rounded border border-border"
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          )
+                        )}
+                      </div>
                     </td>
-                    <td className="p-3 text-center text-xs">
-                      M: {sport.mensImageCount} / W: {sport.womensImageCount}
-                    </td>
-                    <td className="p-3 text-center text-xs">
-                      M: {sport.mensMembers} / W: {sport.womensMembers}
-                    </td>
-                  </>
-                ) : (
-                  <>
-                    <td className="p-3 text-center">{sport.hasAchievement ? tc('yes') : tc('no')}</td>
-                    <td className="p-3 text-center">{sport.imageCount}</td>
-                    <td className="p-3 text-center">{sport.memberCount}</td>
-                  </>
+                  </tr>
                 )}
-                <td className="p-3 text-center">{sport.coachCount}</td>
-              </tr>
+              </React.Fragment>
             ))}
             {paginated.length === 0 && (
               <tr><td colSpan={6} className="p-3 text-center text-text-secondary">{tc('noData')}</td></tr>

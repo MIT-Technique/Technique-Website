@@ -73,11 +73,25 @@ export default function PhotoshootsPage() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState(null);
   const [timeAssignments, setTimeAssignments] = useState({});
+  const [photographers, setPhotographers] = useState([]);
 
   useEffect(() => {
     fetchTimes();
     fetchProposals();
+    fetchPhotographers();
   }, [filter]);
+
+  async function fetchPhotographers() {
+    try {
+      const res = await fetch('/api/admin/photographers');
+      if (res.ok) {
+        const data = await res.json();
+        setPhotographers(data.photographers || []);
+      }
+    } catch (error) {
+      console.error('Error fetching photographers:', error);
+    }
+  }
 
   async function fetchTimes() {
     try {
@@ -231,6 +245,19 @@ export default function PhotoshootsPage() {
     if (res.ok) fetchTimes();
   }
 
+  async function handleAssignPhotographer(timeId, photographerId) {
+    const res = await fetch('/api/admin/photoshoot-times', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        timeId,
+        action: 'assign_photographer',
+        photographerId: photographerId || null,
+      }),
+    });
+    if (res.ok) fetchTimes();
+  }
+
   async function handleCalendarDelete(timeId) {
     const res = await fetch('/api/admin/photoshoot-times', {
       method: 'DELETE',
@@ -270,11 +297,13 @@ export default function PhotoshootsPage() {
           proposals={proposals}
           loading={loading}
           timeAssignments={timeAssignments}
+          photographers={photographers}
           onCreate={handleCalendarCreate}
           onDelete={handleCalendarDelete}
           onAcceptProposal={handleAcceptProposal}
           onDeclineProposal={handleDeclineProposal}
           onConfirmLocation={handleConfirmLocation}
+          onAssignPhotographer={handleAssignPhotographer}
         />
       ) : (
         <>

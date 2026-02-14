@@ -43,12 +43,6 @@ function DashboardLayoutInner({ children }) {
 
   const isAdmin = user?.role === 'admin';
 
-  const orgSubTabs = [
-    { id: 'clubs', label: t('tabs.clubs'), href: `/${locale}/dashboard/clubs`, adminOnly: true },
-    { id: 'living-groups', label: t('tabs.livingGroups'), href: `/${locale}/dashboard/living-groups`, adminOnly: false },
-    { id: 'sports', label: t('tabs.sports'), href: `/${locale}/dashboard/sports`, adminOnly: true },
-  ];
-
   const ACCESS_TO_TAB = {
     clubs: { id: 'resp-clubs', label: t('tabs.respClubs'), href: `/${locale}/dashboard/responses/clubs` },
     living_groups: { id: 'resp-living-groups', label: t('tabs.respLivingGroups'), href: `/${locale}/dashboard/responses/living-groups` },
@@ -73,7 +67,6 @@ function DashboardLayoutInner({ children }) {
     { id: 'reset', label: t('tabs.reset'), href: `/${locale}/dashboard/settings/reset` },
   ];
 
-  const isOrgPage = orgSubTabs.some(tab => pathname === tab.href);
   const isResponsesPage = responsesSubTabs.some(tab => pathname === tab.href) || pathname === `/${locale}/dashboard/responses`;
   const isSettingsPage = settingsSubTabs.some(tab => pathname === tab.href);
   const isUsersPage = pathname === `/${locale}/dashboard/users`;
@@ -82,7 +75,6 @@ function DashboardLayoutInner({ children }) {
   const allTabs = [
     { id: 'overview', label: t('tabs.overview'), href: `/${locale}/dashboard`, adminOnly: true },
     { id: 'photoshoots', label: t('tabs.photoshoots'), href: `/${locale}/dashboard/photoshoots`, adminOnly: false },
-    { id: 'organizations', label: t('tabs.organizations'), href: `/${locale}/dashboard/clubs`, adminOnly: true },
     { id: 'responses', label: t('tabs.responses'), href: responsesSubTabs[0]?.href || `/${locale}/dashboard/responses/clubs`, adminOnly: false, requiresAccess: true },
     { id: 'settings', label: t('tabs.settings'), href: `/${locale}/dashboard/users`, adminOnly: true },
   ];
@@ -94,7 +86,6 @@ function DashboardLayoutInner({ children }) {
         if (tab.requiresAccess) return responsesSubTabs.length > 0;
         return true;
       });
-  const visibleOrgSubTabs = isAdmin ? orgSubTabs : orgSubTabs.filter(tab => !tab.adminOnly);
 
   return (
     <main className="min-h-screen pt-24 lg:pt-32 pb-12">
@@ -113,9 +104,7 @@ function DashboardLayoutInner({ children }) {
             <div className="border-b border-border mb-8">
               <nav className="flex gap-8 overflow-x-auto">
                 {tabs.map((tab) => {
-                  const isActive = tab.id === 'organizations'
-                    ? isOrgPage
-                    : tab.id === 'responses'
+                  const isActive = tab.id === 'responses'
                     ? isResponsesPage
                     : tab.id === 'settings'
                     ? isSettingsPage
@@ -138,9 +127,9 @@ function DashboardLayoutInner({ children }) {
             </div>
 
             {/* Sub-tabs */}
-            {(isOrgPage || isResponsesPage || isSettingsPage) && (
+            {(isResponsesPage || isSettingsPage) && (
               <div className="flex items-center gap-4 mb-6 overflow-x-auto">
-                {(isOrgPage ? visibleOrgSubTabs : isResponsesPage ? responsesSubTabs : settingsSubTabs).map((tab) => (
+                {(isResponsesPage ? responsesSubTabs : settingsSubTabs).map((tab) => (
                   <Link
                     key={tab.id}
                     href={tab.href}

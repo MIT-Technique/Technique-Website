@@ -20,6 +20,8 @@ export default function DaySidePanel({
   onCancelBooking,
   onPropose,
   onConfirmLocation,
+  onAssignPhotographer,
+  photographers = [],
   frozen = false,
   formatTime,
   initialStartTime = '',
@@ -40,6 +42,8 @@ export default function DaySidePanel({
   const [proposedLocations, setProposedLocations] = useState(['']);
   // State for admin confirming location on pending bookings
   const [confirmingLocationId, setConfirmingLocationId] = useState(null);
+  // State for assigning photographer
+  const [assigningPhotographerId, setAssigningPhotographerId] = useState(null);
 
   const availableTimes = times.filter((t) => !t.living_group_id && !t.cancelled_at);
   const bookedTimes = times.filter((t) => t.living_group_id && !t.cancelled_at);
@@ -133,6 +137,21 @@ export default function DaySidePanel({
     const lg = getLg(item);
     const user = Array.isArray(lg?.user) ? lg.user[0] : lg?.user;
     return user?.email || null;
+  }
+
+  function getPhotographer(time) {
+    const photographer = time?.photographer;
+    return Array.isArray(photographer) ? photographer[0] : photographer;
+  }
+
+  async function handleAssignPhotographer(timeId, photographerId) {
+    if (!onAssignPhotographer) return;
+    setAssigningPhotographerId(timeId);
+    try {
+      await onAssignPhotographer(timeId, photographerId);
+    } finally {
+      setAssigningPhotographerId(null);
+    }
   }
 
   async function handleCreate(formData) {
@@ -290,6 +309,41 @@ export default function DaySidePanel({
                   {isPending && isLivingGroup && time.proposed_locations?.length > 0 && (
                     <p className="text-xs text-text-muted mt-1">
                       {t('yourLocations')}: {time.proposed_locations.join(', ')}
+                    </p>
+                  )}
+                  {/* Photographer assignment for admin (only for confirmed bookings) */}
+                  {role === 'admin' && isConfirmed && onAssignPhotographer && (
+                    <div className="mt-2 pt-2 border-t border-green-200">
+                      <div className="flex items-center gap-2">
+                        <label className="text-xs font-medium whitespace-nowrap">{t('assignPhotographer')}:</label>
+                        <select
+                          value={getPhotographer(time)?.id || ''}
+                          onChange={(e) => handleAssignPhotographer(time.id, e.target.value || null)}
+                          disabled={assigningPhotographerId === time.id}
+                          className="flex-1 text-xs border border-border rounded px-2 py-1 bg-white disabled:opacity-50"
+                        >
+                          <option value="">{t('unassigned')}</option>
+                          {photographers.map((p) => (
+                            <option key={p.id} value={p.id}>
+                              {p.name || p.email}
+                            </option>
+                          ))}
+                        </select>
+                        {assigningPhotographerId === time.id && (
+                          <span className="text-xs text-text-muted">...</span>
+                        )}
+                      </div>
+                      {getPhotographer(time) && (
+                        <p className="text-xs text-green-700 mt-1">
+                          {t('assignedTo')}: {getPhotographer(time)?.name || getPhotographer(time)?.email}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                  {/* Show assigned photographer for non-admin users */}
+                  {role !== 'admin' && getPhotographer(time) && (
+                    <p className="text-xs text-green-700 mt-1">
+                      {t('photographer')}: {getPhotographer(time)?.name || getPhotographer(time)?.email}
                     </p>
                   )}
                 </div>
