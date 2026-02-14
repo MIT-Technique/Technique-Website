@@ -135,21 +135,16 @@ export async function GET(request: Request) {
 
     let bucketImageCount = 0;
     try {
-      const { data: sportFolders } = await supabase.storage.from('sports-images').list('sports', { limit: 10000 });
-      for (const folder of (sportFolders || []).filter(f => f.id)) {
-        const { data: files } = await supabase.storage.from('sports-images').list(`sports/${folder.name}`, { limit: 10000 });
-        for (const file of (files || [])) {
-          if (file.metadata) {
-            bucketImageCount++;
-          } else {
-            // It's a subfolder (mens/womens)
-            const { data: subFiles } = await supabase.storage.from('sports-images').list(`sports/${folder.name}/${file.name}`, { limit: 10000 });
-            bucketImageCount += (subFiles || []).filter(f => f.name && !f.name.endsWith('/')).length;
-          }
+      (sports || []).forEach(sport => {
+        if (sport.has_gender_teams) {
+          bucketImageCount += [sport.mens_candid_image_1, sport.mens_candid_image_2, sport.mens_candid_image_3,
+            sport.womens_candid_image_1, sport.womens_candid_image_2, sport.womens_candid_image_3].filter(Boolean).length;
+        } else {
+          bucketImageCount += [sport.candid_image_1, sport.candid_image_2, sport.candid_image_3].filter(Boolean).length;
         }
-      }
+      });
     } catch (e) {
-      console.error("Error listing sports images:", e);
+      console.error("Error counting sports images:", e);
     }
 
     return NextResponse.json({

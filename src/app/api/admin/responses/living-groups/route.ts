@@ -102,12 +102,14 @@ export async function GET() {
 
     let bucketImageCount = 0;
     try {
-      for (const prefix of ['dorms', 'fsilgs']) {
-        const { data: files } = await supabase.storage.from('living-group-images').list(prefix, { limit: 10000 });
-        bucketImageCount += (files || []).filter(f => f.name && !f.name.endsWith('/')).length;
-      }
+      const { data: allLGs } = await supabase
+        .from('living_groups')
+        .select('section_images');
+      (allLGs || []).forEach(lg => {
+        bucketImageCount += Object.values(lg.section_images || {}).filter(Boolean).length;
+      });
     } catch (e) {
-      console.error("Error listing LG images:", e);
+      console.error("Error counting LG images:", e);
     }
 
     return NextResponse.json({

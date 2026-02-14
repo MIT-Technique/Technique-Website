@@ -33,17 +33,8 @@ export async function GET() {
 
     const uniqueEvents = Array.from(new Set((candids || []).map(c => c.event_name).filter(Boolean)));
 
-    let candidImageCount = 0;
-    let studentWorkImageCount = 0;
-    try {
-      const { data: cFiles } = await supabase.storage.from('community-candids').list('', { limit: 10000 });
-      candidImageCount = (cFiles || []).filter(f => f.name && !f.name.endsWith('/')).length;
-    } catch (e) { console.error("Error listing candid images:", e); }
-
-    try {
-      const { data: swFiles } = await supabase.storage.from('student-work-images').list('', { limit: 10000 });
-      studentWorkImageCount = (swFiles || []).filter(f => f.name && !f.name.endsWith('/')).length;
-    } catch (e) { console.error("Error listing student work images:", e); }
+    const candidImageCount = (candids || []).reduce((sum, c) => sum + (c.image_urls || []).length, 0);
+    const studentWorkImageCount = (studentWork || []).reduce((sum, sw) => sum + (sw.image_urls || []).length, 0);
 
     return NextResponse.json({
       candids: (candids || []).map(c => ({
