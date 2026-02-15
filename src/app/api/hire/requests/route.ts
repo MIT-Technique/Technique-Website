@@ -16,12 +16,21 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
+    const isStaph = user?.role === "staph";
+
     const supabase = createAdminClient();
-    const { data: requests, error } = await supabase
+    let query = supabase
       .from("hire_requests")
       .select("*")
       .order("status", { ascending: true })
       .order("event_date", { ascending: true });
+
+    // Only admin/staph can see cancelled requests
+    if (!isAdmin && !isStaph) {
+      query = query.neq("status", "cancelled");
+    }
+
+    const { data: requests, error } = await query;
 
     if (error) {
       console.error("Error fetching hire requests:", error);
