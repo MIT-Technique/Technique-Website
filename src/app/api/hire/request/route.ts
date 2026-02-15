@@ -234,7 +234,7 @@ export async function POST(request: Request) {
           </div>
 
           <div style="text-align: center; margin: 28px 0 12px;">
-            <a href="https://technique.mit.edu/en/hire" style="display: inline-block; background: #750014; color: #ffffff; text-decoration: none; padding: 12px 32px; border-radius: 4px; font-weight: 500; font-size: 14px; letter-spacing: 0.5px;">Sign In to Claim</a>
+            <a href="https://technique.mit.edu/en/hire" style="display: inline-block; background: #750014; color: #ffffff; text-decoration: none; padding: 12px 32px; border-radius: 4px; font-weight: 500; font-size: 14px; letter-spacing: 0.5px;">Sign In to Approve</a>
           </div>
 
           <p style="color: #750014; font-size: 14px; font-weight: 500;">— MIT Technique</p>
