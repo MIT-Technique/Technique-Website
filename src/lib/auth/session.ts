@@ -9,6 +9,7 @@ export interface SessionData {
   code_verifier?: string;
   state?: string;
   userId?: string;
+  photographerEmail?: string;
   userInfo?: {
     sub: string;
     name: string;
@@ -23,6 +24,7 @@ export const defaultSession: SessionData = {
   code_verifier: undefined,
   state: undefined,
   userId: undefined,
+  photographerEmail: undefined,
   userInfo: undefined,
 };
 
@@ -96,6 +98,7 @@ export async function clearSession(): Promise<void> {
   session.code_verifier = undefined;
   session.state = undefined;
   session.userId = undefined;
+  session.photographerEmail = undefined;
   session.userInfo = undefined;
   await session.save();
 }
