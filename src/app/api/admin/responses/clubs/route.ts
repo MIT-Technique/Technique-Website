@@ -118,10 +118,14 @@ export async function GET(request: Request) {
       };
 
       try {
-        const { data: files } = await supabase.storage.from('club-images').list('clubs', { limit: 10000 });
-        bucketImageCount = (files || []).filter(f => f.name && !f.name.endsWith('/')).length;
+        const { data: allClubs } = await supabase
+          .from('clubs')
+          .select('candid_image_1, candid_image_2, candid_image_3');
+        bucketImageCount = (allClubs || []).reduce((sum, c) => {
+          return sum + (c.candid_image_1 ? 1 : 0) + (c.candid_image_2 ? 1 : 0) + (c.candid_image_3 ? 1 : 0);
+        }, 0);
       } catch (e) {
-        console.error("Error listing club images:", e);
+        console.error("Error counting club images:", e);
       }
     }
 

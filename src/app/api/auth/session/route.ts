@@ -17,6 +17,7 @@ export async function GET() {
       return NextResponse.json({
         isLoggedIn: false,
         user: null,
+        ...(session.photographerEmail ? { photographerEmail: session.photographerEmail } : {}),
       }, { headers: noCacheHeaders });
     }
 
@@ -77,14 +78,20 @@ export async function GET() {
 
     const frozenForms = formSettings || [];
 
-    return NextResponse.json({
+    const responseData: Record<string, unknown> = {
       isLoggedIn: true,
       user,
       club,
       livingGroup,
       sports,
       frozenForms,
-    }, { headers: noCacheHeaders });
+    };
+
+    if (session.photographerEmail) {
+      responseData.photographerEmail = session.photographerEmail;
+    }
+
+    return NextResponse.json(responseData, { headers: noCacheHeaders });
   } catch (error) {
     console.error('Session error:', error);
     return NextResponse.json(

@@ -51,6 +51,14 @@ export default function UsersPage() {
   const [creatingStaph, setCreatingStaph] = useState(false);
   const [createdPassword, setCreatedPassword] = useState(null);
 
+  // Photographer management state
+  const [showAddPhotographer, setShowAddPhotographer] = useState(false);
+  const [newPhotographerEmail, setNewPhotographerEmail] = useState('');
+  const [newPhotographerName, setNewPhotographerName] = useState('');
+  const [addingPhotographer, setAddingPhotographer] = useState(false);
+  const [photographerAdded, setPhotographerAdded] = useState(false);
+  const [authorizedPhotographers, setAuthorizedPhotographers] = useState([]);
+
   useEffect(() => {
     fetchUsers();
   }, [search, roleFilter]);
@@ -234,6 +242,78 @@ export default function UsersPage() {
     setCreatedPassword(null);
   }
 
+  // Photographer management
+  useEffect(() => {
+    if (userTypeFilter === 'individual') {
+      fetchPhotographers();
+    }
+  }, [userTypeFilter]);
+
+  async function fetchPhotographers() {
+    try {
+      const res = await fetch('/api/admin/photographers');
+      const data = await res.json();
+      setAuthorizedPhotographers(data.authorizedPhotographers || []);
+    } catch (error) {
+      console.error('Error fetching photographers:', error);
+    }
+  }
+
+  async function handleAddPhotographer() {
+    if (!newPhotographerEmail.trim()) return;
+    setAddingPhotographer(true);
+    setPhotographerAdded(false);
+    try {
+      const email = newPhotographerEmail.trim();
+      const normalizedEmail = email.includes('@') ? email : `${email}@mit.edu`;
+      const res = await fetch('/api/admin/photographers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: normalizedEmail,
+          name: newPhotographerName.trim() || undefined,
+        }),
+      });
+      if (res.ok) {
+        setPhotographerAdded(true);
+        setNewPhotographerEmail('');
+        setNewPhotographerName('');
+        fetchPhotographers();
+        setTimeout(() => setPhotographerAdded(false), 4000);
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Failed to add photographer');
+      }
+    } catch (error) {
+      console.error('Error adding photographer:', error);
+    } finally {
+      setAddingPhotographer(false);
+    }
+  }
+
+  async function handleRemovePhotographer(id) {
+    if (!confirm('Remove this photographer?')) return;
+    try {
+      const res = await fetch('/api/admin/photographers', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      });
+      if (res.ok) {
+        fetchPhotographers();
+      }
+    } catch (error) {
+      console.error('Error removing photographer:', error);
+    }
+  }
+
+  function resetAddPhotographer() {
+    setShowAddPhotographer(false);
+    setNewPhotographerEmail('');
+    setNewPhotographerName('');
+    setPhotographerAdded(false);
+  }
+
   const ORG_ROLES = ['club', 'living_group', 'sports'];
   const filteredUsers = userTypeFilter === 'individual'
     ? users.filter(u => !ORG_ROLES.includes(u.role))
@@ -408,17 +488,28 @@ export default function UsersPage() {
         </div>
       )}
 
-      {/* Create Staph Section - only on Individual tab */}
-      {userTypeFilter === 'individual' && (
+      {/* Create Staph + Photographer Section - only on Individual tab */}
+      {userTypeFilter === 'individual' && (<>
         <div className="mt-8 border-t border-border pt-6">
-          {!showCreateStaph ? (
-            <button
-              onClick={() => setShowCreateStaph(true)}
-              className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 text-sm"
-            >
-              {t('createStaph')}
-            </button>
-          ) : (
+          <div className="flex gap-3 mb-4">
+            {!showCreateStaph && (
+              <button
+                onClick={() => { setShowCreateStaph(true); setShowAddPhotographer(false); }}
+                className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 text-sm"
+              >
+                {t('createStaph')}
+              </button>
+            )}
+            {!showAddPhotographer && (
+              <button
+                onClick={() => { setShowAddPhotographer(true); setShowCreateStaph(false); resetCreateStaph(); }}
+                className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 text-sm"
+              >
+                {t('addPhotographer')}
+              </button>
+            )}
+          </div>
+          {showCreateStaph && (
             <div className="max-w-md space-y-4">
               <h3 className="text-sm font-medium">{t('createStaph')}</h3>
               <div>
@@ -509,8 +600,83 @@ export default function UsersPage() {
               </div>
             </div>
           )}
+          {showAddPhotographer && (
+            <div className="max-w-md space-y-4">
+              <h3 className="text-sm font-medium">{t('addPhotographer')}</h3>
+              <div>
+                <label className="block text-xs text-text-secondary mb-1">{t('photographerEmail')}</label>
+                <div className="flex items-center gap-1">
+                  <input
+                    type="text"
+                    value={newPhotographerEmail}
+                    onChange={(e) => setNewPhotographerEmail(e.target.value)}
+                    placeholder="kerb"
+                    className="border border-border rounded px-3 py-2 text-sm flex-1"
+                  />
+                  <span className="text-sm text-text-muted">@mit.edu</span>
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs text-text-secondary mb-1">{t('photographerName')}</label>
+                <input
+                  type="text"
+                  value={newPhotographerName}
+                  onChange={(e) => setNewPhotographerName(e.target.value)}
+                  placeholder="Full Name"
+                  className="border border-border rounded px-3 py-2 text-sm w-full"
+                />
+              </div>
+
+              {photographerAdded && (
+                <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <p className="text-xs text-green-800 font-medium">{t('photographerAdded')}</p>
+                </div>
+              )}
+
+              <div className="flex gap-2">
+                <button
+                  onClick={handleAddPhotographer}
+                  disabled={addingPhotographer || !newPhotographerEmail.trim()}
+                  className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 disabled:opacity-50 text-sm"
+                >
+                  {addingPhotographer ? '...' : t('addPhotographerSubmit')}
+                </button>
+                <button
+                  onClick={resetAddPhotographer}
+                  className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 text-sm"
+                >
+                  {t('cancel')}
+                </button>
+              </div>
+            </div>
+          )}
+          {/* List of authorized photographers */}
+          {authorizedPhotographers.length > 0 && (
+            <div className="mt-4">
+              <h4 className="text-sm font-medium mb-2">{t('authorizedPhotographers')}</h4>
+              <div className="space-y-2">
+                {authorizedPhotographers.map((p) => (
+                  <div key={p.id} className="flex items-center justify-between p-2 border border-border/50 rounded text-sm">
+                    <div>
+                      <span>{p.email}</span>
+                      {p.name && <span className="text-text-muted ml-2">({p.name})</span>}
+                    </div>
+                    <button
+                      onClick={() => handleRemovePhotographer(p.id)}
+                      className="text-xs px-2 py-1 text-red-600 hover:bg-red-50 rounded"
+                    >
+                      {t('removePhotographer')}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {authorizedPhotographers.length === 0 && showAddPhotographer && (
+            <p className="mt-4 text-sm text-text-muted">{t('noPhotographers')}</p>
+          )}
         </div>
-      )}
+      </>)}
     </div>
   );
 }

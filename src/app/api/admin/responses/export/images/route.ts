@@ -5,22 +5,22 @@ import { createAdminClient } from "../../../../../../lib/supabase/admin";
 const ALLOWED_BUCKETS = ['club-images', 'living-group-images', 'sports-images', 'community-candids', 'student-work-images', 'senior-photos'];
 
 async function listAllFiles(supabase: ReturnType<typeof createAdminClient>, bucket: string, prefix: string = ''): Promise<string[]> {
-  const paths: string[] = [];
   const { data: items } = await supabase.storage.from(bucket).list(prefix, { limit: 10000 });
+
+  const files: string[] = [];
+  const folderPromises: Promise<string[]>[] = [];
 
   for (const item of (items || [])) {
     const fullPath = prefix ? `${prefix}/${item.name}` : item.name;
     if (item.metadata) {
-      // It's a file
-      paths.push(fullPath);
+      files.push(fullPath);
     } else {
-      // It's a folder, recurse
-      const subPaths = await listAllFiles(supabase, bucket, fullPath);
-      paths.push(...subPaths);
+      folderPromises.push(listAllFiles(supabase, bucket, fullPath));
     }
   }
 
-  return paths;
+  const nestedFiles = await Promise.all(folderPromises);
+  return files.concat(...nestedFiles);
 }
 
 export async function GET(request: NextRequest) {
@@ -38,13 +38,13 @@ export async function GET(request: NextRequest) {
     const supabase = createAdminClient();
     const filePaths = await listAllFiles(supabase, bucket);
 
-    // Generate signed URLs (1 hour expiry)
-    const signedUrls: { path: string; url: string }[] = [];
-    for (const path of filePaths) {
-      const { data } = await supabase.storage.from(bucket).createSignedUrl(path, 3600);
-      if (data?.signedUrl) {
-        signedUrls.push({ path, url: data.signedUrl });
-      }
+    // Generate signed URLs in batch (1 hour expiry)
+    let signedUrls: { path: string; url: string }[] = [];
+    if (filePaths.length > 0) {
+      const { data } = await supabase.storage.from(bucket).createSignedUrls(filePaths, 3600);
+      signedUrls = (data || [])
+        .filter(item => item.signedUrl)
+        .map(item => ({ path: item.path!, url: item.signedUrl }));
     }
 
     return NextResponse.json({ files: signedUrls });
