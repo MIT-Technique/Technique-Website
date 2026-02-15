@@ -206,38 +206,51 @@ export async function POST(request: Request) {
       const timeRange = `${formatTime(startTime)} – ${formatTime(endTime)}`;
 
       const noticeHtml = `
-        <div style="font-family: Raleway, Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #FFFCFC; border-top: 4px solid #750014; padding: 32px; color: #1A1A1A; font-weight: 300;">
-          <h2 style="color: #750014; font-weight: 600;">New Photography Hire Request</h2>
-          <p>A new event photography request has been submitted and is awaiting a photographer.</p>
-
-          <div style="background: #FFF0F0; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h3 style="margin-top: 0; color: #750014; font-weight: 500;">Requester</h3>
-            <p><strong>Name:</strong> ${requesterName}</p>
-            <p><strong>Email:</strong> <a href="mailto:${requesterEmail}" style="color: #750014;">${requesterEmail}</a></p>
+        <div style="font-family: Raleway, Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #F9F5F5; color: #1A1A1A; font-weight: 300;">
+          <div style="background: #750014; padding: 32px 32px 28px; text-align: center;">
+            <h1 style="color: #ffffff; font-weight: 700; font-size: 22px; margin: 0 0 6px; letter-spacing: 0.5px;">MIT TECHNIQUE</h1>
+            <p style="color: rgba(255,255,255,0.8); font-size: 13px; margin: 0; font-weight: 400; letter-spacing: 0.3px;">New Photography Request</p>
           </div>
 
-          <div style="background: #FFF0F0; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h3 style="margin-top: 0; color: #750014; font-weight: 500;">Event Details</h3>
-            <p><strong>Event:</strong> ${eventName}</p>
-            <p><strong>Type:</strong> ${eventType}</p>
-            <p><strong>Date:</strong> ${eventDateStr}</p>
-            <p><strong>Time:</strong> ${timeRange}</p>
-            ${location ? `<p><strong>Location:</strong> ${location}</p>` : ""}
-            ${description ? `<p><strong>Description:</strong> ${description}</p>` : ""}
-          </div>
+          <div style="padding: 28px 32px 32px;">
+            <p style="margin: 0 0 24px; line-height: 1.6; font-size: 15px;">A new event photography request has been submitted and is awaiting a photographer.</p>
 
-          <div style="background: #FFF0F0; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h3 style="margin-top: 0; color: #750014; font-weight: 500;">Cost</h3>
-            <p><strong>Rate:</strong> $${hourlyRate}/hr</p>
-            <p><strong>Duration:</strong> ${durationHours} hour${durationHours === 1 ? "" : "s"}</p>
-            <p><strong>Total:</strong> $${totalCost}</p>
-          </div>
+            <div style="background: #ffffff; border-left: 3px solid #750014; border-radius: 4px; padding: 20px 24px; margin: 0 0 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
+              <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px; color: #750014; margin: 0 0 12px; font-weight: 600;">Requester Info</p>
+              <p style="margin: 0 0 6px; font-size: 15px; line-height: 1.5;">${requesterName}</p>
+              <p style="margin: 0; font-size: 15px; line-height: 1.5;"><a href="mailto:${requesterEmail}" style="color: #750014; text-decoration: none;">${requesterEmail}</a></p>
+            </div>
 
-          <div style="text-align: center; margin: 28px 0 12px;">
-            <a href="https://technique.mit.edu/en/hire" style="display: inline-block; background: #750014; color: #ffffff; text-decoration: none; padding: 12px 32px; border-radius: 4px; font-weight: 500; font-size: 14px; letter-spacing: 0.5px;">Sign In to Approve</a>
-          </div>
+            <div style="background: #ffffff; border-left: 3px solid #750014; border-radius: 4px; padding: 20px 24px; margin: 0 0 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
+              <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px; color: #750014; margin: 0 0 12px; font-weight: 600;">Event Details</p>
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr><td style="padding: 4px 0; font-size: 13px; color: #888; width: 90px; vertical-align: top;">Event</td><td style="padding: 4px 0; font-size: 15px;">${eventName}</td></tr>
+                <tr><td style="padding: 4px 0; font-size: 13px; color: #888; vertical-align: top;">Type</td><td style="padding: 4px 0; font-size: 15px; text-transform: capitalize;">${eventType}</td></tr>
+                <tr><td style="padding: 4px 0; font-size: 13px; color: #888; vertical-align: top;">Date</td><td style="padding: 4px 0; font-size: 15px;">${eventDateStr}</td></tr>
+                <tr><td style="padding: 4px 0; font-size: 13px; color: #888; vertical-align: top;">Time</td><td style="padding: 4px 0; font-size: 15px;">${timeRange}</td></tr>
+                ${location ? `<tr><td style="padding: 4px 0; font-size: 13px; color: #888; vertical-align: top;">Location</td><td style="padding: 4px 0; font-size: 15px;">${location}</td></tr>` : ""}
+                ${description ? `<tr><td style="padding: 4px 0; font-size: 13px; color: #888; vertical-align: top;">Details</td><td style="padding: 4px 0; font-size: 15px;">${description}</td></tr>` : ""}
+              </table>
+            </div>
 
-          <p style="color: #750014; font-size: 14px; font-weight: 500;">— MIT Technique</p>
+            <div style="background: #ffffff; border-left: 3px solid #750014; border-radius: 4px; padding: 20px 24px; margin: 0 0 28px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
+              <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px; color: #750014; margin: 0 0 12px; font-weight: 600;">Pricing</p>
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr><td style="padding: 4px 0; font-size: 13px; color: #888; width: 90px;">Rate</td><td style="padding: 4px 0; font-size: 15px;">$${hourlyRate}/hr</td></tr>
+                <tr><td style="padding: 4px 0; font-size: 13px; color: #888;">Duration</td><td style="padding: 4px 0; font-size: 15px;">${durationHours} hour${durationHours === 1 ? "" : "s"}</td></tr>
+                <tr><td style="padding: 4px 0; font-size: 13px; color: #888;">Total</td><td style="padding: 4px 0; font-size: 15px; font-weight: 600;">$${totalCost}</td></tr>
+              </table>
+            </div>
+
+            <div style="text-align: center; margin: 0 0 28px;">
+              <a href="https://technique.mit.edu/en/hire" style="display: inline-block; background: #750014; color: #ffffff; text-decoration: none; padding: 14px 40px; border-radius: 24px; font-weight: 600; font-size: 14px; letter-spacing: 0.5px;">View &amp; Assign Photographer</a>
+            </div>
+
+            <div style="border-top: 1px solid #E0D6D6; padding-top: 20px; text-align: center;">
+              <p style="color: #999; font-size: 12px; margin: 0 0 4px;">MIT Technique &middot; Walker Memorial, Room 50-320</p>
+              <p style="color: #999; font-size: 12px; margin: 0;"><a href="mailto:technique@mit.edu" style="color: #999; text-decoration: none;">technique@mit.edu</a></p>
+            </div>
+          </div>
         </div>
       `;
 
