@@ -1,6 +1,15 @@
 import { NextResponse } from "next/server";
+import nodemailer from "nodemailer";
 import { createAdminClient } from "../../../../lib/supabase/admin";
 import crypto from "crypto";
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "mittnq@gmail.com",
+    pass: process.env.GOOGLE_PASSWORD,
+  },
+});
 
 export const dynamic = "force-dynamic";
 
@@ -174,6 +183,72 @@ export async function POST(request: Request) {
     if (insertError) {
       console.error("Error creating hire request:", insertError);
       return NextResponse.json({ error: "Failed to create request" }, { status: 500 });
+    }
+
+    // Send notice email to Technique (non-blocking)
+    try {
+      const eventDateStr = new Date(eventDate + "T00:00:00").toLocaleDateString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        timeZone: "America/New_York",
+      });
+
+      const formatTime = (time: string) => {
+        const [h, m] = time.split(":");
+        const hour = parseInt(h);
+        const ampm = hour >= 12 ? "PM" : "AM";
+        const hour12 = hour % 12 || 12;
+        return `${hour12}:${m} ${ampm} EST`;
+      };
+
+      const timeRange = `${formatTime(startTime)} – ${formatTime(endTime)}`;
+
+      const noticeHtml = `
+        <div style="font-family: Raleway, Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #FFFCFC; border-top: 4px solid #750014; padding: 32px; color: #1A1A1A; font-weight: 300;">
+          <h2 style="color: #750014; font-weight: 600;">New Photography Hire Request</h2>
+          <p>A new event photography request has been submitted and is awaiting a photographer.</p>
+
+          <div style="background: #FFF0F0; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="margin-top: 0; color: #750014; font-weight: 500;">Requester</h3>
+            <p><strong>Name:</strong> ${requesterName}</p>
+            <p><strong>Email:</strong> <a href="mailto:${requesterEmail}" style="color: #750014;">${requesterEmail}</a></p>
+          </div>
+
+          <div style="background: #FFF0F0; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="margin-top: 0; color: #750014; font-weight: 500;">Event Details</h3>
+            <p><strong>Event:</strong> ${eventName}</p>
+            <p><strong>Type:</strong> ${eventType}</p>
+            <p><strong>Date:</strong> ${eventDateStr}</p>
+            <p><strong>Time:</strong> ${timeRange}</p>
+            ${location ? `<p><strong>Location:</strong> ${location}</p>` : ""}
+            ${description ? `<p><strong>Description:</strong> ${description}</p>` : ""}
+          </div>
+
+          <div style="background: #FFF0F0; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="margin-top: 0; color: #750014; font-weight: 500;">Cost</h3>
+            <p><strong>Rate:</strong> $${hourlyRate}/hr</p>
+            <p><strong>Duration:</strong> ${durationHours} hour${durationHours === 1 ? "" : "s"}</p>
+            <p><strong>Total:</strong> $${totalCost}</p>
+          </div>
+
+          <div style="text-align: center; margin: 28px 0 12px;">
+            <a href="https://technique.mit.edu/en/hire" style="display: inline-block; background: #750014; color: #ffffff; text-decoration: none; padding: 12px 32px; border-radius: 4px; font-weight: 500; font-size: 14px; letter-spacing: 0.5px;">Sign In to Approve</a>
+          </div>
+
+          <p style="color: #750014; font-size: 14px; font-weight: 500;">— MIT Technique</p>
+        </div>
+      `;
+
+      await transporter.sendMail({
+        from: "mittnq@gmail.com",
+        to: "technique@mit.edu",
+        subject: `New Hire Request: ${eventName}`,
+        html: noticeHtml,
+      });
+    } catch (emailError) {
+      console.error("Failed to send hire notice email:", emailError);
     }
 
     return NextResponse.json({

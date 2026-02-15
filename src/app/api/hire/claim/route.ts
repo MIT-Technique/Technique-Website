@@ -92,9 +92,9 @@ export async function POST(request: Request) {
 
       const htmlContent = `
         <div style="font-family: Raleway, Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #FFFCFC; border-top: 4px solid #750014; padding: 32px; color: #1A1A1A; font-weight: 300;">
-          <h2 style="color: #750014; font-weight: 600;">Your Photography Request Has Been Claimed!</h2>
+          <h2 style="color: #750014; font-weight: 600;">Your Photography Request Has Been Approved!</h2>
           <p>Hi ${existing.requester_name || "there"},</p>
-          <p>Great news — a photographer has claimed your event photography request. Here are the details:</p>
+          <p>Great news — a photographer has approved your event photography request. Here are the details:</p>
 
           <div style="background: #FFF0F0; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h3 style="margin-top: 0; color: #750014; font-weight: 500;">Event Details</h3>
@@ -133,7 +133,7 @@ export async function POST(request: Request) {
       await transporter.sendMail({
         from: "mittnq@gmail.com",
         to: existing.requester_email,
-        subject: `Photography Request Claimed - ${existing.event_name}`,
+        subject: `Photography Request Approved - ${existing.event_name}`,
         html: htmlContent,
       });
     } catch (emailError) {
