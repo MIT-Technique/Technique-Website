@@ -97,6 +97,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "End time must be after start time" }, { status: 400 });
     }
 
+    // Reject past dates/times
+    const now = new Date();
+    const eventStart = new Date(`${eventDate}T${startTime}`);
+    if (eventStart < now) {
+      return NextResponse.json({ error: "Event date and time must be in the future" }, { status: 400 });
+    }
+
     const durationHours = Math.round(((endMinutes - startMinutes) / 60) * 100) / 100;
     const totalCost = Math.round(hourlyRate * durationHours * 100) / 100;
 
@@ -179,5 +186,49 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("Error processing hire request:", error);
     return NextResponse.json({ error: "Failed to process request" }, { status: 500 });
+  }
+}
+
+// DELETE - Cancel a hire request by confirmation code + email
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const code = searchParams.get("code");
+    const email = searchParams.get("email");
+
+    if (!code || !email) {
+      return NextResponse.json({ error: "Code and email are required" }, { status: 400 });
+    }
+
+    const supabase = createAdminClient();
+    const { data, error: findError } = await supabase
+      .from("hire_requests")
+      .select("id, status")
+      .eq("confirmation_code", code.toUpperCase())
+      .eq("requester_email", email.trim().toLowerCase())
+      .single();
+
+    if (findError || !data) {
+      return NextResponse.json({ error: "Request not found" }, { status: 404 });
+    }
+
+    if (data.status === "claimed") {
+      return NextResponse.json({ error: "Cannot cancel a claimed request" }, { status: 400 });
+    }
+
+    const { error: updateError } = await supabase
+      .from("hire_requests")
+      .update({ status: "cancelled", updated_at: new Date().toISOString() })
+      .eq("id", data.id);
+
+    if (updateError) {
+      console.error("Error cancelling hire request:", updateError);
+      return NextResponse.json({ error: "Failed to cancel request" }, { status: 500 });
+    }
+
+    return NextResponse.json({ cancelled: true });
+  } catch (error) {
+    console.error("Error cancelling hire request:", error);
+    return NextResponse.json({ error: "Failed to cancel request" }, { status: 500 });
   }
 }

@@ -182,7 +182,10 @@
         "copied": "已复制！",
         "rateBreakdown": "{rate}/小时 x {hours} 小时 = ${total}",
         "saveCode": "保存此码以便日后更新您的请求。",
-        "submitAnother": "提交另一个请求"
+        "submitAnother": "提交另一个请求",
+        "edit": "编辑请求",
+        "cancel": "取消请求",
+        "cancelling": "取消中..."
       },
       "photographer": {
         "signIn": "摄影师？在此登录",

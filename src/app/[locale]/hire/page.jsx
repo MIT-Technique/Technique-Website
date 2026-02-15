@@ -121,6 +121,7 @@ function HireRequestForm({ t }) {
   const [copied, setCopied] = useState(false);
   const [lookingUp, setLookingUp] = useState(false);
   const [lookupDone, setLookupDone] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
 
   const [form, setForm] = useState({
     requesterName: "",
@@ -265,6 +266,56 @@ function HireRequestForm({ t }) {
     });
   }
 
+  async function handleCancel() {
+    if (!confirmation?.confirmationCode) return;
+    setCancelling(true);
+    setError("");
+    try {
+      const params = new URLSearchParams({
+        code: confirmation.confirmationCode,
+        email: confirmation.requesterEmail || form.requesterEmail,
+      });
+      const res = await fetch(`/api/hire/request?${params}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Failed to cancel request");
+        setCancelling(false);
+        return;
+      }
+      resetForm();
+    } catch (err) {
+      setError("Failed to cancel request");
+      setCancelling(false);
+    }
+  }
+
+  function handleEdit() {
+    if (!confirmation?.confirmationCode) return;
+    const code = confirmation.confirmationCode;
+    const email = confirmation.requesterEmail || form.requesterEmail;
+    setConfirmation(null);
+    setCopied(false);
+    setIsUpdateMode(true);
+    setForm((prev) => ({
+      ...prev,
+      confirmationCode: code,
+      requesterEmail: email,
+    }));
+    setLookupDone(false);
+  }
+
+  // Today's date in YYYY-MM-DD for min attribute
+  const today = new Date().toLocaleDateString("en-CA"); // en-CA gives YYYY-MM-DD
+
+  // If the selected date is today, compute minimum start time (current time rounded up to next 5 min)
+  const minStartTime = (() => {
+    if (form.eventDate !== today) return undefined;
+    const now = new Date();
+    const m = Math.ceil(now.getMinutes() / 5) * 5;
+    const h = now.getHours() + Math.floor(m / 60);
+    return `${String(h).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
+  })();
+
   const inputClass = "w-full bg-transparent border-b border-border-dark/40 px-0 py-2.5 text-sm text-text-primary placeholder:text-text-muted/60 outline-none transition-colors duration-200 focus:border-accent";
   const labelClass = "block text-[11px] uppercase tracking-widest text-text-muted mb-1.5";
   const selectClass = "w-full bg-transparent border-b border-border-dark/40 pr-5 py-2.5 text-sm text-text-primary outline-none transition-colors duration-200 focus:border-accent appearance-none cursor-pointer bg-[length:10px] bg-[right_0_center] bg-no-repeat bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%20-1%2010%206%22%3E%3Cpath%20d%3D%22M0%200l5%204%205-4%22%20fill%3D%22none%22%20stroke%3D%22%23999%22%20stroke-width%3D%221.2%22%2F%3E%3C%2Fsvg%3E')]";
@@ -301,11 +352,30 @@ function HireRequestForm({ t }) {
           })}
         </p>
 
-        <p className="text-xs text-text-muted font-light mb-10">{t("confirmation.saveCode")}</p>
+        <p className="text-xs text-text-muted font-light mb-8">{t("confirmation.saveCode")}</p>
+
+        {error && <p className="text-xs text-red-700 mb-4">{error}</p>}
 
         <button onClick={resetForm} className="btn-primary">
           {t("confirmation.submitAnother")}
         </button>
+
+        <div className="flex items-center justify-center gap-4 mt-4">
+          <button
+            onClick={handleEdit}
+            className="text-[11px] uppercase tracking-widest text-text-muted hover:text-accent transition-colors"
+          >
+            {t("confirmation.edit")}
+          </button>
+          <span className="text-border">·</span>
+          <button
+            onClick={handleCancel}
+            disabled={cancelling}
+            className="text-[11px] uppercase tracking-widest text-text-muted hover:text-red-600 disabled:opacity-50 transition-colors"
+          >
+            {cancelling ? t("confirmation.cancelling") : t("confirmation.cancel")}
+          </button>
+        </div>
       </div>
     );
   }
@@ -436,6 +506,7 @@ function HireRequestForm({ t }) {
                 type="date"
                 value={form.eventDate}
                 onChange={(e) => updateField("eventDate", e.target.value)}
+                min={today}
                 className={inputClass}
                 required
               />
@@ -446,6 +517,7 @@ function HireRequestForm({ t }) {
                 type="time"
                 value={form.startTime}
                 onChange={(e) => updateField("startTime", e.target.value)}
+                min={minStartTime}
                 className={inputClass}
                 required
               />
@@ -708,7 +780,62 @@ function PhotographerPanel({ t, photographerEmail, onSignOut }) {
     );
   }
 
-  const sectionHeading = "text-[11px] uppercase tracking-widest text-text-muted mb-3";
+  const PAGE_SIZE = 2;
+  const [pendingPage, setPendingPage] = useState(0);
+  const [claimedPage, setClaimedPage] = useState(0);
+  const [otherPage, setOtherPage] = useState(0);
+
+  // Reset pages when requests change
+  useEffect(() => {
+    setPendingPage(0);
+    setClaimedPage(0);
+    setOtherPage(0);
+  }, [requests]);
+
+  function PaginatedSection({ title, items, emptyText, page, setPage, showClaim }) {
+    const totalPages = Math.ceil(items.length / PAGE_SIZE);
+    const paged = items.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
+    return (
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-[11px] uppercase tracking-widest text-text-muted">{title}</h3>
+          {totalPages > 1 && (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setPage((p) => Math.max(0, p - 1))}
+                disabled={page === 0}
+                className="text-text-muted hover:text-text-primary disabled:opacity-25 transition-colors"
+                aria-label="Previous page"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+              </button>
+              <span className="text-[10px] tabular-nums text-text-muted">
+                {page + 1}/{totalPages}
+              </span>
+              <button
+                onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                disabled={page >= totalPages - 1}
+                className="text-text-muted hover:text-text-primary disabled:opacity-25 transition-colors"
+                aria-label="Next page"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+            </div>
+          )}
+        </div>
+        {items.length === 0 ? (
+          <p className="text-[12px] text-text-muted/60 italic">{emptyText}</p>
+        ) : (
+          <div className="space-y-3">
+            {paged.map((r) => (
+              <RequestCard key={r.id} request={r} showClaim={showClaim} />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -726,40 +853,31 @@ function PhotographerPanel({ t, photographerEmail, onSignOut }) {
         <p className="text-[12px] text-text-muted">Loading...</p>
       ) : (
         <>
-          {/* Pending Requests */}
-          <h3 className={sectionHeading}>{t("photographer.pendingRequests")}</h3>
-          {pendingRequests.length === 0 ? (
-            <p className="text-[12px] text-text-muted/60 mb-8 italic">{t("photographer.noRequests")}</p>
-          ) : (
-            <div className="space-y-3 mb-8">
-              {pendingRequests.map((r) => (
-                <RequestCard key={r.id} request={r} showClaim />
-              ))}
-            </div>
-          )}
-
-          {/* My Claimed Events */}
-          <h3 className={sectionHeading}>{t("photographer.myClaimedEvents")}</h3>
-          {myClaimedRequests.length === 0 ? (
-            <p className="text-[12px] text-text-muted/60 mb-8 italic">{t("photographer.noClaimed")}</p>
-          ) : (
-            <div className="space-y-3 mb-8">
-              {myClaimedRequests.map((r) => (
-                <RequestCard key={r.id} request={r} showClaim={false} />
-              ))}
-            </div>
-          )}
-
-          {/* Other requests */}
+          <PaginatedSection
+            title={t("photographer.pendingRequests")}
+            items={pendingRequests}
+            emptyText={t("photographer.noRequests")}
+            page={pendingPage}
+            setPage={setPendingPage}
+            showClaim
+          />
+          <PaginatedSection
+            title={t("photographer.myClaimedEvents")}
+            items={myClaimedRequests}
+            emptyText={t("photographer.noClaimed")}
+            page={claimedPage}
+            setPage={setClaimedPage}
+            showClaim={false}
+          />
           {otherRequests.length > 0 && (
-            <>
-              <h3 className={sectionHeading}>{t("photographer.allRequests")}</h3>
-              <div className="space-y-3">
-                {otherRequests.map((r) => (
-                  <RequestCard key={r.id} request={r} showClaim={false} />
-                ))}
-              </div>
-            </>
+            <PaginatedSection
+              title={t("photographer.allRequests")}
+              items={otherRequests}
+              emptyText=""
+              page={otherPage}
+              setPage={setOtherPage}
+              showClaim={false}
+            />
           )}
         </>
       )}

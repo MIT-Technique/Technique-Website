@@ -182,7 +182,10 @@
         "copied": "¡Copiado!",
         "rateBreakdown": "{rate}/hr x {hours} hrs = ${total}",
         "saveCode": "Guarda este código para actualizar tu solicitud más tarde.",
-        "submitAnother": "Enviar Otra Solicitud"
+        "submitAnother": "Enviar Otra Solicitud",
+        "edit": "Editar Solicitud",
+        "cancel": "Cancelar Solicitud",
+        "cancelling": "Cancelando..."
       },
       "photographer": {
         "signIn": "¿Fotógrafo? Inicia sesión aquí",
