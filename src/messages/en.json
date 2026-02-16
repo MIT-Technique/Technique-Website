@@ -847,7 +847,10 @@
       "respLivingGroups": "Living Groups",
       "respSports": "Sports",
       "respActivities": "Activities",
-      "respSeniors": "Seniors"
+      "respSeniors": "Seniors",
+      "inquiries": "Inquiries",
+      "inqHireRequests": "Hire Requests",
+      "inqYearbookRequests": "Yearbook Requests"
     },
     "stats": {
       "clubs": "Clubs",
@@ -1244,6 +1247,53 @@
         "achievements": "Achievements",
         "exportBios": "Export Senior Bios CSV",
         "exportImages": "Export Images"
+      }
+    },
+    "inquiries": {
+      "hireRequests": {
+        "title": "Hire Requests",
+        "eventName": "Event",
+        "requester": "Requester",
+        "date": "Date",
+        "time": "Time",
+        "status": "Status",
+        "cost": "Cost",
+        "location": "Location",
+        "description": "Description",
+        "claimedBy": "Claimed By",
+        "confirmationCode": "Code",
+        "type": "Type",
+        "noRequests": "No hire requests found",
+        "statusPending": "Pending",
+        "statusClaimed": "Claimed",
+        "statusCompleted": "Completed",
+        "statusCancelled": "Cancelled"
+      },
+      "yearbookRequests": {
+        "title": "Yearbook Requests",
+        "name": "Name",
+        "email": "Email",
+        "source": "Source",
+        "sourceParent": "Parent",
+        "sourceAlumni": "Alumni",
+        "yearRequested": "Year",
+        "status": "Status",
+        "date": "Submitted",
+        "statusPending": "Pending",
+        "statusFulfilled": "Fulfilled",
+        "statusCancelled": "Cancelled",
+        "shippingAddress": "Shipping Address",
+        "studentName": "Student Name",
+        "graduationYear": "Graduation Year",
+        "message": "Message",
+        "noRequests": "No yearbook requests found",
+        "total": "Total",
+        "pending": "Pending",
+        "fulfilled": "Fulfilled"
+      },
+      "common": {
+        "loading": "Loading...",
+        "noData": "No data found"
       }
     }
   },

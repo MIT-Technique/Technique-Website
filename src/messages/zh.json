@@ -812,7 +812,10 @@
       "respLivingGroups": "宿舍",
       "respSports": "体育",
       "respActivities": "活动",
-      "respSeniors": "毕业生"
+      "respSeniors": "毕业生",
+      "inquiries": "咨询",
+      "inqHireRequests": "摄影预约",
+      "inqYearbookRequests": "年鉴请求"
     },
     "stats": {
       "clubs": "社团",
@@ -1209,6 +1212,53 @@
         "achievements": "成就",
         "exportBios": "导出简介CSV",
         "exportImages": "导出图片"
+      }
+    },
+    "inquiries": {
+      "hireRequests": {
+        "title": "摄影预约",
+        "eventName": "活动",
+        "requester": "申请人",
+        "date": "日期",
+        "time": "时间",
+        "status": "状态",
+        "cost": "费用",
+        "location": "地点",
+        "description": "描述",
+        "claimedBy": "认领者",
+        "confirmationCode": "确认码",
+        "type": "类型",
+        "noRequests": "未找到摄影预约请求",
+        "statusPending": "待处理",
+        "statusClaimed": "已认领",
+        "statusCompleted": "已完成",
+        "statusCancelled": "已取消"
+      },
+      "yearbookRequests": {
+        "title": "年鉴请求",
+        "name": "姓名",
+        "email": "邮箱",
+        "source": "来源",
+        "sourceParent": "家长",
+        "sourceAlumni": "校友",
+        "yearRequested": "年份",
+        "status": "状态",
+        "date": "提交时间",
+        "statusPending": "待处理",
+        "statusFulfilled": "已完成",
+        "statusCancelled": "已取消",
+        "shippingAddress": "邮寄地址",
+        "studentName": "学生姓名",
+        "graduationYear": "毕业年份",
+        "message": "留言",
+        "noRequests": "未找到年鉴请求",
+        "total": "总计",
+        "pending": "待处理",
+        "fulfilled": "已完成"
+      },
+      "common": {
+        "loading": "加载中...",
+        "noData": "未找到数据"
       }
     }
   },

@@ -810,7 +810,10 @@
       "respLivingGroups": "Grupos de Vivienda",
       "respSports": "Deportes",
       "respActivities": "Actividades",
-      "respSeniors": "Seniors"
+      "respSeniors": "Seniors",
+      "inquiries": "Consultas",
+      "inqHireRequests": "Solicitudes de Contratación",
+      "inqYearbookRequests": "Solicitudes de Anuario"
     },
     "stats": {
       "clubs": "Clubes",
@@ -1207,6 +1210,53 @@
         "achievements": "Logros",
         "exportBios": "Exportar Biografías CSV",
         "exportImages": "Exportar Imágenes"
+      }
+    },
+    "inquiries": {
+      "hireRequests": {
+        "title": "Solicitudes de Contratación",
+        "eventName": "Evento",
+        "requester": "Solicitante",
+        "date": "Fecha",
+        "time": "Hora",
+        "status": "Estado",
+        "cost": "Costo",
+        "location": "Ubicación",
+        "description": "Descripción",
+        "claimedBy": "Reclamado por",
+        "confirmationCode": "Código",
+        "type": "Tipo",
+        "noRequests": "No se encontraron solicitudes de contratación",
+        "statusPending": "Pendiente",
+        "statusClaimed": "Reclamado",
+        "statusCompleted": "Completado",
+        "statusCancelled": "Cancelado"
+      },
+      "yearbookRequests": {
+        "title": "Solicitudes de Anuario",
+        "name": "Nombre",
+        "email": "Correo Electrónico",
+        "source": "Origen",
+        "sourceParent": "Padre/Madre",
+        "sourceAlumni": "Exalumno",
+        "yearRequested": "Año",
+        "status": "Estado",
+        "date": "Enviado",
+        "statusPending": "Pendiente",
+        "statusFulfilled": "Cumplido",
+        "statusCancelled": "Cancelado",
+        "shippingAddress": "Dirección de Envío",
+        "studentName": "Nombre del Estudiante",
+        "graduationYear": "Año de Graduación",
+        "message": "Mensaje",
+        "noRequests": "No se encontraron solicitudes de anuario",
+        "total": "Total",
+        "pending": "Pendiente",
+        "fulfilled": "Cumplido"
+      },
+      "common": {
+        "loading": "Cargando...",
+        "noData": "No se encontraron datos"
       }
     }
   },
