@@ -389,7 +389,7 @@ export default function BioPage() {
             }}
           >
             {/* Email Field */}
-            <TextField
+            {/* <TextField
               required
               label={t("fields.email")}
               variant="outlined"
@@ -415,8 +415,7 @@ export default function BioPage() {
                 ),
               }}
               disabled={disableEmail}
-            />
-
+            />*/}
             {dataLoaded ? (
               <>
                 <div className="grid grid-cols-2 gap-4">
@@ -626,16 +625,16 @@ export default function BioPage() {
             )}
             {/* <>
             </> */}
-
             {/* Contact mailto */}
             <p className="text-xs text-text-muted text-center mt-4">
-              {t("contactText")}{" "}
-              <a
+              The form has now closed
+              {/* {t("contactText")}{" "} */}
+              {/* <a
                 href="mailto:technique@mit.edu"
                 className="text-primary hover:underline"
               >
                 technique@mit.edu
-              </a>
+              </a> */}
             </p>
           </Box>
         </section>
