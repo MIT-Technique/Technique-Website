@@ -307,13 +307,41 @@ function HireRequestForm({ t }) {
   // Today's date in YYYY-MM-DD for min attribute
   const today = new Date().toLocaleDateString("en-CA"); // en-CA gives YYYY-MM-DD
 
-  // If the selected date is today, compute minimum start time (current time rounded up to next 5 min)
-  const minStartTime = (() => {
-    if (form.eventDate !== today) return undefined;
+  // Generate 30-minute interval time options (00:00 – 23:30)
+  const allTimeSlots = (() => {
+    const slots = [];
+    for (let h = 0; h < 24; h++) {
+      for (const m of [0, 30]) {
+        const value = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+        const hour12 = h % 12 || 12;
+        const ampm = h >= 12 ? "PM" : "AM";
+        const label = `${hour12}:${String(m).padStart(2, "0")} ${ampm}`;
+        slots.push({ value, label });
+      }
+    }
+    return slots;
+  })();
+
+  // If the selected date is today, filter out past time slots
+  const startTimeSlots = (() => {
+    if (form.eventDate !== today) return allTimeSlots;
     const now = new Date();
-    const m = Math.ceil(now.getMinutes() / 5) * 5;
-    const h = now.getHours() + Math.floor(m / 60);
-    return `${String(h).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
+    const nowMinutes = now.getHours() * 60 + now.getMinutes();
+    return allTimeSlots.filter((slot) => {
+      const [h, m] = slot.value.split(":").map(Number);
+      return h * 60 + m > nowMinutes;
+    });
+  })();
+
+  // End time slots: only show times after the selected start time
+  const endTimeSlots = (() => {
+    if (!form.startTime) return allTimeSlots;
+    const [sh, sm] = form.startTime.split(":").map(Number);
+    const startMinutes = sh * 60 + sm;
+    return allTimeSlots.filter((slot) => {
+      const [h, m] = slot.value.split(":").map(Number);
+      return h * 60 + m > startMinutes;
+    });
   })();
 
   const inputClass = "w-full bg-transparent border-b border-border-dark/40 px-0 py-2.5 text-sm text-text-primary placeholder:text-text-muted/60 outline-none transition-colors duration-200 focus:border-accent";
@@ -513,24 +541,39 @@ function HireRequestForm({ t }) {
             </div>
             <div>
               <label className={labelClass}>{t("form.startTime")}</label>
-              <input
-                type="time"
+              <select
                 value={form.startTime}
-                onChange={(e) => updateField("startTime", e.target.value)}
-                min={minStartTime}
-                className={inputClass}
+                onChange={(e) => {
+                  updateField("startTime", e.target.value);
+                  // Clear end time if it's no longer valid
+                  if (form.endTime) {
+                    const [sh, sm] = e.target.value.split(":").map(Number);
+                    const [eh, em] = form.endTime.split(":").map(Number);
+                    if (eh * 60 + em <= sh * 60 + sm) updateField("endTime", "");
+                  }
+                }}
+                className={selectClass}
                 required
-              />
+              >
+                <option value="" disabled></option>
+                {startTimeSlots.map((slot) => (
+                  <option key={slot.value} value={slot.value}>{slot.label}</option>
+                ))}
+              </select>
             </div>
             <div>
               <label className={labelClass}>{t("form.endTime")}</label>
-              <input
-                type="time"
+              <select
                 value={form.endTime}
                 onChange={(e) => updateField("endTime", e.target.value)}
-                className={inputClass}
+                className={selectClass}
                 required
-              />
+              >
+                <option value="" disabled></option>
+                {endTimeSlots.map((slot) => (
+                  <option key={slot.value} value={slot.value}>{slot.label}</option>
+                ))}
+              </select>
             </div>
           </div>
 
