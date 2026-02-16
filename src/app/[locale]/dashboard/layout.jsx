@@ -67,8 +67,14 @@ function DashboardLayoutInner({ children }) {
     { id: 'reset', label: t('tabs.reset'), href: `/${locale}/dashboard/settings/reset` },
   ];
 
+  const inquiriesSubTabs = [
+    { id: 'inq-hire-requests', label: t('tabs.inqHireRequests'), href: `/${locale}/dashboard/inquiries/hire-requests` },
+    { id: 'inq-yearbook-requests', label: t('tabs.inqYearbookRequests'), href: `/${locale}/dashboard/inquiries/yearbook-requests` },
+  ];
+
   const isResponsesPage = responsesSubTabs.some(tab => pathname === tab.href) || pathname === `/${locale}/dashboard/responses`;
   const isSettingsPage = settingsSubTabs.some(tab => pathname === tab.href);
+  const isInquiriesPage = inquiriesSubTabs.some(tab => pathname === tab.href);
   const isUsersPage = pathname === `/${locale}/dashboard/users`;
   const userTypeFilter = searchParams.get('type') || 'all';
 
@@ -76,6 +82,7 @@ function DashboardLayoutInner({ children }) {
     { id: 'overview', label: t('tabs.overview'), href: `/${locale}/dashboard`, adminOnly: true },
     { id: 'photoshoots', label: t('tabs.photoshoots'), href: `/${locale}/dashboard/photoshoots`, adminOnly: false },
     { id: 'responses', label: t('tabs.responses'), href: responsesSubTabs[0]?.href || `/${locale}/dashboard/responses/clubs`, adminOnly: false, requiresAccess: true },
+    { id: 'inquiries', label: t('tabs.inquiries'), href: `/${locale}/dashboard/inquiries/hire-requests`, adminOnly: true },
     { id: 'settings', label: t('tabs.settings'), href: `/${locale}/dashboard/users`, adminOnly: true },
   ];
 
@@ -108,6 +115,8 @@ function DashboardLayoutInner({ children }) {
                     ? isResponsesPage
                     : tab.id === 'settings'
                     ? isSettingsPage
+                    : tab.id === 'inquiries'
+                    ? isInquiriesPage
                     : pathname === tab.href;
                   return (
                     <Link
@@ -127,9 +136,9 @@ function DashboardLayoutInner({ children }) {
             </div>
 
             {/* Sub-tabs */}
-            {(isResponsesPage || isSettingsPage) && (
+            {(isResponsesPage || isSettingsPage || isInquiriesPage) && (
               <div className="flex items-center gap-4 mb-6 overflow-x-auto">
-                {(isResponsesPage ? responsesSubTabs : settingsSubTabs).map((tab) => (
+                {(isResponsesPage ? responsesSubTabs : isInquiriesPage ? inquiriesSubTabs : settingsSubTabs).map((tab) => (
                   <Link
                     key={tab.id}
                     href={tab.href}

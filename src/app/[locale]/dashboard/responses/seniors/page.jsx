@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
+import { downloadImagesAsZip } from '../../../../../lib/utils/downloadImages';
 
 const PAGE_SIZE = 10;
 
@@ -67,20 +68,7 @@ export default function ResponsesSeniorsPage() {
   const handleExportImages = async () => {
     setExportingImages(true);
     try {
-      const res = await fetch('/api/admin/responses/export/images?bucket=senior-photos');
-      const data = await res.json();
-      if (data.files && data.files.length > 0) {
-        // Download each file
-        for (const file of data.files) {
-          const a = document.createElement('a');
-          a.href = file.url;
-          a.download = file.path.split('/').pop() || 'senior-photo';
-          a.target = '_blank';
-          a.click();
-          // Small delay between downloads to prevent browser blocking
-          await new Promise(resolve => setTimeout(resolve, 200));
-        }
-      }
+      await downloadImagesAsZip('senior-photos', 'senior-portraits.zip');
     } catch (error) {
       console.error('Export images error:', error);
     } finally {

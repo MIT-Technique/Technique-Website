@@ -1,0 +1,20 @@
+CREATE TABLE public.yearbook_requests (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  source character varying NOT NULL CHECK (source::text = ANY (ARRAY['parent'::text, 'alumni'::text])),
+  name text NOT NULL,
+  email character varying NOT NULL,
+  student_name text,
+  graduation_year text,
+  year_requested integer NOT NULL,
+  shipping_address text,
+  shipping_city text,
+  shipping_state text,
+  shipping_zip text,
+  message text,
+  status character varying DEFAULT 'pending'::character varying CHECK (status::text = ANY (ARRAY['pending'::text, 'fulfilled'::text, 'cancelled'::text])),
+  status_updated_by uuid,
+  status_updated_at timestamp with time zone,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT yearbook_requests_pkey PRIMARY KEY (id),
+  CONSTRAINT yearbook_requests_status_updated_by_fkey FOREIGN KEY (status_updated_by) REFERENCES public.users(id)
+);

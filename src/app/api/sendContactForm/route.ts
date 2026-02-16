@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import { createAdminClient } from "../../../lib/supabase/admin";
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -50,6 +51,33 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       subject: subject,
       html: htmlContent,
     });
+
+    // Save yearbook purchase requests to database
+    const isYearbookRequest =
+      (formType === "parent" && data.category === "Purchase Old Yearbook") ||
+      (formType === "alumni" && data.category === "Old Yearbooks");
+
+    if (isYearbookRequest) {
+      try {
+        const supabase = createAdminClient();
+        await supabase.from("yearbook_requests").insert({
+          source: formType,
+          name: data.name,
+          email: data.email,
+          student_name: data.studentName || null,
+          graduation_year: data.graduationYear || null,
+          year_requested: parseInt(data.yearRequested) || null,
+          shipping_address: data.shippingAddress || null,
+          shipping_city: data.shippingCity || null,
+          shipping_state: data.shippingState || null,
+          shipping_zip: data.shippingZip || null,
+          message: data.message || null,
+        });
+      } catch (dbError) {
+        console.error("Failed to save yearbook request to database:", dbError);
+        // Don't fail the email — DB save is best-effort
+      }
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

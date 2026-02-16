@@ -13,7 +13,7 @@ export async function GET() {
 
     const { data: clubs } = await supabase
       .from('clubs')
-      .select('id, name')
+      .select('id, name, description, candid_image_1, candid_image_2, candid_image_3')
       .order('name', { ascending: true });
 
     const clubIds = (clubs || []).map(c => c.id);
@@ -33,16 +33,28 @@ export async function GET() {
       }
     });
 
-    // Build CSV: club names as headers, members below
-    const clubList = clubs || [];
-    const maxMembers = Math.max(...clubList.map(c => membersByClub[c.id].length), 0);
+    // Filter clubs: exclude those with no description, no members, and no images
+    const allClubs = clubs || [];
+    const hasImages = (c: any) => !!(c.candid_image_1 || c.candid_image_2 || c.candid_image_3);
+    const hasContent = (c: any) => !!(c.description || membersByClub[c.id].length > 0);
+
+    const fullClubs = allClubs.filter(c => hasContent(c));
+    const imageOnlyClubs = allClubs.filter(c => !hasContent(c) && hasImages(c));
+    // Clubs with nothing are excluded entirely
+
+    const clubList = [...fullClubs, ...imageOnlyClubs];
+    const maxMembers = Math.max(...fullClubs.map(c => membersByClub[c.id].length), 0);
 
     const rows: string[][] = [];
     // Header row
     rows.push(clubList.map(c => c.name || 'Unnamed'));
+    // Description row: image-only clubs get "has_image"
+    rows.push(clubList.map(c =>
+      imageOnlyClubs.includes(c) ? 'has_image' : (c.description || '')
+    ));
 
     for (let i = 0; i < maxMembers; i++) {
-      rows.push(clubList.map(c => membersByClub[c.id][i] || ''));
+      rows.push(clubList.map(c => membersByClub[c.id]?.[i] || ''));
     }
 
     const csv = rows.map(row =>

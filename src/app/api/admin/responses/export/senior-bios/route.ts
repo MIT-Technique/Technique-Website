@@ -32,11 +32,13 @@ export async function GET() {
       from += PAGE_SIZE;
     }
 
-    const headers = ['first_name', 'last_name', 'email', 'major', 'second_major', 'minor', 'quote', 'achievements'];
+    const fields = ['first_name', 'last_name', 'email', 'major', 'second_major', 'minor', 'quote', 'achievements'];
 
-    const rows: string[][] = [headers];
-    allBios.forEach(bio => {
-      rows.push(headers.map(h => (bio as Record<string, string | null>)[h] || ''));
+    // Transposed: each submission is a column, fields are rows
+    const rows: string[][] = [];
+    fields.forEach(field => {
+      const row = [field, ...allBios.map(bio => (bio as Record<string, string | null>)[field] || '')];
+      rows.push(row);
     });
 
     const csv = rows.map(row =>
