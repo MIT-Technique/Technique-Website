@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSession } from "../../../../lib/auth/session";
 import { createAdminClient } from "../../../../lib/supabase/admin";
+import { isFormEffectivelyClosed } from "../../../../lib/utils/formStatus";
 
 // Disable caching for session data
 export const dynamic = 'force-dynamic';
@@ -71,12 +72,15 @@ export async function GET() {
       sports = data;
     }
 
-    // Get frozen forms status (return full objects for page components)
+    // Get form status (return full objects with computed is_closed for page components)
     const { data: formSettings } = await supabase
       .from('form_settings')
-      .select('form_name, is_frozen');
+      .select('form_name, is_frozen, closes_at, reopens_at, unfrozen_at, note');
 
-    const frozenForms = formSettings || [];
+    const frozenForms = (formSettings || []).map((f) => ({
+      ...f,
+      is_closed: isFormEffectivelyClosed(f),
+    }));
 
     const responseData: Record<string, unknown> = {
       isLoggedIn: true,

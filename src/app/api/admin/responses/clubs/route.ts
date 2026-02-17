@@ -41,10 +41,22 @@ export async function GET(request: Request) {
 
     const clubIds = (clubs || []).map(c => c.id);
 
-    // Fetch member counts
-    const { data: members } = clubIds.length > 0
-      ? await supabase.from('club_manual_members').select('club_id').in('club_id', clubIds)
-      : { data: [] };
+    // Fetch member counts (paginate to avoid Supabase 1000-row default limit)
+    let members: { club_id: string }[] = [];
+    if (clubIds.length > 0) {
+      let from = 0;
+      const PAGE = 1000;
+      while (true) {
+        const { data: batch } = await supabase
+          .from('club_manual_members')
+          .select('club_id')
+          .in('club_id', clubIds)
+          .range(from, from + PAGE - 1);
+        members = members.concat(batch || []);
+        if (!batch || batch.length < PAGE) break;
+        from += PAGE;
+      }
+    }
 
     const memberCountMap: Record<string, number> = {};
     (members || []).forEach(m => {
@@ -105,10 +117,21 @@ export async function GET(request: Request) {
         .neq('description', '')
         .not('description', 'is', null);
 
-      const { data: allMembers } = await supabase
-        .from('club_manual_members')
-        .select('club_id');
-      const uniqueClubsWithMembers = new Set((allMembers || []).map(m => m.club_id));
+      let allMembers: { club_id: string }[] = [];
+      {
+        let from = 0;
+        const PAGE = 1000;
+        while (true) {
+          const { data: batch } = await supabase
+            .from('club_manual_members')
+            .select('club_id')
+            .range(from, from + PAGE - 1);
+          allMembers = allMembers.concat(batch || []);
+          if (!batch || batch.length < PAGE) break;
+          from += PAGE;
+        }
+      }
+      const uniqueClubsWithMembers = new Set(allMembers.map(m => m.club_id));
 
       stats = {
         total: totalClubCount || 0,

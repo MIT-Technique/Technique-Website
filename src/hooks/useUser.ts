@@ -79,7 +79,8 @@ export function useFormFrozen(formName: string) {
   const { frozenForms, loading } = useUser();
 
   const isFrozen = frozenForms.some(
-    (form) => form.form_name === formName && form.is_frozen
+    (form: FormSetting & { is_closed?: boolean }) =>
+      form.form_name === formName && (form.is_closed ?? form.is_frozen)
   );
 
   return { isFrozen, loading };

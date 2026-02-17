@@ -13,7 +13,7 @@ export async function GET() {
 
     const { data: lgs, error } = await supabase
       .from('living_groups')
-      .select('id, name, living_group_type, dorm_sections, section_images, manually_booked, manually_booked_by')
+      .select('id, name, living_group_type, dorm_sections, section_images, candid_image_1, candid_image_2, candid_image_3, candid_image_4, manually_booked, manually_booked_by')
       .neq('status', 'disabled')
       .order('name', { ascending: true });
 
@@ -81,7 +81,7 @@ export async function GET() {
         };
       });
 
-      const candidCount = Object.values(sectionImages).filter(Boolean).length;
+      const candidCount = [lg.candid_image_1, lg.candid_image_2, lg.candid_image_3, lg.candid_image_4].filter(Boolean).length;
       const totalMembers = Object.values(memberCountMap[lg.id] || {}).reduce((a: number, b: number) => a + b, 0);
 
       return {
@@ -104,9 +104,12 @@ export async function GET() {
     try {
       const { data: allLGs } = await supabase
         .from('living_groups')
-        .select('section_images');
+        .select('candid_image_1, candid_image_2, candid_image_3, candid_image_4');
       (allLGs || []).forEach(lg => {
-        bucketImageCount += Object.values(lg.section_images || {}).filter(Boolean).length;
+        if (lg.candid_image_1) bucketImageCount++;
+        if (lg.candid_image_2) bucketImageCount++;
+        if (lg.candid_image_3) bucketImageCount++;
+        if (lg.candid_image_4) bucketImageCount++;
       });
     } catch (e) {
       console.error("Error counting LG images:", e);

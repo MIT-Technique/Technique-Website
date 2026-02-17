@@ -1,7 +1,7 @@
 "use client";
 import Footer from "../../../components/Footer/Footer";
 import ImageUpload from "../../../components/ImageUpload/ImageUpload";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import * as React from "react";
 import { useTranslations } from "next-intl";
 import Box from "@mui/material/Box";
@@ -51,6 +51,18 @@ export default function BioPage() {
   const [dataLoaded, setDataLoaded] = useState(false);
   const [disableEmail, setDisabledEmail] = useState(false);
   const [photoUrl, setPhotoUrl] = useState(null);
+  const [isFrozen, setIsFrozen] = useState(false);
+  const [formNote, setFormNote] = useState(null);
+
+  useEffect(() => {
+    fetch('/api/form-status?form=senior_bio')
+      .then(res => res.json())
+      .then(data => {
+        setIsFrozen(data.isFrozen || false);
+        setFormNote(data.note || null);
+      })
+      .catch(() => {});
+  }, []);
 
   const vertical = "top";
   const horizontal = "center";
@@ -375,109 +387,165 @@ export default function BioPage() {
             <h1 className="mb-2">{t("title")}</h1>
           </div>
 
-          <Box
-            component="form"
-            className="card-elevated"
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 2,
-            }}
-            onSubmit={async (event) => {
-              event.preventDefault();
-              await updateBio();
-            }}
-          >
-            {/* Email Field */}
-            <TextField
-              required
-              label={t("fields.email")}
-              variant="outlined"
-              InputLabelProps={{ shrink: true }}
-              value={email}
-              onChange={(event) => {
-                setEmail(event.target.value);
-                if (emailError) validateEmail(event.target.value);
+          {isFrozen ? (
+            <div className="card-elevated">
+              <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg mb-4">
+                <p className="text-gray-700 font-medium">{t('frozen')}</p>
+                {formNote && <p className="text-sm text-gray-600 mt-2">{formNote}</p>}
+              </div>
+              <p className="text-xs text-text-muted text-center">
+                {t("contactText")}{" "}
+                <a
+                  href="mailto:technique@mit.edu"
+                  className="text-primary hover:underline"
+                >
+                  technique@mit.edu
+                </a>
+              </p>
+            </div>
+          ) : (
+            <Box
+              component="form"
+              className="card-elevated"
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 2,
               }}
-              onBlur={(event) => {
-                validateEmail(event.target.value);
-                if (!dataLoaded) fetchBioByEmail(event.target.value);
+              onSubmit={async (event) => {
+                event.preventDefault();
+                await updateBio();
               }}
-              name="email"
-              placeholder="kerb"
-              error={!!emailError}
-              helperText={emailError || t("fields.emailAutofillHint")}
-              sx={textFieldSx}
-              fullWidth
-              InputProps={{
-                endAdornment: (
-                  <span style={{ color: "#666", marginLeft: 4 }}>@mit.edu</span>
-                ),
-              }}
-              disabled={disableEmail}
-            />
-
-            {dataLoaded ? (
-              <>
-                <div className="grid grid-cols-2 gap-4">
-                  <TextField
-                    required
-                    label={t("fields.firstName")}
-                    variant="outlined"
-                    InputLabelProps={{ shrink: true }}
-                    value={firstName}
-                    onChange={(event) => setFirstName(event.target.value)}
-                    name="firstName"
-                    sx={textFieldSx}
-                  />
-                  <TextField
-                    required
-                    label={t("fields.lastName")}
-                    variant="outlined"
-                    InputLabelProps={{ shrink: true }}
-                    value={lastName}
-                    onChange={(event) => setLastName(event.target.value)}
-                    name="lastName"
-                    sx={textFieldSx}
-                  />
+            >
+              {formNote && (
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm text-blue-700">{formNote}</p>
                 </div>
+              )}
 
-                <FormControl fullWidth>
-                  <InputLabel
-                    id="major-label"
-                    shrink
-                    sx={{
-                      "&.Mui-focused": { color: "#750014" },
-                    }}
-                  >
-                    {t("fields.major")} *
-                  </InputLabel>
-                  <Select
-                    labelId="major-label"
-                    id="major-select"
-                    value={major}
-                    label={`${t("fields.major")} *`}
-                    notched
-                    required
-                    displayEmpty
-                    onChange={(event) => setMajor(event.target.value)}
-                    sx={selectSx}
-                  >
-                    <MenuItem value="" disabled>
-                      Select...
-                    </MenuItem>
-                    {majors.map((m) => (
-                      <MenuItem
-                        key={`${m.course}-${m.name}`}
-                        value={`${m.course}, ${m.name}`}
+              {/* Email Field */}
+              <TextField
+                required
+                label={t("fields.email")}
+                variant="outlined"
+                InputLabelProps={{ shrink: true }}
+                value={email}
+                onChange={(event) => {
+                  setEmail(event.target.value);
+                  if (emailError) validateEmail(event.target.value);
+                }}
+                onBlur={(event) => {
+                  validateEmail(event.target.value);
+                  if (!dataLoaded) fetchBioByEmail(event.target.value);
+                }}
+                name="email"
+                placeholder="kerb"
+                error={!!emailError}
+                helperText={emailError || t("fields.emailAutofillHint")}
+                sx={textFieldSx}
+                fullWidth
+                InputProps={{
+                  endAdornment: (
+                    <span style={{ color: "#666", marginLeft: 4 }}>@mit.edu</span>
+                  ),
+                }}
+                disabled={disableEmail}
+              />
+
+              {dataLoaded ? (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <TextField
+                      required
+                      label={t("fields.firstName")}
+                      variant="outlined"
+                      InputLabelProps={{ shrink: true }}
+                      value={firstName}
+                      onChange={(event) => setFirstName(event.target.value)}
+                      name="firstName"
+                      sx={textFieldSx}
+                    />
+                    <TextField
+                      required
+                      label={t("fields.lastName")}
+                      variant="outlined"
+                      InputLabelProps={{ shrink: true }}
+                      value={lastName}
+                      onChange={(event) => setLastName(event.target.value)}
+                      name="lastName"
+                      sx={textFieldSx}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormControl fullWidth>
+                      <InputLabel
+                        id="major-label"
+                        shrink
+                        sx={{
+                          "&.Mui-focused": { color: "#750014" },
+                        }}
                       >
-                        {m.course}, {m.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                        {t("fields.major")} *
+                      </InputLabel>
+                      <Select
+                        labelId="major-label"
+                        id="major-select"
+                        value={major}
+                        label={`${t("fields.major")} *`}
+                        notched
+                        required
+                        displayEmpty
+                        onChange={(event) => setMajor(event.target.value)}
+                        sx={selectSx}
+                      >
+                        <MenuItem value="" disabled>
+                          Select...
+                        </MenuItem>
+                        {majors.map((m) => (
+                          <MenuItem
+                            key={`${m.course}-${m.name}`}
+                            value={`${m.course}, ${m.name}`}
+                          >
+                            {m.course}, {m.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
 
-                <div className="grid grid-cols-2 gap-4">
+                    <FormControl fullWidth>
+                      <InputLabel
+                        id="second-major-label"
+                        shrink
+                        sx={{
+                          "&.Mui-focused": { color: "#750014" },
+                        }}
+                      >
+                        {t("fields.secondMajor")}
+                      </InputLabel>
+                      <Select
+                        labelId="second-major-label"
+                        id="second-major-select"
+                        value={secondMajor}
+                        label={t("fields.secondMajor")}
+                        notched
+                        displayEmpty
+                        onChange={(event) => setSecondMajor(event.target.value)}
+                        sx={selectSx}
+                      >
+                        <MenuItem value="">Select...</MenuItem>
+                        {majors.map((m) => (
+                          <MenuItem
+                            key={`second-${m.course}-${m.name}`}
+                            value={`${m.course}, ${m.name}`}
+                          >
+                            {m.course}, {m.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </div>
+
                   <FormControl fullWidth>
                     <InputLabel
                       id="minor-label"
@@ -510,134 +578,102 @@ export default function BioPage() {
                     </Select>
                   </FormControl>
 
-                  <FormControl fullWidth>
-                    <InputLabel
-                      id="second-major-label"
-                      shrink
-                      sx={{
-                        "&.Mui-focused": { color: "#750014" },
-                      }}
-                    >
-                      {t("fields.secondMajor")}
-                    </InputLabel>
-                    <Select
-                      labelId="second-major-label"
-                      id="second-major-select"
-                      value={secondMajor}
-                      label={t("fields.secondMajor")}
-                      notched
-                      displayEmpty
-                      onChange={(event) => setSecondMajor(event.target.value)}
-                      sx={selectSx}
-                    >
-                      <MenuItem value="">Select...</MenuItem>
-                      {majors.map((m) => (
-                        <MenuItem
-                          key={`second-${m.course}-${m.name}`}
-                          value={`${m.course}, ${m.name}`}
-                        >
-                          {m.course}, {m.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <TextField
+                      label={t("fields.quote")}
+                      variant="outlined"
+                      InputLabelProps={{ shrink: true }}
+                      value={quote}
+                      onChange={(event) => setQuote(event.target.value)}
+                      name="quote"
+                      multiline
+                      minRows={3}
+                      maxRows={8}
+                      sx={textFieldSx}
+                      fullWidth
+                      placeholder={t("fields.quotePlaceholder")}
+                    />
 
-                <TextField
-                  label={t("fields.quote")}
-                  variant="outlined"
-                  InputLabelProps={{ shrink: true }}
-                  value={quote}
-                  onChange={(event) => setQuote(event.target.value)}
-                  name="quote"
-                  multiline
-                  minRows={3}
-                  maxRows={8}
-                  sx={textFieldSx}
-                  fullWidth
-                  placeholder={t("fields.quotePlaceholder")}
-                />
+                    <TextField
+                      label="Extracurriculars"
+                      variant="outlined"
+                      InputLabelProps={{ shrink: true }}
+                      value={extracurriculars}
+                      onChange={(event) => setExtracurriculars(event.target.value)}
+                      name="extracurriculars"
+                      multiline
+                      minRows={3}
+                      maxRows={8}
+                      sx={textFieldSx}
+                      fullWidth
+                      placeholder="Extracurriculars you would like to highlight"
+                    />
+                  </div>
 
-                <TextField
-                  label="Extracurriculars"
-                  variant="outlined"
-                  InputLabelProps={{ shrink: true }}
-                  value={extracurriculars}
-                  onChange={(event) => setExtracurriculars(event.target.value)}
-                  name="extracurriculars"
-                  multiline
-                  minRows={3}
-                  maxRows={8}
-                  sx={textFieldSx}
-                  fullWidth
-                  placeholder="Extracurriculars you would like to highlight"
-                />
+                  {/* Photo Upload Section */}
+                  <div className="mt-4 mb-2">
+                    <p className="text-sm font-medium text-text-secondary mb-2">
+                      {t("photo.label")}
+                    </p>
 
-                {/* Photo Upload Section */}
-                <div className="mt-4 mb-2">
-                  <p className="text-sm font-medium text-text-secondary mb-2">
-                    {t("photo.label")}
-                  </p>
+                    <p className="text-xs text-text-muted mb-3">
+                      {t("photo.guideline")}{" "}
+                      <a href="/seniors" className="text-primary hover:underline">
+                        {t("photo.learnMore")}
+                      </a>
+                    </p>
 
-                  <p className="text-xs text-text-muted mb-3">
-                    {t("photo.guideline")}{" "}
-                    <a href="/seniors" className="text-primary hover:underline">
-                      {t("photo.learnMore")}
-                    </a>
-                  </p>
+                    <ImageUpload
+                      imageUrl={photoUrl}
+                      onUpload={handlePhotoUpload}
+                      onDelete={handlePhotoDelete}
+                      disabled={!dataLoaded}
+                      label={t("photo.uploadLabel")}
+                      size="md"
+                    />
+                  </div>
 
-                  <ImageUpload
-                    imageUrl={photoUrl}
-                    onUpload={handlePhotoUpload}
-                    onDelete={handlePhotoDelete}
-                    disabled={!dataLoaded}
-                    label={t("photo.uploadLabel")}
-                    size="md"
-                  />
-                </div>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    sx={{
+                      mt: 2,
+                      backgroundColor: "#750014",
+                      "&:hover": {
+                        backgroundColor: "#5C0010",
+                      },
+                      "&:active": {
+                        backgroundColor: "#5C0010",
+                        transform: "translateY(1px)",
+                      },
+                      transition: "all 0.2s ease",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.05em",
+                      fontWeight: 500,
+                      py: 1.5,
+                      boxShadow: "none",
+                    }}
+                    fullWidth
+                  >
+                    {t("submitButton")}
+                  </Button>
+                </>
+              ) : (
+                <></>
+              )}
 
-                <Button
-                  type="submit"
-                  variant="contained"
-                  sx={{
-                    mt: 2,
-                    backgroundColor: "#750014",
-                    "&:hover": {
-                      backgroundColor: "#5C0010",
-                    },
-                    "&:active": {
-                      backgroundColor: "#5C0010",
-                      transform: "translateY(1px)",
-                    },
-                    transition: "all 0.2s ease",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.05em",
-                    fontWeight: 500,
-                    py: 1.5,
-                    boxShadow: "none",
-                  }}
-                  fullWidth
+              {/* Contact mailto */}
+              <p className="text-xs text-text-muted text-center mt-4">
+                {t("contactText")}{" "}
+                <a
+                  href="mailto:technique@mit.edu"
+                  className="text-primary hover:underline"
                 >
-                  {t("submitButton")}
-                </Button>
-              </>
-            ) : (
-              <></>
-            )}
-            {/* <>
-            </> */}
-
-            {/* Contact mailto */}
-            <p className="text-xs text-text-muted text-center mt-4">
-              {t("contactText")}{" "}
-              <a
-                href="mailto:technique@mit.edu"
-                className="text-primary hover:underline"
-              >
-                technique@mit.edu
-              </a>
-            </p>
-          </Box>
+                  technique@mit.edu
+                </a>
+              </p>
+            </Box>
+          )}
         </section>
       </main>
 

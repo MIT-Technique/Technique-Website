@@ -27,6 +27,7 @@ export default function ClubPage() {
   const lastSavedDescription = useRef('');
   const [imageMessage, setImageMessage] = useState({ type: '', text: '' });
   const [isFrozen, setIsFrozen] = useState(false);
+  const [formNote, setFormNote] = useState(null);
 
   // Email state
   const [clubEmail, setClubEmail] = useState('');
@@ -169,10 +170,11 @@ export default function ClubPage() {
         try {
           const res = await fetch('/api/auth/session');
           const data = await res.json();
-          const frozen = data.frozenForms?.some(f => f.form_name === 'club_form' && f.is_frozen);
-          setIsFrozen(frozen || false);
+          const formData = data.frozenForms?.find(f => f.form_name === 'club_form');
+          setIsFrozen(formData ? (formData.is_closed ?? formData.is_frozen) : false);
+          setFormNote(formData?.note || null);
         } catch (error) {
-          console.error('Error checking frozen status:', error);
+          console.error('Error checking form status:', error);
         }
       })();
     } else if (activeTab === 'members') {
@@ -490,8 +492,15 @@ export default function ClubPage() {
           {activeTab === 'profile' && (
             <div>
               {isFrozen && (
-                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <p className="text-red-600 font-medium">{t('frozen')}</p>
+                <div className="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                  <p className="text-gray-700 font-medium">{t('frozen')}</p>
+                  {formNote && <p className="text-sm text-gray-600 mt-1">{formNote}</p>}
+                </div>
+              )}
+
+              {!isFrozen && formNote && (
+                <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm text-blue-700">{formNote}</p>
                 </div>
               )}
 
@@ -657,6 +666,13 @@ export default function ClubPage() {
               )}
 
               <h2 className="text-lg font-medium mb-4">{t('members.title')}</h2>
+
+              {manualMembers.length > 30 && (
+                <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                  <p className="text-sm text-amber-800 font-medium">{t('members.officerAlert')}</p>
+                  <p className="text-xs text-amber-700 mt-1">{t('members.officerAlertHint')}</p>
+                </div>
+              )}
 
               {/* Mode Switcher */}
               <div className="mb-4 flex gap-2">

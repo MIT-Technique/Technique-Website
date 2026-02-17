@@ -40,12 +40,16 @@ export default function StudentWorkFeaturePage() {
   const [snackError, setSnackError] = useState(false);
   const [snackMessage, setSnackMessage] = useState("");
   const [isFrozen, setIsFrozen] = useState(false);
+  const [formNote, setFormNote] = useState(null);
   const fileInputRefs = [useRef(null), useRef(null), useRef(null), useRef(null), useRef(null)];
 
   useEffect(() => {
     fetch('/api/form-status?form=student_work_form')
       .then(res => res.json())
-      .then(data => setIsFrozen(data.isFrozen || false))
+      .then(data => {
+        setIsFrozen(data.isFrozen || false);
+        setFormNote(data.note || null);
+      })
       .catch(() => {});
   }, []);
 
@@ -277,8 +281,15 @@ export default function StudentWorkFeaturePage() {
           </div>
 
           {isFrozen && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-600 font-medium">{t('frozen')}</p>
+            <div className="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+              <p className="text-gray-700 font-medium">{t('frozen')}</p>
+              {formNote && <p className="text-sm text-gray-600 mt-1">{formNote}</p>}
+            </div>
+          )}
+
+          {!isFrozen && formNote && (
+            <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-700">{formNote}</p>
             </div>
           )}
 

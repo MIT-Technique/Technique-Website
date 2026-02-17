@@ -731,6 +731,16 @@ created_at timestamp with time zone DEFAULT now(),
 CONSTRAINT admin_logs_pkey PRIMARY KEY (id),
 CONSTRAINT admin_logs_actor_id_fkey FOREIGN KEY (actor_id) REFERENCES public.users(id)
 );
+CREATE TABLE public.authorized_photographers (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+email character varying NOT NULL UNIQUE,
+name text,
+added_by uuid,
+added_at timestamp with time zone DEFAULT now(),
+is_active boolean DEFAULT true,
+CONSTRAINT authorized_photographers_pkey PRIMARY KEY (id),
+CONSTRAINT authorized_photographers_added_by_fkey FOREIGN KEY (added_by) REFERENCES public.users(id)
+);
 CREATE TABLE public.club_manual_members (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
 club_id uuid NOT NULL,
@@ -791,9 +801,34 @@ unfrozen_by uuid,
 unfrozen_at timestamp with time zone,
 created_at timestamp with time zone DEFAULT now(),
 updated_at timestamp with time zone DEFAULT now(),
+config_value jsonb DEFAULT '{}'::jsonb,
+closes_at timestamp with time zone,
+reopens_at timestamp with time zone,
 CONSTRAINT form_settings_pkey PRIMARY KEY (id),
 CONSTRAINT form_settings_frozen_by_fkey FOREIGN KEY (frozen_by) REFERENCES public.users(id),
 CONSTRAINT form_settings_unfrozen_by_fkey FOREIGN KEY (unfrozen_by) REFERENCES public.users(id)
+);
+CREATE TABLE public.hire_requests (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+confirmation_code character varying NOT NULL UNIQUE,
+requester_name text NOT NULL,
+requester_email character varying NOT NULL,
+event_name text NOT NULL,
+event_type character varying NOT NULL CHECK (event_type::text = ANY (ARRAY['conference'::character varying, 'performance'::character varying, 'social'::character varying, 'competition'::character varying, 'other'::character varying]::text[])),
+event_date date NOT NULL,
+start_time time without time zone NOT NULL,
+end_time time without time zone NOT NULL,
+location text,
+description text,
+hourly_rate numeric NOT NULL,
+duration_hours numeric NOT NULL,
+total_cost numeric NOT NULL,
+status character varying DEFAULT 'pending'::character varying CHECK (status::text = ANY (ARRAY['pending'::character varying, 'claimed'::character varying, 'completed'::character varying, 'cancelled'::character varying]::text[])),
+claimed_by character varying,
+claimed_at timestamp with time zone,
+created_at timestamp with time zone DEFAULT now(),
+updated_at timestamp with time zone DEFAULT now(),
+CONSTRAINT hire_requests_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.living_group_manual_members (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -850,6 +885,11 @@ dorm_sections ARRAY DEFAULT '{}'::text[],
 section_images jsonb DEFAULT '{}'::jsonb,
 manually_booked boolean DEFAULT false,
 manually_booked_by uuid,
+candid_image_1 text,
+candid_image_2 text,
+candid_image_3 text,
+candid_image_4 text,
+description text,
 CONSTRAINT living_groups_pkey PRIMARY KEY (id),
 CONSTRAINT living_groups_disabled_by_fkey FOREIGN KEY (disabled_by) REFERENCES public.users(id),
 CONSTRAINT living_groups_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
@@ -890,11 +930,16 @@ updated_at timestamp with time zone DEFAULT now(),
 location text,
 proposed_locations ARRAY,
 booking_status character varying CHECK (booking_status IS NULL OR (booking_status::text = ANY (ARRAY['pending_location'::character varying, 'confirmed'::character varying]::text[]))),
+photographer_id uuid,
+photographer_assigned_at timestamp with time zone,
+photographer_assigned_by uuid,
 CONSTRAINT photoshoot_times_pkey PRIMARY KEY (id),
 CONSTRAINT photoshoot_times_living_group_id_fkey FOREIGN KEY (living_group_id) REFERENCES public.living_groups(id),
 CONSTRAINT photoshoot_times_booked_by_fkey FOREIGN KEY (booked_by) REFERENCES public.users(id),
 CONSTRAINT photoshoot_times_cancelled_by_fkey FOREIGN KEY (cancelled_by) REFERENCES public.users(id),
-CONSTRAINT photoshoot_times_created_by_fkey FOREIGN KEY (created_by) REFERENCES public.users(id)
+CONSTRAINT photoshoot_times_created_by_fkey FOREIGN KEY (created_by) REFERENCES public.users(id),
+CONSTRAINT photoshoot_times_photographer_id_fkey FOREIGN KEY (photographer_id) REFERENCES public.users(id),
+CONSTRAINT photoshoot_times_photographer_assigned_by_fkey FOREIGN KEY (photographer_assigned_by) REFERENCES public.users(id)
 );
 CREATE TABLE public.senior_bios (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -910,6 +955,14 @@ first_name text,
 last_name text,
 major_backup text,
 CONSTRAINT senior_bios_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.senior_photos (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+email character varying NOT NULL UNIQUE,
+image_url text,
+created_at timestamp with time zone DEFAULT now(),
+updated_at timestamp with time zone DEFAULT now(),
+CONSTRAINT senior_photos_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.sessions (
 id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -1025,6 +1078,26 @@ updated_at timestamp with time zone DEFAULT now(),
 updated_by uuid,
 CONSTRAINT yearbook_inventory_pkey PRIMARY KEY (id),
 CONSTRAINT yearbook_inventory_updated_by_fkey FOREIGN KEY (updated_by) REFERENCES public.users(id)
+);
+CREATE TABLE public.yearbook_requests (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+source character varying NOT NULL CHECK (source::text = ANY (ARRAY['parent'::text, 'alumni'::text])),
+name text NOT NULL,
+email character varying NOT NULL,
+student_name text,
+graduation_year text,
+year_requested integer NOT NULL,
+shipping_address text,
+shipping_city text,
+shipping_state text,
+shipping_zip text,
+message text,
+status character varying DEFAULT 'pending'::character varying CHECK (status::text = ANY (ARRAY['pending'::text, 'fulfilled'::text, 'cancelled'::text])),
+status_updated_by uuid,
+status_updated_at timestamp with time zone,
+created_at timestamp with time zone DEFAULT now(),
+CONSTRAINT yearbook_requests_pkey PRIMARY KEY (id),
+CONSTRAINT yearbook_requests_status_updated_by_fkey FOREIGN KEY (status_updated_by) REFERENCES public.users(id)
 );
 
 ## Contact & Support

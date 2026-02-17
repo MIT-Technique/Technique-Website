@@ -111,6 +111,9 @@ export interface FormSetting {
   frozen_at: string | null;
   unfrozen_by: string | null;
   unfrozen_at: string | null;
+  closes_at: string | null;
+  reopens_at: string | null;
+  note: string | null;
   created_at: string;
   updated_at: string;
 }

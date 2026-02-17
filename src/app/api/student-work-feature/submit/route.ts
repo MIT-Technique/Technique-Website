@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "../../../../lib/supabase/admin";
+import { isFormEffectivelyClosed } from "../../../../lib/utils/formStatus";
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 const MAX_SIZE = 25 * 1024 * 1024; // 25MB
@@ -40,14 +41,14 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
 export async function POST(request: NextRequest) {
   try {
-    // Check if form is frozen
+    // Check if form is closed
     const supabaseCheck = createAdminClient();
     const { data: formSettings } = await supabaseCheck
       .from('form_settings')
-      .select('is_frozen')
+      .select('is_frozen, closes_at, reopens_at, unfrozen_at')
       .eq('form_name', 'student_work_form')
       .single();
-    if (formSettings?.is_frozen) {
+    if (isFormEffectivelyClosed(formSettings)) {
       return NextResponse.json(
         { error: "This form is currently closed" },
         { status: 403 }
