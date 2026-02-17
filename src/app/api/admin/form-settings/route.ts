@@ -77,6 +77,8 @@ export async function PUT(request: NextRequest) {
       .eq('form_name', formName)
       .single();
 
+    console.log(`[form-settings] PUT formName=${formName} freeze=${freeze} existingSetting=${JSON.stringify(existingSetting)} closes_at=${closes_at} reopens_at=${reopens_at}`);
+
     if (existingSetting) {
       // Update existing setting
       const updateData: Record<string, unknown> = {
@@ -96,6 +98,8 @@ export async function PUT(request: NextRequest) {
         updateData.unfrozen_by = user.id;
         updateData.unfrozen_at = new Date().toISOString();
       }
+
+      console.log(`[form-settings] updateData=${JSON.stringify(updateData)}`);
 
       // Update schedule fields (null clears the field)
       if (closes_at !== undefined) {

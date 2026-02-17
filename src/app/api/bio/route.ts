@@ -72,7 +72,10 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
       .eq("form_name", "senior_bio")
       .single();
 
-    if (isFormEffectivelyClosed(setting)) {
+    const bioFormClosed = isFormEffectivelyClosed(setting);
+    console.log(`[bio] freeze check: setting=${JSON.stringify(setting)} closed=${bioFormClosed}`);
+
+    if (bioFormClosed) {
       return NextResponse.json(
         { error: "This form is currently closed and not accepting submissions." },
         { status: 403 }

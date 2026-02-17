@@ -26,8 +26,11 @@ export async function GET(request: NextRequest) {
       console.error("Error fetching form setting:", dbError);
     }
 
+    const result = isFormEffectivelyClosed(setting);
+    console.log(`[form-status] form=${formName} setting=${JSON.stringify(setting)} result=${result}`);
+
     return NextResponse.json({
-      isFrozen: isFormEffectivelyClosed(setting),
+      isFrozen: result,
     });
   } catch (error) {
     console.error("Error checking form status:", error);
