@@ -10,6 +10,7 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [schedules, setSchedules] = useState({});
   const [savingSchedule, setSavingSchedule] = useState({});
+  const [savedSchedule, setSavedSchedule] = useState({});
   const [notes, setNotes] = useState({});
   const [savingNote, setSavingNote] = useState({});
 
@@ -20,11 +21,11 @@ export default function SettingsPage() {
 
   const forms = [
     { name: 'senior_bio', label: t('forms.seniorBio') },
+    { name: 'candids_form', label: t('forms.candidsForm') },
+    { name: 'student_work_form', label: t('forms.studentWorkForm') },
     { name: 'club_form', label: t('forms.clubForm') },
     { name: 'living_group_booking', label: t('forms.livingGroupBooking') },
     { name: 'sports_form', label: t('forms.sportsForm') },
-    { name: 'candids_form', label: t('forms.candidsForm') },
-    { name: 'student_work_form', label: t('forms.studentWorkForm') },
   ];
 
   useEffect(() => {
@@ -99,6 +100,8 @@ export default function SettingsPage() {
     return false;
   }
 
+  const orgForms = ['club_form', 'sports_form', 'living_group_booking'];
+
   async function handleToggleClose(formName) {
     const setting = formSettings.find(s => s.form_name === formName);
     const effectivelyClosed = isEffectivelyClosed(setting);
@@ -108,27 +111,47 @@ export default function SettingsPage() {
       if (!confirmed) return;
     }
 
+    if (!effectivelyClosed && orgForms.includes(formName)) {
+      const confirmed = confirm(t('formFreeze.orgCloseWarning'));
+      if (!confirmed) return;
+    }
+
+    const newFrozen = !effectivelyClosed;
+
+    // Optimistic update
+    setFormSettings(prev => prev.map(s =>
+      s.form_name === formName
+        ? { ...s, is_frozen: newFrozen, unfrozen_at: newFrozen ? s.unfrozen_at : new Date().toISOString() }
+        : s
+    ));
+
     try {
       const res = await fetch('/api/admin/form-settings', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           formName,
-          freeze: !effectivelyClosed,
+          freeze: newFrozen,
         }),
       });
-      if (res.ok) fetchSettings();
+      if (!res.ok) fetchSettings(); // revert on failure
     } catch (error) {
       console.error('Error updating form setting:', error);
+      fetchSettings(); // revert on failure
     }
   }
 
-  async function handleSaveSchedule(formName) {
-    const schedule = schedules[formName] || {};
+  async function handleSaveSchedule(formName, overrideSchedule) {
+    const schedule = overrideSchedule || schedules[formName] || {};
     const setting = formSettings.find(s => s.form_name === formName);
     const isClosed = setting?.is_frozen || false;
 
+    const currentClosesAt = setting?.closes_at ? toLocalDatetime(setting.closes_at) : '';
+    const currentReopensAt = setting?.reopens_at ? toLocalDatetime(setting.reopens_at) : '';
+    if (schedule.closes_at === currentClosesAt && schedule.reopens_at === currentReopensAt) return;
+
     setSavingSchedule(prev => ({ ...prev, [formName]: true }));
+    setSavedSchedule(prev => ({ ...prev, [formName]: false }));
     try {
       const res = await fetch('/api/admin/form-settings', {
         method: 'PUT',
@@ -140,7 +163,16 @@ export default function SettingsPage() {
           reopens_at: schedule.reopens_at ? new Date(schedule.reopens_at).toISOString() : null,
         }),
       });
-      if (res.ok) fetchSettings();
+      if (res.ok) {
+        // Update local state instead of refetching
+        setFormSettings(prev => prev.map(s =>
+          s.form_name === formName
+            ? { ...s, closes_at: schedule.closes_at ? new Date(schedule.closes_at).toISOString() : null, reopens_at: schedule.reopens_at ? new Date(schedule.reopens_at).toISOString() : null }
+            : s
+        ));
+        setSavedSchedule(prev => ({ ...prev, [formName]: true }));
+        setTimeout(() => setSavedSchedule(prev => ({ ...prev, [formName]: false })), 2000);
+      }
     } catch (error) {
       console.error('Error saving schedule:', error);
     } finally {
@@ -179,10 +211,9 @@ export default function SettingsPage() {
   }
 
   function handleClearDate(formName, field) {
-    setSchedules(prev => ({
-      ...prev,
-      [formName]: { ...prev[formName], [field]: '' },
-    }));
+    const updated = { ...schedules[formName], [field]: '' };
+    setSchedules(prev => ({ ...prev, [formName]: updated }));
+    handleSaveSchedule(formName, updated);
   }
 
   function getFormStatus(formName) {
@@ -208,14 +239,6 @@ export default function SettingsPage() {
     }
 
     return { isClosed: false, isManual: false, isScheduled: false, isOverridden: false };
-  }
-
-  function hasUnsavedSchedule(formName) {
-    const setting = formSettings.find(s => s.form_name === formName);
-    const schedule = schedules[formName] || {};
-    const currentClosesAt = setting?.closes_at ? toLocalDatetime(setting.closes_at) : '';
-    const currentReopensAt = setting?.reopens_at ? toLocalDatetime(setting.reopens_at) : '';
-    return schedule.closes_at !== currentClosesAt || schedule.reopens_at !== currentReopensAt;
   }
 
   function hasUnsavedNote(formName) {
@@ -265,12 +288,11 @@ export default function SettingsPage() {
         {loading ? (
           <p className="text-text-secondary">Loading...</p>
         ) : (
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {forms.map((form) => {
               const status = getFormStatus(form.name);
               const isClosed = status.isClosed;
               const schedule = schedules[form.name] || {};
-              const unsavedSchedule = hasUnsavedSchedule(form.name);
               const unsavedNote = hasUnsavedNote(form.name);
               const scheduleDisabled = status.isOverridden;
 
@@ -303,7 +325,7 @@ export default function SettingsPage() {
                     )}
                     {status.scheduledClose && (
                       <p className="text-xs text-text-secondary">
-                        ({t('formFreeze.scheduledToClose', { date: new Date(status.scheduledClose).toLocaleString() })})
+                        ({t('formFreeze.scheduledToClose', { date: new Date(status.scheduledClose).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) })})
                       </p>
                     )}
                   </div>
@@ -348,6 +370,7 @@ export default function SettingsPage() {
                             type="datetime-local"
                             value={schedule.closes_at || ''}
                             onChange={(e) => handleScheduleChange(form.name, 'closes_at', e.target.value)}
+                            onBlur={() => handleSaveSchedule(form.name)}
                             className="border border-border rounded px-2 py-1 text-sm flex-1 disabled:bg-gray-100 disabled:cursor-not-allowed"
                             disabled={scheduleDisabled}
                           />
@@ -371,6 +394,7 @@ export default function SettingsPage() {
                             type="datetime-local"
                             value={schedule.reopens_at || ''}
                             onChange={(e) => handleScheduleChange(form.name, 'reopens_at', e.target.value)}
+                            onBlur={() => handleSaveSchedule(form.name)}
                             className="border border-border rounded px-2 py-1 text-sm flex-1 disabled:bg-gray-100 disabled:cursor-not-allowed"
                             disabled={scheduleDisabled}
                           />
@@ -386,14 +410,11 @@ export default function SettingsPage() {
                         </div>
                       </div>
                     </div>
-                    {unsavedSchedule && !scheduleDisabled && (
-                      <button
-                        onClick={() => handleSaveSchedule(form.name)}
-                        disabled={savingSchedule[form.name]}
-                        className="mt-2 px-3 py-1 text-xs bg-accent text-white rounded hover:bg-accent/90 disabled:opacity-50"
-                      >
-                        {savingSchedule[form.name] ? '...' : t('formFreeze.saveSchedule')}
-                      </button>
+                    {savingSchedule[form.name] && (
+                      <p className="mt-1 text-xs text-text-secondary">{t('formFreeze.savingSchedule')}</p>
+                    )}
+                    {savedSchedule[form.name] && !savingSchedule[form.name] && (
+                      <p className="mt-1 text-xs text-green-600">{t('formFreeze.savedSchedule')}</p>
                     )}
                   </div>
                 </div>

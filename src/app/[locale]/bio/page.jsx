@@ -51,17 +51,18 @@ export default function BioPage() {
   const [dataLoaded, setDataLoaded] = useState(false);
   const [disableEmail, setDisabledEmail] = useState(false);
   const [photoUrl, setPhotoUrl] = useState(null);
-  const [isFrozen, setIsFrozen] = useState(false);
-  const [formNote, setFormNote] = useState(null);
+  const [isFrozen, setIsFrozen] = useState(null); // null = loading, true = frozen, false = open
 
   useEffect(() => {
     fetch('/api/form-status?form=senior_bio')
       .then(res => res.json())
       .then(data => {
         setIsFrozen(data.isFrozen || false);
-        setFormNote(data.note || null);
       })
-      .catch(() => {});
+      .catch((err) => {
+        console.error('Failed to check form status:', err);
+        setIsFrozen(false); // fallback to open if API fails
+      });
   }, []);
 
   const vertical = "top";
@@ -387,13 +388,18 @@ export default function BioPage() {
             <h1 className="mb-2">{t("title")}</h1>
           </div>
 
-          {isFrozen ? (
-            <div className="card-elevated">
-              <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg mb-4">
-                <p className="text-gray-700 font-medium">{t('frozen')}</p>
-                {formNote && <p className="text-sm text-gray-600 mt-2">{formNote}</p>}
-              </div>
-              <p className="text-xs text-text-muted text-center">
+          {isFrozen === null ? (
+            <div className="flex justify-center py-12">
+              <CircularProgress sx={{ color: '#750014' }} />
+            </div>
+          ) : isFrozen ? (
+            <div className="card-elevated flex flex-col items-center text-center py-10 px-6">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-[#750014] mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+              </svg>
+              <p className="text-sm font-normal text-gray-600 mb-4">{t('frozen')}</p>
+              <div className="w-12 border-t border-[#E5E5E5] mb-4"></div>
+              <p className="text-xs text-text-muted">
                 {t("contactText")}{" "}
                 <a
                   href="mailto:technique@mit.edu"
@@ -417,12 +423,6 @@ export default function BioPage() {
                 await updateBio();
               }}
             >
-              {formNote && (
-                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <p className="text-sm text-blue-700">{formNote}</p>
-                </div>
-              )}
-
               {/* Email Field */}
               <TextField
                 required

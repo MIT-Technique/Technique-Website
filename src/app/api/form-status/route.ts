@@ -16,15 +16,18 @@ export async function GET(request: NextRequest) {
 
     const supabase = createAdminClient();
 
-    const { data: setting } = await supabase
+    const { data: setting, error: dbError } = await supabase
       .from("form_settings")
-      .select("is_frozen, closes_at, reopens_at, unfrozen_at, note")
+      .select("is_frozen, closes_at, reopens_at, unfrozen_at")
       .eq("form_name", formName)
       .single();
 
+    if (dbError) {
+      console.error("Error fetching form setting:", dbError);
+    }
+
     return NextResponse.json({
       isFrozen: isFormEffectivelyClosed(setting),
-      note: setting?.note || null,
     });
   } catch (error) {
     console.error("Error checking form status:", error);
