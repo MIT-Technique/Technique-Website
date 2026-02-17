@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "../../../../lib/supabase/admin";
+import { isFormEffectivelyClosed } from "../../../../lib/utils/formStatus";
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,14 +34,14 @@ export async function POST(request: NextRequest) {
 
     const supabase = createAdminClient();
 
-    // Check if form is frozen
+    // Check if form is closed
     const { data: formSettings } = await supabase
       .from('form_settings')
-      .select('is_frozen')
+      .select('is_frozen, closes_at, reopens_at, unfrozen_at')
       .eq('form_name', 'candids_form')
       .single();
 
-    if (formSettings?.is_frozen) {
+    if (isFormEffectivelyClosed(formSettings)) {
       return NextResponse.json(
         { error: "This form is currently closed" },
         { status: 403 }

@@ -404,6 +404,7 @@
       "submitButton": "Submit Bio",
       "success": "Your bio was saved successfully",
       "error": "There was an error saving your bio",
+      "frozen": "This form is currently closed and not accepting submissions.",
       "contactText": "Questions or suggestions?",
       "photo": {
         "label": "Senior Photo",
@@ -540,7 +541,7 @@
         "locationHint": "Enter where the photoshoot will take place"
       },
       "disabled": "Your account has been disabled. Please contact an administrator.",
-      "frozen": "This form is currently frozen. You cannot make changes at this time."
+      "frozen": "This form is currently closed. You cannot make changes at this time."
     },
 
     "archives": {
@@ -872,7 +873,7 @@
       "manageUsers": "Manage Users",
       "manageUsersDesc": "View and manage user accounts and roles",
       "formSettings": "Form Settings",
-      "formSettingsDesc": "Freeze or unfreeze forms"
+      "formSettingsDesc": "Open or close forms"
     },
     "photoshoots": {
       "title": "Photoshoot Times",
@@ -1063,12 +1064,26 @@
     "settings": {
       "title": "Settings",
       "formFreeze": {
-        "title": "Form Freeze",
-        "description": "Freeze forms to prevent users from making changes. Frozen forms will show an overlay and disable all inputs.",
-        "frozen": "Frozen - Users cannot make changes",
-        "active": "Active - Users can make changes",
-        "freeze": "Freeze",
-        "unfreeze": "Unfreeze"
+        "title": "Form Status",
+        "description": "Close forms to prevent users from making changes. You can also schedule auto-close and reopen times.",
+        "frozen": "Closed - Users cannot make changes",
+        "active": "Open - Users can make changes",
+        "freeze": "Closed",
+        "unfreeze": "Open",
+        "closesAt": "Auto-close date",
+        "reopensAt": "Auto-reopen date",
+        "clearDate": "Clear",
+        "saveSchedule": "Save Schedule",
+        "savingSchedule": "Saving...",
+        "savedSchedule": "Saved!",
+        "autoCloseInfo": "auto-closed by schedule",
+        "scheduledToClose": "Scheduled to close on {date}",
+        "scheduleOverrideWarning": "This form is currently closed by its schedule. Opening it will override the schedule. The schedule dates will remain but be inactive until you close the form again. Continue?",
+        "orgCloseWarning": "Closing this form will prevent the organization from submitting or editing any information through their portal. Continue?",
+        "scheduleInactive": "Schedule inactive — manually overridden. Close the form to re-activate the schedule.",
+        "noteLabel": "Admin Note",
+        "notePlaceholder": "Optional note displayed to users on the form page...",
+        "saveNote": "Save Note"
       },
       "forms": {
         "seniorBio": "Senior Bio Form",
@@ -1316,7 +1331,7 @@
     },
     "clubId": "Club ID",
     "notes": "Admin Notes",
-    "frozen": "This form is currently frozen. You cannot make changes at this time.",
+    "frozen": "This form is currently closed. You cannot make changes at this time.",
     "tabs": {
       "profile": "Profile",
       "members": "Members",
@@ -1421,6 +1436,8 @@
       "searchPlaceholder": "Search members...",
       "noResults": "No members found",
       "updateRoleError": "Failed to update role",
+      "officerAlert": "Your club has over 30 members — please assign officer positions!",
+      "officerAlertHint": "Use the role field next to each member's name to designate officers (President, Vice President, Secretary, etc.).",
       "role": {
         "member": "Member",
         "leader": "Leader"
@@ -1495,7 +1512,7 @@
     },
     "disabled": "Your account has been disabled",
     "disabledHint": "Please contact an administrator for assistance",
-    "frozen": "Booking is currently frozen. You cannot make changes at this time.",
+    "frozen": "Booking is currently closed. You cannot make changes at this time.",
     "currentBooking": "Upcoming Photoshoots",
     "cancelBooking": "Cancel Booking",
     "cancelling": "Cancelling...",
@@ -1839,7 +1856,7 @@
   "sportsPage": {
     "title": "Sports Team Dashboard",
     "welcome": "Welcome, {name}",
-    "frozen": "This form is currently frozen. Changes cannot be made.",
+    "frozen": "This form is currently closed. Changes cannot be made.",
     "success": "Changes saved successfully",
     "error": "Failed to save changes",
     "save": "Save Changes",

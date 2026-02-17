@@ -390,6 +390,7 @@
       "submitButton": "提交简介",
       "success": "您的简介已成功保存",
       "error": "保存简介时出错",
+      "frozen": "此表单目前已关闭，暂不接受提交。",
       "contactText": "有问题或建议？",
       "photo": {
         "label": "毕业照片",
@@ -524,7 +525,7 @@
         "locationHint": "输入拍摄地点"
       },
       "disabled": "您的账户已被禁用。请联系管理员。",
-      "frozen": "此表单目前已冻结。您暂时无法进行更改。"
+      "frozen": "此表单目前已关闭。您暂时无法进行更改。"
     },
     "archives": {
       "title": "档案",
@@ -837,7 +838,7 @@
       "manageUsers": "管理用户",
       "manageUsersDesc": "查看和管理用户账户与角色",
       "formSettings": "表单设置",
-      "formSettingsDesc": "冻结或解冻表单"
+      "formSettingsDesc": "开启或关闭表单"
     },
     "photoshoots": {
       "title": "拍摄时间管理",
@@ -1028,12 +1029,26 @@
     "settings": {
       "title": "设置",
       "formFreeze": {
-        "title": "表单冻结",
-        "description": "冻结表单以防止用户进行更改。冻结的表单将显示遮罩并禁用所有输入。",
-        "frozen": "已冻结 - 用户无法进行更改",
-        "active": "活跃 - 用户可以进行更改",
-        "freeze": "冻结",
-        "unfreeze": "解冻"
+        "title": "表单状态",
+        "description": "关闭表单以防止用户进行更改。您还可以设定自动关闭和重新开放时间。",
+        "frozen": "已关闭 - 用户无法进行更改",
+        "active": "开放 - 用户可以进行更改",
+        "freeze": "已关闭",
+        "unfreeze": "开放",
+        "closesAt": "自动关闭日期",
+        "reopensAt": "自动重新开放日期",
+        "clearDate": "清除",
+        "saveSchedule": "保存计划",
+        "savingSchedule": "保存中...",
+        "savedSchedule": "已保存！",
+        "autoCloseInfo": "按计划自动关闭",
+        "scheduledToClose": "计划于 {date} 关闭",
+        "scheduleOverrideWarning": "此表单目前按计划关闭。开启将覆盖该计划。计划日期将保留但处于非活动状态，直到您再次关闭表单。是否继续？",
+        "orgCloseWarning": "关闭此表单将阻止该组织通过其门户提交或编辑任何信息。是否继续？",
+        "scheduleInactive": "计划已停用 — 已被手动覆盖。关闭表单以重新激活计划。",
+        "noteLabel": "管理员备注",
+        "notePlaceholder": "可选备注，将显示在表单页面上...",
+        "saveNote": "保存备注"
       },
       "forms": {
         "seniorBio": "毕业生简介表单",
@@ -1280,7 +1295,7 @@
     },
     "clubId": "社团ID",
     "notes": "管理员备注",
-    "frozen": "此表单目前已冻结。您暂时无法进行更改。",
+    "frozen": "此表单目前已关闭。您暂时无法进行更改。",
     "tabs": {
       "profile": "资料",
       "members": "成员",
@@ -1385,6 +1400,8 @@
       "searchPlaceholder": "搜索成员...",
       "noResults": "未找到成员",
       "updateRoleError": "更新角色失败",
+      "officerAlert": "您的社团有超过30名成员——请分配干部职位！",
+      "officerAlertHint": "使用每位成员姓名旁的角色字段来指定干部（主席、副主席、秘书等）。",
       "role": {
         "member": "成员",
         "leader": "负责人"
@@ -1458,7 +1475,7 @@
     },
     "disabled": "您的账户已被禁用",
     "disabledHint": "请联系管理员获取帮助",
-    "frozen": "预约功能目前已冻结。您暂时无法进行更改。",
+    "frozen": "预约功能目前已关闭。您暂时无法进行更改。",
     "currentBooking": "即将到来的拍摄",
     "cancelBooking": "取消预约",
     "cancelling": "取消中...",
@@ -1803,7 +1820,7 @@
   "sportsPage": {
     "title": "运动队管理面板",
     "welcome": "欢迎，{name}",
-    "frozen": "此表单已冻结，无法进行更改。",
+    "frozen": "此表单已关闭，无法进行更改。",
     "success": "更改已保存",
     "error": "保存失败",
     "save": "保存更改",

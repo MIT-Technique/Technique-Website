@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createAdminClientForSeniors } from "../../../lib/supabase/admin";
+import { createAdminClient, createAdminClientForSeniors } from "../../../lib/supabase/admin";
+import { isFormEffectivelyClosed } from "../../../lib/utils/formStatus";
 
 // GET - Fetch senior bio by email
 export async function GET(request: NextRequest): Promise<NextResponse> {
@@ -60,6 +61,21 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json(
         { error: "MIT email is required" },
         { status: 400 }
+      );
+    }
+
+    // Check if form is frozen
+    const adminSupabase = createAdminClient();
+    const { data: setting } = await adminSupabase
+      .from("form_settings")
+      .select("is_frozen, closes_at, reopens_at, unfrozen_at")
+      .eq("form_name", "senior_bio")
+      .single();
+
+    if (isFormEffectivelyClosed(setting)) {
+      return NextResponse.json(
+        { error: "This form is currently closed and not accepting submissions." },
+        { status: 403 }
       );
     }
 

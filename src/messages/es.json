@@ -388,6 +388,7 @@
       "submitButton": "Enviar Bio",
       "success": "Tu bio fue guardada exitosamente",
       "error": "Hubo un error al guardar tu bio",
+      "frozen": "Este formulario está cerrado y no acepta envíos en este momento.",
       "contactText": "¿Preguntas o sugerencias?",
       "photo": {
         "label": "Foto de Graduacion",
@@ -522,7 +523,7 @@
         "locationHint": "Ingresa dónde se realizará la sesión de fotos"
       },
       "disabled": "Tu cuenta ha sido deshabilitada. Por favor contacta a un administrador.",
-      "frozen": "Este formulario está congelado. No puedes hacer cambios en este momento."
+      "frozen": "Este formulario está cerrado. No puedes hacer cambios en este momento."
     },
     "archives": {
       "title": "Archivo",
@@ -835,7 +836,7 @@
       "manageUsers": "Gestionar Usuarios",
       "manageUsersDesc": "Ver y gestionar cuentas y roles de usuarios",
       "formSettings": "Configuración de Formularios",
-      "formSettingsDesc": "Congelar o descongelar formularios"
+      "formSettingsDesc": "Abrir o cerrar formularios"
     },
     "photoshoots": {
       "title": "Horarios de Sesiones",
@@ -1026,12 +1027,26 @@
     "settings": {
       "title": "Configuración",
       "formFreeze": {
-        "title": "Congelar Formularios",
-        "description": "Congele formularios para evitar que los usuarios hagan cambios. Los formularios congelados mostrarán una superposición y deshabilitarán todas las entradas.",
-        "frozen": "Congelado - Los usuarios no pueden hacer cambios",
-        "active": "Activo - Los usuarios pueden hacer cambios",
-        "freeze": "Congelar",
-        "unfreeze": "Descongelar"
+        "title": "Estado de Formularios",
+        "description": "Cierre formularios para evitar que los usuarios hagan cambios. También puede programar cierre y reapertura automáticos.",
+        "frozen": "Cerrado - Los usuarios no pueden hacer cambios",
+        "active": "Abierto - Los usuarios pueden hacer cambios",
+        "freeze": "Cerrado",
+        "unfreeze": "Abierto",
+        "closesAt": "Fecha de cierre automático",
+        "reopensAt": "Fecha de reapertura automática",
+        "clearDate": "Borrar",
+        "saveSchedule": "Guardar Programación",
+        "savingSchedule": "Guardando...",
+        "savedSchedule": "¡Guardado!",
+        "autoCloseInfo": "cerrado automáticamente por programación",
+        "scheduledToClose": "Programado para cerrar el {date}",
+        "scheduleOverrideWarning": "Este formulario está cerrado por su programación. Abrirlo anulará la programación. Las fechas permanecerán pero estarán inactivas hasta que cierre el formulario nuevamente. ¿Continuar?",
+        "orgCloseWarning": "Cerrar este formulario impedirá que la organización envíe o edite información a través de su portal. ¿Continuar?",
+        "scheduleInactive": "Programación inactiva — anulada manualmente. Cierre el formulario para reactivar la programación.",
+        "noteLabel": "Nota del administrador",
+        "notePlaceholder": "Nota opcional que se muestra a los usuarios en la página del formulario...",
+        "saveNote": "Guardar nota"
       },
       "forms": {
         "seniorBio": "Formulario de Bio de Senior",
@@ -1278,7 +1293,7 @@
     },
     "clubId": "ID del Club",
     "notes": "Notas del Admin",
-    "frozen": "Este formulario está congelado. No puede hacer cambios en este momento.",
+    "frozen": "Este formulario está cerrado. No puede hacer cambios en este momento.",
     "tabs": {
       "profile": "Perfil",
       "members": "Miembros",
@@ -1383,6 +1398,8 @@
       "searchPlaceholder": "Buscar miembros...",
       "noResults": "No se encontraron miembros",
       "updateRoleError": "Error al actualizar rol",
+      "officerAlert": "Tu club tiene más de 30 miembros — ¡por favor asigna cargos directivos!",
+      "officerAlertHint": "Usa el campo de rol junto al nombre de cada miembro para designar directivos (Presidente, Vicepresidente, Secretario, etc.).",
       "role": {
         "member": "Miembro",
         "leader": "Líder"
@@ -1456,7 +1473,7 @@
     },
     "disabled": "Su cuenta ha sido deshabilitada",
     "disabledHint": "Por favor contacte a un administrador para asistencia",
-    "frozen": "Las reservas están congeladas. No puede hacer cambios en este momento.",
+    "frozen": "Las reservas están cerradas. No puede hacer cambios en este momento.",
     "currentBooking": "Próximas Sesiones Fotográficas",
     "cancelBooking": "Cancelar Reserva",
     "cancelling": "Cancelando...",
@@ -1797,7 +1814,7 @@
   "sportsPage": {
     "title": "Panel del Equipo Deportivo",
     "welcome": "Bienvenido, {name}",
-    "frozen": "Este formulario está congelado. No se pueden hacer cambios.",
+    "frozen": "Este formulario está cerrado. No se pueden hacer cambios.",
     "success": "Cambios guardados exitosamente",
     "error": "Error al guardar cambios",
     "save": "Guardar Cambios",

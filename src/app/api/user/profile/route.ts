@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser, getSession } from "../../../../lib/auth/session";
 import { createAdminClient } from "../../../../lib/supabase/admin";
+import { isFormEffectivelyClosed } from "../../../../lib/utils/formStatus";
 
 // GET - Get current user profile
 export async function GET() {
@@ -39,17 +40,17 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
     const supabase = createAdminClient();
 
-    // Check if bio form is frozen (for staph)
+    // Check if bio form is closed (for staph)
     if (user.role === 'staph') {
       const { data: formSettings } = await supabase
         .from('form_settings')
-        .select('is_frozen')
+        .select('is_frozen, closes_at, reopens_at, unfrozen_at')
         .eq('form_name', 'senior_bio')
         .single();
 
-      if (formSettings?.is_frozen) {
+      if (isFormEffectivelyClosed(formSettings)) {
         return NextResponse.json(
-          { error: "Senior bio form is currently frozen" },
+          { error: "Senior bio form is currently closed" },
           { status: 403 }
         );
       }

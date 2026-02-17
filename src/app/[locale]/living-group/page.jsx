@@ -67,6 +67,7 @@ export default function LivingGroupPage() {
   const [cancelling, setCancelling] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [isFrozen, setIsFrozen] = useState(false);
+  const [formNote, setFormNote] = useState(null);
 
   // Manual members state
   const [manualMembers, setManualMembers] = useState([]);
@@ -250,10 +251,12 @@ export default function LivingGroupPage() {
     try {
       const res = await fetch('/api/auth/session');
       const data = await res.json();
-      const frozen = data.frozenForms?.some(f => f.form_name === 'living_group_booking' && f.is_frozen);
+      const formData = data.frozenForms?.find(f => f.form_name === 'living_group_booking');
+      const frozen = formData ? (formData.is_closed ?? formData.is_frozen) : false;
       setIsFrozen(frozen || false);
+      setFormNote(formData?.note || null);
     } catch (error) {
-      console.error('Error checking frozen status:', error);
+      console.error('Error checking form status:', error);
     }
   }
 
@@ -1011,10 +1014,17 @@ export default function LivingGroupPage() {
             </div>
           )}
 
-          {/* Frozen Notice */}
+          {/* Closed Notice */}
           {isFrozen && !isDisabled && activeTab === 'schedule' && scheduleSubTab === 'book' && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-600 font-medium">{t('frozen')}</p>
+            <div className="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+              <p className="text-gray-700 font-medium">{t('frozen')}</p>
+              {formNote && <p className="text-sm text-gray-600 mt-1">{formNote}</p>}
+            </div>
+          )}
+
+          {!isFrozen && formNote && !isDisabled && activeTab === 'schedule' && scheduleSubTab === 'book' && (
+            <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-700">{formNote}</p>
             </div>
           )}
 

@@ -16,6 +16,7 @@ export default function SportsPage() {
 
   const [activeTab, setActiveTab] = useState('profile');
   const [isFrozen, setIsFrozen] = useState(false);
+  const [formNote, setFormNote] = useState(null);
 
   // Profile state
   const [formData, setFormData] = useState({
@@ -145,10 +146,11 @@ export default function SportsPage() {
         try {
           const res = await fetch('/api/auth/session');
           const data = await res.json();
-          const frozen = data.frozenForms?.some(f => f.form_name === 'sports_form' && f.is_frozen);
-          setIsFrozen(frozen || false);
+          const formData = data.frozenForms?.find(f => f.form_name === 'sports_form');
+          setIsFrozen(formData ? (formData.is_closed ?? formData.is_frozen) : false);
+          setFormNote(formData?.note || null);
         } catch (error) {
-          console.error('Error checking frozen status:', error);
+          console.error('Error checking form status:', error);
         }
       })();
     } else if (activeTab === 'coaches') {
@@ -645,8 +647,9 @@ export default function SportsPage() {
           {activeTab === 'profile' && (
             <div>
               {isFrozen && (
-                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <p className="text-red-600 font-medium">{t('frozen')}</p>
+                <div className="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                  <p className="text-gray-700 font-medium">{t('frozen')}</p>
+                  {formNote && <p className="text-sm text-gray-600 mt-1">{formNote}</p>}
                 </div>
               )}
 
@@ -1018,8 +1021,9 @@ export default function SportsPage() {
           {activeTab === 'photos' && (
             <div>
               {isFrozen && (
-                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <p className="text-red-600 font-medium">{t('frozen')}</p>
+                <div className="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                  <p className="text-gray-700 font-medium">{t('frozen')}</p>
+                  {formNote && <p className="text-sm text-gray-600 mt-1">{formNote}</p>}
                 </div>
               )}
 

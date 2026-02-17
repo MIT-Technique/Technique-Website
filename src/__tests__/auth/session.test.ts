@@ -79,7 +79,7 @@ describe('/api/auth/session', () => {
     expect(data.club).toEqual(mockClub);
     expect(data.livingGroup).toBeNull();
     expect(data.sports).toBeNull();
-    expect(data.frozenForms).toEqual(mockForms);
+    expect(data.frozenForms).toEqual([{ form_name: 'club', is_frozen: false, is_closed: false }]);
   });
 
   it('returns 500 on unexpected error', async () => {

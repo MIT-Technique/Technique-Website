@@ -39,7 +39,7 @@ export async function GET() {
   }
 }
 
-// PUT - Freeze or unfreeze a form
+// PUT - Close/open a form or update schedule
 export async function PUT(request: NextRequest) {
   try {
     const user = await getCurrentUser();
@@ -52,7 +52,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { formName, freeze } = body;
+    const { formName, freeze, closes_at, reopens_at, note } = body;
 
     if (!formName) {
       return NextResponse.json(
@@ -94,6 +94,17 @@ export async function PUT(request: NextRequest) {
         updateData.unfrozen_at = new Date().toISOString();
       }
 
+      // Update schedule fields (null clears the field)
+      if (closes_at !== undefined) {
+        updateData.closes_at = closes_at || null;
+      }
+      if (reopens_at !== undefined) {
+        updateData.reopens_at = reopens_at || null;
+      }
+      if (note !== undefined) {
+        updateData.note = note || null;
+      }
+
       const { data: updatedSetting, error } = await supabase
         .from('form_settings')
         .update(updateData)
@@ -121,6 +132,10 @@ export async function PUT(request: NextRequest) {
         insertData.frozen_by = user.id;
         insertData.frozen_at = new Date().toISOString();
       }
+
+      if (closes_at) insertData.closes_at = closes_at;
+      if (reopens_at) insertData.reopens_at = reopens_at;
+      if (note) insertData.note = note;
 
       const { data: newSetting, error } = await supabase
         .from('form_settings')

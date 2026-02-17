@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "../../../../lib/auth/session";
 import { createAdminClient } from "../../../../lib/supabase/admin";
+import { isFormEffectivelyClosed } from "../../../../lib/utils/formStatus";
 
 // GET - Get current user's club profile
 export async function GET() {
@@ -62,16 +63,16 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
     const supabase = createAdminClient();
 
-    // Check if club form is frozen
+    // Check if club form is closed
     const { data: formSettings } = await supabase
       .from('form_settings')
-      .select('is_frozen')
+      .select('is_frozen, closes_at, reopens_at, unfrozen_at')
       .eq('form_name', 'club_submission')
       .single();
 
-    if (formSettings?.is_frozen) {
+    if (isFormEffectivelyClosed(formSettings)) {
       return NextResponse.json(
-        { error: "Club submission form is currently frozen" },
+        { error: "Club submission form is currently closed" },
         { status: 403 }
       );
     }
