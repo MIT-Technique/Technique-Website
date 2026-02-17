@@ -1380,6 +1380,9 @@
       "cancelError": "Error al cancelar solicitud",
       "demoteSuccess": "Líder degradado a miembro",
       "demoteError": "Error al degradar líder",
+      "searchPlaceholder": "Buscar miembros...",
+      "noResults": "No se encontraron miembros",
+      "updateRoleError": "Error al actualizar rol",
       "role": {
         "member": "Miembro",
         "leader": "Líder"

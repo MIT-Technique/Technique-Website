@@ -44,6 +44,13 @@ export default function ClubPage() {
   const [addingMember, setAddingMember] = useState(false);
   const [removingMemberId, setRemovingMemberId] = useState(null);
   const [showRoleDropdown, setShowRoleDropdown] = useState(false);
+  const [memberSearchQuery, setMemberSearchQuery] = useState('');
+  const [membersPage, setMembersPage] = useState(1);
+  const MEMBERS_PER_PAGE = 10;
+  const [updatingMemberId, setUpdatingMemberId] = useState(null);
+  const [editingRoleMemberId, setEditingRoleMemberId] = useState(null);
+  const [showMemberRoleDropdown, setShowMemberRoleDropdown] = useState(null);
+  const [savedRoleMemberId, setSavedRoleMemberId] = useState(null);
 
   // Documents state
   const [documents, setDocuments] = useState({
@@ -402,6 +409,34 @@ export default function ClubPage() {
       setMembersMessage({ type: 'error', text: t('members.removeError') });
     } finally {
       setRemovingMemberId(null);
+    }
+  }
+
+  async function handleUpdateMemberRole(memberId, newRole) {
+    setUpdatingMemberId(memberId);
+    try {
+      const res = await fetch('/api/clubs/manual-members', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: memberId, role: newRole || null }),
+      });
+
+      if (res.ok) {
+        setManualMembers(prev =>
+          prev.map(m => m.id === memberId ? { ...m, role: newRole || null } : m)
+        );
+        setSavedRoleMemberId(memberId);
+        setTimeout(() => setSavedRoleMemberId(null), 2000);
+      } else {
+        const data = await res.json();
+        setMembersMessage({ type: 'error', text: data.error || t('members.updateRoleError') });
+      }
+    } catch (error) {
+      setMembersMessage({ type: 'error', text: t('members.updateRoleError') });
+    } finally {
+      setUpdatingMemberId(null);
+      setEditingRoleMemberId(null);
+      setShowMemberRoleDropdown(null);
     }
   }
 
@@ -787,34 +822,180 @@ export default function ClubPage() {
                 </div>
               )}
 
-              {/* Members List */}
+              {/* Members List with Search + Pagination */}
               <div>
                 {membersLoading ? (
                   <p className="text-text-secondary">Loading...</p>
                 ) : manualMembers.length === 0 ? (
                   <p className="text-text-secondary">{t('members.noMembers')}</p>
-                ) : (
-                  <div className="space-y-2">
-                    {manualMembers.map((member) => (
-                      <div
-                        key={member.id}
-                        className="px-3 py-2 border border-border rounded-lg flex justify-between items-center"
-                      >
-                        <span>
-                          {member.name}
-                          {member.role && <span className="text-text-secondary ml-2">— {member.role}</span>}
-                        </span>
-                        <button
-                          onClick={() => handleRemoveManualMember(member.id)}
-                          disabled={removingMemberId === member.id}
-                          className="text-sm text-red-600 hover:text-red-700"
-                        >
-                          {removingMemberId === member.id ? t('members.removing') : t('members.remove')}
-                        </button>
+                ) : (() => {
+                  const filteredMembers = memberSearchQuery.trim()
+                    ? manualMembers.filter(m =>
+                        m.name.toLowerCase().includes(memberSearchQuery.toLowerCase()) ||
+                        (m.role && m.role.toLowerCase().includes(memberSearchQuery.toLowerCase()))
+                      )
+                    : manualMembers;
+
+                  const totalPages = Math.ceil(filteredMembers.length / MEMBERS_PER_PAGE);
+                  const startIndex = (membersPage - 1) * MEMBERS_PER_PAGE;
+                  const paginatedMembers = filteredMembers.slice(startIndex, startIndex + MEMBERS_PER_PAGE);
+
+                  const roleOptions = [
+                    t('members.roles.president'),
+                    t('members.roles.vicePresident'),
+                    t('members.roles.secretary'),
+                    t('members.roles.treasurer'),
+                    t('members.roles.socialChair'),
+                    t('members.roles.publicityChair'),
+                  ];
+
+                  return (
+                    <>
+                      {/* Search + Pagination Bar */}
+                      <div className="mb-4 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+                        <div className="flex-1">
+                          <input
+                            type="text"
+                            value={memberSearchQuery}
+                            onChange={(e) => {
+                              setMemberSearchQuery(e.target.value);
+                              setMembersPage(1);
+                            }}
+                            placeholder={t('members.searchPlaceholder')}
+                            className="w-full border border-border rounded px-4 py-2"
+                          />
+                        </div>
+                        {filteredMembers.length > MEMBERS_PER_PAGE && (
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => setMembersPage(p => Math.max(1, p - 1))}
+                              disabled={membersPage === 1}
+                              className="p-2 text-text-secondary hover:text-text disabled:opacity-30 disabled:cursor-not-allowed border border-border rounded"
+                              aria-label="Previous page"
+                            >
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                              </svg>
+                            </button>
+                            <span className="text-sm text-text-secondary whitespace-nowrap min-w-[60px] text-center">
+                              {membersPage} / {totalPages}
+                            </span>
+                            <button
+                              onClick={() => setMembersPage(p => Math.min(totalPages, p + 1))}
+                              disabled={membersPage >= totalPages}
+                              className="p-2 text-text-secondary hover:text-text disabled:opacity-30 disabled:cursor-not-allowed border border-border rounded"
+                              aria-label="Next page"
+                            >
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                              </svg>
+                            </button>
+                          </div>
+                        )}
                       </div>
-                    ))}
-                  </div>
-                )}
+
+                      {filteredMembers.length === 0 ? (
+                        <p className="text-text-secondary">{t('members.noResults')}</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {paginatedMembers.map((member) => (
+                            <div
+                              key={member.id}
+                              className="px-3 py-2 border border-border rounded-lg flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2"
+                            >
+                              <span className="font-medium">{member.name}</span>
+                              <div className="flex items-center gap-2">
+                                {/* Inline Role Editing */}
+                                <div className="relative">
+                                  <input
+                                    type="text"
+                                    value={editingRoleMemberId === member.id
+                                      ? (member._editRole ?? member.role ?? '')
+                                      : (member.role || '')}
+                                    onChange={(e) => {
+                                      setEditingRoleMemberId(member.id);
+                                      setManualMembers(prev =>
+                                        prev.map(m => m.id === member.id ? { ...m, _editRole: e.target.value } : m)
+                                      );
+                                      setShowMemberRoleDropdown(member.id);
+                                    }}
+                                    onFocus={() => {
+                                      setEditingRoleMemberId(member.id);
+                                      setShowMemberRoleDropdown(member.id);
+                                    }}
+                                    onBlur={() => {
+                                      setTimeout(() => {
+                                        setShowMemberRoleDropdown(null);
+                                        if (editingRoleMemberId === member.id) {
+                                          const newRole = member._editRole ?? member.role ?? '';
+                                          if (newRole !== (member.role || '')) {
+                                            handleUpdateMemberRole(member.id, newRole);
+                                          } else {
+                                            setEditingRoleMemberId(null);
+                                          }
+                                          // Clean up temp edit field
+                                          setManualMembers(prev =>
+                                            prev.map(m => {
+                                              const { _editRole, ...rest } = m;
+                                              return rest;
+                                            })
+                                          );
+                                        }
+                                      }, 150);
+                                    }}
+                                    placeholder={t('members.rolePlaceholder')}
+                                    disabled={updatingMemberId === member.id}
+                                    className="border border-border rounded px-3 py-1 text-sm w-[160px]"
+                                  />
+                                  {showMemberRoleDropdown === member.id && (() => {
+                                    const currentVal = (member._editRole ?? member.role ?? '').toLowerCase();
+                                    const options = roleOptions.filter(o =>
+                                      !currentVal || o.toLowerCase().includes(currentVal)
+                                    );
+                                    return options.length > 0 ? (
+                                      <ul className="absolute z-50 w-full mt-1 bg-white border border-border rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                                        {options.map((option) => (
+                                          <li
+                                            key={option}
+                                            onMouseDown={() => {
+                                              handleUpdateMemberRole(member.id, option);
+                                              setManualMembers(prev =>
+                                                prev.map(m => {
+                                                  const { _editRole, ...rest } = m;
+                                                  return rest;
+                                                })
+                                              );
+                                            }}
+                                            className="px-3 py-1.5 cursor-pointer hover:bg-gray-100 text-sm"
+                                          >
+                                            {option}
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    ) : null;
+                                  })()}
+                                </div>
+                                {updatingMemberId === member.id && (
+                                  <span className="text-xs text-text-secondary whitespace-nowrap">Saving...</span>
+                                )}
+                                {savedRoleMemberId === member.id && updatingMemberId !== member.id && (
+                                  <span className="text-xs text-green-600 whitespace-nowrap">Saved!</span>
+                                )}
+                                <button
+                                  onClick={() => handleRemoveManualMember(member.id)}
+                                  disabled={removingMemberId === member.id}
+                                  className="text-sm text-red-600 hover:text-red-700 whitespace-nowrap"
+                                >
+                                  {removingMemberId === member.id ? t('members.removing') : t('members.remove')}
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
             </div>
           )}
