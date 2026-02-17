@@ -285,6 +285,88 @@ export async function POST(request: NextRequest) {
   }
 }
 
+// PUT - Update a manual member's role
+export async function PUT(request: NextRequest) {
+  try {
+    const user = await getCurrentUser();
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const { id, role, clubId: clubIdParam } = body;
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "Member ID is required" },
+        { status: 400 }
+      );
+    }
+
+    const supabase = createAdminClient();
+
+    const { clubId, error: clubIdError } = await getClubIdForUser(
+      user,
+      supabase,
+      clubIdParam
+    );
+
+    if (!clubId || clubIdError) {
+      return NextResponse.json(
+        { error: clubIdError || "Club not found" },
+        { status: 403 }
+      );
+    }
+
+    // Verify member belongs to this club
+    const { data: member, error: memberError } = await supabase
+      .from("club_manual_members")
+      .select("id, club_id")
+      .eq("id", id)
+      .single();
+
+    if (memberError || !member) {
+      return NextResponse.json(
+        { error: "Member not found" },
+        { status: 404 }
+      );
+    }
+
+    if (member.club_id !== clubId) {
+      return NextResponse.json(
+        { error: "Member does not belong to your club" },
+        { status: 403 }
+      );
+    }
+
+    const trimmedRole = role ? String(role).trim() : null;
+
+    const { data, error } = await supabase
+      .from("club_manual_members")
+      .update({ role: trimmedRole })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Update member role error:", error);
+      return NextResponse.json(
+        { error: "Failed to update member role" },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ member: data });
+  } catch (error) {
+    console.error("Update member role error:", error);
+    return NextResponse.json(
+      { error: "Failed to update member role" },
+      { status: 500 }
+    );
+  }
+}
+
 // DELETE - Remove a manual member
 export async function DELETE(request: NextRequest) {
   try {

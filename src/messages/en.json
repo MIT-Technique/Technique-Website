@@ -1418,6 +1418,9 @@
       "cancelError": "Failed to cancel request",
       "demoteSuccess": "Leader demoted to member",
       "demoteError": "Failed to demote leader",
+      "searchPlaceholder": "Search members...",
+      "noResults": "No members found",
+      "updateRoleError": "Failed to update role",
       "role": {
         "member": "Member",
         "leader": "Leader"

@@ -1382,6 +1382,9 @@
       "cancelError": "取消请求失败",
       "demoteSuccess": "负责人已降为成员",
       "demoteError": "降级失败",
+      "searchPlaceholder": "搜索成员...",
+      "noResults": "未找到成员",
+      "updateRoleError": "更新角色失败",
       "role": {
         "member": "成员",
         "leader": "负责人"
