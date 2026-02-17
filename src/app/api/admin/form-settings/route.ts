@@ -70,10 +70,10 @@ export async function PUT(request: NextRequest) {
 
     const supabase = createAdminClient();
 
-    // Check if form setting exists
+    // Check if form setting exists (include is_frozen to detect actual state transitions)
     const { data: existingSetting } = await supabase
       .from('form_settings')
-      .select('id')
+      .select('id, is_frozen')
       .eq('form_name', formName)
       .single();
 
@@ -89,7 +89,10 @@ export async function PUT(request: NextRequest) {
         updateData.frozen_at = new Date().toISOString();
         updateData.unfrozen_by = null;
         updateData.unfrozen_at = null;
-      } else {
+      } else if (existingSetting.is_frozen) {
+        // Only set unfrozen_at when actually transitioning from frozen to unfrozen.
+        // Schedule-only saves (where is_frozen was already false) should not
+        // update unfrozen_at, as that would override a closes_at schedule.
         updateData.unfrozen_by = user.id;
         updateData.unfrozen_at = new Date().toISOString();
       }
