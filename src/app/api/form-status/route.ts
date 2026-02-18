@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "../../../lib/supabase/admin";
 import { isFormEffectivelyClosed } from "../../../lib/utils/formStatus";
 
+export const dynamic = 'force-dynamic';
+
 // GET - Public endpoint to check if a specific form is closed
 export async function GET(request: NextRequest) {
   try {
