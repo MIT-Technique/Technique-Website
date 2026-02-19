@@ -394,8 +394,8 @@
         "label": "Foto de Graduacion",
         "preferenceLabel": "Preferencia de Foto",
         "preferenceOptions": {
-          "techniquePhoto": "Me gustaría usar la foto que reservé a través de Technique para el anuario",
-          "uploadedPhoto": "Me gustaría que se use mi foto subida para el anuario",
+          "techniquePhoto": "Me gustaría usar la foto de estudio de Technique",
+          "uploadedPhoto": "Me gustaría subir mi propia imagen",
           "noImage": "No quiero una imagen en el anuario"
         },
         "uploadLabel": "Subir Foto",

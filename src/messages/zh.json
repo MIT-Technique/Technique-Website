@@ -396,8 +396,8 @@
         "label": "毕业照片",
         "preferenceLabel": "照片偏好",
         "preferenceOptions": {
-          "techniquePhoto": "我想使用通过 Technique 预约拍摄的照片用于年鉴",
-          "uploadedPhoto": "我想使用我上传的照片用于年鉴",
+          "techniquePhoto": "我想使用 Technique 工作室照片",
+          "uploadedPhoto": "我想上传自己的照片",
           "noImage": "我不想在年鉴中放照片"
         },
         "uploadLabel": "上传照片",

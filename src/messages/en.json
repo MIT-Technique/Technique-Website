@@ -410,8 +410,8 @@
         "label": "Senior Photo",
         "preferenceLabel": "Photo Preference",
         "preferenceOptions": {
-          "techniquePhoto": "I would like to use the picture I booked through Technique for the yearbook",
-          "uploadedPhoto": "I would like my uploaded picture to be used for the yearbook",
+          "techniquePhoto": "I would like to use the Technique studio photo",
+          "uploadedPhoto": "I would like to upload my own photo",
           "noImage": "I do not want an image in the yearbook"
         },
         "uploadLabel": "Upload Photo",
