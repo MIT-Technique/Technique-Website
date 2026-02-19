@@ -325,7 +325,7 @@ export default function BioPage() {
     { name: "Design", course: "4" },
     { name: "History of Architecture, Art and Design", course: "4" },
     { name: "Chemistry", course: "5" },
-    { name: "Computer Science and Engineering", course: "6" },
+    { name: "Computer Science", course: "6" },
     { name: "Biology", course: "7" },
     { name: "Astronomy", course: "8" },
     { name: "Physics", course: "8" },
