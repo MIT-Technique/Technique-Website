@@ -21,12 +21,10 @@ function Sidebar({ pathname }) {
   const tAccount = useTranslations('account');
   const { isLoggedIn, user, club, sports, livingGroup, loading, logout } = useUser();
   const [isOpen, setIsOpen] = useState(false);
-  const [aboutOpen, setAboutOpen] = useState(false);
-  const [purchaseOpen, setPurchaseOpen] = useState(false);
-  const [formsOpen, setFormsOpen] = useState(false);
-  const [getStartedOpen, setGetStartedOpen] = useState(false);
-  const [accountOpen, setAccountOpen] = useState(false);
+  const [openMenu, setOpenMenu] = useState(null); // only one menu open at a time
   const [orgModalOpen, setOrgModalOpen] = useState(false);
+
+  const toggleMenu = (menu) => setOpenMenu(prev => prev === menu ? null : menu);
 
   // Get dashboard link based on role
   const getDashboardLink = () => {
@@ -131,7 +129,7 @@ function Sidebar({ pathname }) {
             {/* About Dropdown */}
             <ListItem disablePadding>
               <ListItemButton
-                onClick={() => setAboutOpen(!aboutOpen)}
+                onClick={() => toggleMenu('about')}
                 sx={{ px: 3, py: 1.5 }}
               >
                 <ListItemText
@@ -149,13 +147,13 @@ function Sidebar({ pathname }) {
                   size={16}
                   style={{
                     color: isAboutActive ? "#750014" : textColor,
-                    transform: aboutOpen ? "rotate(180deg)" : "rotate(0deg)",
+                    transform: openMenu === 'about' ? "rotate(180deg)" : "rotate(0deg)",
                     transition: "transform 0.2s",
                   }}
                 />
               </ListItemButton>
             </ListItem>
-            <Collapse in={aboutOpen} timeout="auto" unmountOnExit>
+            <Collapse in={openMenu === 'about'} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 {[
                   { href: `/${locale}/about`, label: t('dropdown.ourHistory') },
@@ -192,7 +190,7 @@ function Sidebar({ pathname }) {
             {/* Yearbook Dropdown */}
             <ListItem disablePadding>
               <ListItemButton
-                onClick={() => setPurchaseOpen(!purchaseOpen)}
+                onClick={() => toggleMenu('purchase')}
                 sx={{ px: 3, py: 1.5 }}
               >
                 <ListItemText
@@ -210,13 +208,13 @@ function Sidebar({ pathname }) {
                   size={16}
                   style={{
                     color: isPurchaseActive ? "#750014" : textColor,
-                    transform: purchaseOpen ? "rotate(180deg)" : "rotate(0deg)",
+                    transform: openMenu === 'purchase' ? "rotate(180deg)" : "rotate(0deg)",
                     transition: "transform 0.2s",
                   }}
                 />
               </ListItemButton>
             </ListItem>
-            <Collapse in={purchaseOpen} timeout="auto" unmountOnExit>
+            <Collapse in={openMenu === 'purchase'} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 {[
                   { href: `/${locale}/purchase`, label: t('purchase'), external: true },
@@ -253,7 +251,7 @@ function Sidebar({ pathname }) {
             {/* Forms Dropdown */}
             <ListItem disablePadding>
               <ListItemButton
-                onClick={() => setFormsOpen(!formsOpen)}
+                onClick={() => toggleMenu('forms')}
                 sx={{ px: 3, py: 1.5 }}
               >
                 <ListItemText
@@ -271,13 +269,13 @@ function Sidebar({ pathname }) {
                   size={16}
                   style={{
                     color: isFormsActive ? "#750014" : textColor,
-                    transform: formsOpen ? "rotate(180deg)" : "rotate(0deg)",
+                    transform: openMenu === 'forms' ? "rotate(180deg)" : "rotate(0deg)",
                     transition: "transform 0.2s",
                   }}
                 />
               </ListItemButton>
             </ListItem>
-            <Collapse in={formsOpen} timeout="auto" unmountOnExit>
+            <Collapse in={openMenu === 'forms'} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 {/* Students Section */}
                 <ListItem disablePadding>
@@ -399,7 +397,7 @@ function Sidebar({ pathname }) {
             {/* Get Started Dropdown */}
             <ListItem disablePadding>
               <ListItemButton
-                onClick={() => setGetStartedOpen(!getStartedOpen)}
+                onClick={() => toggleMenu('getStarted')}
                 sx={{ px: 3, py: 1.5 }}
               >
                 <ListItemText
@@ -417,13 +415,13 @@ function Sidebar({ pathname }) {
                   size={16}
                   style={{
                     color: isGetStartedActive ? "#750014" : textColor,
-                    transform: getStartedOpen ? "rotate(180deg)" : "rotate(0deg)",
+                    transform: openMenu === 'getStarted' ? "rotate(180deg)" : "rotate(0deg)",
                     transition: "transform 0.2s",
                   }}
                 />
               </ListItemButton>
             </ListItem>
-            <Collapse in={getStartedOpen} timeout="auto" unmountOnExit>
+            <Collapse in={openMenu === 'getStarted'} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 {[
                   { href: `/${locale}/hire`, label: t('dropdown.hireUs') },
@@ -466,7 +464,7 @@ function Sidebar({ pathname }) {
                 <>
                   <ListItem disablePadding sx={{ mt: 1 }}>
                     <ListItemButton
-                      onClick={() => setAccountOpen(!accountOpen)}
+                      onClick={() => toggleMenu('account')}
                       sx={{ px: 3, py: 1.5 }}
                     >
                       <ListItemText
@@ -484,13 +482,13 @@ function Sidebar({ pathname }) {
                         size={16}
                         style={{
                           color: textColor,
-                          transform: accountOpen ? "rotate(180deg)" : "rotate(0deg)",
+                          transform: openMenu === 'account' ? "rotate(180deg)" : "rotate(0deg)",
                           transition: "transform 0.2s",
                         }}
                       />
                     </ListItemButton>
                   </ListItem>
-                  <Collapse in={accountOpen} timeout="auto" unmountOnExit>
+                  <Collapse in={openMenu === 'account'} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding>
                       <ListItem disablePadding>
                         <Link

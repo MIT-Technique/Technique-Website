@@ -18,7 +18,7 @@ export async function GET() {
     while (true) {
       const { data: bios, error } = await supabase
         .from('senior_bios')
-        .select('id, first_name, last_name, email, major, minor, second_major, quote, achievements')
+        .select('id, first_name, last_name, email, major, minor, second_major, quote, achievements, photo_preference')
         .order('last_name', { ascending: true })
         .range(from, from + PAGE_SIZE - 1);
 

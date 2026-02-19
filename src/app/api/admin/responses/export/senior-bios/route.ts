@@ -18,7 +18,7 @@ export async function GET() {
     while (true) {
       const { data: bios, error } = await supabase
         .from('senior_bios')
-        .select('first_name, last_name, email, major, second_major, minor, quote, achievements')
+        .select('first_name, last_name, email, major, second_major, minor, quote, achievements, photo_preference')
         .order('last_name', { ascending: true })
         .range(from, from + PAGE_SIZE - 1);
 
@@ -32,7 +32,7 @@ export async function GET() {
       from += PAGE_SIZE;
     }
 
-    const fields = ['first_name', 'last_name', 'email', 'major', 'second_major', 'minor', 'quote', 'achievements'];
+    const fields = ['first_name', 'last_name', 'email', 'major', 'second_major', 'minor', 'quote', 'achievements', 'photo_preference'];
 
     // Transposed: each submission is a column, fields are rows
     const rows: string[][] = [];

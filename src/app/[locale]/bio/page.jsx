@@ -51,6 +51,7 @@ export default function BioPage() {
   const [dataLoaded, setDataLoaded] = useState(false);
   const [disableEmail, setDisabledEmail] = useState(false);
   const [photoUrl, setPhotoUrl] = useState(null);
+  const [photoPreference, setPhotoPreference] = useState("");
   const [isFrozen, setIsFrozen] = useState(null); // null = loading, true = frozen, false = open
 
   useEffect(() => {
@@ -79,6 +80,7 @@ export default function BioPage() {
       setQuote("");
       setExtracurriculars("");
       setPhotoUrl(null);
+      setPhotoPreference("");
       const trimmed = emailValue.trim().toLowerCase();
       if (!trimmed) return;
       // Normalize: if no @, append @mit.edu
@@ -101,6 +103,8 @@ export default function BioPage() {
           if (json.data.quote) setQuote(json.data.quote);
           if (json.data.achievements)
             setExtracurriculars(json.data.achievements);
+          if (json.data.photo_preference)
+            setPhotoPreference(json.data.photo_preference);
           // If we got name/major from senior_bios, we're done
           if (json.data.firstName && json.data.lastName && json.data.major) {
             setDataLoaded(true);
@@ -222,6 +226,7 @@ export default function BioPage() {
           second_major: secondMajor || null,
           quote,
           achievements: extracurriculars,
+          photo_preference: photoPreference || null,
         }),
       });
 
@@ -605,27 +610,66 @@ export default function BioPage() {
                     />
                   </div>
 
-                  {/* Photo Upload Section */}
+                  {/* Photo Preference + Upload Section */}
                   <div className="mt-4 mb-2">
                     <p className="text-sm font-medium text-text-secondary mb-2">
                       {t("photo.label")}
                     </p>
 
-                    <p className="text-xs text-text-muted mb-3">
-                      {t("photo.guideline")}{" "}
-                      <a href="/seniors" className="text-primary hover:underline">
-                        {t("photo.learnMore")}
-                      </a>
-                    </p>
+                    <FormControl fullWidth sx={{ mb: 2 }}>
+                      <InputLabel
+                        id="photo-preference-label"
+                        shrink
+                        sx={{
+                          "&.Mui-focused": { color: "#750014" },
+                        }}
+                      >
+                        {t("photo.preferenceLabel")}
+                      </InputLabel>
+                      <Select
+                        labelId="photo-preference-label"
+                        id="photo-preference-select"
+                        value={photoPreference}
+                        label={t("photo.preferenceLabel")}
+                        notched
+                        displayEmpty
+                        onChange={(event) => setPhotoPreference(event.target.value)}
+                        sx={selectSx}
+                      >
+                        <MenuItem value="" disabled>
+                          Select...
+                        </MenuItem>
+                        <MenuItem value="technique_photo">
+                          {t("photo.preferenceOptions.techniquePhoto")}
+                        </MenuItem>
+                        <MenuItem value="uploaded_photo">
+                          {t("photo.preferenceOptions.uploadedPhoto")}
+                        </MenuItem>
+                        <MenuItem value="no_image">
+                          {t("photo.preferenceOptions.noImage")}
+                        </MenuItem>
+                      </Select>
+                    </FormControl>
 
-                    <ImageUpload
-                      imageUrl={photoUrl}
-                      onUpload={handlePhotoUpload}
-                      onDelete={handlePhotoDelete}
-                      disabled={!dataLoaded}
-                      label={t("photo.uploadLabel")}
-                      size="md"
-                    />
+                    {photoPreference === "uploaded_photo" && (
+                      <>
+                        <p className="text-xs text-text-muted mb-3">
+                          {t("photo.guideline")}{" "}
+                          <a href="/seniors" className="text-primary hover:underline">
+                            {t("photo.learnMore")}
+                          </a>
+                        </p>
+
+                        <ImageUpload
+                          imageUrl={photoUrl}
+                          onUpload={handlePhotoUpload}
+                          onDelete={handlePhotoDelete}
+                          disabled={!dataLoaded}
+                          label={t("photo.uploadLabel")}
+                          size="md"
+                        />
+                      </>
+                    )}
                   </div>
 
                   <Button

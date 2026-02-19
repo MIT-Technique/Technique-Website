@@ -394,8 +394,14 @@
       "contactText": "有问题或建议？",
       "photo": {
         "label": "毕业照片",
+        "preferenceLabel": "照片偏好",
+        "preferenceOptions": {
+          "techniquePhoto": "我想使用通过 Technique 预约拍摄的照片用于年鉴",
+          "uploadedPhoto": "我想使用我上传的照片用于年鉴",
+          "noImage": "我不想在年鉴中放照片"
+        },
         "uploadLabel": "上传照片",
-        "guideline": "仅在您没有由 Technique 拍摄专业照片时提交。为获得最佳效果，请使用纵向照片，比例为信纸尺寸（8.5 x 11）。",
+        "guideline": "为获得最佳效果，请使用纵向照片，比例为信纸尺寸（8.5 x 11）。",
         "learnMore": "了解更多",
         "uploadError": "上传照片失败",
         "deleteError": "删除照片失败"
@@ -1225,6 +1231,7 @@
         "secondMajor": "第二专业",
         "quote": "引言",
         "achievements": "成就",
+        "photoPreference": "照片偏好",
         "exportBios": "导出简介CSV",
         "exportImages": "导出图片"
       }
