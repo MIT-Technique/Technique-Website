@@ -408,8 +408,14 @@
       "contactText": "Questions or suggestions?",
       "photo": {
         "label": "Senior Photo",
+        "preferenceLabel": "Photo Preference",
+        "preferenceOptions": {
+          "techniquePhoto": "I would like to use the Technique studio photo",
+          "uploadedPhoto": "I would like to upload my own photo",
+          "noImage": "I do not want an image in the yearbook"
+        },
         "uploadLabel": "Upload Photo",
-        "guideline": "Only submit if you did not have a professional photo taken with Technique. For best results, use a portrait-oriented photo with letter-size proportions (8.5 x 11).",
+        "guideline": "For best results, use a portrait-oriented photo with letter-size proportions (8.5 x 11).",
         "learnMore": "Learn more",
         "uploadError": "Failed to upload photo",
         "deleteError": "Failed to remove photo"
@@ -1260,6 +1266,7 @@
         "secondMajor": "2nd Major",
         "quote": "Quote",
         "achievements": "Achievements",
+        "photoPreference": "Photo Pref.",
         "exportBios": "Export Senior Bios CSV",
         "exportImages": "Export Images"
       }

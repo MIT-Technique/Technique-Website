@@ -128,7 +128,8 @@ export default function ResponsesSeniorsPage() {
               <th className="text-left p-2 font-medium">{t('seniors.minor')}</th>
               <th className="text-left p-2 font-medium">{t('seniors.secondMajor')}</th>
               <th className="text-left p-2 font-medium">{t('seniors.quote')}</th>
-              <th className="text-left p-2 pr-3 font-medium">{t('seniors.achievements')}</th>
+              <th className="text-left p-2 font-medium">{t('seniors.achievements')}</th>
+              <th className="text-left p-2 pr-3 font-medium">{t('seniors.photoPreference')}</th>
             </tr>
           </thead>
           <tbody>
@@ -146,12 +147,13 @@ export default function ResponsesSeniorsPage() {
                   <td className="p-2">{bio.minor || '—'}</td>
                   <td className="p-2">{bio.second_major || '—'}</td>
                   <td className={`p-2 ${isExpanded ? '' : 'max-w-[200px] truncate'}`}>{bio.quote || '—'}</td>
-                  <td className={`p-2 pr-3 ${isExpanded ? '' : 'max-w-[200px] truncate'}`}>{bio.achievements || '—'}</td>
+                  <td className={`p-2 ${isExpanded ? '' : 'max-w-[200px] truncate'}`}>{bio.achievements || '—'}</td>
+                  <td className="p-2 pr-3">{bio.photo_preference ? bio.photo_preference.replace(/_/g, ' ') : '—'}</td>
                 </tr>
               );
             })}
             {paginated.length === 0 && (
-              <tr><td colSpan={7} className="p-3 text-center text-text-secondary">{tc('noData')}</td></tr>
+              <tr><td colSpan={8} className="p-3 text-center text-text-secondary">{tc('noData')}</td></tr>
             )}
           </tbody>
         </table>
