@@ -1062,6 +1062,15 @@
       "removePhotographer": "Remove",
       "noPhotographers": "No authorized photographers yet.",
       "photographerAdded": "Photographer added successfully.",
+      "disableUser": "Disable User",
+      "enableUser": "Enable User",
+      "deleteUser": "Delete User",
+      "disableConfirmTitle": "Disable User",
+      "disableConfirmMsg": "Are you sure you want to disable this user? They will not be able to log in.",
+      "enableConfirmTitle": "Enable User",
+      "enableConfirmMsg": "Are you sure you want to re-enable this user?",
+      "deleteConfirmTitle": "Delete User",
+      "deleteConfirmMsg": "Are you sure you want to permanently delete this user? This cannot be undone.",
       "logs": {
         "title": "Logs",
         "noLogs": "No activity logs yet"

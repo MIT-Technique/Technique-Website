@@ -112,9 +112,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify user has admin or staph role
-    if (user.role !== "admin" && user.role !== "staph") {
+    if (user.role !== "admin" && user.role !== "staph" && user.role !== "photographer") {
       return NextResponse.json(
-        { error: "This login is for admin and staph only" },
+        { error: "This login is for admin, staph, and photographers only" },
         { status: 403 }
       );
     }
@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
       userId: user.id,
       userInfo: {
         sub: loginEmail,
-        name: user.name || (user.role === "admin" ? "Admin" : "Staph"),
+        name: user.name || (user.role === "admin" ? "Admin" : user.role === "photographer" ? "Photographer" : "Staph"),
         email: loginEmail,
         email_verified: true,
       },
