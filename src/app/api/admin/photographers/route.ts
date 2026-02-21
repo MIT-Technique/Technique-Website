@@ -85,6 +85,9 @@ export async function POST(request: Request) {
     if (!email || typeof email !== "string") {
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
     }
+    if (!name || typeof name !== "string" || !name.trim()) {
+      return NextResponse.json({ error: "Name is required" }, { status: 400 });
+    }
 
     const normalizedEmail = email.trim().toLowerCase();
 

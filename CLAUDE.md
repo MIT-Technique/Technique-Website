@@ -954,6 +954,7 @@ minor text,
 first_name text,
 last_name text,
 major_backup text,
+photo_preference character varying,
 CONSTRAINT senior_bios_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.senior_photos (

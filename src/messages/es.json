@@ -1025,6 +1025,15 @@
       "removePhotographer": "Eliminar",
       "noPhotographers": "No hay fotógrafos autorizados aún.",
       "photographerAdded": "Fotógrafo agregado exitosamente.",
+      "disableUser": "Deshabilitar Usuario",
+      "enableUser": "Habilitar Usuario",
+      "deleteUser": "Eliminar Usuario",
+      "disableConfirmTitle": "Deshabilitar Usuario",
+      "disableConfirmMsg": "¿Está seguro de que desea deshabilitar este usuario? No podrá iniciar sesión.",
+      "enableConfirmTitle": "Habilitar Usuario",
+      "enableConfirmMsg": "¿Está seguro de que desea volver a habilitar este usuario?",
+      "deleteConfirmTitle": "Eliminar Usuario",
+      "deleteConfirmMsg": "¿Está seguro de que desea eliminar permanentemente este usuario? Esta acción no se puede deshacer.",
       "logs": {
         "title": "Registros",
         "noLogs": "No hay registros de actividad todavía"

@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import ConfirmationModal from '../../../../components/ConfirmationModal/ConfirmationModal';
 
 const PAGE_SIZE = 15;
 const ACCESS_OPTIONS = [
@@ -53,11 +54,21 @@ export default function UsersPage() {
 
   // Photographer management state
   const [showAddPhotographer, setShowAddPhotographer] = useState(false);
-  const [newPhotographerEmail, setNewPhotographerEmail] = useState('');
+  const [newPhotographerKerb, setNewPhotographerKerb] = useState('');
   const [newPhotographerName, setNewPhotographerName] = useState('');
   const [addingPhotographer, setAddingPhotographer] = useState(false);
   const [photographerAdded, setPhotographerAdded] = useState(false);
-  const [authorizedPhotographers, setAuthorizedPhotographers] = useState([]);
+
+  // Generated password state (shown when promoting a photographer to staph/admin)
+  const [promotionPassword, setPromotionPassword] = useState(null);
+  const [promotionEmail, setPromotionEmail] = useState(null);
+
+  // Ellipsis action menu state
+  const [actionMenuUserId, setActionMenuUserId] = useState(null);
+  const actionMenuRef = useRef(null);
+
+  // Confirmation modal state
+  const [confirmAction, setConfirmAction] = useState(null);
 
   useEffect(() => {
     fetchUsers();
@@ -77,6 +88,63 @@ export default function UsersPage() {
       setIsSuperAdmin(data.isSuperAdmin || false);
     } catch (error) {
       console.error('Error fetching admin info:', error);
+    }
+  }
+
+  // Close action menu on outside click
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (actionMenuRef.current && !actionMenuRef.current.contains(e.target)) {
+        setActionMenuUserId(null);
+      }
+    }
+    if (actionMenuUserId) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [actionMenuUserId]);
+
+  async function handleDisableUser(userId) {
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, isActive: false }),
+      });
+      if (res.ok) fetchUsers();
+    } catch (error) {
+      console.error('Error disabling user:', error);
+    }
+  }
+
+  async function handleEnableUser(userId) {
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, isActive: true }),
+      });
+      if (res.ok) fetchUsers();
+    } catch (error) {
+      console.error('Error enabling user:', error);
+    }
+  }
+
+  async function handleDeleteUser(userId) {
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      });
+      if (res.ok) {
+        fetchUsers();
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Failed to delete user');
+      }
+    } catch (error) {
+      console.error('Error deleting user:', error);
     }
   }
 
@@ -102,6 +170,8 @@ export default function UsersPage() {
 
   async function handleRoleChange(userId, newRole) {
     try {
+      setPromotionPassword(null);
+      setPromotionEmail(null);
       const res = await fetch('/api/admin/users', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -109,6 +179,11 @@ export default function UsersPage() {
       });
 
       if (res.ok) {
+        const data = await res.json();
+        if (data.generatedPassword) {
+          setPromotionPassword(data.generatedPassword);
+          setPromotionEmail(data.user?.email);
+        }
         fetchUsers();
       }
     } catch (error) {
@@ -242,84 +317,51 @@ export default function UsersPage() {
     setCreatedPassword(null);
   }
 
-  // Photographer management
-  useEffect(() => {
-    if (userTypeFilter === 'individual') {
-      fetchPhotographers();
-    }
-  }, [userTypeFilter]);
-
-  async function fetchPhotographers() {
-    try {
-      const res = await fetch('/api/admin/photographers');
-      const data = await res.json();
-      setAuthorizedPhotographers(data.authorizedPhotographers || []);
-    } catch (error) {
-      console.error('Error fetching photographers:', error);
-    }
-  }
-
   async function handleAddPhotographer() {
-    if (!newPhotographerEmail.trim()) return;
+    if (!newPhotographerKerb.trim() || !newPhotographerName.trim()) return;
     setAddingPhotographer(true);
     setPhotographerAdded(false);
     try {
-      const email = newPhotographerEmail.trim();
-      const normalizedEmail = email.includes('@') ? email : `${email}@mit.edu`;
-      const res = await fetch('/api/admin/photographers', {
+      const res = await fetch('/api/admin/create-photographer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: normalizedEmail,
-          name: newPhotographerName.trim() || undefined,
+          kerb: newPhotographerKerb.trim(),
+          name: newPhotographerName.trim(),
         }),
       });
+      const data = await res.json();
       if (res.ok) {
         setPhotographerAdded(true);
-        setNewPhotographerEmail('');
+        setNewPhotographerKerb('');
         setNewPhotographerName('');
-        fetchPhotographers();
+        fetchUsers();
         setTimeout(() => setPhotographerAdded(false), 4000);
       } else {
-        const data = await res.json();
         alert(data.error || 'Failed to add photographer');
       }
     } catch (error) {
-      console.error('Error adding photographer:', error);
+      console.error('Error creating photographer:', error);
     } finally {
       setAddingPhotographer(false);
     }
   }
 
-  async function handleRemovePhotographer(id) {
-    if (!confirm('Remove this photographer?')) return;
-    try {
-      const res = await fetch('/api/admin/photographers', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id }),
-      });
-      if (res.ok) {
-        fetchPhotographers();
-      }
-    } catch (error) {
-      console.error('Error removing photographer:', error);
-    }
-  }
-
   function resetAddPhotographer() {
     setShowAddPhotographer(false);
-    setNewPhotographerEmail('');
+    setNewPhotographerKerb('');
     setNewPhotographerName('');
     setPhotographerAdded(false);
   }
 
   const ORG_ROLES = ['club', 'living_group', 'sports'];
-  const filteredUsers = userTypeFilter === 'individual'
+  const baseFilteredUsers = userTypeFilter === 'individual'
     ? users.filter(u => !ORG_ROLES.includes(u.role))
     : userTypeFilter === 'orgs'
     ? users.filter(u => ORG_ROLES.includes(u.role))
     : users;
+
+  const filteredUsers = baseFilteredUsers;
   const totalPages = Math.ceil(filteredUsers.length / PAGE_SIZE);
   const paginatedUsers = filteredUsers.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
@@ -366,6 +408,30 @@ export default function UsersPage() {
         </select>
       </div>
 
+      {/* Generated password banner (shown when promoting a photographer to staph/admin) */}
+      {promotionPassword && (
+        <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+          <p className="text-xs text-green-800 font-medium mb-1">
+            Login credentials generated for {promotionEmail}
+          </p>
+          <div className="flex items-center gap-2">
+            <code className="text-sm bg-white px-2 py-1 rounded border border-green-300 select-all">{promotionPassword}</code>
+            <button
+              onClick={() => navigator.clipboard.writeText(promotionPassword)}
+              className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200"
+            >
+              {t('copy')}
+            </button>
+            <button
+              onClick={() => { setPromotionPassword(null); setPromotionEmail(null); }}
+              className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded hover:bg-gray-200"
+            >
+              {t('createStaphDone')}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Users List */}
       {loading ? (
         <p className="text-text-secondary">Loading...</p>
@@ -381,12 +447,12 @@ export default function UsersPage() {
                 <th className="text-left py-2 px-2">{t('table.role')}</th>
                 <th className="text-left py-2 px-2">{t('table.access')}</th>
                 <th className="text-left py-2 px-2">{t('table.status')}</th>
-                <th className="text-left py-2 px-2">{t('table.actions')}</th>
+                <th className="py-2 px-2 w-10"></th>
               </tr>
             </thead>
             <tbody>
               {paginatedUsers.map((user) => (
-                <tr key={user.id} className="border-b border-border/50">
+                <tr key={user.id} className="border-b border-border/50 group/row">
                   <td className="py-2 px-2 max-w-[200px] truncate" title={user.email}>{user.email}</td>
                   <td className="py-2 px-2 max-w-[150px] truncate" title={user.name}>{user.name}</td>
                   <td className="py-2 px-2">
@@ -408,11 +474,12 @@ export default function UsersPage() {
                       >
                         <option value="staph">Staph</option>
                         <option value="admin">Admin</option>
+                        <option value="photographer">Photographer</option>
                       </select>
                     )}
                   </td>
                   <td className="py-2 px-2 relative">
-                    {!['club', 'living_group', 'sports'].includes(user.role) ? (
+                    {!['club', 'living_group', 'sports', 'photographer'].includes(user.role) ? (
                       <>
                         <button
                           onClick={(e) => accessPopoverUserId === user.id ? setAccessPopoverUserId(null) : openAccessPopover(user, e)}
@@ -466,19 +533,82 @@ export default function UsersPage() {
                       {user.is_active ? t('active') : t('inactive')}
                     </span>
                   </td>
-                  <td className="py-2 px-2 flex items-center gap-2">
-                    <span className="text-xs text-text-muted">
-                      {new Date(user.created_at).toLocaleDateString()}
-                    </span>
-                    {/* Designate Admin button - only for staph users, only visible to super admin */}
-                    {isSuperAdmin && user.role === 'staph' && user.is_staph && adminCount < maxAdmins && (
-                      <button
-                        onClick={() => handleDesignateAdmin(user.id)}
-                        disabled={designatingUserId === user.id}
-                        className="text-xs px-2 py-1 bg-accent text-white rounded hover:bg-accent-dark"
+                  <td className="py-2 px-2 relative">
+                    <button
+                      onClick={() => setActionMenuUserId(actionMenuUserId === user.id ? null : user.id)}
+                      className={`text-lg px-2 py-0.5 rounded hover:bg-gray-100 transition-opacity ${
+                        actionMenuUserId === user.id ? 'opacity-100' : 'opacity-0 group-hover/row:opacity-100'
+                      }`}
+                    >
+                      ⋯
+                    </button>
+                    {actionMenuUserId === user.id && (
+                      <div
+                        ref={actionMenuRef}
+                        className="absolute right-0 top-full mt-1 z-50 bg-white border border-border rounded-lg shadow-lg py-1 min-w-[180px]"
                       >
-                        {designatingUserId === user.id ? '...' : t('designateAdmin')}
-                      </button>
+                        {/* Disable / Enable */}
+                        {user.is_active ? (
+                          <button
+                            onClick={() => {
+                              setActionMenuUserId(null);
+                              setConfirmAction({
+                                type: 'disable',
+                                userId: user.id,
+                                title: t('disableConfirmTitle'),
+                                message: t('disableConfirmMsg'),
+                              });
+                            }}
+                            className="w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50"
+                          >
+                            {t('disableUser')}
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => {
+                              setActionMenuUserId(null);
+                              setConfirmAction({
+                                type: 'enable',
+                                userId: user.id,
+                                title: t('enableConfirmTitle'),
+                                message: t('enableConfirmMsg'),
+                              });
+                            }}
+                            className="w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50"
+                          >
+                            {t('enableUser')}
+                          </button>
+                        )}
+
+                        {/* Designate Admin */}
+                        {isSuperAdmin && user.role === 'staph' && user.is_staph && adminCount < maxAdmins && (
+                          <button
+                            onClick={() => {
+                              setActionMenuUserId(null);
+                              handleDesignateAdmin(user.id);
+                            }}
+                            className="w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50"
+                          >
+                            {t('designateAdmin')}
+                          </button>
+                        )}
+
+                        {/* Delete User */}
+                        <button
+                          onClick={() => {
+                            setActionMenuUserId(null);
+                            setConfirmAction({
+                              type: 'delete',
+                              userId: user.id,
+                              title: t('deleteConfirmTitle'),
+                              message: t('deleteConfirmMsg'),
+                            });
+                          }}
+                          className="w-full text-left px-3 py-1.5 text-xs hover:bg-red-50 text-red-600"
+                        >
+                          {t('deleteUser')}
+                        </button>
+                      </div>
                     )}
                   </td>
                 </tr>
@@ -608,8 +738,8 @@ export default function UsersPage() {
                 <div className="flex items-center gap-1">
                   <input
                     type="text"
-                    value={newPhotographerEmail}
-                    onChange={(e) => setNewPhotographerEmail(e.target.value)}
+                    value={newPhotographerKerb}
+                    onChange={(e) => setNewPhotographerKerb(e.target.value)}
                     placeholder="kerb"
                     className="border border-border rounded px-3 py-2 text-sm flex-1"
                   />
@@ -617,13 +747,14 @@ export default function UsersPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-xs text-text-secondary mb-1">{t('photographerName')}</label>
+                <label className="block text-xs text-text-secondary mb-1">{t('photographerName')} <span className="text-red-500">*</span></label>
                 <input
                   type="text"
                   value={newPhotographerName}
                   onChange={(e) => setNewPhotographerName(e.target.value)}
                   placeholder="Full Name"
                   className="border border-border rounded px-3 py-2 text-sm w-full"
+                  required
                 />
               </div>
 
@@ -636,7 +767,7 @@ export default function UsersPage() {
               <div className="flex gap-2">
                 <button
                   onClick={handleAddPhotographer}
-                  disabled={addingPhotographer || !newPhotographerEmail.trim()}
+                  disabled={addingPhotographer || !newPhotographerKerb.trim() || !newPhotographerName.trim()}
                   className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 disabled:opacity-50 text-sm"
                 >
                   {addingPhotographer ? '...' : t('addPhotographerSubmit')}
@@ -650,33 +781,25 @@ export default function UsersPage() {
               </div>
             </div>
           )}
-          {/* List of authorized photographers */}
-          {authorizedPhotographers.length > 0 && (
-            <div className="mt-4">
-              <h4 className="text-sm font-medium mb-2">{t('authorizedPhotographers')}</h4>
-              <div className="space-y-2">
-                {authorizedPhotographers.map((p) => (
-                  <div key={p.id} className="flex items-center justify-between p-2 border border-border/50 rounded text-sm">
-                    <div>
-                      <span>{p.email}</span>
-                      {p.name && <span className="text-text-muted ml-2">({p.name})</span>}
-                    </div>
-                    <button
-                      onClick={() => handleRemovePhotographer(p.id)}
-                      className="text-xs px-2 py-1 text-red-600 hover:bg-red-50 rounded"
-                    >
-                      {t('removePhotographer')}
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          {authorizedPhotographers.length === 0 && showAddPhotographer && (
-            <p className="mt-4 text-sm text-text-muted">{t('noPhotographers')}</p>
-          )}
         </div>
       </>)}
+
+      {/* Confirmation Modal for disable/enable/delete */}
+      <ConfirmationModal
+        open={!!confirmAction}
+        title={confirmAction?.title || ''}
+        message={confirmAction?.message || ''}
+        isDangerous={confirmAction?.type === 'delete' || confirmAction?.type === 'disable'}
+        onConfirm={async () => {
+          if (!confirmAction) return;
+          const { type, userId } = confirmAction;
+          setConfirmAction(null);
+          if (type === 'disable') await handleDisableUser(userId);
+          else if (type === 'enable') await handleEnableUser(userId);
+          else if (type === 'delete') await handleDeleteUser(userId);
+        }}
+        onCancel={() => setConfirmAction(null)}
+      />
     </div>
   );
 }

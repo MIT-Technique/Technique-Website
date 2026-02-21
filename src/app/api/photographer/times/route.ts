@@ -9,14 +9,14 @@ async function isStaphOrPhotographer(
   userId: string,
   supabase: ReturnType<typeof createAdminClient>
 ): Promise<boolean> {
-  // Check if user is staph
+  // Check if user is staph or has photographer role
   const { data: userData } = await supabase
     .from("users")
-    .select("is_staph")
+    .select("is_staph, role")
     .eq("id", userId)
     .single();
 
-  if (userData?.is_staph) {
+  if (userData?.is_staph || userData?.role === "photographer") {
     return true;
   }
 

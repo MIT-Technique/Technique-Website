@@ -1,4 +1,4 @@
-export type UserRole = 'admin' | 'staph' | 'club' | 'living_group' | 'sports';
+export type UserRole = 'admin' | 'staph' | 'club' | 'living_group' | 'sports' | 'photographer';
 export type ApprovalStatus = 'pending' | 'approved' | 'denied';
 export type LivingGroupStatus = 'active' | 'disabled' | 'pending';
 export type PromotionRequestType = 'staph_request' | 'photographer_request';

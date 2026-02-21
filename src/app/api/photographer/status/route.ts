@@ -13,6 +13,22 @@ export async function GET() {
 
     const supabase = createAdminClient();
 
+    // Check if user has the photographer role — if so, they're always a photographer
+    const { data: userData } = await supabase
+      .from("users")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (userData?.role === "photographer") {
+      return NextResponse.json({
+        isPhotographer: true,
+        permission: null,
+        hasPendingRequest: false,
+        pendingRequest: null,
+      });
+    }
+
     // Check if user has an active photographer permission
     const { data: permission, error } = await supabase
       .from("photographer_permissions")

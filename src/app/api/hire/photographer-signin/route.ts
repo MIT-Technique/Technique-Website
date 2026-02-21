@@ -42,7 +42,7 @@ export async function POST(request: Request) {
         .eq("email", normalizedEmail)
         .single();
 
-      isAuthorizedUser = !!user && (user.role === "admin" || user.role === "staph" || user.is_staph);
+      isAuthorizedUser = !!user && (user.role === "admin" || user.role === "staph" || user.role === "photographer" || user.is_staph);
     }
 
     if (!photographer && !isAuthorizedUser) {
