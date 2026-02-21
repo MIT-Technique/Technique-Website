@@ -172,7 +172,7 @@ describe('/api/auth/admin-login', () => {
 
     const res = await POST(makeRequest({ email: 'club@mit.edu', password: 'pass123' }));
     expect(res.status).toBe(403);
-    expect((await res.json()).error).toBe('This login is for admin and staph only');
+    expect((await res.json()).error).toBe('This login is for admin, staph, and photographers only');
   });
 
   it('successful staph login redirects to /en/dashboard', async () => {

@@ -159,15 +159,15 @@ export default function ResponsesLivingGroupsPage() {
           <tbody>
             {paginated.map((lg) => (
               <React.Fragment key={lg.id}>
-                <tr className={`border-b border-border ${lg.type !== 'fsilg' && lg.sections.length > 0 ? 'cursor-pointer hover:bg-bg-secondary/50' : ''}`} onClick={() => lg.type !== 'fsilg' && lg.sections.length > 0 && toggleExpand(lg.id)}>
+                <tr className={`border-b border-border ${lg.type !== 'fsilg' && lg.sections?.length > 0 ? 'cursor-pointer hover:bg-bg-secondary/50' : ''}`} onClick={() => lg.type !== 'fsilg' && lg.sections?.length > 0 && toggleExpand(lg.id)}>
                   <td className="p-3">
-                    {lg.type !== 'fsilg' && lg.sections.length > 0 && <span className="mr-2">{expandedLGs.includes(lg.id) ? '▼' : '▶'}</span>}
+                    {lg.type !== 'fsilg' && lg.sections?.length > 0 && <span className="mr-2">{expandedLGs.includes(lg.id) ? '▼' : '▶'}</span>}
                     {lg.name}
                   </td>
                   <td className="p-3 text-center">{lg.type}</td>
                   <td className="p-3 text-center">{lg.candidCount || 0}</td>
                   <td className="p-3 text-center">
-                    {lg.sections.some(s => s.hasTimeAssignment) ? (
+                    {lg.sections?.some(s => s.hasTimeAssignment) ? (
                       <span className="text-xs px-2 py-0.5 rounded bg-green-100 text-green-800">{t('livingGroups.autoBooked')}</span>
                     ) : lg.manuallyBooked ? (
                       <button onClick={(e) => { e.stopPropagation(); handleToggleBook(lg.id, false); }}
@@ -185,10 +185,10 @@ export default function ResponsesLivingGroupsPage() {
                   <td className="p-3 text-center">
                     {lg.type === 'fsilg'
                       ? `${lg.totalMembers} members`
-                      : `${lg.sections.length} sections · ${lg.totalMembers} members`}
+                      : `${lg.sections?.length || 0} sections · ${lg.totalMembers} members`}
                   </td>
                 </tr>
-                {lg.type !== 'fsilg' && expandedLGs.includes(lg.id) && lg.sections.map((section) => (
+                {lg.type !== 'fsilg' && expandedLGs.includes(lg.id) && (lg.sections || []).map((section) => (
                   <tr key={`${lg.id}-${section.name}`} className="border-b border-border bg-bg-secondary/30">
                     <td className="p-3 pl-10">{section.name}</td>
                     <td className="p-3 text-center">{section.hasImage ? tc('yes') : tc('no')}</td>

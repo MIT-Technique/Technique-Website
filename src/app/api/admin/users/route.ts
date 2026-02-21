@@ -4,6 +4,15 @@ import { createAdminClient } from "../../../../lib/supabase/admin";
 import { UserRole } from "../../../../lib/supabase/types";
 import { createLog } from "../../../../lib/admin-logs";
 import crypto from "crypto";
+import nodemailer from "nodemailer";
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "mittnq@gmail.com",
+    pass: process.env.GOOGLE_PASSWORD,
+  },
+});
 
 // GET - List all users
 export async function GET(request: NextRequest) {
@@ -151,6 +160,44 @@ export async function PUT(request: NextRequest) {
         .eq('id', userId);
 
       generatedPassword = password;
+
+      // Send credentials email (non-blocking)
+      const roleLabel = role === 'admin' ? 'Admin' : 'Staph';
+      try {
+        await transporter.sendMail({
+          from: "mittnq@gmail.com",
+          to: existingUser.email,
+          subject: `Your MIT Technique ${roleLabel} Account`,
+          html: `
+            <div style="font-family: Raleway, Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #F9F5F5; color: #1A1A1A; font-weight: 300;">
+              <div style="background: #750014; padding: 32px 32px 28px; text-align: center;">
+                <h1 style="color: #ffffff; font-weight: 700; font-size: 22px; margin: 0 0 6px; letter-spacing: 0.5px;">MIT TECHNIQUE</h1>
+                <p style="color: rgba(255,255,255,0.8); font-size: 13px; margin: 0; font-weight: 400; letter-spacing: 0.3px;">${roleLabel} Account Created</p>
+              </div>
+              <div style="padding: 28px 32px 32px;">
+                <p style="margin: 0 0 24px; line-height: 1.6; font-size: 15px;">Hi ${existingUser.name || roleLabel}, you've been promoted to ${roleLabel.toLowerCase()} on MIT Technique.</p>
+                <div style="background: #ffffff; border-left: 3px solid #750014; border-radius: 4px; padding: 20px 24px; margin: 0 0 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
+                  <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px; color: #750014; margin: 0 0 12px; font-weight: 600;">Your Credentials</p>
+                  <table style="width: 100%; border-collapse: collapse;">
+                    <tr><td style="padding: 4px 0; font-size: 13px; color: #888; width: 90px;">Email</td><td style="padding: 4px 0; font-size: 15px;">${existingUser.email}</td></tr>
+                    <tr><td style="padding: 4px 0; font-size: 13px; color: #888;">Password</td><td style="padding: 4px 0; font-size: 15px; font-family: monospace;">${password}</td></tr>
+                  </table>
+                </div>
+                <p style="margin: 0 0 24px; line-height: 1.6; font-size: 14px; color: #666;">Please change your password after your first login.</p>
+                <div style="text-align: center; margin: 0 0 28px;">
+                  <a href="https://technique.mit.edu/en/login/admin" style="display: inline-block; background: #750014; color: #ffffff; text-decoration: none; padding: 14px 40px; border-radius: 24px; font-weight: 600; font-size: 14px; letter-spacing: 0.5px;">Sign In</a>
+                </div>
+                <div style="border-top: 1px solid #E0D6D6; padding-top: 20px; text-align: center;">
+                  <p style="color: #999; font-size: 12px; margin: 0 0 4px;">MIT Technique &middot; Walker Memorial, Room 50-320</p>
+                  <p style="color: #999; font-size: 12px; margin: 0;"><a href="mailto:technique@mit.edu" style="color: #999; text-decoration: none;">technique@mit.edu</a></p>
+                </div>
+              </div>
+            </div>
+          `,
+        });
+      } catch (emailError) {
+        console.error("Failed to send promotion credentials email:", emailError);
+      }
     }
 
     // If changing role to 'photographer', upsert into authorized_photographers for hire system backward compat
