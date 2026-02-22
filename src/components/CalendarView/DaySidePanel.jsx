@@ -502,9 +502,9 @@ export default function DaySidePanel({
               {proposals.map((proposal) => {
                 // Living groups see other groups' proposals as gray
                 const isOwnProposal = isLivingGroup || isAdminOrPhotographer;
-                const proposalBorder = isOwnProposal ? 'border-yellow-200' : 'border-gray-200';
-                const proposalBg = isOwnProposal ? 'bg-yellow-50' : 'bg-gray-50';
-                const proposalNameColor = isOwnProposal ? 'text-yellow-700' : 'text-gray-700';
+                const proposalBorder = isOwnProposal ? 'border-blue-200' : 'border-gray-200';
+                const proposalBg = isOwnProposal ? 'bg-blue-50' : 'bg-gray-50';
+                const proposalNameColor = isOwnProposal ? 'text-blue-700' : 'text-gray-700';
                 return (
                 <div key={proposal.id} className={`px-3 py-2 border ${proposalBorder} ${proposalBg} rounded-lg text-sm${isLivingGroup ? ' !border-l-[3px] !border-l-accent' : ''}`}>
                   <div className="flex justify-between items-center">

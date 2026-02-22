@@ -24,13 +24,21 @@ export async function GET() {
       .in('club_id', clubIds)
       .order('name', { ascending: true });
 
-    // Group members by club
-    const membersByClub: Record<string, string[]> = {};
+    // Group members by club, officers first then regular members
+    const membersByClub: Record<string, { name: string; role: string }[]> = {};
     (clubs || []).forEach(c => { membersByClub[c.id] = []; });
     (members || []).forEach(m => {
       if (membersByClub[m.club_id]) {
-        membersByClub[m.club_id].push(m.role ? `${m.name} (${m.role})` : m.name);
+        membersByClub[m.club_id].push({ name: m.name, role: m.role || '' });
       }
+    });
+    // Sort: officers (have role) first, then regular members
+    Object.values(membersByClub).forEach(list => {
+      list.sort((a, b) => {
+        if (a.role && !b.role) return -1;
+        if (!a.role && b.role) return 1;
+        return a.name.localeCompare(b.name);
+      });
     });
 
     // Filter clubs: exclude those with no description, no members, and no images
@@ -45,16 +53,22 @@ export async function GET() {
     const clubList = [...fullClubs, ...imageOnlyClubs];
     const maxMembers = Math.max(...fullClubs.map(c => membersByClub[c.id].length), 0);
 
+    // Each club gets two columns: Name, Title
     const rows: string[][] = [];
-    // Header row
-    rows.push(clubList.map(c => c.name || 'Unnamed'));
+    // Header row: Club Name spans two columns (name, then empty for title)
+    rows.push(clubList.flatMap(c => [c.name || 'Unnamed', '']));
+    // Sub-header row: "Name", "Title" for each club
+    rows.push(clubList.flatMap(() => ['Name', 'Title']));
     // Description row: image-only clubs get "has_image"
-    rows.push(clubList.map(c =>
-      imageOnlyClubs.includes(c) ? 'has_image' : (c.description || '')
+    rows.push(clubList.flatMap(c =>
+      imageOnlyClubs.includes(c) ? ['has_image', ''] : [c.description || '', '']
     ));
 
     for (let i = 0; i < maxMembers; i++) {
-      rows.push(clubList.map(c => membersByClub[c.id]?.[i] || ''));
+      rows.push(clubList.flatMap(c => {
+        const m = membersByClub[c.id]?.[i];
+        return m ? [m.name, m.role] : ['', ''];
+      }));
     }
 
     const csv = rows.map(row =>
