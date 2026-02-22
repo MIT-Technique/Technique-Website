@@ -107,7 +107,7 @@ export default function WeekView({
     const colIdx = Math.floor((x - 50) / colWidth);
     if (colIdx < 0 || colIdx > 6) return;
     const dateStr = toDateStr(weekDates[colIdx]);
-    if (new Date(dateStr) < new Date(todayStr)) {
+    if (new Date(dateStr) < new Date(todayStr) && role !== 'admin') {
       showFlashError(t('noPastDates'));
       return;
     }

@@ -208,7 +208,7 @@ export default function CalendarView({
             <span className="w-2.5 h-2.5 rounded-full bg-green-500" /> {t('booked')}
           </span>
           <span className="flex items-center gap-1">
-            <span className="w-2.5 h-2.5 rounded-full bg-yellow-400" /> {t('pending')}
+            <span className="w-2.5 h-2.5 rounded-full bg-blue-400" /> {t('pending')}
           </span>
           {role === 'living_group' && (
             <span className="flex items-center gap-1">

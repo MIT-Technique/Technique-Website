@@ -76,7 +76,7 @@ export default function DayView({
     : null;
 
   const handleGridClick = useCallback((e) => {
-    if (isPast) {
+    if (isPast && role !== 'admin') {
       showFlashError(t('noPastDates'));
       return;
     }
@@ -94,7 +94,7 @@ export default function DayView({
     const endTime = endHour >= 24 ? '23:45' : `${String(endHour).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
     setPrefillTimes({ startTime, endTime });
     setShowPanel(true);
-  }, [isPast, t]);
+  }, [isPast, role, t]);
 
   if (loading) {
     return <div className="py-12 text-center text-text-secondary text-sm">Loading...</div>;
@@ -103,7 +103,7 @@ export default function DayView({
   return (
     <div className="relative">
       {/* Timeline */}
-      <div className={`overflow-y-auto border border-border rounded-lg relative ${isPast ? 'opacity-40' : ''}`} style={{ maxHeight: '600px' }}>
+      <div className={`overflow-y-auto border border-border rounded-lg relative ${isPast && role !== 'admin' ? 'opacity-40' : ''}`} style={{ maxHeight: '600px' }}>
         {flashError && (
           <div className="sticky top-1/2 z-30 flex justify-center pointer-events-none">
             <div className="bg-red-600 text-white text-xs font-medium px-3 py-1.5 rounded-full shadow-lg animate-fade-in-out">

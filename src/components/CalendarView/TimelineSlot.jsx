@@ -16,13 +16,13 @@ export function timeToRow(timeStr) {
 const TYPE_STYLES = {
   available: 'border-blue-200 bg-blue-50 text-blue-900',
   booked: 'border-green-200 bg-green-50 text-green-900',
-  proposal: 'border-yellow-200 bg-yellow-50 text-yellow-900',
+  proposal: 'border-blue-200 bg-blue-50 text-blue-900',
 };
 
 const TYPE_BADGE = {
   available: 'bg-blue-100 text-blue-700',
   booked: 'bg-green-100 text-green-700',
-  proposal: 'bg-yellow-100 text-yellow-700',
+  proposal: 'bg-blue-100 text-blue-700',
 };
 
 export default function TimelineSlot({

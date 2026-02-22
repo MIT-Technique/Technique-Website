@@ -18,6 +18,7 @@ export default function MonthView({
   proposalsByDate,
   selectedDate,
   onDayClick,
+  role,
   loading,
   locale,
   dayNames,
@@ -86,7 +87,7 @@ export default function MonthView({
               <div
                 key={day}
                 onClick={() => {
-                  if (isPast) { showFlashError(t('noPastDates')); return; }
+                  if (isPast && role !== 'admin') { showFlashError(t('noPastDates')); return; }
                   onDayClick(dateStr);
                 }}
                 className={`border-r border-b border-border min-h-[56px] sm:min-h-[80px] p-1 sm:p-1.5 cursor-pointer transition-colors ${
@@ -118,8 +119,8 @@ export default function MonthView({
                     </span>
                   )}
                   {proposalCount > 0 && (
-                    <span className="flex items-center gap-0.5 text-[10px] text-yellow-700">
-                      <span className="w-2 h-2 rounded-full bg-yellow-400" />
+                    <span className="flex items-center gap-0.5 text-[10px] text-blue-600">
+                      <span className="w-2 h-2 rounded-full bg-blue-400" />
                       {proposalCount}
                     </span>
                   )}
