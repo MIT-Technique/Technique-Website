@@ -119,6 +119,7 @@ export default function WeekView({
     const endHour = hour + 1;
     const endTime = endHour >= 24 ? '23:45' : `${String(endHour).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
     onGridTimeClick({ date: dateStr, startTime, endTime });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [weekDates, todayStr, onGridTimeClick, t]);
 
   if (loading) {

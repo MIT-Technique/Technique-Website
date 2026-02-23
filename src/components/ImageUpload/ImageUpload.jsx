@@ -97,6 +97,7 @@ export default function ImageUpload({ imageUrl, onUpload, onDelete, disabled, la
       <div className="flex flex-col gap-1">
         {label && <span className="text-xs font-medium text-text-muted">{label}</span>}
         <div className="relative inline-block">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={displayUrl}
             alt={label || 'Uploaded image'}

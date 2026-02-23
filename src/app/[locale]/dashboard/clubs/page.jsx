@@ -109,11 +109,13 @@ export default function ClubsPage() {
       fetchClubs();
     }, 300);
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
 
   // Initial fetch
   useEffect(() => {
     fetchClubs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const totalPages = Math.ceil(clubs.length / PAGE_SIZE);
@@ -226,6 +228,7 @@ export default function ClubsPage() {
                   {[club.candid_image_1, club.candid_image_2, club.candid_image_3]
                     .filter(Boolean)
                     .map((img, i) => (
+                      /* eslint-disable-next-line @next/next/no-img-element */
                       <img
                         key={i}
                         src={img}

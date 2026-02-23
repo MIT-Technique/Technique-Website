@@ -14,6 +14,7 @@ export default function SportsPage() {
 
   useEffect(() => {
     fetchSports();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -22,6 +23,7 @@ export default function SportsPage() {
       fetchSports();
     }, 300);
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
 
   async function fetchSports() {
@@ -117,6 +119,7 @@ export default function SportsPage() {
                     .filter(Boolean)
                     .slice(0, 6)
                     .map((img, i) => (
+                      /* eslint-disable-next-line @next/next/no-img-element */
                       <img
                         key={i}
                         src={img}

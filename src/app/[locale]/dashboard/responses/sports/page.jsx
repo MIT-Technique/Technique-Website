@@ -215,6 +215,7 @@ export default function ResponsesSportsPage() {
                                 <span className="text-text-secondary text-sm block mb-2">{t('sports.mensImages')}:</span>
                                 <div className="flex gap-2">
                                   {sport.mensImageUrls.map((url, i) => (
+                                    /* eslint-disable-next-line @next/next/no-img-element */
                                     <img
                                       key={i}
                                       src={url}
@@ -230,6 +231,7 @@ export default function ResponsesSportsPage() {
                                 <span className="text-text-secondary text-sm block mb-2">{t('sports.womensImages')}:</span>
                                 <div className="flex gap-2">
                                   {sport.womensImageUrls.map((url, i) => (
+                                    /* eslint-disable-next-line @next/next/no-img-element */
                                     <img
                                       key={i}
                                       src={url}
@@ -247,6 +249,7 @@ export default function ResponsesSportsPage() {
                               <span className="text-text-secondary text-sm block mb-2">{t('sports.imagePreview')}:</span>
                               <div className="flex gap-2">
                                 {sport.imageUrls.map((url, i) => (
+                                  /* eslint-disable-next-line @next/next/no-img-element */
                                   <img
                                     key={i}
                                     src={url}
