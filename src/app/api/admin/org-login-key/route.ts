@@ -15,6 +15,54 @@ const transporter = nodemailer.createTransport({
 
 const ORG_ROLES = ["club", "living_group", "sports"];
 
+function buildCredentialsEmail(
+  name: string,
+  email: string,
+  password: string,
+  isOrg: boolean,
+  isReset: boolean
+) {
+  const subtitle = isOrg
+    ? isReset ? "Password Reset" : "Organization Login Credentials"
+    : "Password Reset";
+  const greeting = isReset
+    ? `Hi ${name || "there"}, your login password has been reset.`
+    : `Hi ${name || "there"}, here are your Technique portal login credentials.`;
+  const signInUrl = isOrg
+    ? "https://technique.mit.edu/en/login"
+    : "https://technique.mit.edu/en/login/admin";
+  const orgRow = isOrg
+    ? `<tr><td style="padding: 4px 0; font-size: 13px; color: #888; width: 120px;">Organization</td><td style="padding: 4px 0; font-size: 15px;">${name || ""}</td></tr>`
+    : "";
+
+  return `
+    <div style="font-family: Raleway, Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #F9F5F5; color: #1A1A1A; font-weight: 300;">
+      <div style="background: #750014; padding: 32px 32px 28px; text-align: center;">
+        <h1 style="color: #ffffff; font-weight: 700; font-size: 22px; margin: 0 0 6px; letter-spacing: 0.5px;">MIT TECHNIQUE</h1>
+        <p style="color: rgba(255,255,255,0.8); font-size: 13px; margin: 0; font-weight: 400; letter-spacing: 0.3px;">${subtitle}</p>
+      </div>
+      <div style="padding: 28px 32px 32px;">
+        <p style="margin: 0 0 24px; line-height: 1.6; font-size: 15px;">${greeting}</p>
+        <div style="background: #ffffff; border-left: 3px solid #750014; border-radius: 4px; padding: 20px 24px; margin: 0 0 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
+          <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px; color: #750014; margin: 0 0 12px; font-weight: 600;">Your Credentials</p>
+          <table style="width: 100%; border-collapse: collapse;">
+            ${orgRow}
+            <tr><td style="padding: 4px 0; font-size: 13px; color: #888; width: 120px;">Email</td><td style="padding: 4px 0; font-size: 15px;">${email}</td></tr>
+            <tr><td style="padding: 4px 0; font-size: 13px; color: #888;">Password</td><td style="padding: 4px 0; font-size: 15px; font-family: monospace;">${password}</td></tr>
+          </table>
+        </div>
+        <div style="text-align: center; margin: 0 0 28px;">
+          <a href="${signInUrl}" style="display: inline-block; background: #750014; color: #ffffff; text-decoration: none; padding: 14px 40px; border-radius: 24px; font-weight: 600; font-size: 14px; letter-spacing: 0.5px;">Sign In</a>
+        </div>
+        <div style="border-top: 1px solid #E0D6D6; padding-top: 20px; text-align: center;">
+          <p style="color: #999; font-size: 12px; margin: 0 0 4px;">MIT Technique &middot; Walker Memorial, Room 50-320</p>
+          <p style="color: #999; font-size: 12px; margin: 0;"><a href="mailto:technique@mit.edu" style="color: #999; text-decoration: none;">technique@mit.edu</a></p>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 export async function POST(request: Request) {
   try {
     const user = await getCurrentUser();
@@ -33,19 +81,12 @@ export async function POST(request: Request) {
     // Look up user
     const { data: targetUser, error: userError } = await supabase
       .from("users")
-      .select("id, email, name, role, supabase_auth_id")
+      .select("id, email, name, role, supabase_auth_id, login_key_encrypted")
       .eq("id", userId)
       .single();
 
     if (userError || !targetUser) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    if (!ORG_ROLES.includes(targetUser.role)) {
-      return NextResponse.json(
-        { error: "Only organization accounts can have login keys" },
-        { status: 400 }
-      );
     }
 
     if (!targetUser.supabase_auth_id) {
@@ -55,11 +96,14 @@ export async function POST(request: Request) {
       );
     }
 
+    const isOrg = ORG_ROLES.includes(targetUser.role);
     const cryptr = getCryptr();
 
     if (action === "reset") {
-      // Generate new password matching existing script pattern: TNQ- + 12 hex chars
-      const newPassword = "TNQ-" + crypto.randomBytes(6).toString("hex");
+      // Generate new password: TNQ- + 12 hex chars for orgs, base64url for staph/admin
+      const newPassword = isOrg
+        ? "TNQ-" + crypto.randomBytes(6).toString("hex")
+        : crypto.randomBytes(12).toString("base64url");
 
       // Update Supabase Auth password
       const { error: authError } =
@@ -84,17 +128,34 @@ export async function POST(request: Request) {
 
       if (updateError) {
         console.error("Error storing encrypted key:", updateError);
-        return NextResponse.json(
-          { error: "Password updated but failed to store encrypted key" },
-          { status: 500 }
-        );
+        // Password was still updated in Auth, so continue
+      }
+
+      // Send email with new credentials
+      try {
+        await transporter.sendMail({
+          from: "mittnq@gmail.com",
+          to: targetUser.email,
+          subject: "MIT Technique - Your Password Has Been Reset",
+          html: buildCredentialsEmail(
+            targetUser.name,
+            targetUser.email,
+            newPassword,
+            isOrg,
+            true
+          ),
+        });
+      } catch (emailError) {
+        console.error("Failed to send password reset email:", emailError);
+        // Don't fail the whole request — admin still sees the password in UI
       }
 
       // Log the action
       const { createLog } = await import("../../../../lib/admin-logs");
-      await createLog(user.id, "reset_org_login_key", "user", userId, {
-        orgEmail: targetUser.email,
-        orgName: targetUser.name,
+      await createLog(user.id, "reset_login_key", "user", userId, {
+        email: targetUser.email,
+        name: targetUser.name,
+        role: targetUser.role,
       });
 
       return NextResponse.json({
@@ -105,77 +166,31 @@ export async function POST(request: Request) {
 
     if (action === "send") {
       // Check for stored key
-      const { data: fullUser } = await supabase
-        .from("users")
-        .select("login_key_encrypted")
-        .eq("id", userId)
-        .single();
-
-      if (!fullUser?.login_key_encrypted) {
+      if (!targetUser.login_key_encrypted) {
         return NextResponse.json(
           { error: "No stored key. Reset the password first." },
           { status: 400 }
         );
       }
 
-      const loginKey = cryptr.decrypt(fullUser.login_key_encrypted);
-
-      // Resolve org contact email
-      let contactEmail = targetUser.email;
-
-      if (targetUser.role === "club") {
-        const { data: club } = await supabase
-          .from("clubs")
-          .select("id")
-          .eq("user_id", userId)
-          .single();
-        if (club) {
-          const { data: clubEmail } = await supabase
-            .from("clubs")
-            .select("contact_email:email")
-            .eq("user_id", userId)
-            .single();
-          // clubs table doesn't have an email column directly, use the lookup approach
-        }
-      }
-      // For all org types, we send to the user's own email (which is the org login email)
-      // This is the email they use to log in
+      const loginKey = cryptr.decrypt(targetUser.login_key_encrypted);
 
       // Send email
       try {
         await transporter.sendMail({
           from: "mittnq@gmail.com",
-          to: contactEmail,
-          subject: "MIT Technique - Your Organization Login Credentials",
-          html: `
-            <div style="font-family: Raleway, Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #F9F5F5; color: #1A1A1A; font-weight: 300;">
-              <div style="background: #750014; padding: 32px 32px 28px; text-align: center;">
-                <h1 style="color: #ffffff; font-weight: 700; font-size: 22px; margin: 0 0 6px; letter-spacing: 0.5px;">MIT TECHNIQUE</h1>
-                <p style="color: rgba(255,255,255,0.8); font-size: 13px; margin: 0; font-weight: 400; letter-spacing: 0.3px;">Organization Login Credentials</p>
-              </div>
-              <div style="padding: 28px 32px 32px;">
-                <p style="margin: 0 0 24px; line-height: 1.6; font-size: 15px;">Hi ${targetUser.name || "there"}, here are your Technique portal login credentials.</p>
-                <div style="background: #ffffff; border-left: 3px solid #750014; border-radius: 4px; padding: 20px 24px; margin: 0 0 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
-                  <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px; color: #750014; margin: 0 0 12px; font-weight: 600;">Your Credentials</p>
-                  <table style="width: 100%; border-collapse: collapse;">
-                    <tr><td style="padding: 4px 0; font-size: 13px; color: #888; width: 120px;">Organization</td><td style="padding: 4px 0; font-size: 15px;">${targetUser.name || ""}</td></tr>
-                    <tr><td style="padding: 4px 0; font-size: 13px; color: #888;">Email</td><td style="padding: 4px 0; font-size: 15px;">${contactEmail}</td></tr>
-                    <tr><td style="padding: 4px 0; font-size: 13px; color: #888;">Password</td><td style="padding: 4px 0; font-size: 15px; font-family: monospace;">${loginKey}</td></tr>
-                  </table>
-                </div>
-                <div style="text-align: center; margin: 0 0 28px;">
-                  <a href="https://technique.mit.edu/en/login" style="display: inline-block; background: #750014; color: #ffffff; text-decoration: none; padding: 14px 40px; border-radius: 24px; font-weight: 600; font-size: 14px; letter-spacing: 0.5px;">Sign In</a>
-                </div>
-                <div style="border-top: 1px solid #E0D6D6; padding-top: 20px; text-align: center;">
-                  <p style="color: #999; font-size: 12px; margin: 0 0 4px;">MIT Technique &middot; Walker Memorial, Room 50-320</p>
-                  <p style="color: #999; font-size: 12px; margin: 0;"><a href="mailto:technique@mit.edu" style="color: #999; text-decoration: none;">technique@mit.edu</a></p>
-                </div>
-              </div>
-            </div>
-          `,
+          to: targetUser.email,
+          subject: "MIT Technique - Your Login Credentials",
+          html: buildCredentialsEmail(
+            targetUser.name,
+            targetUser.email,
+            loginKey,
+            isOrg,
+            false
+          ),
         });
       } catch (emailError) {
-        console.error("Failed to send org login email:", emailError);
+        console.error("Failed to send login email:", emailError);
         return NextResponse.json(
           { error: "Failed to send email" },
           { status: 500 }
@@ -184,9 +199,10 @@ export async function POST(request: Request) {
 
       // Log the action
       const { createLog } = await import("../../../../lib/admin-logs");
-      await createLog(user.id, "send_org_login_key", "user", userId, {
-        orgEmail: targetUser.email,
-        orgName: targetUser.name,
+      await createLog(user.id, "send_login_key", "user", userId, {
+        email: targetUser.email,
+        name: targetUser.name,
+        role: targetUser.role,
       });
 
       return NextResponse.json({ success: true });

@@ -16,6 +16,7 @@ const ACCESS_OPTIONS = [
 
 export default function UsersPage() {
   const t = useTranslations('dashboard.users');
+  const tOrg = useTranslations('dashboard.orgActions');
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -70,6 +71,11 @@ export default function UsersPage() {
 
   // Confirmation modal state
   const [confirmAction, setConfirmAction] = useState(null);
+
+  // Reset password state
+  const [resetPasswordResult, setResetPasswordResult] = useState(null); // { userId, loginKey }
+  const [resetPasswordLoading, setResetPasswordLoading] = useState(null); // userId
+  const [resetCopied, setResetCopied] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -147,6 +153,28 @@ export default function UsersPage() {
       }
     } catch (error) {
       console.error('Error deleting user:', error);
+    }
+  }
+
+  async function handleResetPassword(userId) {
+    setResetPasswordLoading(userId);
+    setResetPasswordResult(null);
+    try {
+      const res = await fetch('/api/admin/org-login-key', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, action: 'reset' }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setResetPasswordResult({ userId, loginKey: data.loginKey });
+      } else {
+        alert(data.error || 'Failed to reset password');
+      }
+    } catch {
+      alert('Failed to reset password');
+    } finally {
+      setResetPasswordLoading(null);
     }
   }
 
@@ -434,6 +462,30 @@ export default function UsersPage() {
         </div>
       )}
 
+      {/* Reset password result banner */}
+      {resetPasswordResult && (
+        <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+          <p className="text-xs text-green-800 font-medium mb-1">
+            {tOrg('resetKeySuccess')} {t('resetPasswordEmailed')}
+          </p>
+          <div className="flex items-center gap-2">
+            <code className="text-sm bg-white px-2 py-1 rounded border border-green-300 select-all">{resetPasswordResult.loginKey}</code>
+            <button
+              onClick={() => { navigator.clipboard.writeText(resetPasswordResult.loginKey); setResetCopied(true); setTimeout(() => setResetCopied(false), 2000); }}
+              className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200"
+            >
+              {resetCopied ? tOrg('copied') : tOrg('copyKey')}
+            </button>
+            <button
+              onClick={() => setResetPasswordResult(null)}
+              className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded hover:bg-gray-200"
+            >
+              {t('createStaphDone')}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Users List */}
       {loading ? (
         <p className="text-text-secondary">Loading...</p>
@@ -559,7 +611,7 @@ export default function UsersPage() {
                       <div
                         ref={actionMenuRef}
                         style={{ position: 'fixed', top: actionMenuPos.top, left: actionMenuPos.left, zIndex: 50 }}
-                        className="bg-white border border-border rounded-lg shadow-lg py-1 min-w-[180px]"
+                        className="bg-white border border-border rounded-lg shadow-lg py-1 w-[180px]"
                       >
                         {/* Disable / Enable */}
                         {user.is_active ? (
@@ -604,6 +656,24 @@ export default function UsersPage() {
                             className="w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50"
                           >
                             {t('designateAdmin')}
+                          </button>
+                        )}
+
+                        {/* Reset Password */}
+                        {user.supabase_auth_id && (
+                          <button
+                            onClick={() => {
+                              setActionMenuUserId(null);
+                              setConfirmAction({
+                                type: 'resetPassword',
+                                userId: user.id,
+                                title: t('resetPasswordTitle'),
+                                message: t('resetPasswordMsg'),
+                              });
+                            }}
+                            className="w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50"
+                          >
+                            {t('resetPassword')}
                           </button>
                         )}
 
@@ -811,6 +881,7 @@ export default function UsersPage() {
           if (type === 'disable') await handleDisableUser(userId);
           else if (type === 'enable') await handleEnableUser(userId);
           else if (type === 'delete') await handleDeleteUser(userId);
+          else if (type === 'resetPassword') await handleResetPassword(userId);
         }}
         onCancel={() => setConfirmAction(null)}
       />
