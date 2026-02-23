@@ -65,6 +65,7 @@ export default function UsersPage() {
 
   // Ellipsis action menu state
   const [actionMenuUserId, setActionMenuUserId] = useState(null);
+  const [actionMenuPos, setActionMenuPos] = useState({ top: 0, left: 0 });
   const actionMenuRef = useRef(null);
 
   // Confirmation modal state
@@ -534,9 +535,20 @@ export default function UsersPage() {
                       {user.is_active ? t('active') : t('inactive')}
                     </span>
                   </td>
-                  <td className="py-2 px-2 relative">
+                  <td className="py-2 px-2">
                     <button
-                      onClick={() => setActionMenuUserId(actionMenuUserId === user.id ? null : user.id)}
+                      onClick={(e) => {
+                        if (actionMenuUserId === user.id) {
+                          setActionMenuUserId(null);
+                        } else {
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          setActionMenuPos({
+                            top: rect.bottom + 4,
+                            left: rect.right - 180,
+                          });
+                          setActionMenuUserId(user.id);
+                        }
+                      }}
                       className={`text-lg px-2 py-0.5 rounded hover:bg-gray-100 transition-opacity ${
                         actionMenuUserId === user.id ? 'opacity-100' : 'opacity-0 group-hover/row:opacity-100'
                       }`}
@@ -546,7 +558,8 @@ export default function UsersPage() {
                     {actionMenuUserId === user.id && (
                       <div
                         ref={actionMenuRef}
-                        className="absolute right-0 top-full mt-1 z-50 bg-white border border-border rounded-lg shadow-lg py-1 min-w-[180px]"
+                        style={{ position: 'fixed', top: actionMenuPos.top, left: actionMenuPos.left, zIndex: 50 }}
+                        className="bg-white border border-border rounded-lg shadow-lg py-1 min-w-[180px]"
                       >
                         {/* Disable / Enable */}
                         {user.is_active ? (

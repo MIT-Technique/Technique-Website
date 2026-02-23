@@ -224,7 +224,17 @@
         "statusClaimed": "Claimed",
         "statusCompleted": "Completed",
         "statusCancelled": "Cancelled",
-        "claimedBy": "Claimed by {email}"
+        "claimedBy": "Claimed by {email}",
+        "myEvents": "My Events",
+        "markComplete": "Mark as Completed",
+        "completing": "Completing...",
+        "notesLabel": "Notes",
+        "notesPlaceholder": "Add notes about the event...",
+        "uploadPhotos": "Event Photos",
+        "uploading": "Uploading...",
+        "photosUploaded": "photos",
+        "deletePhoto": "Delete photo",
+        "photoLimit": "Maximum 10 photos reached."
       }
     },
 
@@ -996,6 +1006,20 @@
       "genderTeams": "Men's & Women's Teams",
       "memberCount": "{count} members"
     },
+    "orgActions": {
+      "sendKey": "Send Key",
+      "resetKey": "Reset Key",
+      "sendKeySuccess": "Login credentials sent via email.",
+      "resetKeySuccess": "Password has been reset.",
+      "resetKeyConfirm": "Generate a new login password for this organization? The old password will stop working.",
+      "noStoredKey": "No stored key. Reset the password first.",
+      "newLoginKey": "New Login Password",
+      "copyKey": "Copy",
+      "copied": "Copied!",
+      "keySent": "Email sent",
+      "sending": "Sending...",
+      "resetting": "Resetting..."
+    },
     "users": {
       "title": "User Management",
       "allUsers": "All Users",
@@ -1298,7 +1322,12 @@
         "statusPending": "Pending",
         "statusClaimed": "Claimed",
         "statusCompleted": "Completed",
-        "statusCancelled": "Cancelled"
+        "statusCancelled": "Cancelled",
+        "photosSubmitted": "Photos Submitted",
+        "avgTurnaround": "Avg Turnaround",
+        "viewPhotos": "Photos",
+        "photographerNotes": "Photographer Notes",
+        "turnaround": "Turnaround"
       },
       "yearbookRequests": {
         "title": "Yearbook Requests",

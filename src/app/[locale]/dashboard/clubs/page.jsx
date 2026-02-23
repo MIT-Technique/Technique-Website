@@ -7,6 +7,7 @@ const PAGE_SIZE = 10;
 
 export default function ClubsPage() {
   const t = useTranslations('dashboard.clubs');
+  const tOrg = useTranslations('dashboard.orgActions');
   const locale = useLocale();
   const [clubs, setClubs] = useState([]);
   const [total, setTotal] = useState(0);
@@ -20,6 +21,60 @@ export default function ClubsPage() {
   const [leaderRequests, setLeaderRequests] = useState([]);
   const [leaderRequestsLoading, setLeaderRequestsLoading] = useState(true);
   const [processingRequestId, setProcessingRequestId] = useState(null);
+
+  // Login key management state
+  const [keyActionLoading, setKeyActionLoading] = useState(null); // userId being processed
+  const [keyResult, setKeyResult] = useState(null); // { userId, loginKey } or { userId, sent: true }
+  const [keyError, setKeyError] = useState(null);
+  const [copied, setCopied] = useState(false);
+
+  async function handleResetKey(userId) {
+    if (!confirm(tOrg('resetKeyConfirm'))) return;
+    setKeyActionLoading(userId);
+    setKeyResult(null);
+    setKeyError(null);
+    try {
+      const res = await fetch('/api/admin/org-login-key', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, action: 'reset' }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setKeyResult({ userId, loginKey: data.loginKey });
+      } else {
+        setKeyError(data.error);
+      }
+    } catch {
+      setKeyError('Failed to reset key');
+    } finally {
+      setKeyActionLoading(null);
+    }
+  }
+
+  async function handleSendKey(userId) {
+    setKeyActionLoading(userId);
+    setKeyError(null);
+    try {
+      const res = await fetch('/api/admin/org-login-key', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, action: 'send' }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setKeyResult({ userId, sent: true });
+        setTimeout(() => setKeyResult(r => r?.userId === userId && r?.sent ? null : r), 4000);
+      } else {
+        setKeyError(data.error);
+        setTimeout(() => setKeyError(null), 4000);
+      }
+    } catch {
+      setKeyError('Failed to send key');
+    } finally {
+      setKeyActionLoading(null);
+    }
+  }
 
   useEffect(() => {
     fetchLeaderRequests();
@@ -217,10 +272,46 @@ export default function ClubsPage() {
                 <span className="text-text-muted">
                   ({club.manual_member_count || 0})
                 </span>
-                {club.email && (
-                  <span className="text-text-secondary ml-auto">{club.email}</span>
-                )}
+                <div className="flex items-center gap-1.5 ml-auto">
+                  <button
+                    onClick={() => handleSendKey(club.user_id)}
+                    disabled={keyActionLoading === club.user_id}
+                    className="text-xs px-2 py-1 rounded bg-blue-50 text-blue-700 hover:bg-blue-100 disabled:opacity-50"
+                  >
+                    {keyActionLoading === club.user_id ? tOrg('sending') : tOrg('sendKey')}
+                  </button>
+                  <button
+                    onClick={() => handleResetKey(club.user_id)}
+                    disabled={keyActionLoading === club.user_id}
+                    className="text-xs px-2 py-1 rounded bg-orange-50 text-orange-700 hover:bg-orange-100 disabled:opacity-50"
+                  >
+                    {keyActionLoading === club.user_id ? tOrg('resetting') : tOrg('resetKey')}
+                  </button>
+                  {club.email && (
+                    <span className="text-text-secondary">{club.email}</span>
+                  )}
+                </div>
               </div>
+
+              {/* Key result / error */}
+              {keyResult?.userId === club.user_id && keyResult.loginKey && (
+                <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded flex items-center gap-2">
+                  <span className="text-xs text-green-800 font-medium">{tOrg('newLoginKey')}:</span>
+                  <code className="text-sm bg-white px-2 py-0.5 rounded border border-green-300 select-all">{keyResult.loginKey}</code>
+                  <button
+                    onClick={() => { navigator.clipboard.writeText(keyResult.loginKey); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
+                    className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded hover:bg-green-200"
+                  >
+                    {copied ? tOrg('copied') : tOrg('copyKey')}
+                  </button>
+                </div>
+              )}
+              {keyResult?.userId === club.user_id && keyResult.sent && (
+                <p className="mt-1 text-xs text-green-700">{tOrg('sendKeySuccess')}</p>
+              )}
+              {keyError && keyActionLoading === null && (
+                <p className="mt-1 text-xs text-red-600">{keyError}</p>
+              )}
 
               {/* Images */}
               {[club.candid_image_1, club.candid_image_2, club.candid_image_3].filter(Boolean).length > 0 && (

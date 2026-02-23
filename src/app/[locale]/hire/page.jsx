@@ -704,6 +704,11 @@ function PhotographerPanel({ t, photographerEmail, onSignOut }) {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [claimingId, setClaimingId] = useState(null);
+  const [expandedId, setExpandedId] = useState(null);
+  const [completingId, setCompletingId] = useState(null);
+  const [uploadingId, setUploadingId] = useState(null);
+  const [deletingUrl, setDeletingUrl] = useState(null);
+  const [notes, setNotes] = useState({});
 
   const fetchRequests = useCallback(async () => {
     try {
@@ -740,26 +745,86 @@ function PhotographerPanel({ t, photographerEmail, onSignOut }) {
     }
   }
 
+  async function handleComplete(requestId) {
+    setCompletingId(requestId);
+    try {
+      const res = await fetch("/api/hire/update-status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ requestId, photographerNotes: notes[requestId] || "" }),
+      });
+      if (res.ok) {
+        fetchRequests();
+      }
+    } catch (e) {
+      console.error("Error completing:", e);
+    } finally {
+      setCompletingId(null);
+    }
+  }
+
+  async function handlePhotoUpload(requestId, files) {
+    if (!files || files.length === 0) return;
+    setUploadingId(requestId);
+    try {
+      const formData = new FormData();
+      formData.append("requestId", requestId);
+      Array.from(files).forEach((file, i) => {
+        formData.append(`file${i + 1}`, file);
+      });
+      const res = await fetch("/api/hire/upload-photos", {
+        method: "POST",
+        body: formData,
+      });
+      if (res.ok) {
+        fetchRequests();
+      }
+    } catch (e) {
+      console.error("Error uploading photos:", e);
+    } finally {
+      setUploadingId(null);
+    }
+  }
+
+  async function handleDeletePhoto(requestId, photoUrl) {
+    setDeletingUrl(photoUrl);
+    try {
+      const res = await fetch("/api/hire/upload-photos", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ requestId, photoUrl }),
+      });
+      if (res.ok) {
+        fetchRequests();
+      }
+    } catch (e) {
+      console.error("Error deleting photo:", e);
+    } finally {
+      setDeletingUrl(null);
+    }
+  }
+
   async function handleSignOut() {
     try {
-      // Clear photographer session
       await fetch("/api/hire/photographer-signin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: "", signOut: true }),
       });
     } catch (e) {
-      // Ignore - we'll clear locally regardless
+      // Ignore
     }
     onSignOut();
   }
 
   const pendingRequests = requests.filter((r) => r.status === "pending");
-  const myClaimedRequests = requests.filter(
-    (r) => r.status === "claimed" && r.claimed_by === photographerEmail
+  const myEvents = requests.filter(
+    (r) => (r.status === "claimed" || r.status === "completed") && r.claimed_by === photographerEmail
   );
   const otherRequests = requests.filter(
-    (r) => r.status !== "pending" && !(r.status === "claimed" && r.claimed_by === photographerEmail)
+    (r) => r.status !== "pending" && !(
+      (r.status === "claimed" || r.status === "completed") && r.claimed_by === photographerEmail
+    )
   );
 
   function statusBadge(status) {
@@ -776,34 +841,53 @@ function PhotographerPanel({ t, photographerEmail, onSignOut }) {
     );
   }
 
-  function RequestCard({ request, showClaim }) {
+  function RequestCard({ request, showClaim, isOwned }) {
     const dateStr = new Date(request.event_date + "T00:00:00").toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",
     });
     const timeStr = `${request.start_time?.slice(0, 5)} – ${request.end_time?.slice(0, 5)} EST`;
+    const isExpanded = expandedId === request.id;
+    const photoCount = request.photo_urls?.length || 0;
 
     return (
       <div className="border-l-2 border-accent/30 pl-4 py-2">
-        <div className="flex justify-between items-center mb-1.5">
-          <h4 className="text-sm font-medium text-text-primary">{request.event_name}</h4>
-          {statusBadge(request.status)}
+        <div
+          className={`${isOwned ? "cursor-pointer" : ""}`}
+          onClick={() => isOwned && setExpandedId(isExpanded ? null : request.id)}
+        >
+          <div className="flex justify-between items-center mb-1.5">
+            <div className="flex items-center gap-2">
+              {isOwned && (
+                <span className="text-text-secondary text-xs select-none">{isExpanded ? "▼" : "▶"}</span>
+              )}
+              <h4 className="text-sm font-medium text-text-primary">{request.event_name}</h4>
+            </div>
+            <div className="flex items-center gap-2">
+              {photoCount > 0 && (
+                <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-sm border border-violet-400/60 text-violet-700 bg-violet-50">
+                  {photoCount} {t("photographer.photosUploaded")}
+                </span>
+              )}
+              {statusBadge(request.status)}
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-[12px] text-text-muted">
+            <span>{dateStr}</span>
+            <span>{timeStr}</span>
+            {request.location && <span>{request.location}</span>}
+          </div>
+          <div className="flex flex-wrap justify-between items-center mt-1.5 text-[12px]">
+            <span className="text-text-muted">
+              {request.requester_name} · {request.requester_email}
+            </span>
+            <span className="text-text-primary font-medium">
+              ${request.hourly_rate}/hr &times; {request.duration_hours}h = ${request.total_cost}
+            </span>
+          </div>
         </div>
-        <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-[12px] text-text-muted">
-          <span>{dateStr}</span>
-          <span>{timeStr}</span>
-          {request.location && <span>{request.location}</span>}
-        </div>
-        <div className="flex flex-wrap justify-between items-center mt-1.5 text-[12px]">
-          <span className="text-text-muted">
-            {request.requester_name} · {request.requester_email}
-          </span>
-          <span className="text-text-primary font-medium">
-            ${request.hourly_rate}/hr &times; {request.duration_hours}h = ${request.total_cost}
-          </span>
-        </div>
-        {request.claimed_by && request.status === "claimed" && (
+        {request.claimed_by && request.status === "claimed" && !isOwned && (
           <p className="text-[11px] text-blue-600/80 mt-1">
             {t("photographer.claimedBy", { email: request.claimed_by })}
           </p>
@@ -819,23 +903,102 @@ function PhotographerPanel({ t, photographerEmail, onSignOut }) {
               : t("photographer.claimButton")}
           </button>
         )}
+
+        {/* Expanded detail panel for owned requests */}
+        {isOwned && isExpanded && (
+          <div className="mt-3 pt-3 border-t border-border/40 space-y-4">
+            {/* Notes */}
+            <div>
+              <label className="block text-[11px] uppercase tracking-widest text-text-muted mb-1.5">
+                {t("photographer.notesLabel")}
+              </label>
+              <textarea
+                value={notes[request.id] ?? request.photographer_notes ?? ""}
+                onChange={(e) => setNotes((prev) => ({ ...prev, [request.id]: e.target.value }))}
+                placeholder={t("photographer.notesPlaceholder")}
+                rows={2}
+                className="w-full bg-transparent border border-border/40 rounded px-3 py-2 text-sm text-text-primary placeholder:text-text-muted/60 outline-none focus:border-accent transition-colors resize-y"
+              />
+            </div>
+
+            {/* Mark as Complete button */}
+            {request.status === "claimed" && (
+              <button
+                onClick={(e) => { e.stopPropagation(); handleComplete(request.id); }}
+                disabled={completingId === request.id}
+                className="px-4 py-1.5 bg-emerald-600 text-white text-[11px] uppercase tracking-wider rounded hover:bg-emerald-700 disabled:opacity-50 transition-colors"
+              >
+                {completingId === request.id
+                  ? t("photographer.completing")
+                  : t("photographer.markComplete")}
+              </button>
+            )}
+
+            {/* Photo upload */}
+            <div>
+              <label className="block text-[11px] uppercase tracking-widest text-text-muted mb-1.5">
+                {t("photographer.uploadPhotos")} ({photoCount}/10)
+              </label>
+              {photoCount < 10 && (
+                <div className="mb-2">
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    multiple
+                    onChange={(e) => handlePhotoUpload(request.id, e.target.files)}
+                    disabled={uploadingId === request.id}
+                    className="text-xs text-text-muted file:mr-3 file:py-1 file:px-3 file:border file:border-border/40 file:rounded file:text-[11px] file:uppercase file:tracking-wider file:bg-transparent file:text-text-primary file:cursor-pointer hover:file:border-accent file:transition-colors"
+                  />
+                  {uploadingId === request.id && (
+                    <span className="text-[11px] text-text-muted ml-2">{t("photographer.uploading")}</span>
+                  )}
+                </div>
+              )}
+              {photoCount >= 10 && (
+                <p className="text-[11px] text-text-muted mb-2">{t("photographer.photoLimit")}</p>
+              )}
+
+              {/* Thumbnail gallery */}
+              {photoCount > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {request.photo_urls.map((url) => (
+                    <div key={url} className="relative group w-20 h-20">
+                      <img
+                        src={url}
+                        alt=""
+                        className="w-full h-full object-cover rounded border border-border/40"
+                      />
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleDeletePhoto(request.id, url); }}
+                        disabled={deletingUrl === url}
+                        className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-600 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700 disabled:opacity-50"
+                        title={t("photographer.deletePhoto")}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     );
   }
 
   const PAGE_SIZE = 2;
   const [pendingPage, setPendingPage] = useState(0);
-  const [claimedPage, setClaimedPage] = useState(0);
+  const [myEventsPage, setMyEventsPage] = useState(0);
   const [otherPage, setOtherPage] = useState(0);
 
-  // Reset pages when requests change
   useEffect(() => {
     setPendingPage(0);
-    setClaimedPage(0);
+    setMyEventsPage(0);
     setOtherPage(0);
   }, [requests]);
 
-  function PaginatedSection({ title, items, emptyText, page, setPage, showClaim }) {
+  function PaginatedSection({ title, items, emptyText, page, setPage, showClaim, isOwned }) {
     const totalPages = Math.ceil(items.length / PAGE_SIZE);
     const paged = items.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
@@ -872,7 +1035,7 @@ function PhotographerPanel({ t, photographerEmail, onSignOut }) {
         ) : (
           <div className="space-y-3">
             {paged.map((r) => (
-              <RequestCard key={r.id} request={r} showClaim={showClaim} />
+              <RequestCard key={r.id} request={r} showClaim={showClaim} isOwned={isOwned} />
             ))}
           </div>
         )}
@@ -903,14 +1066,16 @@ function PhotographerPanel({ t, photographerEmail, onSignOut }) {
             page={pendingPage}
             setPage={setPendingPage}
             showClaim
+            isOwned={false}
           />
           <PaginatedSection
-            title={t("photographer.myClaimedEvents")}
-            items={myClaimedRequests}
+            title={t("photographer.myEvents")}
+            items={myEvents}
             emptyText={t("photographer.noClaimed")}
-            page={claimedPage}
-            setPage={setClaimedPage}
+            page={myEventsPage}
+            setPage={setMyEventsPage}
             showClaim={false}
+            isOwned
           />
           {otherRequests.length > 0 && (
             <PaginatedSection
@@ -920,6 +1085,7 @@ function PhotographerPanel({ t, photographerEmail, onSignOut }) {
               page={otherPage}
               setPage={setOtherPage}
               showClaim={false}
+              isOwned={false}
             />
           )}
         </>

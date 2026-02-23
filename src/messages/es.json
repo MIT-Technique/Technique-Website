@@ -214,7 +214,17 @@
         "statusClaimed": "Reclamado",
         "statusCompleted": "Completado",
         "statusCancelled": "Cancelado",
-        "claimedBy": "Reclamado por {email}"
+        "claimedBy": "Reclamado por {email}",
+        "myEvents": "Mis Eventos",
+        "markComplete": "Marcar como Completado",
+        "completing": "Completando...",
+        "notesLabel": "Notas",
+        "notesPlaceholder": "Agregar notas sobre el evento...",
+        "uploadPhotos": "Fotos del Evento",
+        "uploading": "Subiendo...",
+        "photosUploaded": "fotos",
+        "deletePhoto": "Eliminar foto",
+        "photoLimit": "Máximo 10 fotos alcanzado."
       }
     },
     "invoice": {
@@ -959,6 +969,20 @@
       "genderTeams": "Equipos Masculino y Femenino",
       "memberCount": "{count} miembros"
     },
+    "orgActions": {
+      "sendKey": "Enviar Clave",
+      "resetKey": "Restablecer Clave",
+      "sendKeySuccess": "Credenciales enviadas por email.",
+      "resetKeySuccess": "La contraseña ha sido restablecida.",
+      "resetKeyConfirm": "¿Generar una nueva contraseña para esta organización? La contraseña anterior dejará de funcionar.",
+      "noStoredKey": "Sin clave almacenada. Restablezca la contraseña primero.",
+      "newLoginKey": "Nueva Contraseña",
+      "copyKey": "Copiar",
+      "copied": "¡Copiado!",
+      "keySent": "Email enviado",
+      "sending": "Enviando...",
+      "resetting": "Restableciendo..."
+    },
     "users": {
       "title": "Gestión de Usuarios",
       "allUsers": "Todos los Usuarios",
@@ -1261,7 +1285,12 @@
         "statusPending": "Pendiente",
         "statusClaimed": "Reclamado",
         "statusCompleted": "Completado",
-        "statusCancelled": "Cancelado"
+        "statusCancelled": "Cancelado",
+        "photosSubmitted": "Fotos Enviadas",
+        "avgTurnaround": "Tiempo Promedio",
+        "viewPhotos": "Fotos",
+        "photographerNotes": "Notas del Fotógrafo",
+        "turnaround": "Tiempo de Entrega"
       },
       "yearbookRequests": {
         "title": "Solicitudes de Anuario",

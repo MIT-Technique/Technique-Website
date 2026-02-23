@@ -146,6 +146,7 @@ export async function POST(request: Request) {
       await transporter.sendMail({
         from: "mittnq@gmail.com",
         to: existing.requester_email,
+        cc: claimedByEmail,
         subject: `Photography Request Approved - ${existing.event_name}`,
         html: htmlContent,
       });
