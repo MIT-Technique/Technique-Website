@@ -1090,6 +1090,7 @@
       "resetPasswordTitle": "Reset Password",
       "resetPasswordMsg": "Generate a new password for this user? The old password will stop working. An email with the new credentials will be sent.",
       "resetPasswordEmailed": "An email with the new credentials has been sent.",
+      "resetPasswordEmailFailed": "Email failed to send — share the password manually.",
       "disableUser": "Disable User",
       "enableUser": "Enable User",
       "deleteUser": "Delete User",

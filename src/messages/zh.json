@@ -1055,6 +1055,7 @@
       "resetPasswordTitle": "重置密码",
       "resetPasswordMsg": "为此用户生成新密码？旧密码将失效。新凭据将通过邮件发送。",
       "resetPasswordEmailed": "已通过邮件发送新凭据。",
+      "resetPasswordEmailFailed": "邮件发送失败 — 请手动分享密码。",
       "disableUser": "禁用用户",
       "enableUser": "启用用户",
       "deleteUser": "删除用户",

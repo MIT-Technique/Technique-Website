@@ -1053,6 +1053,7 @@
       "resetPasswordTitle": "Restablecer Contraseña",
       "resetPasswordMsg": "¿Generar una nueva contraseña para este usuario? La contraseña anterior dejará de funcionar. Se enviará un email con las nuevas credenciales.",
       "resetPasswordEmailed": "Se ha enviado un email con las nuevas credenciales.",
+      "resetPasswordEmailFailed": "No se pudo enviar el email — comparte la contraseña manualmente.",
       "disableUser": "Deshabilitar Usuario",
       "enableUser": "Habilitar Usuario",
       "deleteUser": "Eliminar Usuario",

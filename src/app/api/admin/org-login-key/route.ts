@@ -132,6 +132,7 @@ export async function POST(request: Request) {
       }
 
       // Send email with new credentials
+      let emailSent = false;
       try {
         await transporter.sendMail({
           from: "mittnq@gmail.com",
@@ -145,9 +146,9 @@ export async function POST(request: Request) {
             true
           ),
         });
+        emailSent = true;
       } catch (emailError) {
         console.error("Failed to send password reset email:", emailError);
-        // Don't fail the whole request — admin still sees the password in UI
       }
 
       // Log the action
@@ -161,6 +162,7 @@ export async function POST(request: Request) {
       return NextResponse.json({
         success: true,
         loginKey: newPassword,
+        emailSent,
       });
     }
 
