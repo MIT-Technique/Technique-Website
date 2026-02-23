@@ -220,11 +220,12 @@
         "completing": "Completando...",
         "notesLabel": "Notas",
         "notesPlaceholder": "Agregar notas sobre el evento...",
-        "uploadPhotos": "Fotos del Evento",
-        "uploading": "Subiendo...",
-        "photosUploaded": "fotos",
-        "deletePhoto": "Eliminar foto",
-        "photoLimit": "Máximo 10 fotos alcanzado."
+        "dropboxLinkLabel": "Enlace de Dropbox",
+        "dropboxLinkPlaceholder": "https://www.dropbox.com/...",
+        "submitLink": "Enviar y Entregar",
+        "submittingLink": "Enviando...",
+        "linkSubmitted": "Enlace Enviado",
+        "linkDeliveryNote": "Al enviar, se entregarán las fotos al solicitante y se solicitará su objeto de costo."
       }
     },
     "invoice": {
@@ -1291,9 +1292,11 @@
         "statusClaimed": "Reclamado",
         "statusCompleted": "Completado",
         "statusCancelled": "Cancelado",
-        "photosSubmitted": "Fotos Enviadas",
+        "linksSubmitted": "Enlaces Enviados",
         "avgTurnaround": "Tiempo Promedio",
-        "viewPhotos": "Fotos",
+        "dropboxLink": "Enlace de Dropbox",
+        "viewDropbox": "Ver en Dropbox",
+        "costObject": "Objeto de Costo",
         "photographerNotes": "Notas del Fotógrafo",
         "turnaround": "Tiempo de Entrega"
       },

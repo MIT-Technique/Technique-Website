@@ -230,11 +230,12 @@
         "completing": "Completing...",
         "notesLabel": "Notes",
         "notesPlaceholder": "Add notes about the event...",
-        "uploadPhotos": "Event Photos",
-        "uploading": "Uploading...",
-        "photosUploaded": "photos",
-        "deletePhoto": "Delete photo",
-        "photoLimit": "Maximum 10 photos reached."
+        "dropboxLinkLabel": "Dropbox Link",
+        "dropboxLinkPlaceholder": "https://www.dropbox.com/...",
+        "submitLink": "Submit & Deliver",
+        "submittingLink": "Submitting...",
+        "linkSubmitted": "Link Submitted",
+        "linkDeliveryNote": "Submitting will deliver photos to the requester and request their cost object."
       }
     },
 
@@ -1328,9 +1329,11 @@
         "statusClaimed": "Claimed",
         "statusCompleted": "Completed",
         "statusCancelled": "Cancelled",
-        "photosSubmitted": "Photos Submitted",
+        "linksSubmitted": "Links Submitted",
         "avgTurnaround": "Avg Turnaround",
-        "viewPhotos": "Photos",
+        "dropboxLink": "Dropbox Link",
+        "viewDropbox": "View on Dropbox",
+        "costObject": "Cost Object",
         "photographerNotes": "Photographer Notes",
         "turnaround": "Turnaround"
       },

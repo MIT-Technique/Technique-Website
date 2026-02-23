@@ -220,11 +220,12 @@
         "completing": "完成中...",
         "notesLabel": "备注",
         "notesPlaceholder": "添加活动备注...",
-        "uploadPhotos": "活动照片",
-        "uploading": "上传中...",
-        "photosUploaded": "张照片",
-        "deletePhoto": "删除照片",
-        "photoLimit": "已达到10张照片上限。"
+        "dropboxLinkLabel": "Dropbox 链接",
+        "dropboxLinkPlaceholder": "https://www.dropbox.com/...",
+        "submitLink": "提交并交付",
+        "submittingLink": "提交中...",
+        "linkSubmitted": "链接已提交",
+        "linkDeliveryNote": "提交后将向请求者交付照片并请求其成本对象。"
       }
     },
     "invoice": {
@@ -1293,9 +1294,11 @@
         "statusClaimed": "已认领",
         "statusCompleted": "已完成",
         "statusCancelled": "已取消",
-        "photosSubmitted": "已提交照片",
+        "linksSubmitted": "已提交链接",
         "avgTurnaround": "平均周转时间",
-        "viewPhotos": "照片",
+        "dropboxLink": "Dropbox 链接",
+        "viewDropbox": "在 Dropbox 查看",
+        "costObject": "成本对象",
         "photographerNotes": "摄影师备注",
         "turnaround": "周转时间"
       },

@@ -20,14 +20,14 @@ export async function GET() {
       return NextResponse.json({ error: "Failed to fetch" }, { status: 500 });
     }
 
-    const withPhotos = requests?.filter(r => r.photo_urls?.length > 0).length || 0;
+    const withLinks = requests?.filter(r => !!r.dropbox_link).length || 0;
 
-    // Calculate average turnaround: photos_submitted_at - event_date (in days)
+    // Calculate average turnaround: link_submitted_at - event_date (in days)
     const turnaroundDays: number[] = [];
     for (const r of (requests || [])) {
-      if (r.photos_submitted_at && r.event_date) {
+      if (r.link_submitted_at && r.event_date) {
         const eventDate = new Date(r.event_date + "T00:00:00");
-        const submittedAt = new Date(r.photos_submitted_at);
+        const submittedAt = new Date(r.link_submitted_at);
         const diffMs = submittedAt.getTime() - eventDate.getTime();
         if (diffMs >= 0) {
           turnaroundDays.push(diffMs / (1000 * 60 * 60 * 24));
@@ -44,7 +44,7 @@ export async function GET() {
       claimed: requests?.filter(r => r.status === 'claimed').length || 0,
       completed: requests?.filter(r => r.status === 'completed').length || 0,
       cancelled: requests?.filter(r => r.status === 'cancelled').length || 0,
-      withPhotos,
+      withLinks,
       avgTurnaround,
     };
 

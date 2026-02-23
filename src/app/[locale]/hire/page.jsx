@@ -706,8 +706,8 @@ function PhotographerPanel({ t, photographerEmail, onSignOut }) {
   const [claimingId, setClaimingId] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
   const [completingId, setCompletingId] = useState(null);
-  const [uploadingId, setUploadingId] = useState(null);
-  const [deletingUrl, setDeletingUrl] = useState(null);
+  const [submittingLinkId, setSubmittingLinkId] = useState(null);
+  const [linkInputs, setLinkInputs] = useState({});
   const [notes, setNotes] = useState({});
 
   const fetchRequests = useCallback(async () => {
@@ -763,44 +763,23 @@ function PhotographerPanel({ t, photographerEmail, onSignOut }) {
     }
   }
 
-  async function handlePhotoUpload(requestId, files) {
-    if (!files || files.length === 0) return;
-    setUploadingId(requestId);
+  async function handleSubmitLink(requestId) {
+    const link = linkInputs[requestId]?.trim();
+    if (!link) return;
+    setSubmittingLinkId(requestId);
     try {
-      const formData = new FormData();
-      formData.append("requestId", requestId);
-      Array.from(files).forEach((file, i) => {
-        formData.append(`file${i + 1}`, file);
-      });
-      const res = await fetch("/api/hire/upload-photos", {
+      const res = await fetch("/api/hire/submit-link", {
         method: "POST",
-        body: formData,
-      });
-      if (res.ok) {
-        fetchRequests();
-      }
-    } catch (e) {
-      console.error("Error uploading photos:", e);
-    } finally {
-      setUploadingId(null);
-    }
-  }
-
-  async function handleDeletePhoto(requestId, photoUrl) {
-    setDeletingUrl(photoUrl);
-    try {
-      const res = await fetch("/api/hire/upload-photos", {
-        method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ requestId, photoUrl }),
+        body: JSON.stringify({ requestId, dropboxLink: link }),
       });
       if (res.ok) {
         fetchRequests();
       }
     } catch (e) {
-      console.error("Error deleting photo:", e);
+      console.error("Error submitting link:", e);
     } finally {
-      setDeletingUrl(null);
+      setSubmittingLinkId(null);
     }
   }
 
@@ -849,7 +828,6 @@ function PhotographerPanel({ t, photographerEmail, onSignOut }) {
     });
     const timeStr = `${request.start_time?.slice(0, 5)} – ${request.end_time?.slice(0, 5)} EST`;
     const isExpanded = expandedId === request.id;
-    const photoCount = request.photo_urls?.length || 0;
 
     return (
       <div className="border-l-2 border-accent/30 pl-4 py-2">
@@ -865,9 +843,9 @@ function PhotographerPanel({ t, photographerEmail, onSignOut }) {
               <h4 className="text-sm font-medium text-text-primary">{request.event_name}</h4>
             </div>
             <div className="flex items-center gap-2">
-              {photoCount > 0 && (
-                <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-sm border border-violet-400/60 text-violet-700 bg-violet-50">
-                  {photoCount} {t("photographer.photosUploaded")}
+              {request.dropbox_link && (
+                <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-sm border border-emerald-400/60 text-emerald-700 bg-emerald-50">
+                  {t("photographer.linkSubmitted")}
                 </span>
               )}
               {statusBadge(request.status)}
@@ -921,66 +899,62 @@ function PhotographerPanel({ t, photographerEmail, onSignOut }) {
               />
             </div>
 
-            {/* Mark as Complete button */}
-            {request.status === "claimed" && (
+            {/* Dropbox link submission */}
+            <div>
+              <label className="block text-[11px] uppercase tracking-widest text-text-muted mb-1.5">
+                {t("photographer.dropboxLinkLabel")}
+              </label>
+              {request.dropbox_link ? (
+                <div className="flex items-center gap-2">
+                  <span className="text-emerald-600 text-sm">&#10003;</span>
+                  <a
+                    href={request.dropbox_link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="text-sm text-accent hover:text-accent-hover underline break-all transition-colors"
+                  >
+                    {request.dropbox_link}
+                  </a>
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <input
+                      type="url"
+                      value={linkInputs[request.id] || ""}
+                      onChange={(e) => { e.stopPropagation(); setLinkInputs((prev) => ({ ...prev, [request.id]: e.target.value })); }}
+                      onClick={(e) => e.stopPropagation()}
+                      placeholder={t("photographer.dropboxLinkPlaceholder")}
+                      className="flex-1 bg-transparent border border-border/40 rounded px-3 py-2 text-sm text-text-primary placeholder:text-text-muted/60 outline-none focus:border-accent transition-colors"
+                    />
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleSubmitLink(request.id); }}
+                      disabled={submittingLinkId === request.id || !linkInputs[request.id]?.trim()}
+                      className="px-4 py-2 bg-accent text-white text-[11px] uppercase tracking-wider rounded hover:bg-accent/90 disabled:opacity-50 transition-colors whitespace-nowrap"
+                    >
+                      {submittingLinkId === request.id
+                        ? t("photographer.submittingLink")
+                        : t("photographer.submitLink")}
+                    </button>
+                  </div>
+                  <p className="text-[11px] text-text-muted">{t("photographer.linkDeliveryNote")}</p>
+                </>
+              )}
+            </div>
+
+            {/* Mark as Complete fallback */}
+            {request.status === "claimed" && !request.dropbox_link && (
               <button
                 onClick={(e) => { e.stopPropagation(); handleComplete(request.id); }}
                 disabled={completingId === request.id}
-                className="px-4 py-1.5 bg-emerald-600 text-white text-[11px] uppercase tracking-wider rounded hover:bg-emerald-700 disabled:opacity-50 transition-colors"
+                className="px-4 py-1.5 border border-border/40 text-text-secondary text-[11px] uppercase tracking-wider rounded hover:border-accent hover:text-accent disabled:opacity-50 transition-colors"
               >
                 {completingId === request.id
                   ? t("photographer.completing")
                   : t("photographer.markComplete")}
               </button>
             )}
-
-            {/* Photo upload */}
-            <div>
-              <label className="block text-[11px] uppercase tracking-widest text-text-muted mb-1.5">
-                {t("photographer.uploadPhotos")} ({photoCount}/10)
-              </label>
-              {photoCount < 10 && (
-                <div className="mb-2">
-                  <input
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp,image/gif"
-                    multiple
-                    onChange={(e) => handlePhotoUpload(request.id, e.target.files)}
-                    disabled={uploadingId === request.id}
-                    className="text-xs text-text-muted file:mr-3 file:py-1 file:px-3 file:border file:border-border/40 file:rounded file:text-[11px] file:uppercase file:tracking-wider file:bg-transparent file:text-text-primary file:cursor-pointer hover:file:border-accent file:transition-colors"
-                  />
-                  {uploadingId === request.id && (
-                    <span className="text-[11px] text-text-muted ml-2">{t("photographer.uploading")}</span>
-                  )}
-                </div>
-              )}
-              {photoCount >= 10 && (
-                <p className="text-[11px] text-text-muted mb-2">{t("photographer.photoLimit")}</p>
-              )}
-
-              {/* Thumbnail gallery */}
-              {photoCount > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {request.photo_urls.map((url) => (
-                    <div key={url} className="relative group w-20 h-20">
-                      <img
-                        src={url}
-                        alt=""
-                        className="w-full h-full object-cover rounded border border-border/40"
-                      />
-                      <button
-                        onClick={(e) => { e.stopPropagation(); handleDeletePhoto(request.id, url); }}
-                        disabled={deletingUrl === url}
-                        className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-600 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700 disabled:opacity-50"
-                        title={t("photographer.deletePhoto")}
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
         )}
       </div>

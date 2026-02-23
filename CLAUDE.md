@@ -717,8 +717,9 @@ Success messages auto-fade after 4 seconds using the `FadeMessage` component pat
 
 ## Supabase Schema
 
--- WARNING: This schema is for context only and is not meant to be run.
--- Table order and constraints may not be valid for execution.
+For the most up-to-date schema, see `supabase/migrations/`. New SQL migration scripts should always be placed in that folder.
+
+Below is a summary of key tables (see migration files for full DDL):
 
 CREATE TABLE public.admin_logs (
 id uuid NOT NULL DEFAULT gen_random_uuid(),

@@ -96,8 +96,8 @@ export default function InquiriesHireRequestsPage() {
           </div>
         ))}
         <div className="px-3 py-1.5 rounded-lg border border-border bg-bg-secondary flex items-center gap-2">
-          <span className="text-xs text-text-secondary">{t('photosSubmitted')}</span>
-          <span className="text-sm font-medium">{stats.withPhotos || 0}</span>
+          <span className="text-xs text-text-secondary">{t('linksSubmitted')}</span>
+          <span className="text-sm font-medium">{stats.withLinks || 0}</span>
         </div>
         {stats.avgTurnaround != null && (
           <div className="px-3 py-1.5 rounded-lg border border-border bg-bg-secondary flex items-center gap-2">
@@ -181,25 +181,28 @@ export default function InquiriesHireRequestsPage() {
                       {r.photographer_notes && (
                         <div className="col-span-2"><span className="text-text-secondary">{t('photographerNotes')}:</span> {r.photographer_notes}</div>
                       )}
-                      {r.photos_submitted_at && r.event_date && (() => {
+                      {r.link_submitted_at && r.event_date && (() => {
                         const eventDate = new Date(r.event_date + 'T00:00:00');
-                        const submitted = new Date(r.photos_submitted_at);
+                        const submitted = new Date(r.link_submitted_at);
                         const days = Math.round((submitted - eventDate) / (1000 * 60 * 60 * 24) * 10) / 10;
                         return days >= 0 ? (
                           <div><span className="text-text-secondary">{t('turnaround')}:</span> {days}d</div>
                         ) : null;
                       })()}
                     </div>
-                    {r.photo_urls?.length > 0 && (
+                    {r.dropbox_link && (
                       <div className="mt-3">
-                        <p className="text-xs text-text-secondary mb-2">{t('viewPhotos')} ({r.photo_urls.length})</p>
-                        <div className="flex flex-wrap gap-2">
-                          {r.photo_urls.map((url) => (
-                            <a key={url} href={url} target="_blank" rel="noopener noreferrer">
-                              <img src={url} alt="" className="w-16 h-16 object-cover rounded border border-border hover:border-accent transition-colors" />
-                            </a>
-                          ))}
-                        </div>
+                        <p className="text-xs text-text-secondary mb-1">{t('dropboxLink')}</p>
+                        <a href={r.dropbox_link} target="_blank" rel="noopener noreferrer"
+                          className="text-sm text-accent hover:text-accent-hover underline break-all transition-colors">
+                          {t('viewDropbox')}
+                        </a>
+                      </div>
+                    )}
+                    {r.cost_object && (
+                      <div className="mt-2">
+                        <span className="text-xs text-text-secondary">{t('costObject')}:</span>{' '}
+                        <span className="text-sm">{r.cost_object}</span>
                       </div>
                     )}
                   </td>
