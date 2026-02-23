@@ -95,6 +95,16 @@ export default function InquiriesHireRequestsPage() {
             <span className="text-sm font-medium">{stats[s]}</span>
           </div>
         ))}
+        <div className="px-3 py-1.5 rounded-lg border border-border bg-bg-secondary flex items-center gap-2">
+          <span className="text-xs text-text-secondary">{t('linksSubmitted')}</span>
+          <span className="text-sm font-medium">{stats.withLinks || 0}</span>
+        </div>
+        {stats.avgTurnaround != null && (
+          <div className="px-3 py-1.5 rounded-lg border border-border bg-bg-secondary flex items-center gap-2">
+            <span className="text-xs text-text-secondary">{t('avgTurnaround')}</span>
+            <span className="text-sm font-medium">{stats.avgTurnaround}d</span>
+          </div>
+        )}
       </div>
 
       {/* Search + Pagination */}
@@ -164,10 +174,37 @@ export default function InquiriesHireRequestsPage() {
                       {r.description && <div className="col-span-2"><span className="text-text-secondary">{t('description')}:</span> {r.description}</div>}
                       {r.claimed_by && <div><span className="text-text-secondary">{t('claimedBy')}:</span> {r.claimed_by}</div>}
                       {r.claimed_at && <div><span className="text-text-secondary">Claimed:</span> {formatDateTime(r.claimed_at)}</div>}
+                      {r.completed_at && <div><span className="text-text-secondary">Completed:</span> {formatDateTime(r.completed_at)}</div>}
                       <div><span className="text-text-secondary">Requested:</span> {formatDateTime(r.created_at)}</div>
                       <div><span className="text-text-secondary">Rate:</span> ${r.hourly_rate}/hr</div>
                       <div><span className="text-text-secondary">Duration:</span> {r.duration_hours}h</div>
+                      {r.photographer_notes && (
+                        <div className="col-span-2"><span className="text-text-secondary">{t('photographerNotes')}:</span> {r.photographer_notes}</div>
+                      )}
+                      {r.link_submitted_at && r.event_date && (() => {
+                        const eventDate = new Date(r.event_date + 'T00:00:00');
+                        const submitted = new Date(r.link_submitted_at);
+                        const days = Math.round((submitted - eventDate) / (1000 * 60 * 60 * 24) * 10) / 10;
+                        return days >= 0 ? (
+                          <div><span className="text-text-secondary">{t('turnaround')}:</span> {days}d</div>
+                        ) : null;
+                      })()}
                     </div>
+                    {r.dropbox_link && (
+                      <div className="mt-3">
+                        <p className="text-xs text-text-secondary mb-1">{t('dropboxLink')}</p>
+                        <a href={r.dropbox_link} target="_blank" rel="noopener noreferrer"
+                          className="text-sm text-accent hover:text-accent-hover underline break-all transition-colors">
+                          {t('viewDropbox')}
+                        </a>
+                      </div>
+                    )}
+                    {r.cost_object && (
+                      <div className="mt-2">
+                        <span className="text-xs text-text-secondary">{t('costObject')}:</span>{' '}
+                        <span className="text-sm">{r.cost_object}</span>
+                      </div>
+                    )}
                   </td>
                 </tr>
               );

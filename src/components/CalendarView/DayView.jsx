@@ -94,6 +94,7 @@ export default function DayView({
     const endTime = endHour >= 24 ? '23:45' : `${String(endHour).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
     setPrefillTimes({ startTime, endTime });
     setShowPanel(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPast, role, t]);
 
   if (loading) {

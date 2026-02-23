@@ -31,6 +31,7 @@ export default function SettingsPage() {
   useEffect(() => {
     fetchSettings();
     fetchHireRate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function fetchSettings() {

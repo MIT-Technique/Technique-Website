@@ -230,6 +230,7 @@ export default function LivingGroupPage() {
         }
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, scheduleSubTab, isLoggedIn, user, livingGroup]);
 
 

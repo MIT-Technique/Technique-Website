@@ -5,7 +5,7 @@ import { createAdminClient } from "../../../../../lib/supabase/admin";
 export async function GET() {
   try {
     const user = await getCurrentUser();
-    if (!user || user.role !== 'admin') {
+    if (!user || (user.role !== 'admin' && user.role !== 'staph')) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -20,12 +20,32 @@ export async function GET() {
       return NextResponse.json({ error: "Failed to fetch" }, { status: 500 });
     }
 
+    const withLinks = requests?.filter(r => !!r.dropbox_link).length || 0;
+
+    // Calculate average turnaround: link_submitted_at - event_date (in days)
+    const turnaroundDays: number[] = [];
+    for (const r of (requests || [])) {
+      if (r.link_submitted_at && r.event_date) {
+        const eventDate = new Date(r.event_date + "T00:00:00");
+        const submittedAt = new Date(r.link_submitted_at);
+        const diffMs = submittedAt.getTime() - eventDate.getTime();
+        if (diffMs >= 0) {
+          turnaroundDays.push(diffMs / (1000 * 60 * 60 * 24));
+        }
+      }
+    }
+    const avgTurnaround = turnaroundDays.length > 0
+      ? Math.round((turnaroundDays.reduce((a, b) => a + b, 0) / turnaroundDays.length) * 10) / 10
+      : null;
+
     const stats = {
       total: requests?.length || 0,
       pending: requests?.filter(r => r.status === 'pending').length || 0,
       claimed: requests?.filter(r => r.status === 'claimed').length || 0,
       completed: requests?.filter(r => r.status === 'completed').length || 0,
       cancelled: requests?.filter(r => r.status === 'cancelled').length || 0,
+      withLinks,
+      avgTurnaround,
     };
 
     return NextResponse.json({ requests: requests || [], stats });

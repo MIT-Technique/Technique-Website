@@ -432,6 +432,7 @@ export default function StudentWorkFeaturePage() {
                   >
                     {previews[index] ? (
                       <div className="relative">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={previews[index]}
                           alt={`Preview ${index + 1}`}

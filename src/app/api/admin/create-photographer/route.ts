@@ -14,7 +14,7 @@ const transporter = nodemailer.createTransport({
 export async function POST(request: Request) {
   try {
     const user = await getCurrentUser();
-    if (!user || user.role !== "admin") {
+    if (!user || (user.role !== "admin" && user.role !== "staph")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

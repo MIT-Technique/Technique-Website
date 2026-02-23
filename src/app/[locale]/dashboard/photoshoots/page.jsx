@@ -79,6 +79,7 @@ export default function PhotoshootsPage() {
     fetchTimes();
     fetchProposals();
     fetchPhotographers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter]);
 
   async function fetchPhotographers() {

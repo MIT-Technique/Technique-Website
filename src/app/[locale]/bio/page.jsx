@@ -135,7 +135,8 @@ export default function BioPage() {
         // Ignore fetch errors
       }
     },
-    [email],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
   );
 
   function handleClose() {

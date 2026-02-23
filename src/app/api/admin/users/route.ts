@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
   try {
     const user = await getCurrentUser();
 
-    if (!user || user.role !== 'admin') {
+    if (!user || (user.role !== 'admin' && user.role !== 'staph')) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
@@ -291,7 +291,7 @@ export async function DELETE(request: NextRequest) {
     // Get target user to check if super admin
     const { data: targetUser } = await supabase
       .from('users')
-      .select('email, role, name')
+      .select('email, role, name, supabase_auth_id')
       .eq('id', userId)
       .single();
 
@@ -329,6 +329,15 @@ export async function DELETE(request: NextRequest) {
         { error: "Failed to delete user" },
         { status: 500 }
       );
+    }
+
+    // Delete from Supabase Auth if they have an auth account
+    if (targetUser.supabase_auth_id) {
+      const { error: authDeleteError } = await supabase.auth.admin.deleteUser(targetUser.supabase_auth_id);
+      if (authDeleteError) {
+        console.error("Error deleting auth user:", authDeleteError);
+        // Don't fail — the public.users record is already deleted
+      }
     }
 
     await createLog(user.id, "user_deleted", "user", userId, {

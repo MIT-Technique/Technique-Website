@@ -199,7 +199,7 @@
         "panelTitle": "摄影师面板",
         "pendingRequests": "待处理请求",
         "myClaimedEvents": "我认领的活动",
-        "allRequests": "所有请求",
+        "allRequests": "所有请求 (Staph Overview)",
         "claimButton": "认领",
         "claiming": "认领中...",
         "noRequests": "目前没有待处理的请求。",
@@ -214,7 +214,22 @@
         "statusClaimed": "已认领",
         "statusCompleted": "已完成",
         "statusCancelled": "已取消",
-        "claimedBy": "由 {email} 认领"
+        "claimedBy": "由 {email} 认领",
+        "myEvents": "我的活动",
+        "upcomingEvents": "即将到来",
+        "completedEvents": "已完成",
+        "noUpcoming": "没有即将到来的活动。",
+        "noCompleted": "还没有已完成的活动。",
+        "markComplete": "标记为已完成",
+        "completing": "完成中...",
+        "notesLabel": "备注",
+        "notesPlaceholder": "添加活动备注...",
+        "dropboxLinkLabel": "Dropbox 链接",
+        "dropboxLinkPlaceholder": "https://www.dropbox.com/...",
+        "submitLink": "提交并交付",
+        "submittingLink": "提交中...",
+        "linkSubmitted": "链接已提交",
+        "linkDeliveryNote": "提交后将向请求者交付照片并请求其成本对象。"
       }
     },
     "invoice": {
@@ -961,6 +976,20 @@
       "genderTeams": "男女分队",
       "memberCount": "{count} 名成员"
     },
+    "orgActions": {
+      "sendKey": "发送密钥",
+      "resetKey": "重置密钥",
+      "sendKeySuccess": "登录凭据已通过邮件发送。",
+      "resetKeySuccess": "密码已重置。",
+      "resetKeyConfirm": "为此组织生成新的登录密码？旧密码将失效。",
+      "noStoredKey": "无存储密钥。请先重置密码。",
+      "newLoginKey": "新登录密码",
+      "copyKey": "复制",
+      "copied": "已复制！",
+      "keySent": "邮件已发送",
+      "sending": "发送中...",
+      "resetting": "重置中..."
+    },
     "users": {
       "title": "用户管理",
       "allUsers": "所有用户",
@@ -1027,6 +1056,11 @@
       "removePhotographer": "移除",
       "noPhotographers": "暂无授权摄影师。",
       "photographerAdded": "摄影师添加成功。",
+      "resetPassword": "重置密码",
+      "resetPasswordTitle": "重置密码",
+      "resetPasswordMsg": "为此用户生成新密码？旧密码将失效。新凭据将通过邮件发送。",
+      "resetPasswordEmailed": "已通过邮件发送新凭据。",
+      "resetPasswordEmailFailed": "邮件发送失败 — 请手动分享密码。",
       "disableUser": "禁用用户",
       "enableUser": "启用用户",
       "deleteUser": "删除用户",
@@ -1263,7 +1297,14 @@
         "statusPending": "待处理",
         "statusClaimed": "已认领",
         "statusCompleted": "已完成",
-        "statusCancelled": "已取消"
+        "statusCancelled": "已取消",
+        "linksSubmitted": "已提交链接",
+        "avgTurnaround": "平均周转时间",
+        "dropboxLink": "Dropbox 链接",
+        "viewDropbox": "在 Dropbox 查看",
+        "costObject": "成本对象",
+        "photographerNotes": "摄影师备注",
+        "turnaround": "周转时间"
       },
       "yearbookRequests": {
         "title": "年鉴请求",

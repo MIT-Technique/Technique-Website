@@ -199,7 +199,7 @@
         "panelTitle": "Panel de Fotógrafo",
         "pendingRequests": "Solicitudes Pendientes",
         "myClaimedEvents": "Mis Eventos Reclamados",
-        "allRequests": "Todas las Solicitudes",
+        "allRequests": "Todas las Solicitudes (Staph Overview)",
         "claimButton": "Reclamar",
         "claiming": "Reclamando...",
         "noRequests": "No hay solicitudes pendientes por ahora.",
@@ -214,7 +214,22 @@
         "statusClaimed": "Reclamado",
         "statusCompleted": "Completado",
         "statusCancelled": "Cancelado",
-        "claimedBy": "Reclamado por {email}"
+        "claimedBy": "Reclamado por {email}",
+        "myEvents": "Mis Eventos",
+        "upcomingEvents": "Próximos",
+        "completedEvents": "Completados",
+        "noUpcoming": "No hay eventos próximos.",
+        "noCompleted": "Aún no hay eventos completados.",
+        "markComplete": "Marcar como Completado",
+        "completing": "Completando...",
+        "notesLabel": "Notas",
+        "notesPlaceholder": "Agregar notas sobre el evento...",
+        "dropboxLinkLabel": "Enlace de Dropbox",
+        "dropboxLinkPlaceholder": "https://www.dropbox.com/...",
+        "submitLink": "Enviar y Entregar",
+        "submittingLink": "Enviando...",
+        "linkSubmitted": "Enlace Enviado",
+        "linkDeliveryNote": "Al enviar, se entregarán las fotos al solicitante y se solicitará su objeto de costo."
       }
     },
     "invoice": {
@@ -959,6 +974,20 @@
       "genderTeams": "Equipos Masculino y Femenino",
       "memberCount": "{count} miembros"
     },
+    "orgActions": {
+      "sendKey": "Enviar Clave",
+      "resetKey": "Restablecer Clave",
+      "sendKeySuccess": "Credenciales enviadas por email.",
+      "resetKeySuccess": "La contraseña ha sido restablecida.",
+      "resetKeyConfirm": "¿Generar una nueva contraseña para esta organización? La contraseña anterior dejará de funcionar.",
+      "noStoredKey": "Sin clave almacenada. Restablezca la contraseña primero.",
+      "newLoginKey": "Nueva Contraseña",
+      "copyKey": "Copiar",
+      "copied": "¡Copiado!",
+      "keySent": "Email enviado",
+      "sending": "Enviando...",
+      "resetting": "Restableciendo..."
+    },
     "users": {
       "title": "Gestión de Usuarios",
       "allUsers": "Todos los Usuarios",
@@ -1025,6 +1054,11 @@
       "removePhotographer": "Eliminar",
       "noPhotographers": "No hay fotógrafos autorizados aún.",
       "photographerAdded": "Fotógrafo agregado exitosamente.",
+      "resetPassword": "Restablecer Contraseña",
+      "resetPasswordTitle": "Restablecer Contraseña",
+      "resetPasswordMsg": "¿Generar una nueva contraseña para este usuario? La contraseña anterior dejará de funcionar. Se enviará un email con las nuevas credenciales.",
+      "resetPasswordEmailed": "Se ha enviado un email con las nuevas credenciales.",
+      "resetPasswordEmailFailed": "No se pudo enviar el email — comparte la contraseña manualmente.",
       "disableUser": "Deshabilitar Usuario",
       "enableUser": "Habilitar Usuario",
       "deleteUser": "Eliminar Usuario",
@@ -1261,7 +1295,14 @@
         "statusPending": "Pendiente",
         "statusClaimed": "Reclamado",
         "statusCompleted": "Completado",
-        "statusCancelled": "Cancelado"
+        "statusCancelled": "Cancelado",
+        "linksSubmitted": "Enlaces Enviados",
+        "avgTurnaround": "Tiempo Promedio",
+        "dropboxLink": "Enlace de Dropbox",
+        "viewDropbox": "Ver en Dropbox",
+        "costObject": "Objeto de Costo",
+        "photographerNotes": "Notas del Fotógrafo",
+        "turnaround": "Tiempo de Entrega"
       },
       "yearbookRequests": {
         "title": "Solicitudes de Anuario",

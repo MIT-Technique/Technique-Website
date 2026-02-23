@@ -212,6 +212,7 @@ export default function ResponsesClubsPage() {
                             <span className="text-text-secondary text-sm block mb-2">{t('clubs.imagePreview')}:</span>
                             <div className="flex gap-2">
                               {club.imageUrls.map((url, i) => (
+                                /* eslint-disable-next-line @next/next/no-img-element */
                                 <img
                                   key={i}
                                   src={url}

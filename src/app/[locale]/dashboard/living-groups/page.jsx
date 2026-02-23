@@ -7,12 +7,67 @@ const ITEMS_PER_PAGE = 5;
 
 export default function LivingGroupsPage() {
   const t = useTranslations('dashboard.livingGroups');
+  const tOrg = useTranslations('dashboard.orgActions');
   const [livingGroups, setLivingGroups] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dormSearch, setDormSearch] = useState('');
   const [fsilgSearch, setFsilgSearch] = useState('');
   const [dormPage, setDormPage] = useState(1);
   const [fsilgPage, setFsilgPage] = useState(1);
+
+  // Login key management state
+  const [keyActionLoading, setKeyActionLoading] = useState(null);
+  const [keyResult, setKeyResult] = useState(null);
+  const [keyError, setKeyError] = useState(null);
+  const [copied, setCopied] = useState(false);
+
+  async function handleResetKey(userId) {
+    if (!confirm(tOrg('resetKeyConfirm'))) return;
+    setKeyActionLoading(userId);
+    setKeyResult(null);
+    setKeyError(null);
+    try {
+      const res = await fetch('/api/admin/org-login-key', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, action: 'reset' }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setKeyResult({ userId, loginKey: data.loginKey });
+      } else {
+        setKeyError(data.error);
+      }
+    } catch {
+      setKeyError('Failed to reset key');
+    } finally {
+      setKeyActionLoading(null);
+    }
+  }
+
+  async function handleSendKey(userId) {
+    setKeyActionLoading(userId);
+    setKeyError(null);
+    try {
+      const res = await fetch('/api/admin/org-login-key', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, action: 'send' }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setKeyResult({ userId, sent: true });
+        setTimeout(() => setKeyResult(r => r?.userId === userId && r?.sent ? null : r), 4000);
+      } else {
+        setKeyError(data.error);
+        setTimeout(() => setKeyError(null), 4000);
+      }
+    } catch {
+      setKeyError('Failed to send key');
+    } finally {
+      setKeyActionLoading(null);
+    }
+  }
 
   useEffect(() => {
     fetchLivingGroups();
@@ -81,8 +136,39 @@ export default function LivingGroupsPage() {
     >
       <div className="flex items-center justify-between">
         <span className="font-medium">{lg.name}</span>
-        <span className="text-sm text-text-muted">{lg.user?.email}</span>
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={() => handleSendKey(lg.user_id)}
+            disabled={keyActionLoading === lg.user_id}
+            className="text-xs px-2 py-0.5 rounded bg-blue-50 text-blue-700 hover:bg-blue-100 disabled:opacity-50"
+          >
+            {keyActionLoading === lg.user_id ? tOrg('sending') : tOrg('sendKey')}
+          </button>
+          <button
+            onClick={() => handleResetKey(lg.user_id)}
+            disabled={keyActionLoading === lg.user_id}
+            className="text-xs px-2 py-0.5 rounded bg-orange-50 text-orange-700 hover:bg-orange-100 disabled:opacity-50"
+          >
+            {keyActionLoading === lg.user_id ? tOrg('resetting') : tOrg('resetKey')}
+          </button>
+          <span className="text-sm text-text-muted">{lg.user?.email}</span>
+        </div>
       </div>
+      {keyResult?.userId === lg.user_id && keyResult.loginKey && (
+        <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded flex items-center gap-2">
+          <span className="text-xs text-green-800 font-medium">{tOrg('newLoginKey')}:</span>
+          <code className="text-sm bg-white px-2 py-0.5 rounded border border-green-300 select-all">{keyResult.loginKey}</code>
+          <button
+            onClick={() => { navigator.clipboard.writeText(keyResult.loginKey); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
+            className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded hover:bg-green-200"
+          >
+            {copied ? tOrg('copied') : tOrg('copyKey')}
+          </button>
+        </div>
+      )}
+      {keyResult?.userId === lg.user_id && keyResult.sent && (
+        <p className="mt-1 text-xs text-green-700">{tOrg('sendKeySuccess')}</p>
+      )}
       {lg.dorm_sections && lg.dorm_sections.length > 0 && (
         <p className="text-xs text-text-muted mt-1">
           {lg.dorm_sections.join(', ')}

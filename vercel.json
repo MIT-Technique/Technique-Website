@@ -1,4 +1,14 @@
 {
+  "crons": [
+    {
+      "path": "/api/hire/weekly-reminder",
+      "schedule": "0 14 * * 1"
+    },
+    {
+      "path": "/api/hire/photographer-reminder",
+      "schedule": "0 14 1,6,11,16,21,26 * *"
+    }
+  ],
   "functions": {
     "src/app/api/clubs/images/route.ts": {
       "maxDuration": 60

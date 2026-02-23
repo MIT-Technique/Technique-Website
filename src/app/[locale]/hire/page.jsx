@@ -698,12 +698,231 @@ function PhotographerSignIn({ t, onSignIn }) {
   );
 }
 
+// ─── Shared Sub-Components (defined outside to preserve React identity) ──────
+
+function statusBadge(status, t) {
+  const styles = {
+    pending: "border-amber-400/60 text-amber-700 bg-amber-50",
+    claimed: "border-blue-400/60 text-blue-700 bg-blue-50",
+    completed: "border-emerald-400/60 text-emerald-700 bg-emerald-50",
+    cancelled: "border-red-300/60 text-red-600 bg-red-50",
+  };
+  return (
+    <span className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-sm border ${styles[status] || "border-gray-300 bg-gray-50 text-gray-600"}`}>
+      {t(`photographer.status${status.charAt(0).toUpperCase() + status.slice(1)}`)}
+    </span>
+  );
+}
+
+function RequestCard({ request, showClaim, isOwned, expandedId, setExpandedId, claimingId, onClaim, completingId, onComplete, submittingLinkId, onSubmitLink, linkInputs, setLinkInputs, notes, setNotes, t }) {
+  const dateStr = new Date(request.event_date + "T00:00:00").toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+  const timeStr = `${request.start_time?.slice(0, 5)} – ${request.end_time?.slice(0, 5)} EST`;
+  const isExpanded = expandedId === request.id;
+
+  return (
+    <div className="border-l-2 border-accent/30 pl-4 py-2">
+      <div
+        className={`${isOwned ? "cursor-pointer" : ""}`}
+        onClick={() => isOwned && setExpandedId(isExpanded ? null : request.id)}
+      >
+        <div className="flex justify-between items-center mb-1.5">
+          <div className="flex items-center gap-2">
+            {isOwned && (
+              <svg
+                className={`w-3 h-3 text-text-secondary transition-transform duration-200 ${isExpanded ? "rotate-90" : ""}`}
+                viewBox="0 0 6 10"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M1 1l4 4-4 4" />
+              </svg>
+            )}
+            <h4 className="text-sm font-medium text-text-primary">{request.event_name}</h4>
+          </div>
+          <div className="flex items-center gap-2">
+            {request.dropbox_link && (
+              <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-sm border border-emerald-400/60 text-emerald-700 bg-emerald-50">
+                {t("photographer.linkSubmitted")}
+              </span>
+            )}
+            {statusBadge(request.status, t)}
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-[12px] text-text-muted">
+          <span>{dateStr}</span>
+          <span>{timeStr}</span>
+          {request.location && <span>{request.location}</span>}
+        </div>
+        <div className="flex flex-wrap justify-between items-center mt-1.5 text-[12px]">
+          <span className="text-text-muted">
+            {request.requester_name} · {request.requester_email}
+          </span>
+          <span className="text-text-primary font-medium">
+            ${request.hourly_rate}/hr &times; {request.duration_hours}h = ${request.total_cost}
+          </span>
+        </div>
+      </div>
+      {request.claimed_by && request.status === "claimed" && !isOwned && (
+        <p className="text-[11px] text-blue-600/80 mt-1">
+          {t("photographer.claimedBy", { email: request.claimed_by })}
+        </p>
+      )}
+      {showClaim && request.status === "pending" && (
+        <button
+          onClick={() => onClaim(request.id)}
+          disabled={claimingId === request.id}
+          className="mt-2 px-3 py-1 bg-accent text-white text-[11px] uppercase tracking-wider hover:bg-accent/90 disabled:opacity-50 transition-colors"
+        >
+          {claimingId === request.id
+            ? t("photographer.claiming")
+            : t("photographer.claimButton")}
+        </button>
+      )}
+
+      {/* Expanded detail panel for owned requests */}
+      {isOwned && isExpanded && (
+        <div className="mt-3 pt-3 border-t border-border/40 space-y-4">
+          {/* Notes */}
+          <div>
+            <label className="block text-[11px] uppercase tracking-widest text-text-muted mb-1.5">
+              {t("photographer.notesLabel")}
+            </label>
+            <textarea
+              value={notes[request.id] ?? request.photographer_notes ?? ""}
+              onChange={(e) => setNotes((prev) => ({ ...prev, [request.id]: e.target.value }))}
+              placeholder={t("photographer.notesPlaceholder")}
+              rows={2}
+              className="w-full bg-transparent border border-border/40 rounded px-3 py-2 text-sm text-text-primary placeholder:text-text-muted/60 outline-none focus:border-accent transition-colors resize-y"
+            />
+          </div>
+
+          {/* Dropbox link submission */}
+          <div>
+            <label className="block text-[11px] uppercase tracking-widest text-text-muted mb-1.5">
+              {t("photographer.dropboxLinkLabel")}
+            </label>
+            {request.dropbox_link ? (
+              <div className="flex items-center gap-2">
+                <span className="text-emerald-600 text-sm">&#10003;</span>
+                <a
+                  href={request.dropbox_link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="text-sm text-accent hover:text-accent-hover underline break-all transition-colors"
+                >
+                  {request.dropbox_link}
+                </a>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <input
+                    type="url"
+                    value={linkInputs[request.id] || ""}
+                    onChange={(e) => { e.stopPropagation(); setLinkInputs((prev) => ({ ...prev, [request.id]: e.target.value })); }}
+                    onClick={(e) => e.stopPropagation()}
+                    placeholder={t("photographer.dropboxLinkPlaceholder")}
+                    className="flex-1 bg-transparent border border-border/40 rounded px-3 py-2 text-sm text-text-primary placeholder:text-text-muted/60 outline-none focus:border-accent transition-colors"
+                  />
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onSubmitLink(request.id); }}
+                    disabled={submittingLinkId === request.id || !linkInputs[request.id]?.trim()}
+                    className="px-4 py-2 bg-accent text-white text-[11px] uppercase tracking-wider rounded hover:bg-accent/90 disabled:opacity-50 transition-colors whitespace-nowrap"
+                  >
+                    {submittingLinkId === request.id
+                      ? t("photographer.submittingLink")
+                      : t("photographer.submitLink")}
+                  </button>
+                </div>
+                <p className="text-[11px] text-text-muted">{t("photographer.linkDeliveryNote")}</p>
+              </>
+            )}
+          </div>
+
+          {/* Mark as Complete fallback */}
+          {request.status === "claimed" && !request.dropbox_link && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onComplete(request.id); }}
+              disabled={completingId === request.id}
+              className="px-4 py-1.5 border border-border/40 text-text-secondary text-[11px] uppercase tracking-wider rounded hover:border-accent hover:text-accent disabled:opacity-50 transition-colors"
+            >
+              {completingId === request.id
+                ? t("photographer.completing")
+                : t("photographer.markComplete")}
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+const PAGE_SIZE = 2;
+
+function PaginatedSection({ title, items, emptyText, page, setPage, showClaim, isOwned, cardProps }) {
+  const totalPages = Math.ceil(items.length / PAGE_SIZE);
+  const paged = items.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
+  return (
+    <div className="mb-8">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-[11px] uppercase tracking-widest text-text-muted">{title}</h3>
+        {totalPages > 1 && (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setPage((p) => Math.max(0, p - 1))}
+              disabled={page === 0}
+              className="text-text-muted hover:text-text-primary disabled:opacity-25 transition-colors"
+              aria-label="Previous page"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <span className="text-[10px] tabular-nums text-text-muted">
+              {page + 1}/{totalPages}
+            </span>
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+              disabled={page >= totalPages - 1}
+              className="text-text-muted hover:text-text-primary disabled:opacity-25 transition-colors"
+              aria-label="Next page"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+          </div>
+        )}
+      </div>
+      {items.length === 0 ? (
+        <p className="text-[12px] text-text-muted/60 italic">{emptyText}</p>
+      ) : (
+        <div className="space-y-3">
+          {paged.map((r) => (
+            <RequestCard key={r.id} request={r} showClaim={showClaim} isOwned={isOwned} {...cardProps} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Photographer Panel ──────────────────────────────────────────────────────
 
 function PhotographerPanel({ t, photographerEmail, onSignOut }) {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [claimingId, setClaimingId] = useState(null);
+  const [expandedId, setExpandedId] = useState(null);
+  const [completingId, setCompletingId] = useState(null);
+  const [submittingLinkId, setSubmittingLinkId] = useState(null);
+  const [linkInputs, setLinkInputs] = useState({});
+  const [notes, setNotes] = useState({});
 
   const fetchRequests = useCallback(async () => {
     try {
@@ -740,145 +959,93 @@ function PhotographerPanel({ t, photographerEmail, onSignOut }) {
     }
   }
 
+  async function handleComplete(requestId) {
+    setCompletingId(requestId);
+    try {
+      const res = await fetch("/api/hire/update-status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ requestId, photographerNotes: notes[requestId] || "" }),
+      });
+      if (res.ok) {
+        fetchRequests();
+      }
+    } catch (e) {
+      console.error("Error completing:", e);
+    } finally {
+      setCompletingId(null);
+    }
+  }
+
+  async function handleSubmitLink(requestId) {
+    const link = linkInputs[requestId]?.trim();
+    if (!link) return;
+    setSubmittingLinkId(requestId);
+    try {
+      const res = await fetch("/api/hire/submit-link", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ requestId, dropboxLink: link }),
+      });
+      if (res.ok) {
+        fetchRequests();
+      }
+    } catch (e) {
+      console.error("Error submitting link:", e);
+    } finally {
+      setSubmittingLinkId(null);
+    }
+  }
+
   async function handleSignOut() {
     try {
-      // Clear photographer session
       await fetch("/api/hire/photographer-signin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: "", signOut: true }),
       });
     } catch (e) {
-      // Ignore - we'll clear locally regardless
+      // Ignore
     }
     onSignOut();
   }
 
   const pendingRequests = requests.filter((r) => r.status === "pending");
-  const myClaimedRequests = requests.filter(
-    (r) => r.status === "claimed" && r.claimed_by === photographerEmail
+
+  const today = new Date().toLocaleDateString("en-CA");
+  const myUpcoming = requests.filter(
+    (r) => r.status === "claimed" && r.claimed_by === photographerEmail && r.event_date >= today
   );
+  const myCompleted = requests.filter(
+    (r) =>
+      ((r.status === "claimed" && r.event_date < today) || r.status === "completed") &&
+      r.claimed_by === photographerEmail
+  );
+
   const otherRequests = requests.filter(
-    (r) => r.status !== "pending" && !(r.status === "claimed" && r.claimed_by === photographerEmail)
+    (r) => r.status !== "pending" && !(
+      (r.status === "claimed" || r.status === "completed") && r.claimed_by === photographerEmail
+    )
   );
 
-  function statusBadge(status) {
-    const styles = {
-      pending: "border-amber-400/60 text-amber-700 bg-amber-50",
-      claimed: "border-blue-400/60 text-blue-700 bg-blue-50",
-      completed: "border-emerald-400/60 text-emerald-700 bg-emerald-50",
-      cancelled: "border-red-300/60 text-red-600 bg-red-50",
-    };
-    return (
-      <span className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-sm border ${styles[status] || "border-gray-300 bg-gray-50 text-gray-600"}`}>
-        {t(`photographer.status${status.charAt(0).toUpperCase() + status.slice(1)}`)}
-      </span>
-    );
-  }
-
-  function RequestCard({ request, showClaim }) {
-    const dateStr = new Date(request.event_date + "T00:00:00").toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-    const timeStr = `${request.start_time?.slice(0, 5)} – ${request.end_time?.slice(0, 5)} EST`;
-
-    return (
-      <div className="border-l-2 border-accent/30 pl-4 py-2">
-        <div className="flex justify-between items-center mb-1.5">
-          <h4 className="text-sm font-medium text-text-primary">{request.event_name}</h4>
-          {statusBadge(request.status)}
-        </div>
-        <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-[12px] text-text-muted">
-          <span>{dateStr}</span>
-          <span>{timeStr}</span>
-          {request.location && <span>{request.location}</span>}
-        </div>
-        <div className="flex flex-wrap justify-between items-center mt-1.5 text-[12px]">
-          <span className="text-text-muted">
-            {request.requester_name} · {request.requester_email}
-          </span>
-          <span className="text-text-primary font-medium">
-            ${request.hourly_rate}/hr &times; {request.duration_hours}h = ${request.total_cost}
-          </span>
-        </div>
-        {request.claimed_by && request.status === "claimed" && (
-          <p className="text-[11px] text-blue-600/80 mt-1">
-            {t("photographer.claimedBy", { email: request.claimed_by })}
-          </p>
-        )}
-        {showClaim && request.status === "pending" && (
-          <button
-            onClick={() => handleClaim(request.id)}
-            disabled={claimingId === request.id}
-            className="mt-2 px-3 py-1 bg-accent text-white text-[11px] uppercase tracking-wider hover:bg-accent/90 disabled:opacity-50 transition-colors"
-          >
-            {claimingId === request.id
-              ? t("photographer.claiming")
-              : t("photographer.claimButton")}
-          </button>
-        )}
-      </div>
-    );
-  }
-
-  const PAGE_SIZE = 2;
   const [pendingPage, setPendingPage] = useState(0);
-  const [claimedPage, setClaimedPage] = useState(0);
+  const [upcomingPage, setUpcomingPage] = useState(0);
+  const [completedPage, setCompletedPage] = useState(0);
   const [otherPage, setOtherPage] = useState(0);
 
-  // Reset pages when requests change
   useEffect(() => {
     setPendingPage(0);
-    setClaimedPage(0);
+    setUpcomingPage(0);
+    setCompletedPage(0);
     setOtherPage(0);
   }, [requests]);
 
-  function PaginatedSection({ title, items, emptyText, page, setPage, showClaim }) {
-    const totalPages = Math.ceil(items.length / PAGE_SIZE);
-    const paged = items.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
-
-    return (
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-[11px] uppercase tracking-widest text-text-muted">{title}</h3>
-          {totalPages > 1 && (
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setPage((p) => Math.max(0, p - 1))}
-                disabled={page === 0}
-                className="text-text-muted hover:text-text-primary disabled:opacity-25 transition-colors"
-                aria-label="Previous page"
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-              </button>
-              <span className="text-[10px] tabular-nums text-text-muted">
-                {page + 1}/{totalPages}
-              </span>
-              <button
-                onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
-                disabled={page >= totalPages - 1}
-                className="text-text-muted hover:text-text-primary disabled:opacity-25 transition-colors"
-                aria-label="Next page"
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-              </button>
-            </div>
-          )}
-        </div>
-        {items.length === 0 ? (
-          <p className="text-[12px] text-text-muted/60 italic">{emptyText}</p>
-        ) : (
-          <div className="space-y-3">
-            {paged.map((r) => (
-              <RequestCard key={r.id} request={r} showClaim={showClaim} />
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  }
+  const cardProps = {
+    expandedId, setExpandedId, claimingId, onClaim: handleClaim,
+    completingId, onComplete: handleComplete, submittingLinkId,
+    onSubmitLink: handleSubmitLink, linkInputs, setLinkInputs,
+    notes, setNotes, t,
+  };
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -903,14 +1070,28 @@ function PhotographerPanel({ t, photographerEmail, onSignOut }) {
             page={pendingPage}
             setPage={setPendingPage}
             showClaim
+            isOwned={false}
+            cardProps={cardProps}
           />
           <PaginatedSection
-            title={t("photographer.myClaimedEvents")}
-            items={myClaimedRequests}
-            emptyText={t("photographer.noClaimed")}
-            page={claimedPage}
-            setPage={setClaimedPage}
+            title={t("photographer.upcomingEvents")}
+            items={myUpcoming}
+            emptyText={t("photographer.noUpcoming")}
+            page={upcomingPage}
+            setPage={setUpcomingPage}
             showClaim={false}
+            isOwned
+            cardProps={cardProps}
+          />
+          <PaginatedSection
+            title={t("photographer.completedEvents")}
+            items={myCompleted}
+            emptyText={t("photographer.noCompleted")}
+            page={completedPage}
+            setPage={setCompletedPage}
+            showClaim={false}
+            isOwned
+            cardProps={cardProps}
           />
           {otherRequests.length > 0 && (
             <PaginatedSection
@@ -920,6 +1101,8 @@ function PhotographerPanel({ t, photographerEmail, onSignOut }) {
               page={otherPage}
               setPage={setOtherPage}
               showClaim={false}
+              isOwned={false}
+              cardProps={cardProps}
             />
           )}
         </>

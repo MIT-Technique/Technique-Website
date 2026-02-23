@@ -209,7 +209,7 @@
         "panelTitle": "Photographer Dashboard",
         "pendingRequests": "Pending Requests",
         "myClaimedEvents": "My Claimed Events",
-        "allRequests": "All Requests",
+        "allRequests": "All Requests (Staph Overview)",
         "claimButton": "Claim",
         "claiming": "Claiming...",
         "noRequests": "No pending requests right now.",
@@ -224,7 +224,22 @@
         "statusClaimed": "Claimed",
         "statusCompleted": "Completed",
         "statusCancelled": "Cancelled",
-        "claimedBy": "Claimed by {email}"
+        "claimedBy": "Claimed by {email}",
+        "myEvents": "My Events",
+        "upcomingEvents": "Upcoming",
+        "completedEvents": "Completed",
+        "noUpcoming": "No upcoming events.",
+        "noCompleted": "No completed events yet.",
+        "markComplete": "Mark as Completed",
+        "completing": "Completing...",
+        "notesLabel": "Notes",
+        "notesPlaceholder": "Add notes about the event...",
+        "dropboxLinkLabel": "Dropbox Link",
+        "dropboxLinkPlaceholder": "https://www.dropbox.com/...",
+        "submitLink": "Submit & Deliver",
+        "submittingLink": "Submitting...",
+        "linkSubmitted": "Link Submitted",
+        "linkDeliveryNote": "Submitting will deliver photos to the requester and request their cost object."
       }
     },
 
@@ -996,6 +1011,20 @@
       "genderTeams": "Men's & Women's Teams",
       "memberCount": "{count} members"
     },
+    "orgActions": {
+      "sendKey": "Send Key",
+      "resetKey": "Reset Key",
+      "sendKeySuccess": "Login credentials sent via email.",
+      "resetKeySuccess": "Password has been reset.",
+      "resetKeyConfirm": "Generate a new login password for this organization? The old password will stop working.",
+      "noStoredKey": "No stored key. Reset the password first.",
+      "newLoginKey": "New Login Password",
+      "copyKey": "Copy",
+      "copied": "Copied!",
+      "keySent": "Email sent",
+      "sending": "Sending...",
+      "resetting": "Resetting..."
+    },
     "users": {
       "title": "User Management",
       "allUsers": "All Users",
@@ -1062,6 +1091,11 @@
       "removePhotographer": "Remove",
       "noPhotographers": "No authorized photographers yet.",
       "photographerAdded": "Photographer added successfully.",
+      "resetPassword": "Reset Password",
+      "resetPasswordTitle": "Reset Password",
+      "resetPasswordMsg": "Generate a new password for this user? The old password will stop working. An email with the new credentials will be sent.",
+      "resetPasswordEmailed": "An email with the new credentials has been sent.",
+      "resetPasswordEmailFailed": "Email failed to send — share the password manually.",
       "disableUser": "Disable User",
       "enableUser": "Enable User",
       "deleteUser": "Delete User",
@@ -1298,7 +1332,14 @@
         "statusPending": "Pending",
         "statusClaimed": "Claimed",
         "statusCompleted": "Completed",
-        "statusCancelled": "Cancelled"
+        "statusCancelled": "Cancelled",
+        "linksSubmitted": "Links Submitted",
+        "avgTurnaround": "Avg Turnaround",
+        "dropboxLink": "Dropbox Link",
+        "viewDropbox": "View on Dropbox",
+        "costObject": "Cost Object",
+        "photographerNotes": "Photographer Notes",
+        "turnaround": "Turnaround"
       },
       "yearbookRequests": {
         "title": "Yearbook Requests",

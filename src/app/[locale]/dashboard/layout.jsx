@@ -67,6 +67,10 @@ function DashboardLayoutInner({ children }) {
     { id: 'reset', label: t('tabs.reset'), href: `/${locale}/dashboard/settings/reset` },
   ];
 
+  const staphSettingsSubTabs = [
+    { id: 'users', label: t('tabs.users'), href: `/${locale}/dashboard/users` },
+  ];
+
   const inquiriesSubTabs = [
     { id: 'inq-hire-requests', label: t('tabs.inqHireRequests'), href: `/${locale}/dashboard/inquiries/hire-requests` },
     { id: 'inq-yearbook-requests', label: t('tabs.inqYearbookRequests'), href: `/${locale}/dashboard/inquiries/yearbook-requests` },
@@ -82,8 +86,8 @@ function DashboardLayoutInner({ children }) {
     { id: 'overview', label: t('tabs.overview'), href: `/${locale}/dashboard`, adminOnly: true },
     { id: 'photoshoots', label: t('tabs.photoshoots'), href: `/${locale}/dashboard/photoshoots`, adminOnly: false },
     { id: 'responses', label: t('tabs.responses'), href: responsesSubTabs[0]?.href || `/${locale}/dashboard/responses/clubs`, adminOnly: false, requiresAccess: true },
-    { id: 'inquiries', label: t('tabs.inquiries'), href: `/${locale}/dashboard/inquiries/hire-requests`, adminOnly: true },
-    { id: 'settings', label: t('tabs.settings'), href: `/${locale}/dashboard/users`, adminOnly: true },
+    { id: 'inquiries', label: t('tabs.inquiries'), href: `/${locale}/dashboard/inquiries/hire-requests`, adminOnly: false },
+    { id: 'settings', label: t('tabs.settings'), href: `/${locale}/dashboard/users`, adminOnly: false },
   ];
 
   const tabs = isAdmin
@@ -138,7 +142,7 @@ function DashboardLayoutInner({ children }) {
             {/* Sub-tabs */}
             {(isResponsesPage || isSettingsPage || isInquiriesPage) && (
               <div className="flex items-center gap-4 mb-6 overflow-x-auto">
-                {(isResponsesPage ? responsesSubTabs : isInquiriesPage ? inquiriesSubTabs : settingsSubTabs).map((tab) => (
+                {(isResponsesPage ? responsesSubTabs : isInquiriesPage ? inquiriesSubTabs : isAdmin ? settingsSubTabs : staphSettingsSubTabs).map((tab) => (
                   <Link
                     key={tab.id}
                     href={tab.href}

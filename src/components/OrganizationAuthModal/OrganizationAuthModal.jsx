@@ -121,6 +121,7 @@ export default function OrganizationAuthModal({ open, onClose, defaultTab = "org
       if (orderA !== orderB) return orderA - orderB;
       return a.name.localeCompare(b.name);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [organizations]);
 
   // Get group label for an organization

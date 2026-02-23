@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import ConfirmationModal from '../../../../components/ConfirmationModal/ConfirmationModal';
+import { useUser } from '../../../../hooks/useUser';
 
 const PAGE_SIZE = 15;
 const ACCESS_OPTIONS = [
@@ -16,6 +17,9 @@ const ACCESS_OPTIONS = [
 
 export default function UsersPage() {
   const t = useTranslations('dashboard.users');
+  const tOrg = useTranslations('dashboard.orgActions');
+  const { user: currentUser } = useUser();
+  const isAdmin = currentUser?.role === 'admin';
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -50,7 +54,7 @@ export default function UsersPage() {
   const [newStaphName, setNewStaphName] = useState('');
   const [newStaphAccess, setNewStaphAccess] = useState([]);
   const [creatingStaph, setCreatingStaph] = useState(false);
-  const [createdPassword, setCreatedPassword] = useState(null);
+  const [staphCreated, setStaphCreated] = useState(false);
 
   // Photographer management state
   const [showAddPhotographer, setShowAddPhotographer] = useState(false);
@@ -65,13 +69,20 @@ export default function UsersPage() {
 
   // Ellipsis action menu state
   const [actionMenuUserId, setActionMenuUserId] = useState(null);
+  const [actionMenuPos, setActionMenuPos] = useState({ top: 0, left: 0 });
   const actionMenuRef = useRef(null);
 
   // Confirmation modal state
   const [confirmAction, setConfirmAction] = useState(null);
 
+  // Reset password state
+  const [resetPasswordResult, setResetPasswordResult] = useState(null); // { userId, loginKey }
+  const [resetPasswordLoading, setResetPasswordLoading] = useState(null); // userId
+  const [resetCopied, setResetCopied] = useState(false);
+
   useEffect(() => {
     fetchUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, roleFilter]);
 
   // Fetch admin designation info
@@ -145,6 +156,28 @@ export default function UsersPage() {
       }
     } catch (error) {
       console.error('Error deleting user:', error);
+    }
+  }
+
+  async function handleResetPassword(userId) {
+    setResetPasswordLoading(userId);
+    setResetPasswordResult(null);
+    try {
+      const res = await fetch('/api/admin/org-login-key', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, action: 'reset' }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setResetPasswordResult({ userId, loginKey: data.loginKey, emailSent: data.emailSent });
+      } else {
+        alert(data.error || 'Failed to reset password');
+      }
+    } catch {
+      alert('Failed to reset password');
+    } finally {
+      setResetPasswordLoading(null);
     }
   }
 
@@ -284,7 +317,7 @@ export default function UsersPage() {
   async function handleCreateStaph() {
     if (!newStaphKerb.trim() || !newStaphName.trim()) return;
     setCreatingStaph(true);
-    setCreatedPassword(null);
+    setStaphCreated(false);
     try {
       const res = await fetch('/api/admin/create-staph', {
         method: 'POST',
@@ -297,8 +330,9 @@ export default function UsersPage() {
       });
       const data = await res.json();
       if (res.ok) {
-        setCreatedPassword(data.password);
+        setStaphCreated(true);
         fetchUsers();
+        setTimeout(() => { resetCreateStaph(); }, 2000);
       } else {
         alert(data.error || 'Failed to create staph account');
       }
@@ -314,7 +348,7 @@ export default function UsersPage() {
     setNewStaphKerb('');
     setNewStaphName('');
     setNewStaphAccess([]);
-    setCreatedPassword(null);
+    setStaphCreated(false);
   }
 
   async function handleAddPhotographer() {
@@ -409,7 +443,7 @@ export default function UsersPage() {
       </div>
 
       {/* Generated password banner (shown when promoting a photographer to staph/admin) */}
-      {promotionPassword && (
+      {isAdmin && promotionPassword && (
         <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
           <p className="text-xs text-green-800 font-medium mb-1">
             Login credentials generated for {promotionEmail}
@@ -424,6 +458,30 @@ export default function UsersPage() {
             </button>
             <button
               onClick={() => { setPromotionPassword(null); setPromotionEmail(null); }}
+              className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded hover:bg-gray-200"
+            >
+              {t('createStaphDone')}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Reset password result banner */}
+      {isAdmin && resetPasswordResult && (
+        <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+          <p className="text-xs text-green-800 font-medium mb-1">
+            {tOrg('resetKeySuccess')} {resetPasswordResult.emailSent ? t('resetPasswordEmailed') : t('resetPasswordEmailFailed')}
+          </p>
+          <div className="flex items-center gap-2">
+            <code className="text-sm bg-white px-2 py-1 rounded border border-green-300 select-all">{resetPasswordResult.loginKey}</code>
+            <button
+              onClick={() => { navigator.clipboard.writeText(resetPasswordResult.loginKey); setResetCopied(true); setTimeout(() => setResetCopied(false), 2000); }}
+              className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200"
+            >
+              {resetCopied ? tOrg('copied') : tOrg('copyKey')}
+            </button>
+            <button
+              onClick={() => setResetPasswordResult(null)}
               className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded hover:bg-gray-200"
             >
               {t('createStaphDone')}
@@ -456,30 +514,34 @@ export default function UsersPage() {
                   <td className="py-2 px-2 max-w-[200px] truncate" title={user.email}>{user.email}</td>
                   <td className="py-2 px-2 max-w-[150px] truncate" title={user.name}>{user.name}</td>
                   <td className="py-2 px-2">
-                    {ORG_ROLES.includes(user.role) ? (
-                      <select
-                        value={user.role}
-                        onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                        className="border border-border rounded px-2 py-1 text-xs"
-                      >
-                        <option value="club">Club</option>
-                        <option value="living_group">Living Group</option>
-                        <option value="sports">Sports</option>
-                      </select>
+                    {isAdmin ? (
+                      ORG_ROLES.includes(user.role) ? (
+                        <select
+                          value={user.role}
+                          onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                          className="border border-border rounded px-2 py-1 text-xs"
+                        >
+                          <option value="club">Club</option>
+                          <option value="living_group">Living Group</option>
+                          <option value="sports">Sports</option>
+                        </select>
+                      ) : (
+                        <select
+                          value={user.role}
+                          onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                          className="border border-border rounded px-2 py-1 text-xs"
+                        >
+                          <option value="staph">Staph</option>
+                          <option value="admin">Admin</option>
+                          <option value="photographer">Photographer</option>
+                        </select>
+                      )
                     ) : (
-                      <select
-                        value={user.role}
-                        onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                        className="border border-border rounded px-2 py-1 text-xs"
-                      >
-                        <option value="staph">Staph</option>
-                        <option value="admin">Admin</option>
-                        <option value="photographer">Photographer</option>
-                      </select>
+                      <span className="text-xs capitalize">{user.role.replace(/_/g, ' ')}</span>
                     )}
                   </td>
                   <td className="py-2 px-2 relative">
-                    {!['club', 'living_group', 'sports', 'photographer'].includes(user.role) ? (
+                    {isAdmin && !['club', 'living_group', 'sports', 'photographer'].includes(user.role) ? (
                       <>
                         <button
                           onClick={(e) => accessPopoverUserId === user.id ? setAccessPopoverUserId(null) : openAccessPopover(user, e)}
@@ -533,19 +595,31 @@ export default function UsersPage() {
                       {user.is_active ? t('active') : t('inactive')}
                     </span>
                   </td>
-                  <td className="py-2 px-2 relative">
-                    <button
-                      onClick={() => setActionMenuUserId(actionMenuUserId === user.id ? null : user.id)}
+                  <td className="py-2 px-2">
+                    {isAdmin && (<button
+                      onClick={(e) => {
+                        if (actionMenuUserId === user.id) {
+                          setActionMenuUserId(null);
+                        } else {
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          setActionMenuPos({
+                            top: rect.bottom + 4,
+                            left: rect.right - 180,
+                          });
+                          setActionMenuUserId(user.id);
+                        }
+                      }}
                       className={`text-lg px-2 py-0.5 rounded hover:bg-gray-100 transition-opacity ${
                         actionMenuUserId === user.id ? 'opacity-100' : 'opacity-0 group-hover/row:opacity-100'
                       }`}
                     >
                       ⋯
-                    </button>
-                    {actionMenuUserId === user.id && (
+                    </button>)}
+                    {isAdmin && actionMenuUserId === user.id && (
                       <div
                         ref={actionMenuRef}
-                        className="absolute right-0 top-full mt-1 z-50 bg-white border border-border rounded-lg shadow-lg py-1 min-w-[180px]"
+                        style={{ position: 'fixed', top: actionMenuPos.top, left: actionMenuPos.left, zIndex: 50 }}
+                        className="bg-white border border-border rounded-lg shadow-lg py-1 w-[180px]"
                       >
                         {/* Disable / Enable */}
                         {user.is_active ? (
@@ -593,6 +667,24 @@ export default function UsersPage() {
                           </button>
                         )}
 
+                        {/* Reset Password */}
+                        {user.supabase_auth_id && (
+                          <button
+                            onClick={() => {
+                              setActionMenuUserId(null);
+                              setConfirmAction({
+                                type: 'resetPassword',
+                                userId: user.id,
+                                title: t('resetPasswordTitle'),
+                                message: t('resetPasswordMsg'),
+                              });
+                            }}
+                            className="w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50"
+                          >
+                            {t('resetPassword')}
+                          </button>
+                        )}
+
                         {/* Delete User */}
                         <button
                           onClick={() => {
@@ -618,171 +710,159 @@ export default function UsersPage() {
         </div>
       )}
 
-      {/* Create Staph + Photographer Section - only on Individual tab */}
-      {userTypeFilter === 'individual' && (<>
+      {/* Create Staph + Photographer Buttons - only on Individual tab */}
+      {userTypeFilter === 'individual' && (
         <div className="mt-8 border-t border-border pt-6">
-          <div className="flex gap-3 mb-4">
-            {!showCreateStaph && (
+          <div className="flex gap-3">
+            {isAdmin && (
               <button
-                onClick={() => { setShowCreateStaph(true); setShowAddPhotographer(false); }}
+                onClick={() => setShowCreateStaph(true)}
                 className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 text-sm"
               >
                 {t('createStaph')}
               </button>
             )}
-            {!showAddPhotographer && (
-              <button
-                onClick={() => { setShowAddPhotographer(true); setShowCreateStaph(false); resetCreateStaph(); }}
-                className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 text-sm"
-              >
-                {t('addPhotographer')}
-              </button>
-            )}
+            <button
+              onClick={() => setShowAddPhotographer(true)}
+              className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 text-sm"
+            >
+              {t('addPhotographer')}
+            </button>
           </div>
-          {showCreateStaph && (
-            <div className="max-w-md space-y-4">
-              <h3 className="text-sm font-medium">{t('createStaph')}</h3>
-              <div>
-                <label className="block text-xs text-text-secondary mb-1">{t('createStaphKerb')}</label>
-                <div className="flex items-center gap-1">
-                  <input
-                    type="text"
-                    value={newStaphKerb}
-                    onChange={(e) => setNewStaphKerb(e.target.value)}
-                    placeholder="kerb"
-                    className="border border-border rounded px-3 py-2 text-sm flex-1"
-                    disabled={!!createdPassword}
-                  />
-                  <span className="text-sm text-text-muted">@mit.edu</span>
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs text-text-secondary mb-1">{t('table.name')}</label>
+        </div>
+      )}
+
+      {/* Create Staph Modal */}
+      {isAdmin && showCreateStaph && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={resetCreateStaph}>
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-sm font-medium">{t('createStaph')}</h3>
+            <div>
+              <label className="block text-xs text-text-secondary mb-1">{t('createStaphKerb')}</label>
+              <div className="flex items-center gap-1">
                 <input
                   type="text"
-                  value={newStaphName}
-                  onChange={(e) => setNewStaphName(e.target.value)}
-                  placeholder="Full Name"
-                  className="border border-border rounded px-3 py-2 text-sm w-full"
-                  disabled={!!createdPassword}
+                  value={newStaphKerb}
+                  onChange={(e) => setNewStaphKerb(e.target.value)}
+                  placeholder="kerb"
+                  className="border border-border rounded px-3 py-2 text-sm flex-1"
+                  disabled={staphCreated}
                 />
-              </div>
-              <div>
-                <label className="block text-xs text-text-secondary mb-1">{t('table.permissions')}</label>
-                <div className="flex flex-wrap gap-3">
-                  {ACCESS_OPTIONS.map(opt => (
-                    <label key={opt.key} className="flex items-center gap-1.5 text-xs cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={newStaphAccess.includes(opt.key)}
-                        onChange={() => setNewStaphAccess(prev =>
-                          prev.includes(opt.key) ? prev.filter(k => k !== opt.key) : [...prev, opt.key]
-                        )}
-                        className="rounded"
-                        disabled={!!createdPassword}
-                      />
-                      {opt.label}
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {createdPassword && (
-                <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                  <p className="text-xs text-green-800 font-medium mb-1">{t('createStaphSuccess')}</p>
-                  <div className="flex items-center gap-2">
-                    <code className="text-sm bg-white px-2 py-1 rounded border border-green-300 select-all">{createdPassword}</code>
-                    <button
-                      onClick={() => navigator.clipboard.writeText(createdPassword)}
-                      className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200"
-                    >
-                      {t('copy')}
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              <div className="flex gap-2">
-                {!createdPassword ? (
-                  <>
-                    <button
-                      onClick={handleCreateStaph}
-                      disabled={creatingStaph || !newStaphKerb.trim() || !newStaphName.trim()}
-                      className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 disabled:opacity-50 text-sm"
-                    >
-                      {creatingStaph ? '...' : t('createStaphSubmit')}
-                    </button>
-                    <button
-                      onClick={resetCreateStaph}
-                      className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 text-sm"
-                    >
-                      {t('cancel')}
-                    </button>
-                  </>
-                ) : (
-                  <button
-                    onClick={resetCreateStaph}
-                    className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 text-sm"
-                  >
-                    {t('createStaphDone')}
-                  </button>
-                )}
+                <span className="text-sm text-text-muted">@mit.edu</span>
               </div>
             </div>
-          )}
-          {showAddPhotographer && (
-            <div className="max-w-md space-y-4">
-              <h3 className="text-sm font-medium">{t('addPhotographer')}</h3>
-              <div>
-                <label className="block text-xs text-text-secondary mb-1">{t('photographerEmail')}</label>
-                <div className="flex items-center gap-1">
-                  <input
-                    type="text"
-                    value={newPhotographerKerb}
-                    onChange={(e) => setNewPhotographerKerb(e.target.value)}
-                    placeholder="kerb"
-                    className="border border-border rounded px-3 py-2 text-sm flex-1"
-                  />
-                  <span className="text-sm text-text-muted">@mit.edu</span>
-                </div>
+            <div>
+              <label className="block text-xs text-text-secondary mb-1">{t('table.name')}</label>
+              <input
+                type="text"
+                value={newStaphName}
+                onChange={(e) => setNewStaphName(e.target.value)}
+                placeholder="Full Name"
+                className="border border-border rounded px-3 py-2 text-sm w-full"
+                disabled={staphCreated}
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-text-secondary mb-1">{t('table.permissions')}</label>
+              <div className="flex flex-wrap gap-3">
+                {ACCESS_OPTIONS.map(opt => (
+                  <label key={opt.key} className="flex items-center gap-1.5 text-xs cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={newStaphAccess.includes(opt.key)}
+                      onChange={() => setNewStaphAccess(prev =>
+                        prev.includes(opt.key) ? prev.filter(k => k !== opt.key) : [...prev, opt.key]
+                      )}
+                      className="rounded"
+                      disabled={staphCreated}
+                    />
+                    {opt.label}
+                  </label>
+                ))}
               </div>
-              <div>
-                <label className="block text-xs text-text-secondary mb-1">{t('photographerName')} <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  value={newPhotographerName}
-                  onChange={(e) => setNewPhotographerName(e.target.value)}
-                  placeholder="Full Name"
-                  className="border border-border rounded px-3 py-2 text-sm w-full"
-                  required
-                />
+            </div>
+
+            {staphCreated && (
+              <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-xs text-green-800 font-medium">{t('createStaphSuccess')}</p>
               </div>
+            )}
 
-              {photographerAdded && (
-                <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                  <p className="text-xs text-green-800 font-medium">{t('photographerAdded')}</p>
-                </div>
-              )}
-
-              <div className="flex gap-2">
+            <div className="flex gap-2 justify-end pt-2">
+              <button
+                onClick={resetCreateStaph}
+                className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 text-sm"
+              >
+                {t('cancel')}
+              </button>
+              {!staphCreated && (
                 <button
-                  onClick={handleAddPhotographer}
-                  disabled={addingPhotographer || !newPhotographerKerb.trim() || !newPhotographerName.trim()}
+                  onClick={handleCreateStaph}
+                  disabled={creatingStaph || !newStaphKerb.trim() || !newStaphName.trim()}
                   className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 disabled:opacity-50 text-sm"
                 >
-                  {addingPhotographer ? '...' : t('addPhotographerSubmit')}
+                  {creatingStaph ? '...' : t('createStaphSubmit')}
                 </button>
-                <button
-                  onClick={resetAddPhotographer}
-                  className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 text-sm"
-                >
-                  {t('cancel')}
-                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Photographer Modal */}
+      {showAddPhotographer && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={resetAddPhotographer}>
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-sm font-medium">{t('addPhotographer')}</h3>
+            <div>
+              <label className="block text-xs text-text-secondary mb-1">{t('photographerEmail')}</label>
+              <div className="flex items-center gap-1">
+                <input
+                  type="text"
+                  value={newPhotographerKerb}
+                  onChange={(e) => setNewPhotographerKerb(e.target.value)}
+                  placeholder="kerb"
+                  className="border border-border rounded px-3 py-2 text-sm flex-1"
+                />
+                <span className="text-sm text-text-muted">@mit.edu</span>
               </div>
             </div>
-          )}
+            <div>
+              <label className="block text-xs text-text-secondary mb-1">{t('photographerName')} <span className="text-red-500">*</span></label>
+              <input
+                type="text"
+                value={newPhotographerName}
+                onChange={(e) => setNewPhotographerName(e.target.value)}
+                placeholder="Full Name"
+                className="border border-border rounded px-3 py-2 text-sm w-full"
+                required
+              />
+            </div>
+
+            {photographerAdded && (
+              <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-xs text-green-800 font-medium">{t('photographerAdded')}</p>
+              </div>
+            )}
+
+            <div className="flex gap-2 justify-end pt-2">
+              <button
+                onClick={resetAddPhotographer}
+                className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 text-sm"
+              >
+                {t('cancel')}
+              </button>
+              <button
+                onClick={handleAddPhotographer}
+                disabled={addingPhotographer || !newPhotographerKerb.trim() || !newPhotographerName.trim()}
+                className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 disabled:opacity-50 text-sm"
+              >
+                {addingPhotographer ? '...' : t('addPhotographerSubmit')}
+              </button>
+            </div>
+          </div>
         </div>
-      </>)}
+      )}
 
       {/* Confirmation Modal for disable/enable/delete */}
       <ConfirmationModal
@@ -797,6 +877,7 @@ export default function UsersPage() {
           if (type === 'disable') await handleDisableUser(userId);
           else if (type === 'enable') await handleEnableUser(userId);
           else if (type === 'delete') await handleDeleteUser(userId);
+          else if (type === 'resetPassword') await handleResetPassword(userId);
         }}
         onCancel={() => setConfirmAction(null)}
       />
