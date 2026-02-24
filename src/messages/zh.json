@@ -155,6 +155,9 @@
         "description": "活动描述",
         "locationPlaceholder": "例如，Kresge Auditorium",
         "descriptionPlaceholder": "告诉我们关于您的活动...",
+        "costObject": "成本对象（可选）",
+        "costObjectPlaceholder": "例如：成本中心、WBS元素或内部订单号",
+        "costObjectHint": "现在提供可以在照片交付后为您省去一个步骤。",
         "submit": "提交请求",
         "submitting": "提交中...",
         "rateDisplay": "${rate}/小时",
@@ -229,7 +232,8 @@
         "submitLink": "提交并交付",
         "submittingLink": "提交中...",
         "linkSubmitted": "链接已提交",
-        "linkDeliveryNote": "提交后将向请求者交付照片并请求其成本对象。"
+        "linkDeliveryNote": "提交后将向请求者交付照片并请求其成本对象。",
+        "costObjectLabel": "成本对象"
       }
     },
     "invoice": {

@@ -165,6 +165,9 @@
         "description": "Event Description",
         "locationPlaceholder": "e.g., Kresge Auditorium",
         "descriptionPlaceholder": "Tell us about your event...",
+        "costObject": "Cost Object (Optional)",
+        "costObjectPlaceholder": "e.g., cost center, WBS element, or internal order number",
+        "costObjectHint": "Providing this now saves you a step after photo delivery.",
         "submit": "Submit Request",
         "submitting": "Submitting...",
         "rateDisplay": "${rate}/hr",
@@ -239,7 +242,8 @@
         "submitLink": "Submit & Deliver",
         "submittingLink": "Submitting...",
         "linkSubmitted": "Link Submitted",
-        "linkDeliveryNote": "Submitting will deliver photos to the requester and request their cost object."
+        "linkDeliveryNote": "Submitting will deliver photos to the requester and request their cost object.",
+        "costObjectLabel": "Cost Object"
       }
     },
 

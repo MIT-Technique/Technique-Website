@@ -133,6 +133,7 @@ function HireRequestForm({ t }) {
     endTime: "",
     location: "",
     description: "",
+    costObject: "",
     confirmationCode: "",
   });
 
@@ -174,6 +175,7 @@ function HireRequestForm({ t }) {
           endTime: data.request.endTime,
           location: data.request.location,
           description: data.request.description,
+          costObject: data.request.costObject || "",
         }));
         setLookupDone(true);
       } else {
@@ -213,6 +215,7 @@ function HireRequestForm({ t }) {
         endTime: form.endTime,
         location: form.location,
         description: form.description,
+        costObject: form.costObject,
       };
 
       if (isUpdateMode && form.confirmationCode) {
@@ -262,6 +265,7 @@ function HireRequestForm({ t }) {
       endTime: "",
       location: "",
       description: "",
+      costObject: "",
       confirmationCode: "",
     });
   }
@@ -600,6 +604,19 @@ function HireRequestForm({ t }) {
             />
           </div>
 
+          {/* Cost Object (optional) */}
+          <div>
+            <label className={labelClass}>{t("form.costObject")}</label>
+            <input
+              type="text"
+              value={form.costObject}
+              onChange={(e) => updateField("costObject", e.target.value)}
+              placeholder={t("form.costObjectPlaceholder")}
+              className={inputClass}
+            />
+            <p className="text-[11px] text-text-muted mt-1">{t("form.costObjectHint")}</p>
+          </div>
+
           {error && <p className="text-xs text-red-700">{error}</p>}
 
           {/* Submit */}
@@ -846,6 +863,16 @@ function RequestCard({ request, showClaim, isOwned, expandedId, setExpandedId, c
               </>
             )}
           </div>
+
+          {/* Cost Object */}
+          {request.cost_object && (
+            <div>
+              <label className="block text-[11px] uppercase tracking-widest text-text-muted mb-1">
+                {t("photographer.costObjectLabel")}
+              </label>
+              <span className="text-sm text-text-primary">{request.cost_object}</span>
+            </div>
+          )}
 
           {/* Mark as Complete fallback */}
           {request.status === "claimed" && !request.dropbox_link && (

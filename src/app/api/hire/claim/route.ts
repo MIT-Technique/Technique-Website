@@ -148,13 +148,21 @@ export async function POST(request: Request) {
         </div>
       `;
 
-      await transporter.sendMail({
+      const info = await transporter.sendMail({
         from: "mittnq@gmail.com",
         to: existing.requester_email,
         cc: claimedByEmail,
-        subject: `Photography Request Approved - ${existing.event_name}`,
+        subject: `Photography Request Approved – ${existing.event_name} | MIT Technique`,
         html: htmlContent,
       });
+
+      // Store the Message-ID so the delivery email can reply to this thread
+      if (info?.messageId) {
+        await supabase
+          .from("hire_requests")
+          .update({ claim_email_message_id: info.messageId })
+          .eq("id", requestId);
+      }
     } catch (emailError) {
       console.error("Failed to send claim confirmation email:", emailError);
     }
