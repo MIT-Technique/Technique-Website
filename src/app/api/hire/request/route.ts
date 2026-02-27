@@ -48,6 +48,7 @@ export async function GET(request: Request) {
         endTime: data.end_time?.slice(0, 5),
         location: data.location || "",
         description: data.description || "",
+        costObject: data.cost_object || "",
       },
     });
   } catch (error) {
@@ -73,6 +74,7 @@ export async function POST(request: Request) {
       endTime,
       location,
       description,
+      costObject,
       confirmationCode: existingCode,
     } = body;
 
@@ -140,6 +142,7 @@ export async function POST(request: Request) {
           end_time: endTime,
           location: location || null,
           description: description || null,
+          cost_object: costObject || null,
           hourly_rate: hourlyRate,
           duration_hours: durationHours,
           total_cost: totalCost,
@@ -175,6 +178,7 @@ export async function POST(request: Request) {
       end_time: endTime,
       location: location || null,
       description: description || null,
+      cost_object: costObject || null,
       hourly_rate: hourlyRate,
       duration_hours: durationHours,
       total_cost: totalCost,

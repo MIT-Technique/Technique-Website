@@ -46,7 +46,7 @@ export async function POST(request: Request) {
 
     const { data: existing, error: findError } = await supabase
       .from("hire_requests")
-      .select("id, status, claimed_by, requester_name, requester_email, event_name, event_type, event_date, start_time, end_time, location, description, hourly_rate, duration_hours, total_cost, confirmation_code")
+      .select("id, status, claimed_by, requester_name, requester_email, event_name, event_type, event_date, start_time, end_time, location, description, hourly_rate, duration_hours, total_cost, confirmation_code, cost_object, claim_email_message_id")
       .eq("id", requestId)
       .single();
 
@@ -139,10 +139,17 @@ export async function POST(request: Request) {
               </table>
             </div>
 
+            ${existing.cost_object ? `
+            <div style="background: #E8F5E9; border-left: 3px solid #4CAF50; border-radius: 4px; padding: 20px 24px; margin: 0 0 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
+              <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px; color: #2E7D32; margin: 0 0 12px; font-weight: 600;">Cost Object on File</p>
+              <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #333;">Your cost object <strong>${existing.cost_object}</strong> was provided when you submitted this request. No further action is needed for payment processing.</p>
+            </div>
+            ` : `
             <div style="background: #FFF8E1; border-left: 3px solid #F9A825; border-radius: 4px; padding: 20px 24px; margin: 0 0 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
               <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px; color: #F57F17; margin: 0 0 12px; font-weight: 600;">Action Required</p>
               <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #333;">To complete payment processing, please reply to this email with your <strong>cost object</strong> (e.g., cost center, WBS element, or internal order number) so we can generate an invoice.</p>
             </div>
+            `}
 
             ${existing.confirmation_code ? `
             <div style="text-align: center; margin: 24px 0;">
@@ -159,13 +166,23 @@ export async function POST(request: Request) {
         </div>
       `;
 
-      await transporter.sendMail({
+      const mailOptions: Record<string, unknown> = {
         from: "mittnq@gmail.com",
         to: existing.requester_email,
         cc: [claimedByEmail, "technique@mit.edu"].filter(Boolean).join(", "),
-        subject: `Photos Delivered – ${existing.event_name} | MIT Technique`,
+        subject: existing.claim_email_message_id
+          ? `Re: Photography Request Approved – ${existing.event_name} | MIT Technique`
+          : `Photos Delivered – ${existing.event_name} | MIT Technique`,
         html: htmlContent,
-      });
+      };
+
+      // Thread as a reply to the claim email if we have the Message-ID
+      if (existing.claim_email_message_id) {
+        mailOptions.inReplyTo = existing.claim_email_message_id;
+        mailOptions.references = existing.claim_email_message_id;
+      }
+
+      await transporter.sendMail(mailOptions);
     } catch (emailError) {
       console.error("Failed to send delivery email:", emailError);
     }

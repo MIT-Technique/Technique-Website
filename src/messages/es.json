@@ -155,6 +155,9 @@
         "description": "Descripción del Evento",
         "locationPlaceholder": "ej., Kresge Auditorium",
         "descriptionPlaceholder": "Cuéntanos sobre tu evento...",
+        "costObject": "Objeto de Costo (Opcional)",
+        "costObjectPlaceholder": "ej., centro de costo, elemento WBS o número de orden interna",
+        "costObjectHint": "Proporcionarlo ahora le ahorra un paso después de la entrega de fotos.",
         "submit": "Enviar Solicitud",
         "submitting": "Enviando...",
         "rateDisplay": "${rate}/hr",
@@ -229,7 +232,8 @@
         "submitLink": "Enviar y Entregar",
         "submittingLink": "Enviando...",
         "linkSubmitted": "Enlace Enviado",
-        "linkDeliveryNote": "Al enviar, se entregarán las fotos al solicitante y se solicitará su objeto de costo."
+        "linkDeliveryNote": "Al enviar, se entregarán las fotos al solicitante y se solicitará su objeto de costo.",
+        "costObjectLabel": "Objeto de Costo"
       }
     },
     "invoice": {
