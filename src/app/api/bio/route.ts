@@ -12,11 +12,13 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const { searchParams } = new URL(request.url);
     const session = await getSession();
     if (!session?.userInfo?.email) {
+      console.log(`Unauthorized!! ${session}\n${session?.userInfo}`);
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const { email } = session?.userInfo;
 
     if (!email) {
+      console.log(`No email ${session}\n${session?.userInfo}`);
       return NextResponse.json(
         {
           data: {
@@ -30,7 +32,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
             achievements: "",
           },
         },
-        { status: 200 },
+        { status: 400 },
       );
     }
 

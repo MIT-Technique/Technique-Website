@@ -2,20 +2,24 @@
 import React from "react";
 import Footer from "@/components/Footer/Footer";
 import Image from "next/image";
+
 function PortfolioPage() {
   const images = [
     {
       src: "/images/other_images/Marcelo_Maza/MJM-21.jpg",
       photographer: "Marcelo Maza",
     },
+
     {
       src: "/images/other_images/Andrew_Okyere/_MG_1028-Enhanced-NR.jpg",
       photographer: "Andrew Okyere",
     },
+
     {
       src: "/images/other_images/Ruhundaka_Ejilemele/ruejilem-Halloween_1-1272.jpg",
       photographer: "Daka Ejilemele",
     },
+    
     {
       src: "/images/other_images/Jade_Chongsathapornpong/_TNA2926.jpg",
       photographer: "Jade Chongsathapornpong",
