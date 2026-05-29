@@ -112,7 +112,6 @@ export default function BioPage() {
         }
 
         // Always show form after fetching (even if no existing data)
-        setDataLoaded(false);
       } catch {
         // Ignore fetch errors
       }
