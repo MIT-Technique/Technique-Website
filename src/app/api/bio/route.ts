@@ -11,11 +11,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
     const { searchParams } = new URL(request.url);
     const session = await getSession();
-    if (!session?.userInfo?.email) {
+    if (!session?.userInfo?.sub) {
       console.log(`Unauthorized!!\n${JSON.stringify(session, null, 2)}`);
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const { email } = session?.userInfo;
+    const email = session?.userInfo.sub;
 
     if (!email) {
       console.log(`No email ${session}\n${session?.userInfo}`);
