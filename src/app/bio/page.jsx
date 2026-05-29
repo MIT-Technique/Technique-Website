@@ -93,7 +93,6 @@ export default function BioPage() {
           if (json.data.firstName && json.data.lastName && json.data.major) {
             setDataLoaded(true);
           }
-          console.log(`Got Data back: `, json);
         }
 
         // Fetch existing photo
