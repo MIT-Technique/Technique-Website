@@ -25,7 +25,7 @@ export default function PrivacyPage() {
                 }
               </p>
 
-              <h3>{"Personal Information (for MIT students only)"}</h3>
+              <h3>{"Personal Information (for MIT Seniors only)"}</h3>
               <ul className="list-disc pl-6 mb-4">
                 <li>{"Name (first and last)"}</li>
                 <li>{"MIT email address"}</li>
