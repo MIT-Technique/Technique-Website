@@ -1,8 +1,8 @@
 # MIT Technique Website - Project Documentation
 
 **Last Updated:** February 1, 2026
-**Tech Stack:** Next.js 14.2.3 (App Router) + next-intl 4.7.0 + Supabase
-**Internationalization:** 3 active languages (en, es, zh)
+**Tech Stack:** Next.js 14.2.3 (App Router) + Supabase  
+**Languages:** Site copy is US English, written directly in components (no translation files or routing layer).
 
 ---
 
@@ -153,18 +153,8 @@ Technique-Website/
 │   │   └── utils/
 │   │       ├── nameParser.ts       # Bulk name parsing (parseBulkNames)
 │   │       └── time.ts             # Time/date utilities (EST formatting)
+│   │   # UI copy lives in components (no src/messages)
 │   │
-│   └── messages/                    # Translation files
-│       ├── en.json                 # English (default, active)
-│       ├── es.json                 # Spanish (active)
-│       ├── zh.json                 # Chinese Simplified (active)
-│       ├── ar.json                 # Arabic (inactive)
-│       ├── fr.json                 # French (inactive)
-│       ├── hi.json                 # Hindi (inactive)
-│       ├── ja.json                 # Japanese (inactive)
-│       ├── ko.json                 # Korean (inactive)
-│       └── pt.json                 # Portuguese (inactive)
-│
 │   └── __tests__/                   # Test files (vitest)
 │       ├── setup.ts                # Test setup
 │       ├── auth/                   # Auth tests (logout, org-signin, session)
@@ -180,49 +170,9 @@ Technique-Website/
 
 ---
 
-## Internationalization (i18n)
+## Internationalization (historical heading)
 
-### Active Locales
-
-Only 3 locales are active (configured in `/src/i18n/config.js`):
-
-- `en` - English (default)
-- `es` - Spanish
-- `zh` - Chinese (Simplified)
-
-6 additional translation files exist (`ar`, `fr`, `hi`, `ja`, `ko`, `pt`) but are not in the active locale list.
-
-### How Locale Routing Works
-
-1. **URL Pattern:** `/{locale}/{page}` (e.g., `/en/about`, `/es/yearbook`)
-2. **Dynamic Segment:** `[locale]` directory handles all language variants
-3. **Middleware:** Detects locale from URL/cookie/Accept-Language, redirects to add locale prefix
-4. **SEO-Friendly:** Each locale has its own URL
-
-### Translation File Structure
-
-Top-level namespaces in each JSON file:
-
-- `common` - Site metadata, branding
-- `nav` - Navigation items, dropdown menus
-- `footer` - Copyright, social links
-- `languageSwitcher` - Language selector label
-- `carousel` - Photo credits
-- `pages.*` - Page-specific translations (home, about, yearbook, contact, hire, invoice, login, portfolio, seniors, bio, archives, candids, studentWorkFeature)
-- `clubPage` - Club dashboard translations
-- `livingGroupPage` - Living group dashboard translations
-- `sportsPage` - Sports dashboard translations (profile, coaches, members, achievements, photos, documents tabs)
-- `organizationAuth` - Organization login modal translations
-- `profilePage` - User profile translations
-- `dashboardPage` - Admin dashboard translations (overview, organizations, photoshoots, responses, settings, yearbook inventory, reset)
-- `calendarView` - Calendar scheduling component translations
-
-### Translation Interpolation
-
-```javascript
-// Translation file: "photoCredit": "Photo: {photographer}"
-t("photoCredit", { photographer: "Michelle Xiang" });
-```
+There is **no locale routing or translation JSON** on this codebase. Routes live under `src/app/` without a `[locale]` segment. Default metadata (`title`, `description`) is set in `src/app/layout.js`. Use string literals / JSX text in components. For EST-sensitive UI copy, follow existing patterns (`America/New_York` / explicit “EST” where already used).
 
 ---
 
@@ -624,23 +574,21 @@ npm start         # Production server
 npm test          # Run vitest tests
 ```
 
-### Adding a New Translation
+### Adding UI copy or a new page
 
-1. Add keys to `/src/messages/en.json`
-2. Add translated keys to `es.json` and `zh.json`
-3. Use in component: `const t = useTranslations('namespace'); t('key')`
+1. Edit the relevant file under `src/app/` or `src/components/` and add strings directly in JSX.
+2. Update default metadata if you introduce a meaningful new top-level page (see `src/app/layout.js` or route-local `metadata` exports).
 
 ### Adding a New Page
 
-1. Create `src/app/[locale]/new-page/page.jsx`
-2. Add translations to all 3 active language files
-3. Update navigation (Navbar, Sidebar) if needed
+1. Create `src/app/new-page/page.jsx` (matching existing layout patterns).
+2. Update navigation (Navbar, Sidebar) if the page should be linked.
 
 ### Build Troubleshooting
 
 - **MODULE_NOT_FOUND:** `rm -rf .next node_modules package-lock.json && npm install && npm run build`
-- **404 on locale routes:** Check middleware matcher configuration
-- **Missing translations:** Verify key exists in all 3 JSON files (en, es, zh)
+- **404 on dynamic routes:** Verify the file exists under `src/app/...` and matches the URL.
+- **Copy typos:** Search the codebase for nearby similar strings instead of translation keys.
 - **Image 404s:** Verify file exists in `/public/images/` (case-sensitive)
 
 ---
@@ -700,11 +648,11 @@ Success messages auto-fade after 4 seconds using the `FadeMessage` component pat
 
 ## Notes for AI Assistants
 
-1. **Always preserve locale structure** - pages must be in `[locale]` directory
-2. **Update all 3 active translation files** (en.json, es.json, zh.json) when adding new text
-3. **Use locale-aware routing** - include `/${locale}/` prefix in all links
+1. **App routes** - pages live under `src/app/` with standard Next.js paths (no `[locale]` segment).
+2. **UI copy** - add or change English strings directly in components; there are no shared JSON translation files.
+3. **Links** - use simple paths like `/about` and `next/link` (no locale prefix).
 4. **Keep API routes separate** - they are NOT localized
-5. **Follow existing patterns** - use `useTranslations` hook consistently
+5. **Follow existing patterns** - keep strings in JSX or small local constants beside the component
 6. **Single session system** - all auth uses `technique_session` via `src/lib/auth/session.ts`
 7. **Update Times Properly** - All posted times should be in EST, and all times shown should explicitly mention EST
 8. **Organization pattern** - clubs, living groups, and sports all follow similar patterns: profile, email, documents, images, manual-members API routes + a dashboard page

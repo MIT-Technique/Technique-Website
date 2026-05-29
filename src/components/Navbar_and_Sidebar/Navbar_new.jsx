@@ -3,87 +3,79 @@ import React, { useState } from "react";
 import Sidebar from "./Sidebar.jsx";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useTranslations, useLocale } from 'next-intl';
-import LanguageSwitcher from "../LanguageSwitcher/LanguageSwitcher";
 import AccountButton from "../AccountButton/AccountButton";
 import "./Navbar.css";
 
 function Navbar() {
   const pathname = usePathname();
-  const locale = useLocale();
-  const t = useTranslations('nav');
-  const tCommon = useTranslations('common');
-  const isHomePage = pathname === `/${locale}`;
+  const isHomePage = pathname === "/";
   const [openDropdown, setOpenDropdown] = useState(null);
 
   // Check if any item in a dropdown is active
   const isDropdownActive = (items) => {
-    return items.some(item => {
+    return items.some((item) => {
       // Senior Bio link should only be active on exactly /login or /bio, not login subpages
-      if (item.href === `/${locale}/login`) return pathname === `/${locale}/login` || pathname === `/${locale}/bio`;
+      if (item.href === `/login`)
+        return pathname === `/login` || pathname === `/bio`;
       // When on login subpages, only match exact paths
-      if (pathname.startsWith(`/${locale}/login/`)) return pathname === item.href;
+      if (pathname.startsWith(`/login/`)) return pathname === item.href;
       return pathname === item.href || pathname.startsWith(item.href + "/");
     });
   };
 
   const isActive = (href) => {
-    if (href === `/${locale}`) return pathname === `/${locale}`;
+    if (href === "/") return pathname === "/";
     // Senior Bio link should only be active on exactly /login or /bio, not login subpages like /login/admin
-    if (href === `/${locale}/login`) return pathname === `/${locale}/login` || pathname === `/${locale}/bio`;
+    if (href === `/login`) return pathname === `/login` || pathname === `/bio`;
     // When on login subpages (/login/admin, /login/club, etc.), only match exact paths
-    if (pathname.startsWith(`/${locale}/login/`)) return pathname === href;
+    if (pathname.startsWith(`/login/`)) return pathname === href;
     return pathname === href || pathname.startsWith(href + "/");
   };
 
   // Navigation structure with dropdowns
   const navStructure = [
     {
-      label: t('about'),
+      label: "ABOUT",
       dropdown: [
-        { href: `/${locale}/about`, label: t('dropdown.ourHistory') },
-        { href: `/${locale}/archives`, label: t('archive') },
-        { href: `/${locale}/portfolio`, label: t('dropdown.portfolio') },
-        { href: `/${locale}/contact`, label: t('dropdown.contact') },
+        { href: `/about`, label: "OUR HISTORY" },
+        { href: `/archives`, label: "ARCHIVE" },
+        { href: `/portfolio`, label: "PORTFOLIO" },
+        { href: `/contact`, label: "CONTACT" },
       ],
     },
     {
-      label: t('yearbook'),
+      label: "YEARBOOK",
       dropdown: [
-        { href: `/${locale}/purchase`, label: t('purchase'), external: true },
-        { href: `/${locale}/seniors`, label: t('seniors') },
-        { href: `/${locale}/parents`, label: t('parents') },
-        { href: `/${locale}/alumni`, label: t('alumni') },
+        { href: `/purchase`, label: "PURCHASE", external: true },
+        { href: `/seniors`, label: "SENIORS" },
+        { href: `/parents`, label: "PARENTS" },
+        { href: `/alumni`, label: "ALUMNI" },
       ],
     },
     {
-      label: t('forms'),
+      label: "FORMS",
       dropdown: [
         {
-          header: t('dropdown.students'),
-          items: [
-            { href: `/${locale}/bio`, label: t('dropdown.seniorBio') },
-            { href: `/${locale}/candids`, label: t('dropdown.candids') },
-            { href: `/${locale}/student-work-feature`, label: t('dropdown.studentWork') },
-          ]
+          header: "STUDENTS",
+          items: [{ href: `/bio`, label: "SENIOR BIO" }],
         },
         {
-          header: t('dropdown.community'),
+          header: "COMMUNITY",
           items: [
-            { href: `/${locale}/invoice`, label: t('dropdown.invoice') },
-            { href: `/${locale}/parent-inquiry`, label: t('dropdown.parent') },
-            { href: `/${locale}/alumni-inquiry`, label: t('dropdown.alumni') },
-          ]
-        }
+            { href: `/invoice`, label: "INVOICE" },
+            { href: `/parent-inquiry`, label: "PARENT" },
+            { href: `/alumni-inquiry`, label: "ALUMNI" },
+          ],
+        },
       ],
       grouped: true,
     },
-    { href: `/${locale}/resources`, label: t('resources') },
+    { href: `/resources`, label: "FAQ" },
     {
-      label: t('getStarted'),
+      label: "GET STARTED",
       dropdown: [
-        { href: `/${locale}/hire`, label: t('dropdown.hireUs') },
-        { href: `/${locale}/join`, label: t('dropdown.joinUs') },
+        { href: `/hire`, label: "HIRE US" },
+        { href: `/join`, label: "JOIN US" },
       ],
       special: true,
     },
@@ -107,16 +99,14 @@ function Navbar() {
                 ? "text-white hover:text-white/80"
                 : "text-text-primary hover:text-accent"
             }`}
-            href={`/${locale}`}
+            href="/"
           >
-            {tCommon('siteName')}
+            {"TECHNIQUE"}
           </Link>
 
           {/* Nav Links */}
           <div className="flex items-center gap-8">
-            {/* Language Switcher */}
-            <LanguageSwitcher isHomePage={isHomePage} />
-            {navStructure.map((item, index) => (
+            {navStructure.map((item, index) =>
               item.dropdown ? (
                 // Dropdown item
                 <div
@@ -127,7 +117,7 @@ function Navbar() {
                 >
                   <button
                     className={`nav-item nav-dropdown text-xs uppercase tracking-widest font-medium transition-colors flex items-center gap-1 ${
-                      item.special ? 'nav-item-hire group' : ''
+                      item.special ? "nav-item-hire group" : ""
                     } ${
                       isHomePage
                         ? isDropdownActive(item.dropdown)
@@ -145,12 +135,17 @@ function Navbar() {
                       </span>
                     ) : (
                       <svg
-                        className={`w-3 h-3 transition-transform ${openDropdown === item.label ? 'rotate-180' : ''}`}
+                        className={`w-3 h-3 transition-transform ${openDropdown === item.label ? "rotate-180" : ""}`}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
                       >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
                       </svg>
                     )}
                   </button>
@@ -164,7 +159,7 @@ function Navbar() {
                     }`}
                   >
                     <div
-                      className={`${item.grouped ? 'min-w-[320px]' : 'min-w-[160px]'} py-2 rounded shadow-lg ${
+                      className={`${item.grouped ? "min-w-[320px]" : "min-w-[160px]"} py-2 rounded shadow-lg ${
                         isHomePage
                           ? "bg-black/90 backdrop-blur-sm"
                           : "bg-white border border-border"
@@ -174,10 +169,21 @@ function Navbar() {
                         // Grouped dropdown with columns
                         <div className="grid grid-cols-2 gap-0">
                           {item.dropdown.map((group, groupIndex) => (
-                            <div key={groupIndex} className={groupIndex > 0 ? 'border-l border-border/30' : ''}>
-                              <div className={`px-4 py-2 text-[0.65rem] font-semibold uppercase tracking-widest ${
-                                isHomePage ? "text-white/60" : "text-text-muted"
-                              }`}>
+                            <div
+                              key={groupIndex}
+                              className={
+                                groupIndex > 0
+                                  ? "border-l border-border/30"
+                                  : ""
+                              }
+                            >
+                              <div
+                                className={`px-4 py-2 text-[0.65rem] font-semibold uppercase tracking-widest ${
+                                  isHomePage
+                                    ? "text-white/60"
+                                    : "text-text-muted"
+                                }`}
+                              >
                                 {group.header}
                               </div>
                               {group.items.map((subItem) => (
@@ -206,7 +212,9 @@ function Navbar() {
                           <Link
                             key={subItem.href}
                             href={subItem.href}
-                            {...(subItem.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                            {...(subItem.external
+                              ? { target: "_blank", rel: "noopener noreferrer" }
+                              : {})}
                             className={`block px-4 py-2 text-xs uppercase tracking-wider transition-colors ${
                               isHomePage
                                 ? isActive(subItem.href)
@@ -229,7 +237,7 @@ function Navbar() {
                 <Link
                   key={item.href}
                   className={`nav-item text-xs uppercase tracking-widest font-medium transition-colors ${
-                    item.special ? 'nav-item-hire group' : ''
+                    item.special ? "nav-item-hire group" : ""
                   } ${
                     isHomePage
                       ? isActive(item.href)
@@ -248,8 +256,8 @@ function Navbar() {
                     </span>
                   )}
                 </Link>
-              )
-            ))}
+              ),
+            )}
             {/* Account Button */}
             <AccountButton isHomePage={isHomePage} />
           </div>

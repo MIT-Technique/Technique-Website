@@ -9,38 +9,34 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import Collapse from "@mui/material/Collapse";
 import { VscThreeBars, VscClose, VscChevronDown } from "react-icons/vsc";
-import { useTranslations, useLocale } from 'next-intl';
-import LanguageSwitcher from "../LanguageSwitcher/LanguageSwitcher";
 import OrganizationAuthModal from "../OrganizationAuthModal/OrganizationAuthModal";
-import { useUser } from "../../hooks/useUser";
+import { useUser } from "@/hooks/useUser";
 
 function Sidebar({ pathname }) {
-  const locale = useLocale();
-  const t = useTranslations('nav');
-  const tCommon = useTranslations('common');
-  const tAccount = useTranslations('account');
-  const { isLoggedIn, user, club, sports, livingGroup, loading, logout } = useUser();
+  const { isLoggedIn, user, club, sports, livingGroup, loading, logout } =
+    useUser();
   const [isOpen, setIsOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState(null); // only one menu open at a time
   const [orgModalOpen, setOrgModalOpen] = useState(false);
 
-  const toggleMenu = (menu) => setOpenMenu(prev => prev === menu ? null : menu);
+  const toggleMenu = (menu) =>
+    setOpenMenu((prev) => (prev === menu ? null : menu));
 
   // Get dashboard link based on role
   const getDashboardLink = () => {
     switch (user?.role) {
-      case 'admin':
-        return `/${locale}/dashboard`;
-      case 'club':
-        return `/${locale}/club`;
-      case 'living_group':
-        return `/${locale}/living-group`;
+      case "admin":
+        return `/dashboard`;
+      case "club":
+        return `/club`;
+      case "living_group":
+        return `/living-group`;
       default:
-        return `/${locale}/bio`;
+        return `/bio`;
     }
   };
 
-  const isHomePage = pathname === `/${locale}`;
+  const isHomePage = pathname === "/";
   const textColor = isHomePage ? "#FFFFFF" : "#1A1A1A";
   const mutedColor = isHomePage ? "rgba(255,255,255,0.6)" : "#666666";
   const bgColor = isHomePage ? "#000000" : "#FFFAFA";
@@ -48,16 +44,28 @@ function Sidebar({ pathname }) {
 
   const isActive = (href) => {
     // Senior Bio link (/login) should only be active on exactly /login or /bio, not on /login/admin, /login/club, etc.
-    if (href === `/${locale}/login`) return pathname === `/${locale}/login` || pathname === `/${locale}/bio`;
+    if (href === `/login`) return pathname === `/login` || pathname === `/bio`;
     // For other paths, check exact match or subpath, but exclude login subpages from general matching
-    if (pathname.startsWith(`/${locale}/login/`)) return pathname === href;
+    if (pathname.startsWith(`/login/`)) return pathname === href;
     return pathname === href || pathname.startsWith(href + "/");
   };
 
-  const isAboutActive = [`/${locale}/about`, `/${locale}/archives`, `/${locale}/portfolio`, `/${locale}/contact`].some(isActive);
-  const isPurchaseActive = [`/${locale}/purchase`, `/${locale}/seniors`, `/${locale}/parents`, `/${locale}/alumni`].some(isActive);
-  const isFormsActive = [`/${locale}/login`, `/${locale}/invoice`, `/${locale}/parent-inquiry`, `/${locale}/alumni-inquiry`, `/${locale}/candids`, `/${locale}/student-work-feature`].some(isActive);
-  const isGetStartedActive = [`/${locale}/hire`, `/${locale}/join`].some(isActive);
+  const isAboutActive = [`/about`, `/archives`, `/portfolio`, `/contact`].some(
+    isActive,
+  );
+  const isPurchaseActive = [
+    `/purchase`,
+    `/seniors`,
+    `/parents`,
+    `/alumni`,
+  ].some(isActive);
+  const isFormsActive = [
+    `/login`,
+    `/invoice`,
+    `/parent-inquiry`,
+    `/alumni-inquiry`,
+  ].some(isActive);
+  const isGetStartedActive = [`/hire`, `/join`].some(isActive);
 
   return (
     <div
@@ -67,11 +75,11 @@ function Sidebar({ pathname }) {
     >
       <Link
         className="text-lg font-medium tracking-wide"
-        href={`/${locale}`}
+        href="/"
         onClick={() => setIsOpen(false)}
         style={{ color: textColor }}
       >
-        {tCommon('siteName')}
+        {"TECHNIQUE"}
       </Link>
 
       <button
@@ -129,11 +137,11 @@ function Sidebar({ pathname }) {
             {/* About Dropdown */}
             <ListItem disablePadding>
               <ListItemButton
-                onClick={() => toggleMenu('about')}
+                onClick={() => toggleMenu("about")}
                 sx={{ px: 3, py: 1.5 }}
               >
                 <ListItemText
-                  primary={t('about')}
+                  primary={"ABOUT"}
                   primaryTypographyProps={{
                     sx: {
                       fontSize: "0.75rem",
@@ -147,24 +155,27 @@ function Sidebar({ pathname }) {
                   size={16}
                   style={{
                     color: isAboutActive ? "#750014" : textColor,
-                    transform: openMenu === 'about' ? "rotate(180deg)" : "rotate(0deg)",
+                    transform:
+                      openMenu === "about" ? "rotate(180deg)" : "rotate(0deg)",
                     transition: "transform 0.2s",
                   }}
                 />
               </ListItemButton>
             </ListItem>
-            <Collapse in={openMenu === 'about'} timeout="auto" unmountOnExit>
+            <Collapse in={openMenu === "about"} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 {[
-                  { href: `/${locale}/about`, label: t('dropdown.ourHistory') },
-                  { href: `/${locale}/archives`, label: t('archive') },
-                  { href: `/${locale}/portfolio`, label: t('dropdown.portfolio') },
-                  { href: `/${locale}/contact`, label: t('dropdown.contact') },
+                  { href: `/about`, label: "OUR HISTORY" },
+                  { href: `/archives`, label: "ARCHIVE" },
+                  { href: `/portfolio`, label: "PORTFOLIO" },
+                  { href: `/contact`, label: "CONTACT" },
                 ].map((item) => (
                   <ListItem key={item.href} disablePadding>
                     <Link
                       href={item.href}
-                      {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                      {...(item.external
+                        ? { target: "_blank", rel: "noopener noreferrer" }
+                        : {})}
                       onClick={() => setIsOpen(false)}
                       className="w-full"
                     >
@@ -176,7 +187,9 @@ function Sidebar({ pathname }) {
                               fontSize: "0.7rem",
                               fontWeight: 400,
                               letterSpacing: "0.05em",
-                              color: isActive(item.href) ? "#750014" : mutedColor,
+                              color: isActive(item.href)
+                                ? "#750014"
+                                : mutedColor,
                             },
                           }}
                         />
@@ -190,11 +203,11 @@ function Sidebar({ pathname }) {
             {/* Yearbook Dropdown */}
             <ListItem disablePadding>
               <ListItemButton
-                onClick={() => toggleMenu('purchase')}
+                onClick={() => toggleMenu("purchase")}
                 sx={{ px: 3, py: 1.5 }}
               >
                 <ListItemText
-                  primary={t('yearbook')}
+                  primary={"YEARBOOK"}
                   primaryTypographyProps={{
                     sx: {
                       fontSize: "0.75rem",
@@ -208,24 +221,29 @@ function Sidebar({ pathname }) {
                   size={16}
                   style={{
                     color: isPurchaseActive ? "#750014" : textColor,
-                    transform: openMenu === 'purchase' ? "rotate(180deg)" : "rotate(0deg)",
+                    transform:
+                      openMenu === "purchase"
+                        ? "rotate(180deg)"
+                        : "rotate(0deg)",
                     transition: "transform 0.2s",
                   }}
                 />
               </ListItemButton>
             </ListItem>
-            <Collapse in={openMenu === 'purchase'} timeout="auto" unmountOnExit>
+            <Collapse in={openMenu === "purchase"} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 {[
-                  { href: `/${locale}/purchase`, label: t('purchase'), external: true },
-                  { href: `/${locale}/seniors`, label: t('seniors') },
-                  { href: `/${locale}/parents`, label: t('parents') },
-                  { href: `/${locale}/alumni`, label: t('alumni') },
+                  { href: `/purchase`, label: "PURCHASE", external: true },
+                  { href: `/seniors`, label: "SENIORS" },
+                  { href: `/parents`, label: "PARENTS" },
+                  { href: `/alumni`, label: "ALUMNI" },
                 ].map((item) => (
                   <ListItem key={item.href} disablePadding>
                     <Link
                       href={item.href}
-                      {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                      {...(item.external
+                        ? { target: "_blank", rel: "noopener noreferrer" }
+                        : {})}
                       onClick={() => setIsOpen(false)}
                       className="w-full"
                     >
@@ -237,7 +255,9 @@ function Sidebar({ pathname }) {
                               fontSize: "0.7rem",
                               fontWeight: 400,
                               letterSpacing: "0.05em",
-                              color: isActive(item.href) ? "#750014" : mutedColor,
+                              color: isActive(item.href)
+                                ? "#750014"
+                                : mutedColor,
                             },
                           }}
                         />
@@ -251,11 +271,11 @@ function Sidebar({ pathname }) {
             {/* Forms Dropdown */}
             <ListItem disablePadding>
               <ListItemButton
-                onClick={() => toggleMenu('forms')}
+                onClick={() => toggleMenu("forms")}
                 sx={{ px: 3, py: 1.5 }}
               >
                 <ListItemText
-                  primary={t('forms')}
+                  primary={"FORMS"}
                   primaryTypographyProps={{
                     sx: {
                       fontSize: "0.75rem",
@@ -269,19 +289,20 @@ function Sidebar({ pathname }) {
                   size={16}
                   style={{
                     color: isFormsActive ? "#750014" : textColor,
-                    transform: openMenu === 'forms' ? "rotate(180deg)" : "rotate(0deg)",
+                    transform:
+                      openMenu === "forms" ? "rotate(180deg)" : "rotate(0deg)",
                     transition: "transform 0.2s",
                   }}
                 />
               </ListItemButton>
             </ListItem>
-            <Collapse in={openMenu === 'forms'} timeout="auto" unmountOnExit>
+            <Collapse in={openMenu === "forms"} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 {/* Students Section */}
                 <ListItem disablePadding>
                   <ListItemButton sx={{ pl: 5, py: 0.5 }} disabled>
                     <ListItemText
-                      primary={t('dropdown.students')}
+                      primary={"STUDENTS"}
                       primaryTypographyProps={{
                         sx: {
                           fontSize: "0.6rem",
@@ -294,15 +315,13 @@ function Sidebar({ pathname }) {
                     />
                   </ListItemButton>
                 </ListItem>
-                {[
-                  { href: `/${locale}/bio`, label: t('dropdown.seniorBio') },
-                  { href: `/${locale}/candids`, label: t('dropdown.candids') },
-                  { href: `/${locale}/student-work-feature`, label: t('dropdown.studentWork') },
-                ].map((item) => (
+                {[{ href: `/bio`, label: "SENIOR BIO" }].map((item) => (
                   <ListItem key={item.href} disablePadding>
                     <Link
                       href={item.href}
-                      {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                      {...(item.external
+                        ? { target: "_blank", rel: "noopener noreferrer" }
+                        : {})}
                       onClick={() => setIsOpen(false)}
                       className="w-full"
                     >
@@ -314,7 +333,9 @@ function Sidebar({ pathname }) {
                               fontSize: "0.7rem",
                               fontWeight: 400,
                               letterSpacing: "0.05em",
-                              color: isActive(item.href) ? "#750014" : mutedColor,
+                              color: isActive(item.href)
+                                ? "#750014"
+                                : mutedColor,
                             },
                           }}
                         />
@@ -327,7 +348,7 @@ function Sidebar({ pathname }) {
                 <ListItem disablePadding sx={{ mt: 1 }}>
                   <ListItemButton sx={{ pl: 5, py: 0.5 }} disabled>
                     <ListItemText
-                      primary={t('dropdown.community')}
+                      primary={"COMMUNITY"}
                       primaryTypographyProps={{
                         sx: {
                           fontSize: "0.6rem",
@@ -341,14 +362,16 @@ function Sidebar({ pathname }) {
                   </ListItemButton>
                 </ListItem>
                 {[
-                  { href: `/${locale}/invoice`, label: t('dropdown.invoice') },
-                  { href: `/${locale}/parent-inquiry`, label: t('dropdown.parent') },
-                  { href: `/${locale}/alumni-inquiry`, label: t('dropdown.alumni') },
+                  { href: `/invoice`, label: "INVOICE" },
+                  { href: `/parent-inquiry`, label: "PARENT" },
+                  { href: `/alumni-inquiry`, label: "ALUMNI" },
                 ].map((item) => (
                   <ListItem key={item.href} disablePadding>
                     <Link
                       href={item.href}
-                      {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                      {...(item.external
+                        ? { target: "_blank", rel: "noopener noreferrer" }
+                        : {})}
                       onClick={() => setIsOpen(false)}
                       className="w-full"
                     >
@@ -360,7 +383,9 @@ function Sidebar({ pathname }) {
                               fontSize: "0.7rem",
                               fontWeight: 400,
                               letterSpacing: "0.05em",
-                              color: isActive(item.href) ? "#750014" : mutedColor,
+                              color: isActive(item.href)
+                                ? "#750014"
+                                : mutedColor,
                             },
                           }}
                         />
@@ -374,19 +399,19 @@ function Sidebar({ pathname }) {
             {/* Resources */}
             <ListItem disablePadding>
               <Link
-                href={`/${locale}/resources`}
+                href={`/resources`}
                 onClick={() => setIsOpen(false)}
                 className="w-full"
               >
                 <ListItemButton sx={{ px: 3, py: 1.5 }}>
                   <ListItemText
-                    primary={t('resources')}
+                    primary={"FAQ"}
                     primaryTypographyProps={{
                       sx: {
                         fontSize: "0.75rem",
                         fontWeight: 500,
                         letterSpacing: "0.1em",
-                        color: isActive(`/${locale}/resources`) ? "#750014" : textColor,
+                        color: isActive(`/resources`) ? "#750014" : textColor,
                       },
                     }}
                   />
@@ -397,11 +422,11 @@ function Sidebar({ pathname }) {
             {/* Get Started Dropdown */}
             <ListItem disablePadding>
               <ListItemButton
-                onClick={() => toggleMenu('getStarted')}
+                onClick={() => toggleMenu("getStarted")}
                 sx={{ px: 3, py: 1.5 }}
               >
                 <ListItemText
-                  primary={`${t('getStarted')} →`}
+                  primary={`${"GET STARTED"} →`}
                   primaryTypographyProps={{
                     sx: {
                       fontSize: "0.75rem",
@@ -415,22 +440,31 @@ function Sidebar({ pathname }) {
                   size={16}
                   style={{
                     color: isGetStartedActive ? "#750014" : textColor,
-                    transform: openMenu === 'getStarted' ? "rotate(180deg)" : "rotate(0deg)",
+                    transform:
+                      openMenu === "getStarted"
+                        ? "rotate(180deg)"
+                        : "rotate(0deg)",
                     transition: "transform 0.2s",
                   }}
                 />
               </ListItemButton>
             </ListItem>
-            <Collapse in={openMenu === 'getStarted'} timeout="auto" unmountOnExit>
+            <Collapse
+              in={openMenu === "getStarted"}
+              timeout="auto"
+              unmountOnExit
+            >
               <List component="div" disablePadding>
                 {[
-                  { href: `/${locale}/hire`, label: t('dropdown.hireUs') },
-                  { href: `/${locale}/join`, label: t('dropdown.joinUs') },
+                  { href: `/hire`, label: "HIRE US" },
+                  { href: `/join`, label: "JOIN US" },
                 ].map((item) => (
                   <ListItem key={item.href} disablePadding>
                     <Link
                       href={item.href}
-                      {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                      {...(item.external
+                        ? { target: "_blank", rel: "noopener noreferrer" }
+                        : {})}
                       onClick={() => setIsOpen(false)}
                       className="w-full"
                     >
@@ -442,7 +476,9 @@ function Sidebar({ pathname }) {
                               fontSize: "0.7rem",
                               fontWeight: 400,
                               letterSpacing: "0.05em",
-                              color: isActive(item.href) ? "#750014" : mutedColor,
+                              color: isActive(item.href)
+                                ? "#750014"
+                                : mutedColor,
                             },
                           }}
                         />
@@ -453,22 +489,24 @@ function Sidebar({ pathname }) {
               </List>
             </Collapse>
 
-            {/* Language Switcher */}
-            <ListItem disablePadding sx={{ mt: 2, px: 3 }}>
-              <LanguageSwitcher isHomePage={isHomePage} />
-            </ListItem>
-
             {/* Account Section */}
-            {!loading && (
-              isLoggedIn ? (
+            {!loading &&
+              (isLoggedIn ? (
                 <>
                   <ListItem disablePadding sx={{ mt: 1 }}>
                     <ListItemButton
-                      onClick={() => toggleMenu('account')}
+                      onClick={() => toggleMenu("account")}
                       sx={{ px: 3, py: 1.5 }}
                     >
                       <ListItemText
-                        primary={sports?.name || club?.name || livingGroup?.name || user?.name || user?.email?.split('@')[0] || tAccount('login')}
+                        primary={
+                          sports?.name ||
+                          club?.name ||
+                          livingGroup?.name ||
+                          user?.name ||
+                          user?.email?.split("@")[0] ||
+                          "SIGN IN"
+                        }
                         primaryTypographyProps={{
                           sx: {
                             fontSize: "0.75rem",
@@ -482,13 +520,20 @@ function Sidebar({ pathname }) {
                         size={16}
                         style={{
                           color: textColor,
-                          transform: openMenu === 'account' ? "rotate(180deg)" : "rotate(0deg)",
+                          transform:
+                            openMenu === "account"
+                              ? "rotate(180deg)"
+                              : "rotate(0deg)",
                           transition: "transform 0.2s",
                         }}
                       />
                     </ListItemButton>
                   </ListItem>
-                  <Collapse in={openMenu === 'account'} timeout="auto" unmountOnExit>
+                  <Collapse
+                    in={openMenu === "account"}
+                    timeout="auto"
+                    unmountOnExit
+                  >
                     <List component="div" disablePadding>
                       <ListItem disablePadding>
                         <Link
@@ -498,7 +543,7 @@ function Sidebar({ pathname }) {
                         >
                           <ListItemButton sx={{ pl: 6, py: 1 }}>
                             <ListItemText
-                              primary={tAccount('dashboard')}
+                              primary={"DASHBOARD"}
                               primaryTypographyProps={{
                                 sx: {
                                   fontSize: "0.7rem",
@@ -520,7 +565,7 @@ function Sidebar({ pathname }) {
                           sx={{ pl: 6, py: 1 }}
                         >
                           <ListItemText
-                            primary={tAccount('signOut')}
+                            primary={"SIGN OUT"}
                             primaryTypographyProps={{
                               sx: {
                                 fontSize: "0.7rem",
@@ -545,7 +590,7 @@ function Sidebar({ pathname }) {
                     sx={{ px: 3, py: 1.5 }}
                   >
                     <ListItemText
-                      primary={tAccount('login')}
+                      primary={"SIGN IN"}
                       primaryTypographyProps={{
                         sx: {
                           fontSize: "0.75rem",
@@ -557,8 +602,7 @@ function Sidebar({ pathname }) {
                     />
                   </ListItemButton>
                 </ListItem>
-              )
-            )}
+              ))}
           </List>
         </Box>
       </Drawer>

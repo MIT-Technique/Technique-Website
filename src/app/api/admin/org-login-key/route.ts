@@ -29,8 +29,8 @@ function buildCredentialsEmail(
     ? `Hi ${name || "there"}, your login password has been reset.`
     : `Hi ${name || "there"}, here are your Technique portal login credentials.`;
   const signInUrl = isOrg
-    ? "https://technique.mit.edu/en/login"
-    : "https://technique.mit.edu/en/login/admin";
+    ? "https://technique.mit.edu/login"
+    : "https://technique.mit.edu/login/admin";
   const orgRow = isOrg
     ? `<tr><td style="padding: 4px 0; font-size: 13px; color: #888; width: 120px;">Organization</td><td style="padding: 4px 0; font-size: 15px;">${name || ""}</td></tr>`
     : "";

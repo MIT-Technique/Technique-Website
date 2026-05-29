@@ -1,8 +1,6 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
-
 function getDaysInMonth(year, month) {
   return new Date(year, month + 1, 0).getDate();
 }
@@ -23,7 +21,6 @@ export default function MonthView({
   locale,
   dayNames,
 }) {
-  const t = useTranslations('calendarView');
   const today = new Date();
   const todayStr = today.toISOString().split('T')[0];
   const [flashError, setFlashError] = useState(null);
@@ -87,7 +84,7 @@ export default function MonthView({
               <div
                 key={day}
                 onClick={() => {
-                  if (isPast && role !== 'admin') { showFlashError(t('noPastDates')); return; }
+                  if (isPast && role !== 'admin') { showFlashError("Cannot schedule in the past"); return; }
                   onDayClick(dateStr);
                 }}
                 className={`border-r border-b border-border min-h-[56px] sm:min-h-[80px] p-1 sm:p-1.5 cursor-pointer transition-colors ${

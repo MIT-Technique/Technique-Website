@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
 import { AnimatePresence } from 'framer-motion';
 import DaySidePanel from './DaySidePanel';
 import MonthView from './MonthView';
@@ -29,6 +28,8 @@ function getWeekStart(date) {
   return d;
 }
 
+const VIEW_MODE_TAB_LABELS = { day: 'Day', week: 'Week', month: 'Month' };
+
 export default function CalendarView({
   role,
   times = [],
@@ -48,8 +49,8 @@ export default function CalendarView({
   loading = false,
   timeAssignments = {},
 }) {
-  const locale = useLocale();
-  const t = useTranslations('calendarView');
+  const locale = 'en-US';
+
   const today = new Date();
 
   const [viewMode, setViewMode] = useState('month'); // 'day' | 'week' | 'month'
@@ -179,7 +180,7 @@ export default function CalendarView({
               onClick={goToToday}
               className="text-xs px-2 py-1 rounded border border-border hover:bg-bg-secondary text-text-secondary"
             >
-              {t('today')}
+              {"Today"}
             </button>
             <div className="flex rounded border border-border overflow-hidden">
             {['day', 'week', 'month'].map((mode) => (
@@ -192,7 +193,7 @@ export default function CalendarView({
                     : 'bg-bg-secondary text-text-secondary hover:bg-bg-secondary/80'
                 }`}
               >
-                {t(`${mode}View`)}
+                {VIEW_MODE_TAB_LABELS[mode]}
               </button>
             ))}
             </div>
@@ -202,17 +203,17 @@ export default function CalendarView({
         {/* Legend */}
         <div className="flex gap-4 mb-3 text-xs text-text-secondary">
           <span className="flex items-center gap-1">
-            <span className="w-2.5 h-2.5 rounded-full bg-blue-400" /> {t('available')}
+            <span className="w-2.5 h-2.5 rounded-full bg-blue-400" /> {"Available"}
           </span>
           <span className="flex items-center gap-1">
-            <span className="w-2.5 h-2.5 rounded-full bg-green-500" /> {t('booked')}
+            <span className="w-2.5 h-2.5 rounded-full bg-green-500" /> {"Booked"}
           </span>
           <span className="flex items-center gap-1">
-            <span className="w-2.5 h-2.5 rounded-full bg-blue-400" /> {t('pending')}
+            <span className="w-2.5 h-2.5 rounded-full bg-blue-400" /> {"Proposed"}
           </span>
           {role === 'living_group' && (
             <span className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded-full bg-gray-400" /> {t('otherProposals')}
+              <span className="w-2.5 h-2.5 rounded-full bg-gray-400" /> {"Other Proposals"}
             </span>
           )}
         </div>

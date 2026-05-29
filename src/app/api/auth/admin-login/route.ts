@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
 
     const supabaseAdmin = createAdminClient();
     const session = await getSession();
-    const dashboardUrl = "/en/dashboard";
+    const dashboardUrl = "/dashboard";
 
     // Get user from our users table
     const { data: user, error: userError } = await supabaseAdmin

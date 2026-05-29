@@ -4,14 +4,9 @@ import Link from "next/link";
 import MailIcon from "@mui/icons-material/Mail";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import { usePathname } from "next/navigation";
-import { useTranslations, useLocale } from 'next-intl';
-
 export default function Footer() {
   const pathname = usePathname();
-  const locale = useLocale();
-  const t = useTranslations('footer');
-  const isHomePage = pathname === `/${locale}`;
-
+  const isHomePage = pathname === '/';
   return (
     <footer
       className={`${
@@ -27,17 +22,17 @@ export default function Footer() {
                 isHomePage ? "text-white/60" : "text-text-muted"
               }`}
             >
-              {t('copyright')}
+              {"© 2026 Technique. All Rights Reserved."}
             </p>
             <Link
-              href={`/${locale}/privacy`}
+              href={`/privacy`}
               className={`text-xs ${
                 isHomePage
                   ? "text-white/60 hover:text-white"
                   : "text-text-muted hover:text-accent"
               } transition-colors underline`}
             >
-              {t('privacyPolicy')}
+              {"Privacy Policy"}
             </Link>
           </div>
 
@@ -50,7 +45,7 @@ export default function Footer() {
                   ? "text-white/60 hover:text-white"
                   : "text-text-muted hover:text-accent"
               } transition-colors`}
-              aria-label={t('emailLabel')}
+              aria-label={"Email us"}
             >
               <MailIcon sx={{ fontSize: 18 }} />
             </a>
@@ -63,7 +58,7 @@ export default function Footer() {
                   ? "text-white/60 hover:text-white"
                   : "text-text-muted hover:text-accent"
               } transition-colors`}
-              aria-label={t('instagramLabel')}
+              aria-label={"Follow us on Instagram"}
             >
               <InstagramIcon sx={{ fontSize: 18 }} />
             </a>

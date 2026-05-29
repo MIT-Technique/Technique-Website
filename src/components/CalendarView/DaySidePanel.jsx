@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import CreateSlotForm from './CreateSlotForm';
 
@@ -27,8 +26,7 @@ export default function DaySidePanel({
   initialStartTime = '',
   initialEndTime = '',
 }) {
-  const locale = useLocale();
-  const t = useTranslations('calendarView');
+  const locale = 'en-US';
 
   const isAdminOrPhotographer = role === 'admin' || role === 'photographer';
   const isLivingGroup = role === 'living_group';
@@ -107,7 +105,7 @@ export default function DaySidePanel({
 
   async function handleDeclineProposal(proposalId) {
     if (!onDeclineProposal) return;
-    const reason = prompt(t('declineReasonPrompt'));
+    const reason = prompt("Enter a reason for declining (optional):");
     if (reason === null) return;
     setProcessingId(proposalId);
     try {
@@ -124,8 +122,8 @@ export default function DaySidePanel({
 
   function getCreatorLabel(time) {
     const creator = time?.creator || time?.created_by_user;
-    if (!creator) return t('unknown');
-    return creator.name || creator.email || t('unknown');
+    if (!creator) return "Unknown";
+    return creator.name || creator.email || "Unknown";
   }
 
   function getCreatorEmail(time) {
@@ -186,7 +184,7 @@ export default function DaySidePanel({
           <div>
             <h3 className="font-medium text-sm">{dateLabel}</h3>
             <p className="text-xs text-text-muted mt-0.5">
-              {availableTimes.length + bookedTimes.length} {t('slots')} &middot; {proposals.length} {t('proposals')}
+              {availableTimes.length + bookedTimes.length} {"slots"} &middot; {proposals.length} {"proposals"}
             </p>
           </div>
           <button
@@ -216,7 +214,7 @@ export default function DaySidePanel({
                 onClick={() => setShowCreateForm(true)}
                 className="w-full py-2 text-sm border border-dashed border-accent/40 text-accent rounded-lg hover:bg-accent/5 transition-colors"
               >
-                + {t('addSlot')}
+                + {"Add Time Slot"}
               </button>
             )}
           </div>
@@ -225,7 +223,7 @@ export default function DaySidePanel({
         {/* Booked Times */}
         {bookedTimes.length > 0 && (
           <div className="mb-4">
-            <h4 className="text-xs font-medium text-text-muted uppercase mb-2">{t('booked')}</h4>
+            <h4 className="text-xs font-medium text-text-muted uppercase mb-2">{"Booked"}</h4>
             <div className="space-y-2">
               {bookedTimes.map((time) => {
                 const isPending = time.booking_status === 'pending_location';
@@ -240,7 +238,7 @@ export default function DaySidePanel({
                         {formatTime(time.start_time)} - {formatTime(time.end_time)} EST
                       </p>
                       {isPending && (
-                        <span className="text-[10px] px-1.5 py-0.5 bg-yellow-200 text-yellow-800 rounded font-medium">{t('pendingLocation')}</span>
+                        <span className="text-[10px] px-1.5 py-0.5 bg-yellow-200 text-yellow-800 rounded font-medium">{"Proposed"}</span>
                       )}
                     </div>
                     <div className="flex gap-1 flex-shrink-0 ml-2">
@@ -250,7 +248,7 @@ export default function DaySidePanel({
                           disabled={processingId === time.id}
                           className="text-xs text-red-600 hover:text-red-700"
                         >
-                          {processingId === time.id ? '...' : t('cancel')}
+                          {processingId === time.id ? '...' : "Cancel"}
                         </button>
                       )}
                       {role === 'admin' && (
@@ -259,23 +257,23 @@ export default function DaySidePanel({
                           disabled={processingId === time.id}
                           className={`text-xs ${confirmDeleteId === time.id ? 'text-red-700 font-medium' : 'text-red-600 hover:text-red-700'}`}
                         >
-                          {processingId === time.id ? '...' : confirmDeleteId === time.id ? t('confirmAction') : t('deleteSlot')}
+                          {processingId === time.id ? '...' : confirmDeleteId === time.id ? "Confirm?" : "Delete"}
                         </button>
                       )}
                     </div>
                   </div>
                   <p className="text-xs text-text-muted mt-0.5 leading-snug">
-                    {t('postedBy')}{' '}
+                    {"Posted by"}{' '}
                     {isLivingGroup && getCreatorEmail(time) ? (
                       <a href={`mailto:${getCreatorEmail(time)}`} className="text-accent hover:underline font-medium">{getCreatorLabel(time)}</a>
                     ) : (
                       <span className="font-medium">{getCreatorLabel(time)}</span>
                     )}
-                    {' · '}{t('bookedBy')}{' '}
+                    {' · '}{"Booked by"}{' '}
                     {isAdminOrPhotographer && getLivingGroupEmail(time) ? (
-                      <a href={`mailto:${getLivingGroupEmail(time)}`} className="text-green-700 hover:underline font-medium">{getLg(time)?.name || t('booked')}</a>
+                      <a href={`mailto:${getLivingGroupEmail(time)}`} className="text-green-700 hover:underline font-medium">{getLg(time)?.name || "Booked"}</a>
                     ) : (
-                      <span className="text-green-700 font-medium">{getLg(time)?.name || t('booked')}</span>
+                      <span className="text-green-700 font-medium">{getLg(time)?.name || "Booked"}</span>
                     )}
                     {isConfirmed && time.location && <>{' · '}{time.location}</>}
                     {time.notes && <>{' · '}<span className="italic">{time.notes}</span></>}
@@ -283,7 +281,7 @@ export default function DaySidePanel({
                   {/* Admin location selector for pending bookings */}
                   {isPending && isAdminOrPhotographer && onConfirmLocation && time.proposed_locations?.length > 0 && (
                     <div className="mt-2 pt-2 border-t border-yellow-200">
-                      <p className="text-xs font-medium mb-1">{t('selectLocation')}</p>
+                      <p className="text-xs font-medium mb-1">{"Select a location:"}</p>
                       <div className="flex flex-wrap gap-1">
                         {time.proposed_locations.map((loc, i) => (
                           <button
@@ -308,21 +306,21 @@ export default function DaySidePanel({
                   {/* LG view of pending locations */}
                   {isPending && isLivingGroup && time.proposed_locations?.length > 0 && (
                     <p className="text-xs text-text-muted mt-1">
-                      {t('yourLocations')}: {time.proposed_locations.join(', ')}
+                      {"Proposed locations"}: {time.proposed_locations.join(', ')}
                     </p>
                   )}
                   {/* Photographer assignment for admin (only for confirmed bookings) */}
                   {role === 'admin' && isConfirmed && onAssignPhotographer && (
                     <div className="mt-2 pt-2 border-t border-green-200">
                       <div className="flex items-center gap-2">
-                        <label className="text-xs font-medium whitespace-nowrap">{t('assignPhotographer')}:</label>
+                        <label className="text-xs font-medium whitespace-nowrap">{"Photographer"}:</label>
                         <select
                           value={getPhotographer(time)?.id || ''}
                           onChange={(e) => handleAssignPhotographer(time.id, e.target.value || null)}
                           disabled={assigningPhotographerId === time.id}
                           className="flex-1 text-xs border border-border rounded px-2 py-1 bg-white disabled:opacity-50"
                         >
-                          <option value="">{t('unassigned')}</option>
+                          <option value="">{"Unassigned"}</option>
                           {photographers.map((p) => (
                             <option key={p.id} value={p.id}>
                               {p.name || p.email}
@@ -335,7 +333,7 @@ export default function DaySidePanel({
                       </div>
                       {getPhotographer(time) && (
                         <p className="text-xs text-green-700 mt-1">
-                          {t('assignedTo')}: {getPhotographer(time)?.name || getPhotographer(time)?.email}
+                          {"Assigned to"}: {getPhotographer(time)?.name || getPhotographer(time)?.email}
                         </p>
                       )}
                     </div>
@@ -343,7 +341,7 @@ export default function DaySidePanel({
                   {/* Show assigned photographer for non-admin users */}
                   {role !== 'admin' && getPhotographer(time) && (
                     <p className="text-xs text-green-700 mt-1">
-                      {t('photographer')}: {getPhotographer(time)?.name || getPhotographer(time)?.email}
+                      {"Photographer"}: {getPhotographer(time)?.name || getPhotographer(time)?.email}
                     </p>
                   )}
                 </div>
@@ -356,8 +354,8 @@ export default function DaySidePanel({
         {/* Available Times */}
         {(availableTimes.length > 0 || (isLivingGroup && !frozen && !isPast && onPropose)) && (
           <div className="mb-4">
-            <h4 className="text-xs font-medium text-text-muted uppercase mb-2 group/tooltip relative inline-block cursor-help" title={t('availableTooltip')}>
-              {t('available')}
+            <h4 className="text-xs font-medium text-text-muted uppercase mb-2 group/tooltip relative inline-block cursor-help" title={"Click on dates and the calendar grid to set or propose time slots"}>
+              {"Available"}
               <svg className="w-3.5 h-3.5 inline-block ml-1 -mt-0.5 text-text-muted/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -378,7 +376,7 @@ export default function DaySidePanel({
                           disabled={processingId === time.id}
                           className="text-xs px-2.5 py-1 bg-accent text-white rounded hover:bg-accent/90 disabled:opacity-50"
                         >
-                          {t('book')}
+                          {"Book"}
                         </button>
                       )}
                       {isAdminOrPhotographer && (
@@ -389,7 +387,7 @@ export default function DaySidePanel({
                               disabled={processingId === time.id}
                               className={`text-xs ${confirmDeleteId === time.id ? 'text-red-700 font-medium' : 'text-red-600 hover:text-red-700'}`}
                             >
-                              {processingId === time.id ? '...' : confirmDeleteId === time.id ? t('confirmAction') : t('deleteSlot')}
+                              {processingId === time.id ? '...' : confirmDeleteId === time.id ? "Confirm?" : "Delete"}
                             </button>
                           )}
                         </>
@@ -397,7 +395,7 @@ export default function DaySidePanel({
                     </div>
                   </div>
                   <p className="text-xs text-text-muted mt-0.5 leading-snug">
-                    {t('postedBy')}{' '}
+                    {"Posted by"}{' '}
                     {isLivingGroup && getCreatorEmail(time) ? (
                       <a href={`mailto:${getCreatorEmail(time)}`} className="text-accent hover:underline font-medium">{getCreatorLabel(time)}</a>
                     ) : (
@@ -408,7 +406,7 @@ export default function DaySidePanel({
                   {/* Booking location form */}
                   {isBookingThis && (
                     <div className="mt-2 pt-2 border-t border-blue-200">
-                      <p className="text-xs font-medium mb-1">{t('proposeLocations')}</p>
+                      <p className="text-xs font-medium mb-1">{"Proposed Location(s)"}</p>
                       <div className="space-y-1.5">
                         {proposedLocations.map((loc, i) => (
                           <div key={i} className="flex gap-1">
@@ -420,7 +418,7 @@ export default function DaySidePanel({
                                 updated[i] = e.target.value;
                                 setProposedLocations(updated);
                               }}
-                              placeholder={t('locationPlaceholder')}
+                              placeholder={"e.g., Baker House Main Lounge"}
                               className="flex-1 border border-border rounded px-2 py-1 text-xs"
                               maxLength={200}
                             />
@@ -441,7 +439,7 @@ export default function DaySidePanel({
                             onClick={() => setProposedLocations([...proposedLocations, ''])}
                             className="text-xs text-accent hover:underline"
                           >
-                            + {t('addLocation')}
+                            + {"Add another location"}
                           </button>
                         )}
                       </div>
@@ -455,13 +453,13 @@ export default function DaySidePanel({
                           disabled={processingId === time.id}
                           className="text-xs px-2.5 py-1 bg-accent text-white rounded hover:bg-accent/90 disabled:opacity-50"
                         >
-                          {processingId === time.id ? '...' : t('confirmBook')}
+                          {processingId === time.id ? '...' : "Confirm Booking"}
                         </button>
                         <button
                           onClick={() => { setBookingTimeId(null); setProposedLocations(['']); }}
                           className="text-xs text-text-secondary hover:text-text-primary"
                         >
-                          {t('cancelAction')}
+                          {"Cancel"}
                         </button>
                       </div>
                     </div>
@@ -477,7 +475,7 @@ export default function DaySidePanel({
                     date={date}
                     onSubmit={handlePropose}
                     onCancel={() => setShowProposeForm(false)}
-                    submitLabel={t('proposeSlot')}
+                    submitLabel={"Propose"}
                     initialStartTime={initialStartTime}
                     initialEndTime={initialEndTime}
                   />
@@ -486,7 +484,7 @@ export default function DaySidePanel({
                     onClick={() => setShowProposeForm(true)}
                     className="w-full py-2 text-sm border border-dashed border-accent/40 text-accent rounded-lg hover:bg-accent/5 transition-colors"
                   >
-                    + {t('proposeTime')}
+                    + {"Propose Time"}
                   </button>
                 )
               )}
@@ -497,7 +495,7 @@ export default function DaySidePanel({
         {/* Proposals */}
         {proposals.length > 0 && (
           <div className="mb-4">
-            <h4 className="text-xs font-medium text-text-muted uppercase mb-2">{t('pending')}</h4>
+            <h4 className="text-xs font-medium text-text-muted uppercase mb-2">{"Proposed"}</h4>
             <div className="space-y-2">
               {proposals.map((proposal) => {
                 // Living groups see other groups' proposals as gray
@@ -519,25 +517,25 @@ export default function DaySidePanel({
                             disabled={processingId === proposal.id}
                             className="text-xs px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
                           >
-                            {processingId === proposal.id ? '...' : t('accept')}
+                            {processingId === proposal.id ? '...' : "Accept"}
                           </button>
                           <button
                             onClick={() => handleDeclineProposal(proposal.id)}
                             disabled={processingId === proposal.id}
                             className="text-xs px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
                           >
-                            {processingId === proposal.id ? '...' : t('decline')}
+                            {processingId === proposal.id ? '...' : "Decline"}
                           </button>
                         </>
                       )}
                     </div>
                   </div>
                   <p className="text-xs text-text-muted mt-0.5 leading-snug">
-                    {t('proposedBy')}{' '}
+                    {"Proposed by"}{' '}
                     {isAdminOrPhotographer && getLivingGroupEmail(proposal) ? (
-                      <a href={`mailto:${getLivingGroupEmail(proposal)}`} className={`${proposalNameColor} hover:underline font-medium`}>{getLg(proposal)?.name || t('unknown')}</a>
+                      <a href={`mailto:${getLivingGroupEmail(proposal)}`} className={`${proposalNameColor} hover:underline font-medium`}>{getLg(proposal)?.name || "Unknown"}</a>
                     ) : (
-                      <span className={`${proposalNameColor} font-medium`}>{getLg(proposal)?.name || t('unknown')}</span>
+                      <span className={`${proposalNameColor} font-medium`}>{getLg(proposal)?.name || "Unknown"}</span>
                     )}
                     {proposal.notes && <>{' · '}<span className="italic">{proposal.notes}</span></>}
                   </p>
@@ -550,7 +548,7 @@ export default function DaySidePanel({
 
         {/* Empty state */}
         {availableTimes.length === 0 && bookedTimes.length === 0 && proposals.length === 0 && (
-          <p className="text-sm text-text-secondary text-center py-8">{t('noSlots')}</p>
+          <p className="text-sm text-text-secondary text-center py-8">{"No time slots for this day"}</p>
         )}
       </div>
     </motion.div>

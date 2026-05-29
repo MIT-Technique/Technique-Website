@@ -126,7 +126,7 @@ export async function GET(request: Request) {
             </div>
 
             <div style="text-align: center; margin: 28px 0;">
-              <a href="https://technique.mit.edu/en/hire" style="display: inline-block; background: #750014; color: #ffffff; text-decoration: none; padding: 14px 40px; border-radius: 24px; font-weight: 600; font-size: 14px; letter-spacing: 0.5px;">Submit Photos</a>
+              <a href="https://technique.mit.edu/hire" style="display: inline-block; background: #750014; color: #ffffff; text-decoration: none; padding: 14px 40px; border-radius: 24px; font-weight: 600; font-size: 14px; letter-spacing: 0.5px;">Submit Photos</a>
             </div>
 
             <div style="border-top: 1px solid #E0D6D6; padding-top: 20px; text-align: center;">

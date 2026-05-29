@@ -77,7 +77,7 @@ describe('/api/auth/org-signin', () => {
     expect((await res.json()).code).toBe('INVALID_ORG_TYPE');
   });
 
-  it('returns relative redirect URL /en/club for club login', async () => {
+  it('returns relative redirect URL /club for club login', async () => {
     setupClubMocks();
     mockSupabaseAuthSignIn.mockResolvedValue({
       data: { user: { email: 'club@test.com', email_confirmed_at: '2024-01-01' }, session: { access_token: 'tok' } },
@@ -91,38 +91,7 @@ describe('/api/auth/org-signin', () => {
 
     expect(res.status).toBe(200);
     expect(data.success).toBe(true);
-    expect(data.redirectUrl).toBe('/en/club');
-  });
-
-  it('returns locale-aware redirect URL when locale is provided', async () => {
-    setupClubMocks();
-    mockSupabaseAuthSignIn.mockResolvedValue({
-      data: { user: { email: 'club@test.com', email_confirmed_at: '2024-01-01' }, session: { access_token: 'tok' } },
-      error: null,
-    });
-    mockGetSession.mockResolvedValue({ isLoggedIn: false, save: mockSessionSave });
-    mockSessionSave.mockResolvedValue(undefined);
-
-    const res = await POST(makeRequest({ password: 'pass', orgType: 'club', name: 'Test Club', locale: 'es' }));
-    const data = await res.json();
-
-    expect(data.redirectUrl).toBe('/es/club');
-  });
-
-  it('defaults to /en/ when no locale provided', async () => {
-    setupClubMocks();
-    mockSupabaseAuthSignIn.mockResolvedValue({
-      data: { user: { email: 'club@test.com', email_confirmed_at: '2024-01-01' }, session: { access_token: 'tok' } },
-      error: null,
-    });
-    mockGetSession.mockResolvedValue({ isLoggedIn: false, save: mockSessionSave });
-    mockSessionSave.mockResolvedValue(undefined);
-
-    const res = await POST(makeRequest({ password: 'pass', orgType: 'club', name: 'Test Club' }));
-    const data = await res.json();
-
-    expect(data.redirectUrl).toBe('/en/club');
-    // Verify it's a relative URL, not absolute
+    expect(data.redirectUrl).toBe('/club');
     expect(data.redirectUrl).not.toContain('http');
   });
 
@@ -150,7 +119,7 @@ describe('/api/auth/org-signin', () => {
     expect((await res.json()).code).toBe('ACCOUNT_DISABLED');
   });
 
-  it('returns /en/sports for sports login', async () => {
+  it('returns /sports for sports login', async () => {
     mockSupabaseAdminFrom.mockImplementation((table: string) => {
       if (table === 'sports') {
         return {
@@ -180,10 +149,10 @@ describe('/api/auth/org-signin', () => {
     mockSessionSave.mockResolvedValue(undefined);
 
     const res = await POST(makeRequest({ password: 'pass', orgType: 'sports', name: 'Test Team' }));
-    expect((await res.json()).redirectUrl).toBe('/en/sports');
+    expect((await res.json()).redirectUrl).toBe('/sports');
   });
 
-  it('returns /en/living-group for living group login', async () => {
+  it('returns /living-group for living group login', async () => {
     mockSupabaseAdminFrom.mockImplementation((table: string) => {
       if (table === 'living_groups') {
         return {
@@ -219,6 +188,6 @@ describe('/api/auth/org-signin', () => {
     mockSessionSave.mockResolvedValue(undefined);
 
     const res = await POST(makeRequest({ password: 'pass', orgType: 'living_group', name: 'Baker House' }));
-    expect((await res.json()).redirectUrl).toBe('/en/living-group');
+    expect((await res.json()).redirectUrl).toBe('/living-group');
   });
 });

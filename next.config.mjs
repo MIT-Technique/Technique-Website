@@ -1,22 +1,35 @@
-import createNextIntlPlugin from "next-intl/plugin";
+import path from "path";
+import { fileURLToPath } from "url";
 
-const withNextIntl = createNextIntlPlugin("./src/i18n/request.js");
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      "@": path.join(__dirname, "src"),
+    };
+    return config;
+  },
   experimental: {
     serverActions: {
-      bodySizeLimit: '25mb',
+      bodySizeLimit: "25mb",
     },
   },
   async redirects() {
     return [
       {
-        source: "/",
-        destination: "/en",
+        source: "/en",
+        destination: "/",
+        permanent: false,
+      },
+      {
+        source: "/en/:path*",
+        destination: "/:path*",
         permanent: false,
       },
       {
@@ -26,8 +39,13 @@ const nextConfig = {
         permanent: false,
       },
       {
-        source: "/:locale/purchase",
-        destination: "https://engage.mit.edu/technique/rsvp_boot?id=916938",
+        source: "/es/:path*",
+        destination: "/:path*",
+        permanent: false,
+      },
+      {
+        source: "/zh/:path*",
+        destination: "/:path*",
         permanent: false,
       },
       {
@@ -36,14 +54,12 @@ const nextConfig = {
         permanent: false,
       },
       {
-        source: "/bio",
-        destination: "/en/bio",
         source: "/admin",
-        destination: "/en/login/admin",
+        destination: "/login/admin",
         permanent: false,
       },
     ];
   },
 };
 
-export default withNextIntl(nextConfig);
+export default nextConfig;

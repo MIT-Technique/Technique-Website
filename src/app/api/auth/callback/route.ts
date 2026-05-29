@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
       if (authError || !authData.user) {
         console.error("Auth callback error:", authError);
         return NextResponse.redirect(
-          `${process.env.NEXT_PUBLIC_APP_URL}/en/login?error=auth_failed`
+          `${process.env.NEXT_PUBLIC_APP_URL}/login?error=auth_failed`
         );
       }
 
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
           if (!clubName) {
             console.error("Club signup error: no club name provided");
             return NextResponse.redirect(
-              `${process.env.NEXT_PUBLIC_APP_URL}/en/login/club?error=missing_club_name`
+              `${process.env.NEXT_PUBLIC_APP_URL}/login/club?error=missing_club_name`
             );
           }
 
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
           if (createError) {
             console.error("Error creating club user:", createError);
             return NextResponse.redirect(
-              `${process.env.NEXT_PUBLIC_APP_URL}/en/login/club?error=user_create_failed`
+              `${process.env.NEXT_PUBLIC_APP_URL}/login/club?error=user_create_failed`
             );
           }
 
@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
           // User exists but isn't a club account
           console.error("Club callback error: user exists but not a club account");
           return NextResponse.redirect(
-            `${process.env.NEXT_PUBLIC_APP_URL}/en/login/club?error=not_club_account`
+            `${process.env.NEXT_PUBLIC_APP_URL}/login/club?error=not_club_account`
           );
         } else {
           // EXISTING CLUB LOGIN
@@ -125,19 +125,19 @@ export async function GET(request: NextRequest) {
         await session.save();
 
         return NextResponse.redirect(
-          `${process.env.NEXT_PUBLIC_APP_URL}/en/club`
+          `${process.env.NEXT_PUBLIC_APP_URL}/club`
         );
       }
     }
 
     // Fallback - redirect to login
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_APP_URL}/en/login`
+      `${process.env.NEXT_PUBLIC_APP_URL}/login`
     );
   } catch (error) {
     console.error("Auth callback error:", error);
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_APP_URL}/en/login?error=callback_failed`
+      `${process.env.NEXT_PUBLIC_APP_URL}/login?error=callback_failed`
     );
   }
 }

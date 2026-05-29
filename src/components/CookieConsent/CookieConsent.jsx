@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { useLocale } from 'next-intl';
+
+
 import Link from 'next/link';
 
 export default function CookieConsent() {
   const [isVisible, setIsVisible] = useState(false);
   const pathname = usePathname();
-  const locale = useLocale();
-  const isHomePage = pathname === `/${locale}`;
+  const isHomePage = pathname === '/';
 
   useEffect(() => {
     // Check if user has already consented
@@ -55,7 +55,7 @@ export default function CookieConsent() {
             >
               We use cookies to enhance your experience, store language preferences, and manage authentication sessions.{' '}
               <Link
-                href={`/${locale}/privacy`}
+                href={`/privacy`}
                 className={`underline hover:no-underline ${
                   isHomePage ? 'text-white' : 'text-accent'
                 }`}

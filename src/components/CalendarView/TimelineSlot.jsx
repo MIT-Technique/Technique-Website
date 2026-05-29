@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { useTranslations } from 'next-intl';
 import { formatTimeDisplay } from '../../lib/utils/time';
 import { SECTION_COLORS } from './SectionAssignmentTimeline';
 
@@ -41,7 +40,6 @@ export default function TimelineSlot({
   onCancelBooking,
   sectionAssignments,
 }) {
-  const t = useTranslations('calendarView');
   const [processing, setProcessing] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
@@ -57,8 +55,8 @@ export default function TimelineSlot({
 
   function getCreatorLabel() {
     const creator = slot?.creator || slot?.created_by_user;
-    if (!creator) return t('unknown');
-    return creator.name || creator.email || t('unknown');
+    if (!creator) return "Unknown";
+    return creator.name || creator.email || "Unknown";
   }
 
   function getCreatorEmail() {
@@ -98,7 +96,7 @@ export default function TimelineSlot({
   }
 
   async function handleDecline() {
-    const reason = prompt(t('declineReasonPrompt'));
+    const reason = prompt("Enter a reason for declining (optional):");
     if (reason === null) return;
     await handleAction(onDeclineProposal, slot.id, reason);
   }
@@ -220,7 +218,7 @@ export default function TimelineSlot({
             {formatTime(slot.start_time)} - {formatTime(slot.end_time)} EST
           </span>
           <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${badgeStyles}`}>
-            {t(type === 'available' ? 'available' : type === 'booked' ? 'booked' : 'pending')}
+            {type === 'available' ? 'Available' : type === 'booked' ? 'Booked' : 'Proposed'}
           </span>
         </div>
         <div className="flex gap-1 flex-shrink-0">
@@ -230,7 +228,7 @@ export default function TimelineSlot({
               disabled={processing}
               className="text-xs px-2 py-0.5 bg-accent text-white rounded hover:bg-accent/90 disabled:opacity-50"
             >
-              {processing ? '...' : t('book')}
+              {processing ? '...' : "Book"}
             </button>
           )}
           {type === 'booked' && isLivingGroup && !frozen && (
@@ -247,7 +245,7 @@ export default function TimelineSlot({
               disabled={processing}
               className={`text-xs ${confirmCancel ? 'text-red-700 font-medium' : 'text-red-600 hover:text-red-700'}`}
             >
-              {processing ? '...' : confirmCancel ? t('confirmAction') : t('cancel')}
+              {processing ? '...' : confirmCancel ? "Confirm?" : "Cancel"}
             </button>
           )}
           {type === 'available' && isAdminOrPhotographer && (isAdmin || slot.created_by === currentUserId) && (
@@ -256,7 +254,7 @@ export default function TimelineSlot({
               disabled={processing}
               className={`text-xs ${confirmDelete ? 'text-red-700 font-medium' : 'text-red-600 hover:text-red-700'}`}
             >
-              {processing ? '...' : confirmDelete ? t('confirmAction') : t('deleteSlot')}
+              {processing ? '...' : confirmDelete ? "Confirm?" : "Delete"}
             </button>
           )}
           {type === 'booked' && isAdmin && (
@@ -265,7 +263,7 @@ export default function TimelineSlot({
               disabled={processing}
               className={`text-xs ${confirmDelete ? 'text-red-700 font-medium' : 'text-red-600 hover:text-red-700'}`}
             >
-              {processing ? '...' : confirmDelete ? t('confirmAction') : t('deleteSlot')}
+              {processing ? '...' : confirmDelete ? "Confirm?" : "Delete"}
             </button>
           )}
           {type === 'proposal' && isAdminOrPhotographer && (
@@ -275,14 +273,14 @@ export default function TimelineSlot({
                 disabled={processing}
                 className="text-xs px-2 py-0.5 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
               >
-                {processing ? '...' : t('accept')}
+                {processing ? '...' : "Accept"}
               </button>
               <button
                 onClick={handleDecline}
                 disabled={processing}
                 className="text-xs px-2 py-0.5 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
               >
-                {processing ? '...' : t('decline')}
+                {processing ? '...' : "Decline"}
               </button>
             </>
           )}
@@ -290,10 +288,10 @@ export default function TimelineSlot({
       </div>
       <p className="text-xs opacity-75 mt-0.5 leading-snug truncate">
         {type === 'proposal'
-          ? <>{t('proposedBy')}{' '}{isAdminOrPhotographer && getLivingGroupEmail() ? <a href={`mailto:${getLivingGroupEmail()}`} className="font-medium hover:underline">{getLg()?.name || t('unknown')}</a> : <span className="font-medium">{getLg()?.name || t('unknown')}</span>}</>
+          ? <>{"Proposed by"}{' '}{isAdminOrPhotographer && getLivingGroupEmail() ? <a href={`mailto:${getLivingGroupEmail()}`} className="font-medium hover:underline">{getLg()?.name || "Unknown"}</a> : <span className="font-medium">{getLg()?.name || "Unknown"}</span>}</>
           : type === 'booked'
-            ? <>{t('postedBy')}{' '}{isLivingGroup && getCreatorEmail() ? <a href={`mailto:${getCreatorEmail()}`} className="font-medium hover:underline">{getCreatorLabel()}</a> : <span className="font-medium">{getCreatorLabel()}</span>}{' · '}{t('bookedBy')}{' '}{isAdminOrPhotographer && getLivingGroupEmail() ? <a href={`mailto:${getLivingGroupEmail()}`} className="font-medium text-green-700 hover:underline">{getLg()?.name || t('booked')}</a> : <span className="font-medium text-green-700">{getLg()?.name || t('booked')}</span>}</>
-            : <>{t('postedBy')}{' '}{isLivingGroup && getCreatorEmail() ? <a href={`mailto:${getCreatorEmail()}`} className="font-medium hover:underline">{getCreatorLabel()}</a> : getCreatorLabel()}</>
+            ? <>{"Posted by"}{' '}{isLivingGroup && getCreatorEmail() ? <a href={`mailto:${getCreatorEmail()}`} className="font-medium hover:underline">{getCreatorLabel()}</a> : <span className="font-medium">{getCreatorLabel()}</span>}{' · '}{"Booked by"}{' '}{isAdminOrPhotographer && getLivingGroupEmail() ? <a href={`mailto:${getLivingGroupEmail()}`} className="font-medium text-green-700 hover:underline">{getLg()?.name || "Booked"}</a> : <span className="font-medium text-green-700">{getLg()?.name || "Booked"}</span>}</>
+            : <>{"Posted by"}{' '}{isLivingGroup && getCreatorEmail() ? <a href={`mailto:${getCreatorEmail()}`} className="font-medium hover:underline">{getCreatorLabel()}</a> : getCreatorLabel()}</>
         }
         {slot.location && <>{' · '}{slot.location}</>}
         {slot.notes && <>{' · '}<span className="italic">{slot.notes}</span></>}

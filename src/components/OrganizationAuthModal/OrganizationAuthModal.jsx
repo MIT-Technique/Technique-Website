@@ -19,8 +19,6 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import { useTranslations, useLocale } from "next-intl";
-
 const textFieldSx = {
   "& .MuiOutlinedInput-root": {
     "& fieldset": { borderColor: "#E5E5E5" },
@@ -49,10 +47,6 @@ const linkButtonSx = {
 };
 
 export default function OrganizationAuthModal({ open, onClose, defaultTab = "organization" }) {
-  const t = useTranslations("pages.login.org");
-  const tAdmin = useTranslations("pages.login.admin");
-  const locale = useLocale();
-
   // Tab state
   const [activeTab, setActiveTab] = useState(defaultTab);
 
@@ -126,9 +120,9 @@ export default function OrganizationAuthModal({ open, onClose, defaultTab = "org
 
   // Get group label for an organization
   const getGroupLabel = (option) => {
-    if (option.type === "club") return t("clubsGroup");
-    if (option.type === "sports") return t("sportsGroup");
-    return t("livingGroupsGroup");
+    if (option.type === "club") return "Clubs";
+    if (option.type === "sports") return "Sports";
+    return "Living Groups";
   };
 
   // Reset tab to defaultTab when modal opens
@@ -163,8 +157,8 @@ export default function OrganizationAuthModal({ open, onClose, defaultTab = "org
   };
 
   const validateSignIn = () => {
-    if (!inputValue.trim()) return t("organizationRequired");
-    if (!password) return t("passwordRequired");
+    if (!inputValue.trim()) return "Please select an organization";
+    if (!password) return "Password is required";
     return null;
   };
 
@@ -172,10 +166,10 @@ export default function OrganizationAuthModal({ open, onClose, defaultTab = "org
   const validateField = (field, value) => {
     switch (field) {
       case "organization":
-        if (!value || !value.trim()) return t("organizationRequired");
+        if (!value || !value.trim()) return "Please select an organization";
         return null;
       case "password":
-        if (!value) return t("passwordRequired");
+        if (!value) return "Password is required";
         return null;
       default:
         return null;
@@ -234,7 +228,6 @@ export default function OrganizationAuthModal({ open, onClose, defaultTab = "org
         password,
         orgType: orgToUse?.type || "club", // Default to club, API will handle validation
         name: inputValue.trim(),
-        locale,
       };
 
       const res = await fetch("/api/auth/org-signin", {
@@ -247,21 +240,21 @@ export default function OrganizationAuthModal({ open, onClose, defaultTab = "org
 
       if (!res.ok) {
         if (data.code === "EMAIL_NOT_VERIFIED") {
-          setError(t("emailNotVerified"));
+          setError("Please verify your email before signing in");
         } else if (data.code === "INVALID_CREDENTIALS") {
-          setError(t("invalidCredentials"));
+          setError("Invalid credentials");
         } else if (data.code === "LG_NOT_FOUND" || data.code === "CLUB_NOT_FOUND" || data.code === "SPORTS_NOT_FOUND") {
-          setError(t("organizationNotFound"));
+          setError("Organization not found");
         } else {
-          setError(data.error || t("invalidCredentials"));
+          setError(data.error || "Invalid credentials");
         }
         return;
       }
 
-      setSuccess(t("successRedirecting"));
-      window.location.href = data.redirectUrl || `/${locale}/`;
+      setSuccess("Success! Redirecting…");
+      window.location.href = data.redirectUrl || `/`;
     } catch (err) {
-      setError(t("invalidCredentials"));
+      setError("Invalid credentials");
     } finally {
       setLoading(false);
     }
@@ -273,7 +266,7 @@ export default function OrganizationAuthModal({ open, onClose, defaultTab = "org
     setSuccess("");
 
     if (!forgotSelectedOrg) {
-      setError(t("organizationRequired"));
+      setError("Please select an organization");
       return;
     }
 
@@ -293,18 +286,18 @@ export default function OrganizationAuthModal({ open, onClose, defaultTab = "org
       const data = await res.json();
 
       if (!res.ok && data.code === "NO_LEADER") {
-        setError(t("noLeaderError"));
+        setError("No leader assigned to this Living Group. Please contact tnq-exec@mit.edu for assistance.");
         return;
       }
 
       // Show success message
       if (forgotSelectedOrg.type === "club") {
-        setSuccess(t("resetLinkSent"));
+        setSuccess("If an account exists, a reset link has been sent.");
       } else {
-        setSuccess(data.message || t("resetSentToLeader"));
+        setSuccess(data.message || "Password reset info has been sent. Check with your Living Group Leader.");
       }
     } catch (err) {
-      setSuccess(t("resetLinkSent"));
+      setSuccess("If an account exists, a reset link has been sent.");
     } finally {
       setLoading(false);
     }
@@ -313,7 +306,7 @@ export default function OrganizationAuthModal({ open, onClose, defaultTab = "org
   const handleStaphLogin = async (e) => {
     e.preventDefault();
     if (!staphPassword) {
-      setStaphMessage({ type: "error", text: tAdmin("passwordRequired") });
+      setStaphMessage({ type: "error", text: "Password is required" });
       return;
     }
     setStaphLoading(true);
@@ -326,15 +319,15 @@ export default function OrganizationAuthModal({ open, onClose, defaultTab = "org
       });
       const data = await res.json();
       if (res.ok) {
-        setStaphMessage({ type: "success", text: tAdmin("success") });
+        setStaphMessage({ type: "success", text: "Login successful! Redirecting..." });
         setTimeout(() => {
           window.location.href = data.redirectUrl;
         }, 500);
       } else {
-        setStaphMessage({ type: "error", text: data.error || tAdmin("error") });
+        setStaphMessage({ type: "error", text: data.error || "Invalid credentials. Please try again." });
       }
     } catch (err) {
-      setStaphMessage({ type: "error", text: tAdmin("error") });
+      setStaphMessage({ type: "error", text: "Invalid credentials. Please try again." });
     } finally {
       setStaphLoading(false);
     }
@@ -372,14 +365,14 @@ export default function OrganizationAuthModal({ open, onClose, defaultTab = "org
         }}
       >
         <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          {t("forgotPasswordTitle")}
+          {"Reset Password"}
           <IconButton onClick={handleClose} size="small">
             <CloseIcon />
           </IconButton>
         </DialogTitle>
         <DialogContent>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            {t("forgotPasswordDescription")}
+            {"Select your organization to receive a password reset link."}
           </Typography>
 
           {error && (
@@ -437,8 +430,8 @@ export default function OrganizationAuthModal({ open, onClose, defaultTab = "org
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label={t("selectOrganization")}
-                  placeholder={t("searchOrganization")}
+                  label={"Name"}
+                  placeholder={"Search for your organization..."}
                   sx={{ ...textFieldSx, mb: 3 }}
                   disabled={loading || success}
                   InputProps={{
@@ -452,13 +445,13 @@ export default function OrganizationAuthModal({ open, onClose, defaultTab = "org
                   }}
                 />
               )}
-              noOptionsText={t("noOrganizationsFound")}
+              noOptionsText={"No organizations found"}
               disabled={loading || success}
             />
 
             {forgotSelectedOrg?.type === "living_group" && (
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2, fontSize: "0.85rem" }}>
-                {t("forgotPasswordLivingGroupInfo")}
+                {"A password reset link will be sent to your Living Group Leader's email."}
               </Typography>
             )}
 
@@ -469,7 +462,7 @@ export default function OrganizationAuthModal({ open, onClose, defaultTab = "org
               disabled={loading || success || !forgotSelectedOrg}
               sx={buttonSx}
             >
-              {loading ? t("sendingResetLink") : t("sendResetLink")}
+              {loading ? "Sending..." : "Send Reset Link"}
             </Button>
 
             <Button
@@ -483,7 +476,7 @@ export default function OrganizationAuthModal({ open, onClose, defaultTab = "org
               }}
               sx={{ mt: 2, textTransform: "none" }}
             >
-              {t("backToSignIn")}
+              {"Back to Sign In"}
             </Button>
           </Box>
         </DialogContent>
@@ -515,7 +508,7 @@ export default function OrganizationAuthModal({ open, onClose, defaultTab = "org
       }}
     >
       <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        {t("signInTitle")}
+        {"Sign In"}
         <IconButton onClick={handleClose} size="small">
           <CloseIcon />
         </IconButton>
@@ -524,10 +517,10 @@ export default function OrganizationAuthModal({ open, onClose, defaultTab = "org
       {/* Tabs */}
       <Box sx={{ display: "flex", borderBottom: "1px solid #e0e0e0", px: 3 }}>
         <Button disableRipple onClick={() => handleTabSwitch("organization")} sx={tabStyle("organization")}>
-          {t("organizationTab")}
+          {"Organization"}
         </Button>
         <Button disableRipple onClick={() => handleTabSwitch("staph")} sx={tabStyle("staph")}>
-          {t("staphTab")}
+          {"Staph"}
         </Button>
       </Box>
 
@@ -550,8 +543,8 @@ export default function OrganizationAuthModal({ open, onClose, defaultTab = "org
               <Box sx={{ display: "flex", gap: 1, alignItems: "flex-start" }} ref={dropdownAnchorRef}>
                 <TextField
                   fullWidth
-                  label={t("selectOrganization")}
-                  placeholder={t("searchOrganization")}
+                  label={"Name"}
+                  placeholder={"Search for your organization..."}
                   value={inputValue}
                   onChange={(e) => {
                     setInputValue(e.target.value);
@@ -609,7 +602,7 @@ export default function OrganizationAuthModal({ open, onClose, defaultTab = "org
                       <TextField
                         fullWidth
                         size="small"
-                        placeholder={t("searchOrganization")}
+                        placeholder={"Search for your organization..."}
                         value={dropdownSearch}
                         onChange={(e) => setDropdownSearch(e.target.value)}
                         autoFocus
@@ -619,7 +612,7 @@ export default function OrganizationAuthModal({ open, onClose, defaultTab = "org
 
                     {filteredDropdownOrgs.length === 0 ? (
                       <Typography sx={{ p: 2, color: "#666" }}>
-                        {t("noOrganizationsFound")}
+                        {"No organizations found"}
                       </Typography>
                     ) : (
                       <>
@@ -639,7 +632,7 @@ export default function OrganizationAuthModal({ open, onClose, defaultTab = "org
                                 borderBottom: "1px solid #e0e0e0",
                               }}
                             >
-                              {t("clubsGroup")}
+                              {"Clubs"}
                             </Typography>
                             {filteredDropdownOrgs
                               .filter(o => o.type === "club")
@@ -678,7 +671,7 @@ export default function OrganizationAuthModal({ open, onClose, defaultTab = "org
                                 borderBottom: "1px solid #e0e0e0",
                               }}
                             >
-                              {t("livingGroupsGroup")}
+                              {"Living Groups"}
                             </Typography>
                             {filteredDropdownOrgs
                               .filter(o => o.type === "living_group")
@@ -717,7 +710,7 @@ export default function OrganizationAuthModal({ open, onClose, defaultTab = "org
                                 borderBottom: "1px solid #e0e0e0",
                               }}
                             >
-                              {t("sportsGroup")}
+                              {"Sports"}
                             </Typography>
                             {filteredDropdownOrgs
                               .filter(o => o.type === "sports")
@@ -748,7 +741,7 @@ export default function OrganizationAuthModal({ open, onClose, defaultTab = "org
               <TextField
                 fullWidth
                 type="password"
-                label={t("password")}
+                label={"Password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 onBlur={() => handleBlur("password", password)}
@@ -768,7 +761,7 @@ export default function OrganizationAuthModal({ open, onClose, defaultTab = "org
                 {loading ? (
                   <CircularProgress size={24} sx={{ color: "white" }} />
                 ) : (
-                  t("signInButton")
+                  "Sign In"
                 )}
               </Button>
 
@@ -778,7 +771,7 @@ export default function OrganizationAuthModal({ open, onClose, defaultTab = "org
                   onClick={() => window.open('mailto:tnq-exec@mit.edu', '_blank')}
                   sx={linkButtonSx}
                 >
-                  {t("unexpectedIssues")}
+                  {"Unexpected issues?"}
                 </Button>
               </Box>
             </Box>
@@ -796,8 +789,8 @@ export default function OrganizationAuthModal({ open, onClose, defaultTab = "org
               <TextField
                 fullWidth
                 type="email"
-                label={tAdmin("emailLabel")}
-                placeholder={tAdmin("emailPlaceholder")}
+                label={"Email"}
+                placeholder={"Leave blank for admin login"}
                 value={staphEmail}
                 onChange={(e) => setStaphEmail(e.target.value)}
                 sx={{ ...textFieldSx, mb: 2 }}
@@ -808,8 +801,8 @@ export default function OrganizationAuthModal({ open, onClose, defaultTab = "org
               <TextField
                 fullWidth
                 type="password"
-                label={tAdmin("passwordLabel")}
-                placeholder={tAdmin("passwordPlaceholder")}
+                label={"Password"}
+                placeholder={"Enter password"}
                 value={staphPassword}
                 onChange={(e) => setStaphPassword(e.target.value)}
                 sx={{ ...textFieldSx, mb: 3 }}
@@ -827,7 +820,7 @@ export default function OrganizationAuthModal({ open, onClose, defaultTab = "org
                 {staphLoading ? (
                   <CircularProgress size={24} sx={{ color: "white" }} />
                 ) : (
-                  tAdmin("signInButton")
+                  "Sign In"
                 )}
               </Button>
             </Box>

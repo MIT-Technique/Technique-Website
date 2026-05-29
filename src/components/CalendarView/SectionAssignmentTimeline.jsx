@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useRef, useCallback, useMemo } from 'react';
-import { useTranslations } from 'next-intl';
 import { generateTimeSlots, formatTimeDisplay } from '../../lib/utils/time';
 
 // Consistent colors for sections
@@ -33,7 +32,6 @@ export default function SectionAssignmentTimeline({
   formatTime,
   saving = false,
 }) {
-  const t = useTranslations('calendarView');
   const [activeBrush, setActiveBrush] = useState(null); // section name or '__clear__'
   const [dragStart, setDragStart] = useState(null);
   const [dragEnd, setDragEnd] = useState(null);
@@ -199,15 +197,15 @@ export default function SectionAssignmentTimeline({
               : 'border-border text-text-secondary hover:bg-gray-50'
           }`}
         >
-          ✕ {t('clearBrush')}
+          ✕ {"Clear"}
         </button>
       </div>
 
       {activeBrush && (
         <p className="text-xs text-text-muted mb-2">
           {activeBrush === '__clear__'
-            ? t('dragToClear')
-            : t('dragToAssign', { section: activeBrush })}
+            ? "Drag across slots to clear assignments"
+            : `Drag across slots to assign "${activeBrush}"`}
         </p>
       )}
 

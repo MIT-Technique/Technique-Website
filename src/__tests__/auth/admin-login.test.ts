@@ -82,7 +82,7 @@ describe('/api/auth/admin-login', () => {
 
     expect(res.status).toBe(200);
     expect(data.success).toBe(true);
-    expect(data.redirectUrl).toBe('/en/dashboard');
+    expect(data.redirectUrl).toBe('/dashboard');
     expect(mockSupabaseAuthSignIn).toHaveBeenCalledWith({
       email: 'tnq-exec@mit.edu',
       password: 'pass123',
@@ -123,7 +123,7 @@ describe('/api/auth/admin-login', () => {
 
     expect(res.status).toBe(200);
     expect(data.success).toBe(true);
-    expect(data.redirectUrl).toBe('/en/dashboard');
+    expect(data.redirectUrl).toBe('/dashboard');
   });
 
   it('returns 404 for non-admin email not in users table', async () => {
@@ -175,7 +175,7 @@ describe('/api/auth/admin-login', () => {
     expect((await res.json()).error).toBe('This login is for admin, staph, and photographers only');
   });
 
-  it('successful staph login redirects to /en/dashboard', async () => {
+  it('successful staph login redirects to /dashboard', async () => {
     mockSupabaseAuthSignIn.mockResolvedValue({
       data: { user: { id: 'auth-4', email: 'staph@mit.edu' }, session: { access_token: 'tok' } },
       error: null,
@@ -203,7 +203,7 @@ describe('/api/auth/admin-login', () => {
 
     expect(res.status).toBe(200);
     expect(data.success).toBe(true);
-    expect(data.redirectUrl).toBe('/en/dashboard');
+    expect(data.redirectUrl).toBe('/dashboard');
   });
 
   it('saves session with correct user info', async () => {

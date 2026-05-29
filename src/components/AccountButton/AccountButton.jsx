@@ -2,13 +2,12 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { useLocale, useTranslations } from 'next-intl';
 import { useUser } from '../../hooks/useUser';
 import OrganizationAuthModal from '../OrganizationAuthModal/OrganizationAuthModal';
 
 function AccountButton({ isHomePage = false }) {
-  const locale = useLocale();
-  const t = useTranslations('account');
+  const locale = 'en-US';
+
   const { isLoggedIn, user, loading, logout } = useUser();
   const [isOpen, setIsOpen] = useState(false);
   const [orgModalOpen, setOrgModalOpen] = useState(false);
@@ -51,7 +50,7 @@ function AccountButton({ isHomePage = false }) {
               : 'border-border text-text-secondary hover:border-accent hover:text-accent'
           }`}
         >
-          {t('login')}
+          {"SIGN IN"}
         </button>
 
         <OrganizationAuthModal
@@ -65,12 +64,12 @@ function AccountButton({ isHomePage = false }) {
   // Get dashboard link based on role
   const getDashboardLink = () => {
     if (user?.role === 'admin' || user?.role === 'staph') {
-      return `/${locale}/dashboard`;
+      return `/dashboard`;
     }
-    if (user?.role === 'club') return `/${locale}/club`;
-    if (user?.role === 'living_group') return `/${locale}/living-group`;
-    if (user?.role === 'sports') return `/${locale}/sports`;
-    return `/${locale}/profile`;
+    if (user?.role === 'club') return `/club`;
+    if (user?.role === 'living_group') return `/living-group`;
+    if (user?.role === 'sports') return `/sports`;
+    return `/profile`;
   };
 
   // Get display name
@@ -121,7 +120,7 @@ function AccountButton({ isHomePage = false }) {
                 : 'text-text-secondary hover:text-text-primary hover:bg-bg-secondary'
             }`}
           >
-            {(user?.role === 'admin' || user?.role === 'staph') ? t('dashboard') : t('profile')}
+            {(user?.role === 'admin' || user?.role === 'staph') ? "DASHBOARD" : "PROFILE"}
           </Link>
           <button
             onClick={() => {
@@ -134,7 +133,7 @@ function AccountButton({ isHomePage = false }) {
                 : 'text-text-secondary hover:text-text-primary hover:bg-bg-secondary'
             }`}
           >
-            {t('signOut')}
+            {"SIGN OUT"}
           </button>
         </div>
       </div>

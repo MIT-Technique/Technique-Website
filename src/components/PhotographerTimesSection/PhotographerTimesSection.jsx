@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
 import TextField from "@mui/material/TextField";
 import CalendarView from '../CalendarView/CalendarView';
 
@@ -22,8 +21,7 @@ const textFieldSx = {
 };
 
 export default function PhotographerTimesSection() {
-  const locale = useLocale();
-  const t = useTranslations('photographerTimes');
+  const locale = 'en-US';
 
   // Time slots state
   const [times, setTimes] = useState([]);
@@ -56,8 +54,6 @@ export default function PhotographerTimesSection() {
   const [message, setMessage] = useState({ type: '', text: '' });
   const [messageFading, setMessageFading] = useState(false);
   const [viewMode, setViewMode] = useState('calendar');
-  const tc = useTranslations('calendarView');
-
   // Toggle expansion for a time slot
   function toggleTimeExpanded(timeId) {
     setExpandedTimeIds(prev => {
@@ -115,10 +111,10 @@ export default function PhotographerTimesSection() {
 
   // Helper to get creator display name
   function getCreatorLabel(time) {
-    if (!time.creator) return t('unknownCreator');
+    if (!time.creator) return "Unknown";
     if (time.creator.role === 'admin') return 'TNQ Photo';
     const name = time.creator.name || '';
-    return name || time.creator.email || t('unknownCreator');
+    return name || time.creator.email || "Unknown";
   }
 
   async function fetchProposals() {
@@ -137,7 +133,7 @@ export default function PhotographerTimesSection() {
   async function handleSubmitTime(e) {
     e.preventDefault();
     if (!timeForm.date || !timeForm.start_time || !timeForm.end_time) {
-      setMessage({ type: 'error', text: t('fieldsRequired') });
+      setMessage({ type: 'error', text: "Date, start time, and end time are required" });
       return;
     }
 
@@ -154,7 +150,7 @@ export default function PhotographerTimesSection() {
       const data = await res.json();
 
       if (res.ok) {
-        setMessage({ type: 'success', text: t('addSuccess') });
+        setMessage({ type: 'success', text: "Time slot added successfully" });
         setTimeForm({
           date: '',
           start_time: '',
@@ -164,10 +160,10 @@ export default function PhotographerTimesSection() {
         });
         fetchTimes();
       } else {
-        setMessage({ type: 'error', text: data.error || t('addError') });
+        setMessage({ type: 'error', text: data.error || "Failed to add time slot" });
       }
     } catch (error) {
-      setMessage({ type: 'error', text: t('addError') });
+      setMessage({ type: 'error', text: "Failed to add time slot" });
     } finally {
       setSubmittingTime(false);
     }
@@ -199,14 +195,14 @@ export default function PhotographerTimesSection() {
       });
 
       if (res.ok) {
-        setMessage({ type: 'success', text: t('deleteSuccess') });
+        setMessage({ type: 'success', text: "Time slot deleted" });
         fetchTimes();
       } else {
         const data = await res.json();
-        setMessage({ type: 'error', text: data.error || t('deleteError') });
+        setMessage({ type: 'error', text: data.error || "Failed to delete time slot" });
       }
     } catch (error) {
-      setMessage({ type: 'error', text: t('deleteError') });
+      setMessage({ type: 'error', text: "Failed to delete time slot" });
     } finally {
       setDeletingTimeId(null);
     }
@@ -216,7 +212,7 @@ export default function PhotographerTimesSection() {
     setProcessingProposalId(proposalId);
     setMessage({ type: '', text: '' });
 
-    const declineReason = action === 'decline' ? prompt(t('declineReasonPrompt')) : null;
+    const declineReason = action === 'decline' ? prompt("Enter a reason for declining (optional):") : null;
     if (action === 'decline' && declineReason === null) {
       setProcessingProposalId(null);
       return;
@@ -234,17 +230,17 @@ export default function PhotographerTimesSection() {
       if (res.ok) {
         setMessage({
           type: 'success',
-          text: action === 'accept' ? t('acceptSuccess') : t('declineSuccess'),
+          text: action === 'accept' ? "Proposal accepted and time scheduled" : "Proposal declined",
         });
         fetchProposals();
         if (action === 'accept') {
           fetchTimes(); // Refresh times since a new one was created
         }
       } else {
-        setMessage({ type: 'error', text: data.error || t('actionError') });
+        setMessage({ type: 'error', text: data.error || "Failed to process proposal" });
       }
     } catch (error) {
-      setMessage({ type: 'error', text: t('actionError') });
+      setMessage({ type: 'error', text: "Failed to process proposal" });
     } finally {
       setProcessingProposalId(null);
     }
@@ -265,13 +261,13 @@ export default function PhotographerTimesSection() {
 
       {/* Add Time Slot Form */}
       <div className="bg-white border border-border rounded-lg p-6">
-        <h3 className="font-medium mb-4">{t('addTime')}</h3>
-        <p className="text-text-muted text-xs mb-4">{t('timezoneNote')}</p>
+        <h3 className="font-medium mb-4">{"Add Time Slot"}</h3>
+        <p className="text-text-muted text-xs mb-4">{"All times are in Eastern Standard Time (EST)"}</p>
         <form onSubmit={handleSubmitTime} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <TextField
               type="date"
-              label={t('date')}
+              label={"Date"}
               value={timeForm.date}
               onChange={(e) => setTimeForm({ ...timeForm, date: e.target.value })}
               InputLabelProps={{ shrink: true }}
@@ -281,7 +277,7 @@ export default function PhotographerTimesSection() {
             />
             <TextField
               type="time"
-              label={t('startTime')}
+              label={"Start Time"}
               value={timeForm.start_time}
               onChange={(e) => setTimeForm({ ...timeForm, start_time: e.target.value })}
               InputLabelProps={{ shrink: true }}
@@ -291,7 +287,7 @@ export default function PhotographerTimesSection() {
             />
             <TextField
               type="time"
-              label={t('endTime')}
+              label={"End Time"}
               value={timeForm.end_time}
               onChange={(e) => setTimeForm({ ...timeForm, end_time: e.target.value })}
               InputLabelProps={{ shrink: true }}
@@ -302,14 +298,14 @@ export default function PhotographerTimesSection() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <TextField
-              label={t('location')}
+              label={"Location (optional)"}
               value={timeForm.location}
               onChange={(e) => setTimeForm({ ...timeForm, location: e.target.value })}
               size="small"
               fullWidth
             />
             <TextField
-              label={t('notes')}
+              label={"Notes (optional)"}
               value={timeForm.notes}
               onChange={(e) => setTimeForm({ ...timeForm, notes: e.target.value })}
               size="small"
@@ -321,7 +317,7 @@ export default function PhotographerTimesSection() {
             disabled={submittingTime}
             className="btn-primary text-sm"
           >
-            {submittingTime ? t('adding') : t('addTimeButton')}
+            {submittingTime ? "Adding..." : "Add Time"}
           </button>
         </form>
       </div>
@@ -329,7 +325,7 @@ export default function PhotographerTimesSection() {
       {/* All Posted Times */}
       <div className="bg-white border border-border rounded-lg p-6">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="font-medium">{t('allTimes')}</h3>
+          <h3 className="font-medium">{"All Posted Times"}</h3>
           <div className="flex items-center gap-3">
             {/* View toggle */}
             <div className="flex rounded border border-border overflow-hidden">
@@ -337,13 +333,13 @@ export default function PhotographerTimesSection() {
                 onClick={() => setViewMode('calendar')}
                 className={`px-3 py-1 text-xs ${viewMode === 'calendar' ? 'bg-accent text-white' : 'bg-bg-secondary text-text-secondary hover:bg-bg-secondary/80'}`}
               >
-                {tc('calendar')}
+                {"Calendar"}
               </button>
               <button
                 onClick={() => setViewMode('list')}
                 className={`px-3 py-1 text-xs ${viewMode === 'list' ? 'bg-accent text-white' : 'bg-bg-secondary text-text-secondary hover:bg-bg-secondary/80'}`}
               >
-                {tc('list')}
+                {"List"}
               </button>
             </div>
             {viewMode === 'list' && times.length > ITEMS_PER_PAGE && (
@@ -398,13 +394,13 @@ export default function PhotographerTimesSection() {
                 const data = await res.json();
                 throw new Error(data.error || 'Failed to create');
               }
-              setMessage({ type: 'success', text: t('addSuccess') });
+              setMessage({ type: 'success', text: "Time slot added successfully" });
               fetchTimes();
             }}
             onDelete={async (timeId) => {
               const res = await fetch(`/api/photographer/times?id=${timeId}`, { method: 'DELETE' });
               if (res.ok) {
-                setMessage({ type: 'success', text: t('deleteSuccess') });
+                setMessage({ type: 'success', text: "Time slot deleted" });
                 fetchTimes();
               }
             }}
@@ -415,7 +411,7 @@ export default function PhotographerTimesSection() {
                 body: JSON.stringify({ proposalId, action: 'accept' }),
               });
               if (res.ok) {
-                setMessage({ type: 'success', text: t('acceptSuccess') });
+                setMessage({ type: 'success', text: "Proposal accepted and time scheduled" });
                 fetchProposals();
                 fetchTimes();
               }
@@ -427,7 +423,7 @@ export default function PhotographerTimesSection() {
                 body: JSON.stringify({ proposalId, action: 'decline', decline_reason: reason }),
               });
               if (res.ok) {
-                setMessage({ type: 'success', text: t('declineSuccess') });
+                setMessage({ type: 'success', text: "Proposal declined" });
                 fetchProposals();
               }
             }}
@@ -437,7 +433,7 @@ export default function PhotographerTimesSection() {
             {timesLoading ? (
               <p className="text-text-secondary text-sm">Loading...</p>
             ) : times.length === 0 ? (
-              <p className="text-text-secondary text-sm">{t('noTimes')}</p>
+              <p className="text-text-secondary text-sm">{"No times have been posted yet"}</p>
             ) : (
               <div className="space-y-2">
                 {times.slice(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE).map((time) => {
@@ -480,11 +476,11 @@ export default function PhotographerTimesSection() {
                         </div>
                         <div className="flex items-center gap-3 flex-shrink-0">
                           <span className="text-text-muted text-xs">
-                            {t('postedBy', { name: getCreatorLabel(time) })}
+                            {`Posted by ${getCreatorLabel(time)}`}
                           </span>
                           {time.living_group && (
                             <span className="text-green-600 text-xs font-medium">
-                              {t('bookedBy', { name: time.living_group.name })}
+                              {`Booked by ${time.living_group.name}`}
                             </span>
                           )}
                           {!time.living_group_id && time.created_by === currentUserId && (
@@ -493,7 +489,7 @@ export default function PhotographerTimesSection() {
                               disabled={deletingTimeId === time.id}
                               className={`text-xs ${confirmingDeleteId === time.id ? 'text-red-700 font-medium' : 'text-red-600 hover:text-red-700'}`}
                             >
-                              {deletingTimeId === time.id ? '...' : confirmingDeleteId === time.id ? t('confirm') : t('delete')}
+                              {deletingTimeId === time.id ? '...' : confirmingDeleteId === time.id ? "Confirm" : "Delete"}
                             </button>
                           )}
                         </div>
@@ -516,11 +512,11 @@ export default function PhotographerTimesSection() {
 
       {/* Proposed Timeslots from Living Groups */}
       <div className="bg-white border border-border rounded-lg p-6">
-        <h3 className="font-medium mb-4">{t('pendingProposals')}</h3>
+        <h3 className="font-medium mb-4">{"Proposed Timeslots"}</h3>
         {proposalsLoading ? (
           <p className="text-text-secondary text-sm">Loading...</p>
         ) : proposals.length === 0 ? (
-          <p className="text-text-secondary text-sm">{t('noProposals')}</p>
+          <p className="text-text-secondary text-sm">{"No proposed timeslots from living groups"}</p>
         ) : (
           <div className="space-y-2">
             {proposals.map((proposal) => {
@@ -566,14 +562,14 @@ export default function PhotographerTimesSection() {
                         disabled={processingProposalId === proposal.id}
                         className="text-xs px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
                       >
-                        {processingProposalId === proposal.id ? '...' : t('accept')}
+                        {processingProposalId === proposal.id ? '...' : "Accept"}
                       </button>
                       <button
                         onClick={(e) => { e.stopPropagation(); handleProposalAction(proposal.id, 'decline'); }}
                         disabled={processingProposalId === proposal.id}
                         className="text-xs px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
                       >
-                        {processingProposalId === proposal.id ? '...' : t('decline')}
+                        {processingProposalId === proposal.id ? '...' : "Decline"}
                       </button>
                     </div>
                   </div>

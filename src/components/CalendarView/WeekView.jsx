@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
 import TimelineSlot, { timeToRow } from './TimelineSlot';
 
 const HOUR_START = 0;
@@ -48,8 +47,8 @@ export default function WeekView({
   onGridTimeClick,
   timeAssignments = {},
 }) {
-  const locale = useLocale();
-  const t = useTranslations('calendarView');
+  const locale = 'en-US';
+
   const [rowHeight, setRowHeight] = useState(ROW_HEIGHT_DEFAULT);
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 639px)');
@@ -108,7 +107,7 @@ export default function WeekView({
     if (colIdx < 0 || colIdx > 6) return;
     const dateStr = toDateStr(weekDates[colIdx]);
     if (new Date(dateStr) < new Date(todayStr) && role !== 'admin') {
-      showFlashError(t('noPastDates'));
+      showFlashError("Cannot schedule in the past");
       return;
     }
     const row = Math.floor(y / rowHeight);

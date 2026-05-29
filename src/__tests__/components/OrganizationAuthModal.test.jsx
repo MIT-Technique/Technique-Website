@@ -2,12 +2,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import React from 'react';
 
-// Mock next-intl
-vi.mock('next-intl', () => ({
-  useTranslations: () => (key) => key,
-  useLocale: () => 'en',
-}));
-
 // Mock fetch
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
@@ -70,7 +64,7 @@ describe('OrganizationAuthModal', () => {
           ok: true,
           json: () => Promise.resolve({
             success: true,
-            redirectUrl: '/en/club',
+            redirectUrl: '/club',
           }),
         });
       }
@@ -80,23 +74,23 @@ describe('OrganizationAuthModal', () => {
     render(<OrganizationAuthModal open={true} onClose={() => {}} />);
 
     // Fill in the form
-    const orgInput = screen.getByLabelText('selectOrganization');
+    const orgInput = screen.getByLabelText('Name');
     fireEvent.change(orgInput, { target: { value: 'Test Club' } });
 
-    const passwordInput = screen.getByLabelText('password');
+    const passwordInput = screen.getByLabelText('Password');
     fireEvent.change(passwordInput, { target: { value: 'testpass' } });
 
     // Submit
-    const submitButton = screen.getByRole('button', { name: 'signInButton' });
+    const submitButton = screen.getByRole('button', { name: 'Sign In' });
     fireEvent.click(submitButton);
 
     // Redirect should happen immediately (not after 1000ms)
     await waitFor(() => {
-      expect(locationHrefSpy).toHaveBeenCalledWith('/en/club');
+      expect(locationHrefSpy).toHaveBeenCalledWith('/club');
     }, { timeout: 500 }); // Fails if redirect takes >500ms (old behavior was 1000ms)
   });
 
-  it('falls back to /{locale}/ when redirectUrl is missing', async () => {
+  it('falls back to / when redirectUrl is missing', async () => {
     mockFetch.mockImplementation((url) => {
       if (url === '/api/organizations/list') {
         return Promise.resolve({
@@ -120,21 +114,21 @@ describe('OrganizationAuthModal', () => {
 
     render(<OrganizationAuthModal open={true} onClose={() => {}} />);
 
-    const orgInput = screen.getByLabelText('selectOrganization');
+    const orgInput = screen.getByLabelText('Name');
     fireEvent.change(orgInput, { target: { value: 'Test Club' } });
 
-    const passwordInput = screen.getByLabelText('password');
+    const passwordInput = screen.getByLabelText('Password');
     fireEvent.change(passwordInput, { target: { value: 'testpass' } });
 
-    const submitButton = screen.getByRole('button', { name: 'signInButton' });
+    const submitButton = screen.getByRole('button', { name: 'Sign In' });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(locationHrefSpy).toHaveBeenCalledWith('/en/');
+      expect(locationHrefSpy).toHaveBeenCalledWith('/');
     }, { timeout: 500 });
   });
 
-  it('sends locale in the sign-in payload', async () => {
+  it('sign-in payload does not include unused locale field', async () => {
     let capturedPayload = null;
     mockFetch.mockImplementation((url, opts) => {
       if (url === '/api/organizations/list') {
@@ -149,7 +143,7 @@ describe('OrganizationAuthModal', () => {
         capturedPayload = JSON.parse(opts.body);
         return Promise.resolve({
           ok: true,
-          json: () => Promise.resolve({ success: true, redirectUrl: '/en/club' }),
+          json: () => Promise.resolve({ success: true, redirectUrl: '/club' }),
         });
       }
       return Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
@@ -157,18 +151,18 @@ describe('OrganizationAuthModal', () => {
 
     render(<OrganizationAuthModal open={true} onClose={() => {}} />);
 
-    const orgInput = screen.getByLabelText('selectOrganization');
+    const orgInput = screen.getByLabelText('Name');
     fireEvent.change(orgInput, { target: { value: 'Test Club' } });
 
-    const passwordInput = screen.getByLabelText('password');
+    const passwordInput = screen.getByLabelText('Password');
     fireEvent.change(passwordInput, { target: { value: 'testpass' } });
 
-    const submitButton = screen.getByRole('button', { name: 'signInButton' });
+    const submitButton = screen.getByRole('button', { name: 'Sign In' });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
       expect(capturedPayload).toBeTruthy();
-      expect(capturedPayload.locale).toBe('en');
+      expect(capturedPayload.locale).toBeUndefined();
     });
   });
 
@@ -194,13 +188,13 @@ describe('OrganizationAuthModal', () => {
 
     render(<OrganizationAuthModal open={true} onClose={() => {}} />);
 
-    const orgInput = screen.getByLabelText('selectOrganization');
+    const orgInput = screen.getByLabelText('Name');
     fireEvent.change(orgInput, { target: { value: 'Test Club' } });
 
-    const passwordInput = screen.getByLabelText('password');
+    const passwordInput = screen.getByLabelText('Password');
     fireEvent.change(passwordInput, { target: { value: 'wrong' } });
 
-    const submitButton = screen.getByRole('button', { name: 'signInButton' });
+    const submitButton = screen.getByRole('button', { name: 'Sign In' });
     fireEvent.click(submitButton);
 
     await waitFor(() => {

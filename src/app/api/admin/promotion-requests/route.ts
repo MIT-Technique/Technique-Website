@@ -199,7 +199,7 @@ export async function PUT(request: NextRequest) {
                     <p style="margin: 0 0 24px; line-height: 1.6; font-size: 15px;">Hi${photographerName ? ` ${photographerName}` : ""}, your photographer access has been approved!</p>
                     <p style="margin: 0 0 24px; line-height: 1.6; font-size: 15px;">You can now view and claim available photography times on the Hire Us page. Sign in with your MIT email to get started.</p>
                     <div style="text-align: center; margin: 0 0 28px;">
-                      <a href="https://technique.mit.edu/en/hire" style="display: inline-block; background: #750014; color: #ffffff; text-decoration: none; padding: 14px 40px; border-radius: 24px; font-weight: 600; font-size: 14px; letter-spacing: 0.5px;">View Available Times</a>
+                      <a href="https://technique.mit.edu/hire" style="display: inline-block; background: #750014; color: #ffffff; text-decoration: none; padding: 14px 40px; border-radius: 24px; font-weight: 600; font-size: 14px; letter-spacing: 0.5px;">View Available Times</a>
                     </div>
                     <div style="border-top: 1px solid #E0D6D6; padding-top: 20px; text-align: center;">
                       <p style="color: #999; font-size: 12px; margin: 0 0 4px;">MIT Technique &middot; Walker Memorial, Room 50-320</p>

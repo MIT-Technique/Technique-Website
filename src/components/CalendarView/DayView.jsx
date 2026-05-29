@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
 import { AnimatePresence } from 'framer-motion';
 import DaySidePanel from './DaySidePanel';
 import TimelineSlot, { timeToRow } from './TimelineSlot';
@@ -37,7 +36,6 @@ export default function DayView({
   onPropose,
   timeAssignments = {},
 }) {
-  const t = useTranslations('calendarView');
   const [rowHeight, setRowHeight] = useState(ROW_HEIGHT_DEFAULT);
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 639px)');
@@ -77,7 +75,7 @@ export default function DayView({
 
   const handleGridClick = useCallback((e) => {
     if (isPast && role !== 'admin') {
-      showFlashError(t('noPastDates'));
+      showFlashError("Cannot schedule in the past");
       return;
     }
     if (e.target.closest('[data-slot]')) return;

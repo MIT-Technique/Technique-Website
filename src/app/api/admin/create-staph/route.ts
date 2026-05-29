@@ -116,7 +116,7 @@ export async function POST(request: Request) {
               </div>
               <p style="margin: 0 0 24px; line-height: 1.6; font-size: 14px; color: #666;">Please change your password after your first login.</p>
               <div style="text-align: center; margin: 0 0 28px;">
-                <a href="https://technique.mit.edu/en/login/admin" style="display: inline-block; background: #750014; color: #ffffff; text-decoration: none; padding: 14px 40px; border-radius: 24px; font-weight: 600; font-size: 14px; letter-spacing: 0.5px;">Sign In</a>
+                <a href="https://technique.mit.edu/login/admin" style="display: inline-block; background: #750014; color: #ffffff; text-decoration: none; padding: 14px 40px; border-radius: 24px; font-weight: 600; font-size: 14px; letter-spacing: 0.5px;">Sign In</a>
               </div>
               <div style="border-top: 1px solid #E0D6D6; padding-top: 20px; text-align: center;">
                 <p style="color: #999; font-size: 12px; margin: 0 0 4px;">MIT Technique &middot; Walker Memorial, Room 50-320</p>

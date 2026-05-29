@@ -19,7 +19,6 @@ interface OrgSigninRequest {
   name?: string;
   password: string;
   orgType: "club" | "living_group" | "sports";
-  locale?: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -222,14 +221,13 @@ export async function POST(request: NextRequest) {
     await session.save();
 
     // Determine redirect URL based on role
-    const locale = body.locale || "en";
     let redirectUrl: string;
     if (user.role === "club") {
-      redirectUrl = `/${locale}/club`;
+      redirectUrl = `/club`;
     } else if (user.role === "sports") {
-      redirectUrl = `/${locale}/sports`;
+      redirectUrl = `/sports`;
     } else {
-      redirectUrl = `/${locale}/living-group`;
+      redirectUrl = `/living-group`;
     }
 
     return NextResponse.json({

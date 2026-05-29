@@ -1,8 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
-
 // Generate 15-minute time slot options (00:00 to 23:45)
 function generateTimeOptions() {
   const options = [];
@@ -25,7 +23,6 @@ function formatTimeLabel(time) {
 const TIME_OPTIONS = generateTimeOptions();
 
 export default function CreateSlotForm({ date, onSubmit, onCancel, submitLabel, initialStartTime = '', initialEndTime = '' }) {
-  const t = useTranslations('calendarView');
   const [form, setForm] = useState({
     startTime: initialStartTime,
     endTime: initialEndTime,
@@ -37,11 +34,11 @@ export default function CreateSlotForm({ date, onSubmit, onCancel, submitLabel, 
   async function handleSubmit(e) {
     e.preventDefault();
     if (!form.startTime || !form.endTime) {
-      setError(t('fieldsRequired'));
+      setError("Start and end time are required");
       return;
     }
     if (form.startTime >= form.endTime) {
-      setError(t('startBeforeEnd'));
+      setError("Start time must be before end time");
       return;
     }
 
@@ -56,7 +53,7 @@ export default function CreateSlotForm({ date, onSubmit, onCancel, submitLabel, 
       });
       setForm({ startTime: '', endTime: '', notes: '' });
     } catch (err) {
-      setError(err.message || t('createError'));
+      setError(err.message || "Failed to create time slot");
     } finally {
       setSubmitting(false);
     }
@@ -66,7 +63,7 @@ export default function CreateSlotForm({ date, onSubmit, onCancel, submitLabel, 
     <form onSubmit={handleSubmit} className="p-3 border border-border rounded-lg bg-bg-secondary space-y-3">
       <div className="grid grid-cols-2 gap-2">
         <div>
-          <label className="block text-xs font-medium mb-1">{t('startTime')} (EST)</label>
+          <label className="block text-xs font-medium mb-1">{"Start Time"} (EST)</label>
           <select
             value={form.startTime}
             onChange={(e) => setForm({ ...form, startTime: e.target.value })}
@@ -80,7 +77,7 @@ export default function CreateSlotForm({ date, onSubmit, onCancel, submitLabel, 
           </select>
         </div>
         <div>
-          <label className="block text-xs font-medium mb-1">{t('endTime')} (EST)</label>
+          <label className="block text-xs font-medium mb-1">{"End Time"} (EST)</label>
           <select
             value={form.endTime}
             onChange={(e) => setForm({ ...form, endTime: e.target.value })}
@@ -98,7 +95,7 @@ export default function CreateSlotForm({ date, onSubmit, onCancel, submitLabel, 
         type="text"
         value={form.notes}
         onChange={(e) => setForm({ ...form, notes: e.target.value })}
-        placeholder={t('notesPlaceholder')}
+        placeholder={"Notes (optional)"}
         className="w-full text-sm border border-border rounded px-2 py-1.5"
       />
       {error && <p className="text-xs text-red-600">{error}</p>}
@@ -108,14 +105,14 @@ export default function CreateSlotForm({ date, onSubmit, onCancel, submitLabel, 
           disabled={submitting}
           className="flex-1 text-sm py-1.5 bg-accent text-white rounded hover:bg-accent/90 disabled:opacity-50"
         >
-          {submitting ? '...' : (submitLabel || t('createSlot'))}
+          {submitting ? '...' : (submitLabel || "Create")}
         </button>
         <button
           type="button"
           onClick={onCancel}
           className="text-sm py-1.5 px-3 border border-border rounded hover:bg-bg-secondary"
         >
-          {t('cancelAction')}
+          {"Cancel"}
         </button>
       </div>
     </form>

@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
 
       // Send the actual reset email to the leader
       const { error: resetError } = await supabaseAuth.auth.resetPasswordForEmail(email.toLowerCase(), {
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/en/reset-password`,
+        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/reset-password`,
       });
 
       if (resetError) {
@@ -191,7 +191,7 @@ export async function POST(request: NextRequest) {
       // Send password reset email (this triggers Supabase's reset flow)
       // The reset will go to the system email, but we'll inform the user it was sent to the leader
       const { error: resetError } = await supabaseAuth.auth.resetPasswordForEmail(lgUser.email, {
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/en/reset-password`,
+        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/reset-password`,
       });
 
       if (resetError) {

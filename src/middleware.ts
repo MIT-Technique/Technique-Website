@@ -1,17 +1,10 @@
-import createMiddleware from "next-intl/middleware";
-import { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-const intlMiddleware = createMiddleware({
-  locales: ["en", "es", "zh"],
-  defaultLocale: "en",
-});
-
-export async function middleware(req: NextRequest) {
-  return intlMiddleware(req);
+export function middleware(_req: NextRequest) {
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: [
-    "/((?!api|_next|_vercel|.*\\..*).*)",
-  ],
+  matcher: ["/((?!api|_next|_vercel|.*\\..*).*)"],
 };
