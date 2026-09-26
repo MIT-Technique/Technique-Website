@@ -11,6 +11,7 @@ import Collapse from "@mui/material/Collapse";
 import { VscThreeBars, VscClose, VscChevronDown } from "react-icons/vsc";
 import OrganizationAuthModal from "../OrganizationAuthModal/OrganizationAuthModal";
 import { useUser } from "@/hooks/useUser";
+import { YEARBOOK_NAV_ITEMS } from "@/lib/siteConfig";
 
 function Sidebar({ pathname }) {
   const { isLoggedIn, user, club, sports, livingGroup, loading, logout } =
@@ -53,12 +54,9 @@ function Sidebar({ pathname }) {
   const isAboutActive = [`/about`, `/archives`, `/portfolio`, `/contact`].some(
     isActive,
   );
-  const isPurchaseActive = [
-    `/purchase`,
-    `/seniors`,
-    `/parents`,
-    `/alumni`,
-  ].some(isActive);
+  const isPurchaseActive = YEARBOOK_NAV_ITEMS.map((item) => item.href).some(
+    isActive,
+  );
   const isFormsActive = [
     `/login`,
     `/invoice`,
@@ -232,22 +230,18 @@ function Sidebar({ pathname }) {
             </ListItem>
             <Collapse in={openMenu === "purchase"} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
-                {[
-                  { href: `/purchase`, label: "PURCHASE", external: true },
-                  { href: `/seniors`, label: "SENIORS" },
-                  { href: `/parents`, label: "PARENTS" },
-                  { href: `/alumni`, label: "ALUMNI" },
-                ].map((item) => (
+                {YEARBOOK_NAV_ITEMS.map((item) => (
                   <ListItem key={item.href} disablePadding>
-                    <Link
-                      href={item.href}
-                      {...(item.external
-                        ? { target: "_blank", rel: "noopener noreferrer" }
-                        : {})}
-                      onClick={() => setIsOpen(false)}
-                      className="w-full"
-                    >
-                      <ListItemButton sx={{ pl: 6, py: 1 }}>
+                    {item.disabled ? (
+                      <ListItemButton
+                        disabled
+                        sx={{
+                          pl: 6,
+                          py: 1,
+                          opacity: 0.5,
+                          cursor: "not-allowed",
+                        }}
+                      >
                         <ListItemText
                           primary={item.label}
                           primaryTypographyProps={{
@@ -255,14 +249,37 @@ function Sidebar({ pathname }) {
                               fontSize: "0.7rem",
                               fontWeight: 400,
                               letterSpacing: "0.05em",
-                              color: isActive(item.href)
-                                ? "#750014"
-                                : mutedColor,
+                              color: mutedColor,
                             },
                           }}
                         />
                       </ListItemButton>
-                    </Link>
+                    ) : (
+                      <Link
+                        href={item.href}
+                        {...(item.external
+                          ? { target: "_blank", rel: "noopener noreferrer" }
+                          : {})}
+                        onClick={() => setIsOpen(false)}
+                        className="w-full"
+                      >
+                        <ListItemButton sx={{ pl: 6, py: 1 }}>
+                          <ListItemText
+                            primary={item.label}
+                            primaryTypographyProps={{
+                              sx: {
+                                fontSize: "0.7rem",
+                                fontWeight: 400,
+                                letterSpacing: "0.05em",
+                                color: isActive(item.href)
+                                  ? "#750014"
+                                  : mutedColor,
+                              },
+                            }}
+                          />
+                        </ListItemButton>
+                      </Link>
+                    )}
                   </ListItem>
                 ))}
               </List>

@@ -4,6 +4,7 @@ import Sidebar from "./Sidebar.jsx";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import AccountButton from "../AccountButton/AccountButton";
+import { YEARBOOK_NAV_ITEMS } from "@/lib/siteConfig";
 import "./Navbar.css";
 
 function Navbar() {
@@ -45,12 +46,7 @@ function Navbar() {
     },
     {
       label: "YEARBOOK",
-      dropdown: [
-        { href: `/purchase`, label: "PURCHASE", external: true },
-        { href: `/seniors`, label: "SENIORS" },
-        { href: `/parents`, label: "PARENTS" },
-        { href: `/alumni`, label: "ALUMNI" },
-      ],
+      dropdown: [...YEARBOOK_NAV_ITEMS],
     },
     {
       label: "FORMS",
@@ -208,26 +204,43 @@ function Navbar() {
                         </div>
                       ) : (
                         // Regular dropdown
-                        item.dropdown.map((subItem) => (
-                          <Link
-                            key={subItem.href}
-                            href={subItem.href}
-                            {...(subItem.external
-                              ? { target: "_blank", rel: "noopener noreferrer" }
-                              : {})}
-                            className={`block px-4 py-2 text-xs uppercase tracking-wider transition-colors ${
-                              isHomePage
-                                ? isActive(subItem.href)
-                                  ? "text-white bg-white/10"
-                                  : "text-white/70 hover:text-white hover:bg-white/10"
-                                : isActive(subItem.href)
-                                  ? "text-accent bg-accent/5"
-                                  : "text-text-secondary hover:text-text-primary hover:bg-bg-secondary"
-                            }`}
-                          >
-                            {subItem.label}
-                          </Link>
-                        ))
+                        item.dropdown.map((subItem) =>
+                          subItem.disabled ? (
+                            <span
+                              key={subItem.href}
+                              aria-disabled="true"
+                              className={`block px-4 py-2 text-xs uppercase tracking-wider opacity-50 cursor-not-allowed ${
+                                isHomePage
+                                  ? "text-white/40"
+                                  : "text-text-muted"
+                              }`}
+                            >
+                              {subItem.label}
+                            </span>
+                          ) : (
+                            <Link
+                              key={subItem.href}
+                              href={subItem.href}
+                              {...(subItem.external
+                                ? {
+                                    target: "_blank",
+                                    rel: "noopener noreferrer",
+                                  }
+                                : {})}
+                              className={`block px-4 py-2 text-xs uppercase tracking-wider transition-colors ${
+                                isHomePage
+                                  ? isActive(subItem.href)
+                                    ? "text-white bg-white/10"
+                                    : "text-white/70 hover:text-white hover:bg-white/10"
+                                  : isActive(subItem.href)
+                                    ? "text-accent bg-accent/5"
+                                    : "text-text-secondary hover:text-text-primary hover:bg-bg-secondary"
+                              }`}
+                            >
+                              {subItem.label}
+                            </Link>
+                          ),
+                        )
                       )}
                     </div>
                   </div>

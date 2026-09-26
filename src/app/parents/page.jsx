@@ -2,6 +2,10 @@
 import React from "react";
 import Footer from "@/components/Footer/Footer";
 import Link from "next/link";
+import {
+  YEARBOOK_PURCHASE_ENABLED,
+  YEARBOOK_PURCHASE_HREF,
+} from "@/lib/siteConfig";
 
 function ParentsPage() {
   return (
@@ -28,13 +32,23 @@ function ParentsPage() {
                     "Preorder yearbooks at a discounted price before the release date."
                   }
                 </p>
-                <Link
-                  href={`/purchase`}
-                  className="btn-primary inline-block"
-                  disabled
-                >
-                  {"Preorder Now"}
-                </Link>
+                {YEARBOOK_PURCHASE_ENABLED ? (
+                  <Link
+                    href={YEARBOOK_PURCHASE_HREF}
+                    className="btn-primary inline-block"
+                  >
+                    {"Preorder Now"}
+                  </Link>
+                ) : (
+                  <>
+                    <span className="btn-primary inline-block opacity-50 cursor-not-allowed pointer-events-none">
+                      {"Preorder Now"}
+                    </span>
+                    <p className="text-xs text-text-muted mt-2 pb-0">
+                      {"Preorder is currently closed."}
+                    </p>
+                  </>
+                )}
               </div>
 
               {/* Inquiries Card */}

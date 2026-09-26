@@ -3,6 +3,10 @@ import React from "react";
 import Footer from "@/components/Footer/Footer";
 import Image from "next/image";
 import Link from "next/link";
+import {
+  YEARBOOK_PURCHASE_ENABLED,
+  YEARBOOK_PURCHASE_HREF,
+} from "@/lib/siteConfig";
 
 function YearbookPage() {
   return (
@@ -52,20 +56,16 @@ function YearbookPage() {
             </div>
           </div>
 
-          {/* Preorder CTA */}
-          <div className="text-center mb-8">
-            <a
-              href="https://engage.mit.edu/technique/rsvp_boot?id=916938"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary"
-            >
-              {"Preorder Your Copy"}
-            </a>
-            <p className="text-sm text-text-muted mt-4">
-              {"Secure your yearbook at the discounted preorder price."}
-            </p>
-          </div>
+          {YEARBOOK_PURCHASE_ENABLED && (
+            <div className="text-center mb-8">
+              <Link href={YEARBOOK_PURCHASE_HREF} className="btn-primary">
+                {"Preorder Your Copy"}
+              </Link>
+              <p className="text-sm text-text-muted mt-4">
+                {"Secure your yearbook at the discounted preorder price."}
+              </p>
+            </div>
+          )}
         </section>
 
         {/* Info Section */}
@@ -115,18 +115,6 @@ function YearbookPage() {
         </section>
 
         {/* Forms Section */}
-        <section className="section container-text text-center">
-          <div className="divider-accent mb-8 mx-auto" />
-          <h3 className="mb-6">{"Get Featured"}</h3>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link
-              href={`/clubs`}
-              className="btn-secondary hover:!bg-accent hover:!border-accent"
-            >
-              {"Club Form"}
-            </Link>
-          </div>
-        </section>
       </main>
       <Footer />
     </>

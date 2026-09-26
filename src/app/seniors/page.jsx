@@ -1,11 +1,10 @@
 "use client";
 import React from "react";
-import Footer from '@/components/Footer/Footer';
+import Footer from "@/components/Footer/Footer";
 import Image from "next/image";
 import Link from "next/link";
 
 function SeniorsPage() {
-
   return (
     <>
       <main className="min-h-screen pt-24 lg:pt-32">
@@ -24,12 +23,12 @@ function SeniorsPage() {
             >
               {"Schedule Your Portrait"}
             </a>
-            <Link
+            {/* <Link
               href={`/bio`}
               className="px-6 py-3 text-sm border border-accent text-accent font-medium hover:bg-accent hover:text-white transition-colors"
             >
               {"SELF-SUBMISSIONS"}
-            </Link>
+            </Link> */}
           </div>
         </section>
 
@@ -38,7 +37,9 @@ function SeniorsPage() {
           <div className="divider-accent mb-6" />
           <h2 className="mb-4">{"Dress Code"}</h2>
           <p>
-            {"There is no dress code for senior portraits. You can show up in a suit, dress, or even your pajamas. We have even had students bring their instruments and pets. We recommend wearing something that you are comfortable being pictured in, since your image will likely be on shelves of your peers for decades to come."}
+            {
+              "There is no dress code for senior portraits. You can show up in a suit, dress, or even your pajamas. We have even had students bring their instruments and pets. We recommend wearing something that you are comfortable being pictured in, since your image will likely be on shelves of your peers for decades to come."
+            }
           </p>
 
           {/* Example Images */}
@@ -79,10 +80,14 @@ function SeniorsPage() {
           <div className="divider-accent mb-6" />
           <h2 className="mb-4">{"Senior Discount"}</h2>
           <p>
-            {"After your senior photo appointment, you will be able to order your yearbook for a special senior portrait only discounted price. This pricing only applies to seniors who attend their appointment."}
+            {
+              "After your senior photo appointment, you will be able to order your yearbook for a special senior portrait only discounted price. This pricing only applies to seniors who attend their appointment."
+            }
           </p>
           <p>
-            {"If you do not wish to get your senior portrait, you are still able to pre-order your yearbook at the pre-order discounted price on our order page."}
+            {
+              "If you do not wish to get your senior portrait, you are still able to pre-order your yearbook at the pre-order discounted price on our order page."
+            }
           </p>
         </section>
 

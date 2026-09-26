@@ -6,6 +6,10 @@ import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Link from "next/link";
+import {
+  YEARBOOK_PURCHASE_ENABLED,
+  YEARBOOK_PURCHASE_HREF,
+} from "@/lib/siteConfig";
 
 function ResourcesPage() {
   const [expanded, setExpanded] = useState(false);
@@ -21,18 +25,20 @@ function ResourcesPage() {
       questions: [
         {
           q: "When can I order the yearbook?",
-          a: (
+          a: YEARBOOK_PURCHASE_ENABLED ? (
             <>
               Yearbooks are typically available for preorder in the spring
               semester. Check{" "}
               <Link
-                href="/purchase"
+                href={YEARBOOK_PURCHASE_HREF}
                 className="text-accent hover:text-accent-hover"
               >
                 here
               </Link>{" "}
               for current availability and pricing.
             </>
+          ) : (
+            "Yearbooks are typically available for preorder in the spring semester. Preorder is currently closed; check the Yearbook page or contact technique@mit.edu for updates."
           ),
         },
         {

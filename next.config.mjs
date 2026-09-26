@@ -23,29 +23,9 @@ const nextConfig = {
   async redirects() {
     return [
       {
-        source: "/en",
-        destination: "/",
-        permanent: false,
-      },
-      {
-        source: "/en/:path*",
-        destination: "/:path*",
-        permanent: false,
-      },
-      {
         source: "/portrait",
         destination:
           "https://seniors.legacystudios.com/massachusetts-institute-technology-cambridge-ma/",
-        permanent: false,
-      },
-      {
-        source: "/es/:path*",
-        destination: "/:path*",
-        permanent: false,
-      },
-      {
-        source: "/zh/:path*",
-        destination: "/:path*",
         permanent: false,
       },
       {

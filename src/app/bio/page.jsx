@@ -245,7 +245,7 @@ export default function BioPage() {
     { name: "Chemistry", course: "5" },
     { name: "Chemistry and Biology", course: "5-7" },
     { name: "Electrical Science and Engineering", course: "6-1" },
-    { name: "Electrical Engineering and Computer Science", course: "6-P" },
+    { name: "Electrical Engineering and Computer Science", course: "6-P " },
     { name: "Electrical Engineering and Computer Science", course: "6-2" },
     { name: "Electrical Engineering and Computer Science", course: "6-2A" },
     { name: "Computer Science and Engineering", course: "6-3" },
@@ -608,7 +608,7 @@ export default function BioPage() {
                   </div>
 
                   {/* Photo Preference + Upload Section */}
-                  <div className="mt-4 mb-2">
+                  {/* <div className="mt-4 mb-2">
                     <p className="text-sm font-medium text-text-secondary mb-2">
                       {"Senior Photo"}
                     </p>
@@ -674,7 +674,7 @@ export default function BioPage() {
                         />
                       </>
                     )}
-                  </div>
+                  </div> */}
 
                   <Button
                     type="submit"
