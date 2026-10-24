@@ -9,17 +9,19 @@ import { isFormEffectivelyClosed } from "../../../lib/utils/formStatus";
 const SENIOR_BIO_SELECT =
   "first_name, last_name, major, minor, second_major, quote, achievements, photo_preference";
 
+function seniorBioEmailLookupVariants(sessionEmail: string): string[] {
+  const trimmed = sessionEmail.trim();
+  const at = trimmed.indexOf("@");
+  const kerb = (at >= 0 ? trimmed.slice(0, at) : trimmed).toLowerCase();
+  return [`${kerb}@MIT.EDU`, `${kerb}@mit.edu`];
+}
+
 /** Try kerberos@MIT.EDU first, then kerberos@mit.edu (DB casing varies). */
 async function fetchSeniorBioBySessionEmail(
   supabase: ReturnType<typeof createAdminClientForSeniors>,
   sessionEmail: string,
 ) {
-  const trimmed = sessionEmail.trim();
-  const at = trimmed.indexOf("@");
-  const kerb = (at >= 0 ? trimmed.slice(0, at) : trimmed).toLowerCase();
-  const lookupEmails = [`${kerb}@MIT.EDU`, `${kerb}@mit.edu`];
-
-  for (const lookupEmail of lookupEmails) {
+  for (const lookupEmail of seniorBioEmailLookupVariants(sessionEmail)) {
     const { data: bio } = await supabase
       .from("senior_bios")
       .select(SENIOR_BIO_SELECT)
@@ -28,6 +30,26 @@ async function fetchSeniorBioBySessionEmail(
 
     if (bio) {
       return bio;
+    }
+  }
+
+  return null;
+}
+
+/** Email column value for an existing row, if any (preserves @MIT.EDU vs @mit.edu). */
+async function findExistingSeniorBioEmailKey(
+  supabase: ReturnType<typeof createAdminClientForSeniors>,
+  sessionEmail: string,
+): Promise<string | null> {
+  for (const lookupEmail of seniorBioEmailLookupVariants(sessionEmail)) {
+    const { data } = await supabase
+      .from("senior_bios")
+      .select("email")
+      .eq("email", lookupEmail)
+      .maybeSingle();
+
+    if (data?.email) {
+      return data.email;
     }
   }
 
@@ -165,10 +187,16 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
 
     const supabase = createAdminClientForSeniors();
 
-    // Upsert senior bio by email
+    const existingEmailKey = await findExistingSeniorBioEmailKey(
+      supabase,
+      normalizedEmail,
+    );
+    const upsertEmail = existingEmailKey ?? normalizedEmail;
+
+    // Upsert senior bio by email (match existing DB key when present)
     const { error: bioError } = await supabase.from("senior_bios").upsert(
       {
-        email: normalizedEmail,
+        email: upsertEmail,
         first_name: firstName,
         last_name: lastName,
         major: major || null,
