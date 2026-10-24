@@ -6,6 +6,34 @@ import {
 } from "../../../lib/supabase/admin";
 import { isFormEffectivelyClosed } from "../../../lib/utils/formStatus";
 
+const SENIOR_BIO_SELECT =
+  "first_name, last_name, major, minor, second_major, quote, achievements, photo_preference";
+
+/** Try kerberos@MIT.EDU first, then kerberos@mit.edu (DB casing varies). */
+async function fetchSeniorBioBySessionEmail(
+  supabase: ReturnType<typeof createAdminClientForSeniors>,
+  sessionEmail: string,
+) {
+  const trimmed = sessionEmail.trim();
+  const at = trimmed.indexOf("@");
+  const kerb = (at >= 0 ? trimmed.slice(0, at) : trimmed).toLowerCase();
+  const lookupEmails = [`${kerb}@MIT.EDU`, `${kerb}@mit.edu`];
+
+  for (const lookupEmail of lookupEmails) {
+    const { data: bio } = await supabase
+      .from("senior_bios")
+      .select(SENIOR_BIO_SELECT)
+      .eq("email", lookupEmail)
+      .maybeSingle();
+
+    if (bio) {
+      return bio;
+    }
+  }
+
+  return null;
+}
+
 // GET - Fetch senior bio by email
 export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
@@ -38,15 +66,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
 
     const supabase = createAdminClientForSeniors();
-    console.log(`EMAIL!!\n${JSON.stringify(email, null, 2)}`);
-    const { data: bio } = await supabase
-      .from("senior_bios")
-      .select(
-        "first_name, last_name, major, minor, second_major, quote, achievements, photo_preference",
-      )
-      .eq("email", email)
-      .single();
-
+    const bio = await fetchSeniorBioBySessionEmail(supabase, email);
     console.log(`BIO!!\n${JSON.stringify(bio, null, 2)}`);
     return NextResponse.json(
       {
