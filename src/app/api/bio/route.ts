@@ -15,7 +15,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       console.log(`Unauthorized!!\n${JSON.stringify(session, null, 2)}`);
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    console.log(`INPUT!!\n${JSON.stringify(session, null, 2)}`)
+    console.log(`INPUT!!\n${JSON.stringify(session, null, 2)}`);
     const email = session?.userInfo.sub;
 
     if (!email) {
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
 
     const supabase = createAdminClientForSeniors();
-
+    console.log(`EMAIL!!\n${JSON.stringify(email, null, 2)}`);
     const { data: bio } = await supabase
       .from("senior_bios")
       .select(
@@ -47,6 +47,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       .eq("email", email)
       .single();
 
+    console.log(`BIO!!\n${JSON.stringify(bio, null, 2)}`);
     return NextResponse.json(
       {
         data: {
