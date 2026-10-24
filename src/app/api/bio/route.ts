@@ -15,6 +15,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       console.log(`Unauthorized!!\n${JSON.stringify(session, null, 2)}`);
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+    console.log(`INPUT!!\n${JSON.stringify(session, null, 2)}`)
     const email = session?.userInfo.sub;
 
     if (!email) {
